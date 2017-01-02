@@ -226,8 +226,17 @@ class TraitsTraitsController extends TraitsController
 			$this->redirect('traitgroup_traits.php?group='.$group['id']);
 		}
 
+		if (count($this->getProjectDatatypes())==0)
+		{
+			$this->addError(
+				$this->translate('No trait datatypes have been added to your project.').' '.
+				'<a href="project_types.php">'. $this->translate('Add datatypes now.').'</a>'
+			);
+			$this->smarty->assign('cantSave',true);
+		}
+
 		$this->smarty->assign('languages',$this->getProjectLanguages());
-		$this->smarty->assign('datatypes',$this->getDatatypes());
+		$this->smarty->assign('datatypes',$this->getProjectDatatypes());
 		$this->smarty->assign('dateformats',$this->getDateFormats());
 		$this->smarty->assign('group',$group);
 		$this->smarty->assign('trait',$trait);
@@ -298,6 +307,14 @@ class TraitsTraitsController extends TraitsController
 	private function getDatatypes()
 	{
 		return $this->models->TraitsTraitsModel->getDatatypes(array(
+			"language_id"=>$this->getDefaultProjectLanguage(),
+			"project_id"=>$this->getCurrentProjectId()
+		));
+	}
+
+	private function getProjectDatatypes()
+	{
+		return $this->models->TraitsTraitsModel->getProjectDatatypes(array(
 			"language_id"=>$this->getDefaultProjectLanguage(),
 			"project_id"=>$this->getCurrentProjectId()
 		));
