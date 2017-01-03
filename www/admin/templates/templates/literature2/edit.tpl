@@ -190,7 +190,7 @@ function saveLitForm()
 
 
 	<tr>
-    	<th title="{t}volume or issue nummber between brackets, e.g. 53(1){/t}">{t}volume:{/t}</th>
+    	<th title="{t}volume, with issue number between brackets, e.g. 53(1){/t}">{t}volume:{/t}</th>
         <td><input class="small" type="text" name="volume" value="{$reference.volume}" /></td>
 	</tr>
 	<tr>
