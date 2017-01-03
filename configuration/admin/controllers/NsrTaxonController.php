@@ -1116,33 +1116,34 @@ class NsrTaxonController extends NsrController
 			$error=array('classis','subclassis');
 		}
 		else
-		if ($ranks[$child_base_rank]['rank']=='subclassis' && $ranks[$parent_base_rank]['rank']!='classis')
+		if ($child_base_rank==SUBCLASSIS_RANK_ID && $parent_base_rank!=CLASSIS_RANK_ID)
 		{
 			// subklasse moet onder klasse
 			$error=array('classis');
 		}
 		else
-		if (($ranks[$child_base_rank]['rank']=='classis' && $ranks[$parent_base_rank]['rank']!='subphylum') &&
-			($ranks[$child_base_rank]['rank']=='classis' && $ranks[$parent_base_rank]['rank']!='phylum'))
+		if (($child_base_rank==CLASSIS_RANK_ID && $parent_base_rank!=SUPERCLASSIS_RANK_ID) &&
+			($child_base_rank==CLASSIS_RANK_ID && $parent_base_rank!=SUBPHYLUM_RANK_ID) &&
+			($child_base_rank==CLASSIS_RANK_ID && $parent_base_rank!=PHYLUM_RANK_ID))
 		{
-			// klasse moet onder subphylum of phylum
-			$error=array('subphylum','phylum');
+			// klasse moet onder superclassis, subphylum of phylum
+			$error=array('superclassis','subphylum','phylum');
 		}
 		else
-		if ($ranks[$child_base_rank]['rank']=='subphylum' && $ranks[$parent_base_rank]['rank']!='phylum')
+		if ($child_base_rank==SUBPHYLUM_RANK_ID && $parent_base_rank!=PHYLUM_RANK_ID)
 		{
 			// subphylum moet onder phylum
 			$error=array('phylum');
 		}
 		else
-		if (($ranks[$child_base_rank]['rank']=='phylum' && $ranks[$parent_base_rank]['rank']!='subregnum') &&
-			($ranks[$child_base_rank]['rank']=='phylum' && $ranks[$parent_base_rank]['rank']!='regnum'))
+		if (($child_base_rank==PHYLUM_RANK_ID && $parent_base_rank!=SUBREGNUM_RANK_ID) &&
+			($child_base_rank==PHYLUM_RANK_ID && $parent_base_rank!=REGNUM_RANK_ID))
 		{
 			// phylum moet moet onder subrijk of rijk
 			$error=array('subregnum','regnum');
 		}
 		else
-		if ($ranks[$child_base_rank]['rank']=='subregnum' && $ranks[$parent_base_rank]['rank']!='regnum')
+		if ($child_base_rank==SUBREGNUM_RANK_ID && $parent_base_rank!=REGNUM_RANK_ID)
 		{
 			// subrijk moet onder rijk
 			$error=array('regnum');
