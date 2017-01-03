@@ -75,7 +75,8 @@ class Literature2Controller extends Controller
 
 		$ref=$this->getReference( $this->rGetId() );
 
-		$this->setPageName($ref['label'].', '.$ref['source']);
+		//$this->setPageName($ref['label'].', '.$ref['source']);
+		$this->setPageName($ref['label']);
 
 		$this->smarty->assign( 'ref', $ref );
 		$this->smarty->assign( 'taxa', $this->getReferencedTaxa( $this->rGetId() ) );

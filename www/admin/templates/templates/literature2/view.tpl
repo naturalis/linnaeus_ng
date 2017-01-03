@@ -49,9 +49,8 @@
 			{/foreach}
 		</td>
 	</tr>
-	<tr><th>{t}citatie:{/t}</th><td>{$reference.citation}</td></tr>
-	<tr><th>{t}bron:{/t}</th><td>{$reference.source}</td></tr>
-
+    {* <tr><th>{t}citatie:{/t}</th><td>{$reference.citation}</td></tr> *}
+	{* <tr><th>{t}bron:{/t}</th><td>{$reference.source}</td></tr> *}
 	<tr>
 		<th>gepubliceerd in:</th>
 		<td>

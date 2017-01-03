@@ -31,9 +31,11 @@
                 {if $v.data.volume}{$v.data.volume}{/if}{if $v.data.pages}: {$v.data.pages}. {/if}
                 {if $v.data.publisher}{$v.data.publisher}.{/if}      
                 </a></li>
-			{elseif $v.predicate=='hasReference' && $v.data.citation!=''}
-			{assign var=hasReferences value=hasReferences+1}
-			<li><a href="../literature2/reference.php?id={$v.data.id}">{$v.data.citation}</a></li>
+            {*
+                {elseif $v.predicate=='hasReference' && $v.data.citation!=''}
+                {assign var=hasReferences value=hasReferences+1}
+                <li><a href="../literature2/reference.php?id={$v.data.id}">{$v.data.citation}</a></li>
+            *}
 			{/if}
 		{/foreach}
 		{/capture}

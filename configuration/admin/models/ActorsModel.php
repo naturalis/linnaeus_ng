@@ -274,8 +274,8 @@ final class ActorsModel extends AbstractModel
             select
 				distinct
 				_b.id,
-				_b.label,
-				_b.citation
+				_b.label
+
 			from
 				%PRE%literature2_authors _a
 

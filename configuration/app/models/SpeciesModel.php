@@ -1384,8 +1384,6 @@ class SpeciesModel extends AbstractModel
 				_a.date,
 				_a.author,
 				_a.publication_type,
-				_a.citation,
-				_a.source,
 				ifnull(_a.publishedin,ifnull(_h.label,null)) as publishedin,
 				ifnull(_a.periodical,ifnull(_i.label,null)) as periodical,
 				_a.pages,

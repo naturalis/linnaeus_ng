@@ -66,8 +66,7 @@ final class TraitsTaxonModel extends AbstractModel
 			select
 				_ttr.id,
 				_a.id as literature_id,
-				_a.label,
-				_a.citation
+				_a.label
 			
 			from %PRE%literature2 _a
 			

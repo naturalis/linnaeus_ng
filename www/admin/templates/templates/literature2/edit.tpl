@@ -138,8 +138,8 @@ function saveLitForm()
             <!-- verbatim: {$reference.publication_type} -->
 		</td>
 	</tr>
-	<tr><th>{t}citation{/t}:</th><td><input class="large" type="text" name="citation" value="{$reference.citation|@escape}" /></td></tr>
-	<tr><th>{t}source{/t}:</th><td><input class="medium" type="text" name="source" value="{$reference.source|@escape}" /></td></tr>
+	{* <tr><th>{t}citation{/t}:</th><td><input class="large" type="text" name="citation" value="{$reference.citation|@escape}" /></td></tr> *}
+	{* <tr><th>{t}source{/t}:</th><td><input class="medium" type="text" name="source" value="{$reference.source|@escape}" /></td></tr> *}
 
 	<tr>
 		<th title="{t}use this field for parts/chapters of books and sections of websites.{/t}">{t}published in{/t}:</th>
