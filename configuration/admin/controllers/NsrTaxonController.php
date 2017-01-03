@@ -282,6 +282,8 @@ class NsrTaxonController extends NsrController
 			$this->checkAuthorisation();
 
 			$this->setNameId($this->rGetId());
+			
+			$this->updateName();
 
 			if ($this->needParentChange()!=false && $this->canParentChange()!=false)
 			{
@@ -291,7 +293,6 @@ class NsrTaxonController extends NsrController
 			}
 			else
 			{
-				$this->updateName();
 				$this->updateConceptBySciName();
 				$this->doNameIntegrityChecks($this->getName(array('id'=>$this->getNameId())));
 			}
