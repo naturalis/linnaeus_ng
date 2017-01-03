@@ -521,7 +521,7 @@ final class SearchNSRModel extends AbstractModel
 		;
 
 		$data=$this->freeQuery( $query );
-	
+
 		$count=$this->freeQuery( "select found_rows() as total" );
 
 		return array('data'=>$data,'count'=>$count[0]['total']);
@@ -1657,6 +1657,7 @@ final class SearchNSRModel extends AbstractModel
 					left join %PRE%traits_traits _tt
 						on _tv.project_id = _tt.project_id
 						and _tv.trait_id = _tt.id
+						and _tt.trait_group_id=".$group."
 		
 					left join %PRE%traits_taxon_freevalues _ttf
 						on _a.project_id = _ttf.project_id
@@ -1665,9 +1666,8 @@ final class SearchNSRModel extends AbstractModel
 					left join %PRE%traits_traits _tt2
 						on _ttf.project_id = _tt2.project_id
 						and _ttf.trait_id = _tt2.id
+						and _tt2.trait_group_id=".$group."
 					",
-				"where"=> "
-					and ( _tt.trait_group_id=".$group."  or _tt2.trait_group_id=".$group.")",
 				"having"=>
 					"having count(_ttv.id)+count(_ttf.id) > 0"
 			 ];
