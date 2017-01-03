@@ -4,6 +4,7 @@
 		<input type="hidden" id="group_id" name="group_id" value="{$search.group_id}">
 		<fieldset class="block">
 
+			{*
 			<div class="formrow">
 				<label accesskey="g" for="name">
 					{t}Soortnaam{/t}
@@ -17,10 +18,11 @@
 				</div>
 				<div id="name_suggestion" class="suggestion" match="like" class="auto_complete" style="display: none;"></div>
 			</div>
+            *}
 
 			<div class="formrow">
 				<label accesskey="g" for="group">
-					{t}Soortgroep{/t}
+					{t}Soort(groep){/t}
                     <i class="ion-chevron-down down"></i>
                     <i class="ion-chevron-up up"></i>
 				</label>
