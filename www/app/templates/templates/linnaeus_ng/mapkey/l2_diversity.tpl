@@ -1,9 +1,5 @@
-{include file="../shared/header.tpl"}
 {assign var=currentPage value=$session.app.system.path.filename}
-
-
-
-{include file="../shared/header.tpl" title="Distribution"}
+{include file="../shared/header.tpl" title="Distribution" subtitle="Please note, the distribution module is being phased out"}
 
 {include file="_categories.tpl"}
 
@@ -102,7 +98,6 @@
 	</tr>
 </table>
 
-{include file="_phased-out.tpl"}
 
 
 </div>

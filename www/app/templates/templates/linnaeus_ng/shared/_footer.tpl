@@ -39,9 +39,7 @@
 $(document).ready(function()
 {
 	// Apply prettyDialog behaviour to items with inline-image class
-	$('.fancy-box').fancybox({
-		nextClick: true
-	});
+	$('.fancy-box').fancybox();
 
 	$(".inline-video").each(function()
 	{

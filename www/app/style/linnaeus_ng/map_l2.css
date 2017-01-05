@@ -9,10 +9,6 @@
   background-color: #f9f9f7; }
 
 #mapName {
-  height: 0;
-  overflow: display;
-  position: relative;
-  top: -362px;
   width: 200px;
   font-family: Arial, sans-serif; }
 
@@ -76,12 +72,7 @@
 .cellwrapper {
   position: relative; }
 
-#mapName {
-  padding: 0.5em 1em;
-  position: absolute;
-  top: 0;
-  left: 0;
-  margin-top: -35px; }
+
   #mapName span {
     display: block;
     border: 1px solid #cccccc;
@@ -103,7 +94,8 @@
 #mapTable {
   outline: 1px solid #000;
   visibility: hidden;
-  margin-top: 30px; }
+  margin-top: 1px;
+  margin-bottom: 1px; }
 
 #mapTable td {
   padding: 0;
@@ -189,8 +181,8 @@
 
 #speciesNameA, #speciesNameB {
   font-family: Arial, sans-serif;
-  font-size: 12px;
-  margin-right: 2em; }
+  font-size: 12px; 
+}
 
 .selectIcon {
   color: #009ee0;

@@ -1,11 +1,5 @@
-{include file="../shared/header.tpl"}
 {assign var=currentPage value=$session.app.system.path.filename}
-
-<div id="titles">
-    <span id="header-title">
-        {t}Distribution{/t}
-    </span>
-</div>
+{include file="../shared/header.tpl" title="Distribution"}
 
 {include file="_categories.tpl"}
 
@@ -25,8 +19,6 @@
         <td id="gridMapCell" class="searchMap"> 
 
             <div class="cellwrapper">
-
-
         		{if $map.mapExists}
         			<table id="mapTable">
         			{assign var=cellNo value=1}
