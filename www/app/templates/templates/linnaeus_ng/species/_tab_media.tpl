@@ -58,7 +58,7 @@
 					</a>
 				{else}
 					{if $v.category == 'image'}
-						<a href="{$smarty.capture.fullImgUrl}" title="{$v.file_name}" class="fancy-box" alt="{$v.description}">
+						<a href="{$smarty.capture.fullImgUrl}" title="{$v.file_name} <br />test" class="fancy-box" alt="{$v.description}">
 						<img src="{$smarty.capture.fullImgUrl}" alt="{$v.description}" id="media-{$k}" class="image-full" />
 						</a><br/>
 						{$name}
