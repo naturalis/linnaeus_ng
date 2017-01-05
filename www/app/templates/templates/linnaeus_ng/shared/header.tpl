@@ -1,7 +1,7 @@
 {include file="../shared/_head.tpl"}
 {include file="../shared/_body-start.tpl"}
 {if $title}
-<div class="page-title">
+<div class="page-title set-as-title">
 	{$title}
 </div>
 {/if}
