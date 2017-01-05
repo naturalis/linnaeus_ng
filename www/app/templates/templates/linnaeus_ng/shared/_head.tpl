@@ -20,7 +20,7 @@
 {/foreach}
 {/if}
 	<link rel="stylesheet" type="text/css" href="{$baseUrl}app/style/css/orchids.css">
-	<link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/jquery.fancybox.css" />
+	<link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/fancybox2/jquery.fancybox.css" />
     <link type="text/css" rel="stylesheet" href="//code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" media="all">
 	<link rel="stylesheet" type="text/css" media="print" href="{$projectUrls.projectCSS}print.css" />
 
@@ -43,7 +43,7 @@
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.shrinkText.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.prettyDialog.js"></script>
     <script type="text/javascript" src="{$baseUrl}app/javascript/inline_templates.js"></script>
-    <script type="text/javascript" src="{$baseUrl}app/javascript/jquery.fancybox.pack.js"></script>
+    <script type="text/javascript" src="{$projectUrls.projectCSS}../css/fancybox2/jquery.fancybox.pack.js"></script>
 
 
 {if $javascriptsToLoad}
