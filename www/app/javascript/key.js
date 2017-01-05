@@ -49,9 +49,10 @@ var keyListAttr='name_sci';
 
 function keyCompare(a,b)
 {
-	var x=$(a).attr(keyListAttr).replace( /<.*?>/g,'').toLowerCase();
-	var y=$(b).attr(keyListAttr).replace( /<.*?>/g,'').toLowerCase();
-	return x<y ? -1 : x>y ? 1 : 0;
+	console.log(keyListAttr);
+	// var x=$(a).attr(keyListAttr).replace( /<.*?>/g,'').toLowerCase();
+	// var y=$(b).attr(keyListAttr).replace( /<.*?>/g,'').toLowerCase();
+	// return x<y ? -1 : x>y ? 1 : 0;
 }
 
 function keyListsort(list)
@@ -73,7 +74,7 @@ function keyListsort(list)
 }
 
 function keyNameswitch(ele)
-{
+{ 
 	keyListAttr=$(ele).attr('data-type');
 
 	$('.taxon-links').each(function(){
@@ -83,7 +84,6 @@ function keyNameswitch(ele)
 	
 	keyListsort('ul-remaining');
 	keyListsort('ul-excluded');
-	
 	$("[data-type=name_common]").toggle(true);
 	$("[data-type=name_sci]").toggle(true);
 	$("[data-type="+keyListAttr+"]").toggle(false);

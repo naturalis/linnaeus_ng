@@ -43,11 +43,13 @@
 				{assign var=w value=taxa}
 			{/if}
 			<p id="header">
-				{t _s1=$remaining|@count _s2=$w}%s possible %s remaining{/t}<br />
+				<span class="remaining-count">
+					{t _s1=$remaining|@count _s2=$w}%s possible %s remaining{/t}
+				</span>
 				<a href="#" class="name_switch" data-type="name_sci" style="display:none" onclick="keyNameswitch(this);return false;";>
 					{t}show scientific names{/t}
 				</a>
-				<a href="#" class="name_switch" data-type="name_common" style="display:inline" onclick="keyNameswitch(this);return false;">
+				<a href="#" class="name_switch" data-type="name_common" style="display:block" onclick="keyNameswitch(this);return false;">
 					{t}show common names{/t}
 				</a>
 			</p>
@@ -68,11 +70,13 @@
 				{assign var=w value=taxa}
 			{/if}
 			<p id="header">
-				{t _s1=$excluded|@count _s2=$w}%s %s excluded{/t}<br />
+				<span class="remaining-count">
+					{t _s1=$excluded|@count _s2=$w}%s %s excluded{/t}<br />
+				</span>
 				<a href="#" class="name_switch" data-type="name_sci" style="display:none" onclick="keyNameswitch(this);return false;";>
 					{t}show scientific names{/t}
 				</a>
-				<a href="#" class="name_switch" data-type="name_common" style="display:inline" onclick="keyNameswitch(this);return false;">
+				<a href="#" class="name_switch" data-type="name_common" style="display:block" onclick="keyNameswitch(this);return false;">
 					{t}show common names{/t}
 				</a>
 			</p>
