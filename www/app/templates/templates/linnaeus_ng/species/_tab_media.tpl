@@ -20,7 +20,7 @@
 			<div class="media-cell media-type-{$v.category}" id="media-cell-{$k}">
 				{if $v.rs_id == ''}
 					<a
-					rel="prettyPhoto[gallery]"
+					rel="fancybox"
 					class="image-wrap "
 					title="{$v.description}"
 					href="{$smarty.capture.fullImgUrl}"
@@ -63,7 +63,7 @@
 						</a><br/>
 						{$name}
 					{else if $v.category == 'audio' or $v.category == 'video'}
-						<a href="#inline-media-{$k}" class="fancy-box fancy-box-video"><i class="ion-ios-videocam"></i></a>
+						<a href="#inline-media-{$k}" rel="fancybox" class="fancy-box fancy-box-video"><i class="ion-ios-videocam"></i></a>
 						<div id="inline-media-{$k}" style="display: none;">
 							<{$v.category} src="{$smarty.capture.fullImgUrl}" alt="{$v.description}" id="media-{$k}" controls
 								{if $v.width != '' && $v.height != ''}style="width: {$v.width}px; height: {$v.height}px;"{/if}/>
