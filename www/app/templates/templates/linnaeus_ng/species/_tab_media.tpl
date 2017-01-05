@@ -22,9 +22,9 @@
 					<a
 					rel="prettyPhoto[gallery]"
 					class="image-wrap "
-					title="{$v.file_name}"
+					title="{$v.description}"
 					href="{$smarty.capture.fullImgUrl}"
-					alt="{$v.description}">
+					alt="">
 					{if $v.category=='image'}
 						<div>
 							<img
@@ -58,7 +58,7 @@
 					</a>
 				{else}
 					{if $v.category == 'image'}
-						<a href="{$smarty.capture.fullImgUrl}" title="{$v.file_name} <br />test" class="fancy-box" alt="{$v.description}">
+						<a href="{$smarty.capture.fullImgUrl}" title="{$v.description}" class="fancy-box" alt="">
 						<img src="{$smarty.capture.fullImgUrl}" alt="{$v.description}" id="media-{$k}" class="image-full" />
 						</a><br/>
 						{$name}
