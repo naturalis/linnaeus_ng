@@ -8,7 +8,7 @@
 		{if !$map.mapExists}
 		    <div>{t _s1=$map.name}The image file for the map "%s" is missing.{/t}</div>
 		{else}
-			<a id="taxonName" class="selectIcon selectRight" href="../species/taxon.php?id={$taxon.id}"
+			<a id="taxonName" href="../species/taxon.php?id={$taxon.id}"
 			        	title="{t}Go to this taxon{/t}">
 			        {$taxon.taxon}</a>
 			<div class="map-legend-container">
