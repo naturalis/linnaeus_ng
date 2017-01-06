@@ -53,22 +53,24 @@
                     <div id="legend">
                         {foreach from=$geoDataTypes key=k item=v name=x}
                         <div class="mapPCheckbox">
-                            <label>
+                            <label class="checkbox-input">
                                 <input type="checkbox" 
                                     name="dataTypes[]" 
                                     {if $selectedDataTypes[$v.id]==true || $didSearch==false}checked="checked"{/if}  value="{$v.id}" />
+                                <span class="mock-checkbox"></span>
                                 {$v.title}
                             </label>
                         </div>
                         {/foreach}
+                        <p style="margin-bottom: 8px;">{t}Select the area you want to search by clicking the relevant squares.{/t}</p>
+                        <p>{t}When finished, click 'Search'.{/t}</p>
+                        <div class="map_controls">
+                            <input type="button" value="{t}Search{/t}" onclick="l2DoSearchMap()" />&nbsp;
+                            <input type="button" value="{t}Clear map{/t}" onclick="l2DoClearSearch()" />
+                            <input type="hidden" name="mapId" value="{$mapId}" />
+                        </div>
                     </div>
-                    <p style="margin-bottom: 8px;">{t}Select the area you want to search by clicking the relevant squares.{/t}</p>
-                    <p>{t}When finished, click 'Search'.{/t}</p>
-                    <div class="map_controls">
-                        <input type="button" value="{t}Search{/t}" onclick="l2DoSearchMap()" />&nbsp;
-                        <input type="button" value="{t}Clear map{/t}" onclick="l2DoClearSearch()" />
-                        <input type="hidden" name="mapId" value="{$mapId}" />
-                    </div>
+                    
                 </div>
             </div>
         </form>

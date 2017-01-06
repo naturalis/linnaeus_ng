@@ -775,8 +775,10 @@ label.checkbox-input
 .map-legend-container
 	display: flex
 	margin-top: 15px
+	@media screen and (max-width: 650px)
+		flex-direction: column
 	.map
-		width: 574px
+		flex-grow: 1
 	#legend
 		font-size: 12px
 		p
@@ -805,8 +807,20 @@ label.checkbox-input
 	#mapTable
 		flex-grow: 1
 		height: 100%!important
-		background-size: cover
+		background-size: cover!important
 		width: 100%!important
+	.legend-container
+		width: 150px
+		flex-grow: 0
+		flex-shrink: 0
+		@media screen and (max-width: 650px)
+			width: 100%
+			margin-top: 20px
+	.mapCheckbox
+		margin-bottom: 10px
+		label
+			display: flex
+			padding-left: 0!important
 
 
 .subtitle
