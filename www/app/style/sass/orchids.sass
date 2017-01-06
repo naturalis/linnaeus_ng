@@ -769,13 +769,46 @@ label.checkbox-input
 	white-space: wrap
 	margin-top: 5px
 
+.map-page
+	width: 100%
+
 .map-legend-container
 	display: flex
 	margin-top: 15px
+	.map
+		width: 574px
 	#legend
 		font-size: 12px
 		p
 			margin-bottom: 15px
+		.mapCellLegend
+			height: 10px
+			width: 10px
+			display: block
+	#mapName
+		display: flex
+		margin-bottom: 15px
+		align-items: center
+		justify-content: space-between
+	.mapContainer
+		position: absolute
+		left: 0
+		padding: 1px
+		right: 0
+		bottom: 0
+		top: 0
+		display: flex
+		flex-direction: column
+	.map-padding
+		position: relative
+		padding-top: 62.7%
+	#mapTable
+		flex-grow: 1
+		height: 100%!important
+		background-size: cover
+		width: 100%!important
+
+
 .subtitle
 	display: block
 	color: #000

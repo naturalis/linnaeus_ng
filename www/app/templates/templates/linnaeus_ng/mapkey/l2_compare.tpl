@@ -1,11 +1,11 @@
 {assign var=currentPage value=$session.app.system.path.filename}
-{include file="../shared/header.tpl" title="Distribution"}
+{include file="../shared/header.tpl" title="Distribution" subtitle="Please note, the distribution module is being phased out"}
 
 
 {assign var=map value=$maps[$mapId]}
 
 <div id="page-main">
-    <div>
+    <div class="map-page">
         {include file="_categories.tpl"}
 
         {if !$map.mapExists}
@@ -16,31 +16,35 @@
                 <div class="map">
                     <div id="mapName">
                         {if $maps|@count>1}
-                            <span class="selectIcon" title="{t}Select a different map{/t}" onclick="
-                                showDialog('{t}Choose a map{/t}',
-                                '<div id=\'lookup-DialogContent\'>'+
-                                    {foreach item=v from=$maps}'<p class=\'row{if $v.id==$mapId} row-selected{/if}\'><a href=?id={$taxon.id}&m={$v.id}>{$v.name|escape:'htmlall'}{if $v.id!=$mapId}</a>{/if}</p>'+
-                                    {/foreach}' ' + '</div>',
-                                    false, true
-                                );">{$map.name}</span>
+                            <select id="map-select">
+                                {foreach item=v from=$maps}
+                                <option {if $v.id==$mapId}selected="selected"{/if} value="?id={$taxon.id}&m={$v.id}">
+                                    {$v.name|escape:'htmlall'}
+                                </option>
+                                {/foreach}
+                            </select>
                         {else}
                             {$map.name}
                         {/if}
+                        <div id="coordinates"></div>
                     </div>
                     {if $map.mapExists}
-                        <table id="mapTable">
-                        {assign var=cellNo value=1}
-                        {section name=rows start=1 loop=$map.rows+1 step=1}
-                            <tr>
-                            {section name=cols start=1 loop=$map.cols+1 step=1}
-                                <td id="cell-{$cellNo}" datatype="{$occurrences[$cellNo].type_id}" class="mapCell mapCell{$overlap[$cellNo]}"></td>
-                                {assign var=cellNo value=$cellNo+1}
-                            {/section}
-                            </tr>
-                        {/section}
-                        </table>
+                        <div class="map-padding">
+                            <div class="mapContainer">
+                                <table id="mapTable">
+                                {assign var=cellNo value=1}
+                                {section name=rows start=1 loop=$map.rows+1 step=1}
+                                    <tr>
+                                    {section name=cols start=1 loop=$map.cols+1 step=1}
+                                        <td id="cell-{$cellNo}" datatype="{$occurrences[$cellNo].type_id}" class="mapCell mapCell{$overlap[$cellNo]}"></td>
+                                        {assign var=cellNo value=$cellNo+1}
+                                    {/section}
+                                    </tr>
+                                {/section}
+                                </table>
+                            </div>
+                        </div>
                     {/if}
-                    <div id="coordinates"></div>
                 </div>
                 <div class="legend-container">
                     <div id="legend">
@@ -96,10 +100,10 @@
             </div>
             
         </form>
-
+        {/if}
     </div>
 </div>
-{/if}
+<script type="text/javascript" src="{$baseUrl}app/javascript/map.js"></script>
 
 {include file="_mapJquery-start.tpl"}
 {include file="_mapJquery-end.tpl"}
