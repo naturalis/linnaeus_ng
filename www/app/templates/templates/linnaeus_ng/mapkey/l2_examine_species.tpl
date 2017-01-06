@@ -63,10 +63,10 @@
 							</label>
 						</div>
 						{/foreach}
+						<p>
+							<a id="toggleGrid" href="#" onclick="l2ToggleGrid(this);"><span style="display:block">{t}Hide grid{/t}</span><span style="display:none">{t}Show grid{/t}</span></a>
+				        </p>
 					</div>
-					<p>
-						<a id="toggleGrid" href="#" onclick="l2ToggleGrid(this);"><span style="display:block">{t}Hide grid{/t}</span><span style="display:none">{t}Show grid{/t}</span></a>
-			        </p>
 				</div>
             </div>
 	   {/if}
