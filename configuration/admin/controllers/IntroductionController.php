@@ -115,6 +115,7 @@ class IntroductionController extends Controller
 			$this->checkAuthorisation();
 
 			$id = $this->createPage();
+			$this->logChange(array('after'=>["id"=>$id],'note'=>'created new page'));
 
 			// redirecting to protect against resubmits
 			if ($id)
@@ -132,7 +133,9 @@ class IntroductionController extends Controller
 			{
 				$this->UserRights->setActionType( $this->UserRights->getActionDelete() );
 				$this->checkAuthorisation();
+				$before=$this->getPage();
 				$this->deletePage();
+				$this->logChange(array('before'=>$before,'note'=>'deleted page '.$before['topic']));
 				$this->redirect('index.php');
 			}
 			else
@@ -141,7 +144,9 @@ class IntroductionController extends Controller
 				$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 				$this->checkAuthorisation();
 				//$this->deleteMedia();
+				$before=$this->getPage();
 				$this->detachAllMedia();
+				$this->logChange(array('before'=>$before,'after'=>$this->getPage(),'note'=>'deleted media from '.$before['topic']));
 			}
 			else
 			if ($this->rHasVal('action','preview'))
