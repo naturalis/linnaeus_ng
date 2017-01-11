@@ -2159,4 +2159,5 @@ strong {
 
 .whiteBox {
   max-width: 100%;
+  max-width: 735px; /* for IE only, but <!--[if !IE]> no longer detects IE >= v10 */
 }
