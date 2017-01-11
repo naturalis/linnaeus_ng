@@ -3,12 +3,12 @@
 	<div class="search-title-or-author">
 		<ul class="tabs tabs-grow literature-tabs-js">
 			<li class="tab-active">
-				<a href="javascript:void(0)" class="select-tab-js" data-target="search-title">
+				<a href="javascript:checkFirst();" class="select-tab-js" data-target="search-title">
 					Search by title
 				</a>
 			</li>
 			<li>
-				<a href="javascript:void(0)" class="select-tab-js" data-target="search-author">
+				<a href="javascript:checkFirst();" class="select-tab-js" data-target="search-author">
 					Search by author
 				</a>
 			</li>
@@ -48,8 +48,16 @@
 <div class="search-results"></div>
 
 <script>
+
+function  checkFirst()
+{
+	if ($('.alphabet-active-letter:visible').length==0) $('.click-letter:first').trigger('click');
+	return false;
+}
+
 $(document).ready(function() {
-	$('body').on('click', '.select-tab-js', function() {
+	$('body').on('click', '.select-tab-js', function()
+	{
 		var target = $(this).attr('data-target');
 		$('.tab-content-js').removeClass('active');
 		$('.tab-content-js[data-content="'+target+'"]').addClass('active');
@@ -61,8 +69,14 @@ $(document).ready(function() {
 		$('#lookup-input-title').val('{$prevSearch.search_title|@escape}').trigger('onkeyup');
 	{else if $prevSearch.search_author!=''}
 		$('#lookup-input-author').val('{$prevSearch.search_author|@escape}').trigger('onkeyup');
-	{/if}
+	{/if}	
+
+	checkFirst();
 });
+
+
+
+
 </script>
 
 
