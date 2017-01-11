@@ -51,7 +51,7 @@
 
 function  checkFirst()
 {
-	if ($('.alphabet-active-letter:visible').length==0) $('.click-letter:first').trigger('click');
+	if ($('.alphabet-active-letter:visible').length==0) $('.click-letter:visible:first').trigger('click');
 	return false;
 }
 
