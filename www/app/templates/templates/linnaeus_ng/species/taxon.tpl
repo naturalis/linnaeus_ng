@@ -1,3 +1,5 @@
+{$_page_start_tpl__filter_content_placeholder='Search taxa'}
+
 {include file="../shared/header.tpl" title=$taxon.label}
 
 <div id="dialogRidge">

@@ -21,7 +21,7 @@
 				{if !$controllerMenuOverride and $controllerMenuExists and $controllerBaseName}
 					<div class="lookup__container">
 						<div id="lookupDialog">
-							<input type="text" id="lookupDialogInput" placeholder="Filter content...">
+							<input type="text" id="lookupDialogInput" placeholder="{if $_page_start_tpl__filter_content_placeholder}{$_page_start_tpl__filter_content_placeholder}{else}Filter content...{/if}">
 							<div id="lookup-DialogContent"></div>
 						</div>
 					</div>
