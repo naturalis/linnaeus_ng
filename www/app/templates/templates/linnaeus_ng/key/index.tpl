@@ -1,7 +1,8 @@
+{$module=Key}
 {if $step.number!=$step.title}
-    {assign "pagetitle" "Step "|cat:$step.number|cat:". "|cat:$step.title}
+    {assign "pagetitle" "$module: Step "|cat:$step.number|cat:". "|cat:$step.title}
 {else}
-    {assign "pagetitle" "Step "|cat:$step.number}
+    {assign "pagetitle" "$module: Step "|cat:$step.number}
 {/if}
 
 {include file="../shared/header.tpl" title=$pagetitle}
