@@ -119,7 +119,7 @@ function printBaseData()
 	else
 	{
 		header=fetchTemplate( 'resultHeaderMinTpl' )
-			.replace('%SHOWING%', maxresults);
+			.replace('%SHOWING%', results.length);
 	}
 
 	header=header+fetchTemplate( 'remarkTpl' );
