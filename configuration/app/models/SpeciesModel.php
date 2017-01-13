@@ -735,12 +735,22 @@ class SpeciesModel extends AbstractModel
 		$lower = isset($params['lower']) ? $params['lower'] : true;
 
 		if ( is_null($project_id) ) return;
-
+		
+		/*
+			query first orders by a "corrected" first character, which is the 
+			- ASCII-value of the first character of the lowercased value of the taxon if it's 
+				- a letter (ASCII val 97-122), 
+				- a number (cASCII valhar 48-57) or 
+				- a opening bracket ( (ASCII val 40).
+			- ASCII-value + 122 of the first character it's anything else
+			this will avoid the species opening with anything that starts with a strange character other than ( (like a ? for instance)
+		*/
 
         $query = "
 			select
-				_a.id
-
+				_a.id,
+				_a.taxon,
+				if(((ascii(lower(_a.taxon)) BETWEEN 0 AND 47) or (ascii(lower(_a.taxon)) BETWEEN 58 AND 96)) and (ascii(lower(_a.taxon))!=40),ascii(lower(_a.taxon))+122,ascii(lower(_a.taxon))) as first_letter_corrected
 			from
 				%PRE%taxa _a
 
@@ -762,9 +772,10 @@ class SpeciesModel extends AbstractModel
 				and _p.lower_taxon= " . ($lower ? "1" : "0" ) . "
 
 			order by
-				" . ($lower ? "_a.taxon" : "_p.rank_id asc, _a.taxon" ) . "
+				" . ($lower ? "first_letter_corrected,_a.taxon" : "_p.rank_id asc, first_letter_corrected,_a.taxon" ) . "
 
 			limit 1";
+
 
         $d = $this->freeQuery($query);
 
