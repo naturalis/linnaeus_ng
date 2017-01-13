@@ -740,7 +740,7 @@ class SpeciesModel extends AbstractModel
 			query first orders by a "corrected" first character, which is the 
 			- ASCII-value of the first character of the lowercased value of the taxon if it's 
 				- a letter (ASCII val 97-122), 
-				- a number (cASCII valhar 48-57) or 
+				- a number (ASCII val 48-57) or 
 				- a opening bracket ( (ASCII val 40).
 			- ASCII-value + 122 of the first character it's anything else
 			this will avoid the species opening with anything that starts with a strange character other than ( (like a ? for instance)
