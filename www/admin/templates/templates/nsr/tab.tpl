@@ -193,37 +193,41 @@ label {
                                             <option value="{$v.field}"{if $v.field==$page.external_reference_decoded->check_type} selected="selected"{/if}>{$v.label}</option>
                                             {/foreach}
                                         </select>
-										<div class="explanation">
-                                        <u>checking by webservice output</u>
-                                        {t}the system assumes the webservice returns JSON-encoded data. after decoding, the data is fed to the PHP
-                                        function 'empty()'. if the function returns true, it is assumed there is no data for the taxon under
-                                        consideration, and the tab is not shown.{/t}
-										<br />
-                                        <u>checking by URL</u>
-                                        {t}specify an additional URL below to use for checking, rather than checking the one specified above (useful
-                                        when you have specified multiple URLs above). this URL is parameterized the same way as the one above, and its
-                                        output also checked against the 'empty()'-function. the output is JSON-decoded if the response header is "application/json",
-                                        otherwise it is checked directly.{/t}
-                                        <br />
-                                        {t}please note that by using this check, you make the performance of your site partially dependent on the
-                                        response time of the queried webservice.{/t}
-                                        </div>
                                     </td>
                                 </tr>
                                 <tr class="tr-highlight">
                                     <td>
                                     	<span class="check-by-none">{t}n/a{/t}</span>
-                                    	<span class="check-by-query" style="display:none">{t}"check by" query:{/t}</span>
-                                    	<span class="check-by-url" style="display:none">{t}"check by" URL:{/t}</span>
+                                    	<span class="check-by-query" style="display:none">{t}query:{/t}</span>
+                                    	<span class="check-by-url" style="display:none">{t}URL:{/t}</span>
+                                    	<span class="check-by-output" style="display:none">{t}element (optional):{/t}</span>
                                     </td>
                                     <td>
                                     	<textarea name="external_reference[query]">{$page.external_reference_decoded->query}</textarea>
-                                        <div class="explanation">
-                                        <u>checking by query</u>
-                                        {t}query can take two parameters, <code>%pid%</code> for project ID and <code>%tid%</code> for taxon ID.<br />
+										<div class="explanation">
+                                        <u>checking by webservice output</u>:
+                                        {t}the system assumes the webservice returns JSON-encoded data. after decoding, the data is fed to the PHP
+                                        function 'empty()'. if the function returns true, it is assumed there is no data for the taxon under
+                                        consideration, and the tab is not shown.{/t}<br />
+                                        {t}if you want to check a specific field in the output against empty(), enter the path to the field in the textarea below. for
+                                        instance, if the output is something like
+                                        <code>{ "search":"Meles","results":[ { "count":"23","data" : [ ... ] } ] }</code> enter <code>search->count</code> to check the value of the 
+                                        field "count". you cannot access a numbered array-element, just object properties.{/t}
+										<br /><br />
+                                        <u>checking by URL</u>:
+                                        {t}specify an additional URL below to use for checking, rather than checking the one specified above (useful
+                                        when you have specified multiple URLs above). this URL is parameterized the same way as the one above, and its
+                                        output also checked against the 'empty()'-function. the output is JSON-decoded if the response header is "application/json",
+                                        otherwise it is checked directly.{/t}
+                                        <br /><br />
+                                        <u>checking by query</u>:
+                                        {t}enter the SQL-query to run below. it can take two parameters, <code>%pid%</code> for project ID and <code>%tid%</code> for taxon ID.<br />
                                         query is expected to return one row with a column called <code>result</code> that has a value of either 1
                                         (data present) or 0 (no data present).<br />
 										queries are run "as is" and have the potential to destroy your entire databas, so don't mess around.{/t}
+                                        <br /><br />
+                                        {t}please note that by using webservice- of URL-checks, you make the performance of your site partially dependent on the
+                                        response time of the queried webservice or URL.{/t}
                                         </div>
 									</td>
                                 </tr>
@@ -479,11 +483,12 @@ $(document).ready(function()
 	
 	$( '[name^=external_reference\\[check_type\\]]' ).on( 'change', function(n)
 	{
-		$( '[name=external_reference\\[query\\]]' ).prop( 'disabled', $(this).val()=='none' || $(this).val()=='output' );
+		$( '[name=external_reference\\[query\\]]' ).prop( 'disabled', $(this).val()=='none' );
 
 		$( '.check-by-query' ).toggle( $(this).val()=='query' );
-		$( '.check-by-none' ).toggle( $(this).val()=='none' || $(this).val()=='output' );
+		$( '.check-by-none' ).toggle( $(this).val()=='none' );
 		$( '.check-by-url' ).toggle( $(this).val()=='url' );
+		$( '.check-by-output' ).toggle( $(this).val()=='output' );
 	});
 
 	$( '[name^=external_reference\\[check_type\\]]' ).trigger( 'change' );

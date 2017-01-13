@@ -633,7 +633,29 @@ class SpeciesControllerNSR extends SpeciesController
 				if ( $remote_check )
 				{
 					$ctx=stream_context_create( [ 'http'=> [ 'timeout' => $this->_ext_tab_timeout ] ] );
-					$is_empty=empty( @json_decode( @file_get_contents( $full_url, false, $ctx ) ) );
+					
+					if (!empty($reference->query))
+					{
+						$output=@json_decode( @file_get_contents( $full_url, false, $ctx ), true );
+						$path=explode( "->", $reference->query );
+						foreach((array)$path as $bit)
+						{
+							if (isset($output[$bit]))
+							{
+								$output=$output[$bit];
+							}
+							else
+							{
+								break;
+							}
+						}
+					}
+					else
+					{
+						$output=@json_decode( @file_get_contents( $full_url, false, $ctx ) );
+					}
+
+					$is_empty=empty( $output );
 				}
 			}
 			else
