@@ -1,4 +1,4 @@
-<div id="allNavigationPane">
+<!-- <div id="allNavigationPane">
 {include file="../shared/_back-to-search.tpl"}
 <div class="navigation-icon-wrapper">
 
@@ -26,7 +26,7 @@
     <span class="navigation-icon icon-nav-back icon-inactive" id="back-icon-inactive">{t}Back{/t}</span>
 {/if}
 </div>
-</div>
+</div> -->
 
 <script type="text/javascript">
 $(document).ready(function()

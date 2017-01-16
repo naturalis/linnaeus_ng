@@ -30,6 +30,25 @@
 }
 {/if}
 
+
+#result-count, .headerPagination {
+	margin:3px 0 3px 0;
+}
+
+.list.paging li {
+	display:inline;
+	font-weight:bold;
+}
+
+.list.paging li a {
+	text-decoration: none;
+	font-weight:normal;	
+	color: black;
+}
+.list.paging li a:hover {
+	text-decoration: underline;
+}
+
 </style>
 
 	<div id="dialogRidge">
@@ -38,18 +57,16 @@
 
 	    <div id="content" class="title-type4">
 
-	        <div id="resultsHeader">
-	            <div>
-                <div class="headerPagination">
-                    <ul id="paging-header" class="list paging"></ul>
-                </div>
-	            </div>
-	        </div>
-
 			<div>
 				<div id="similarSpeciesHeader" class="hidden" style="width:100%"></div>
 				<div id="result-count" class="headerSelectionLabel"></div>
 			</div>
+
+	        <div id="resultsHeader">
+                <div class="headerPagination">
+                    <ul id="paging-header" class="list paging"></ul>
+                </div>
+	        </div>
 
 	        <div id="results">
 	            <div id="results-container"></div>

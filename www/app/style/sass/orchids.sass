@@ -1,0 +1,832 @@
+@import "reset"
+@import "typography"
+
+*, *:after, *:before
+	box-sizing: border-box
+
+body, html
+	overflow: hidden
+	height: 100%
+
+body
+	font-family: Arial, sans-serif
+
+#content p
+	word-wrap: break-word
+	margin-bottom: 10px
+
+.container
+	padding: 0 15px
+
+.site__container
+	display: flex
+	height: 100%
+	position: relative
+	transform: translateX(0)
+	transition: transform 0.5s ease
+
+.menu-open-push
+	.site__container
+		transform: translateX(250px)
+		transition: transform 0.5s ease
+
+.menu-open-over
+	.menu__container
+		position: absolute
+		left: 250px
+		height: 100%
+		z-index: 1000
+		transition: left 0.5s ease
+
+#bottombar
+	border-radius: 0
+
+.content__container
+	flex-grow: 1
+	height: 100%
+	display: flex
+	flex-direction: column
+	overflow-y: scroll
+	-webkit-overflow-scrolling: touch
+	@media screen and (max-width: 994px)
+		overflow: hidden
+
+.scroll__container
+	display: block
+	z-index: 10
+	flex-grow: 1
+	// overflow-y: scroll
+	@media screen and (max-width: 994px)
+		-webkit-overflow-scrolling: touch
+		position: absolute
+		top: 0
+		bottom: 0
+		left: 0
+		right: 0
+		width: 100%
+		height: 100%
+		padding-top: 50px
+		overflow-y: scroll
+
+
+#header-titles-small
+	background-color: #fff
+	padding: 30px
+	padding-bottom: 0
+	line-height: 1
+	@media screen and (max-width: 800px)
+		padding: 15px
+
+.allLookupListCellSelected
+	background-color: #e3004a
+	color: #fff
+
+.logo-svg
+	width: 75px
+	margin-left: 15px
+	margin-top: 15px
+
+#lookup-DialogContent .row:hover
+	background-color: #CE004A
+	color: #fff
+
+#content, #common, #classification, #media, #search-results, #definition, #list
+	background-color: #fff
+	padding: 0
+	margin-bottom: 0
+
+#lookupDialog
+	background-color: #009ee0
+	padding: 10px
+
+#lookupDialogInput
+	border: none
+	box-shadow: none
+	width: 100%
+
+#lookup-DialogContent
+	padding-left: 0
+	border: none
+	background-color: #fff
+	max-height: 400px
+	height: auto
+	.row
+		padding: 12px 15px
+		cursor: pointer
+		margin-bottom: 0
+
+#lookup-DialogContent
+	margin: 10px -10px -10px -10px
+
+@media screen and (max-width: 800px)
+	#lookup-DialogContent
+		transition: transform 0.26s ease
+		transition-delay: 0.1s
+		width: 100%
+		box-shadow: 0px 1px 7px 0px rgba(0,0,0,0.75)
+		max-height: 150px
+		transform: scaleY(0)
+		transform-origin: top
+		position: absolute
+		z-index: 100
+	#lookupDialogInput:focus ~ #lookup-DialogContent
+		transform: scaleY(1)
+		transition: transform 0.26s ease
+		transition-delay: 0s
+
+#container
+	padding: 30px 5px
+	background-color: transparent
+	flex-grow: 1
+	width: 100%
+	min-height: calc(100vh - 150px)
+	@media screen and (max-width: 994px)
+		min-height: calc(100vh - 100px)
+	@media screen and (max-width: 800px)
+		padding: 0px
+		min-height: calc(100vh - 250px)
+
+.menu__container
+	width: 250px
+	flex-shrink: 0
+	background-color: #000
+	margin-left: -250px
+	position: relative
+	z-index: 0
+	left: 0
+	z-index: 5
+	transition: left 0.5s ease
+	overflow-y: auto
+
+.menu-search-bar__container
+	position: relative
+	overflow: hidden
+	padding-top: 0px
+	transition: padding-top 0.5s ease
+	z-index: 200
+
+.search-open
+	.menu-search-bar__container
+		padding-top: 50px
+		transition: padding-top 0.5s ease
+
+.search-bar__container
+	background-color: #e3004a
+	position: absolute
+	width: 100%
+	top: 0
+	height: 50px
+	.search-bar
+		width: 100%
+		max-width: 1080px
+		margin: 0 auto
+		position: relative
+	#search
+		width: 100%
+		-webkit-appearance: none
+		background-color: transparent
+		border: 0
+		height: 50px
+		color: #fff
+		max-width: 100%
+		padding: 0 60px 0 15px
+		box-shadow: none
+		&::placeholder
+			color: #fff
+	.close-search
+		position: absolute
+		top: 0
+		right: 0
+		color: #fff
+		width: 60px
+		height: 50px
+		display: flex
+		justify-content: center
+		align-items: center
+		font-size: 21px
+
+.menu-bar__container
+	min-height: 50px
+	background-color: #000
+	position: relative
+	z-index: 200
+
+.menu-bar
+	display: flex
+	justify-content: space-between
+	width: 100%
+	max-width: 1080px
+	margin: 0 auto
+
+.site-title
+	width: 100%
+	max-width: 1080px
+	margin: 0 auto
+	padding: 0 15px
+	@media screen and (max-width: 994px)
+		display: none
+	a
+		text-decoration: none
+		font-family: 'platform', Arial
+		font-feature-settings: "ss01"
+		font-size: 30px
+		color: #e3004a
+		display: block
+		padding: 10px 0
+		&:hover
+			text-decoration: none
+			color: #ce004a
+
+#overview-image, .introduction-img
+	@media screen and (max-width: 600px)
+		max-width: 100%
+		margin-left: 0
+		float: none
+		display: block
+
+#page-container
+	background-color: transparent
+	-ms-flex: 1
+	flex-grow: 1
+
+.media-type-video 
+	a
+		background-color: #f1f1f1
+		display: flex
+		align-items: center
+		justify-content: center
+		i
+			font-size: 80px
+
+
+#main-body
+	display: flex
+	@media screen and (max-width: 800px)
+		flex-direction: column
+
+.responsive-site-title
+	display: none
+	@media screen and (max-width: 994px)
+		display: flex
+		flex-grow: 1
+		align-items: center
+		padding: 0 15px
+		text-align: center
+		a
+			display: block
+			width: 100%
+			text-align: center
+			color: #fff
+
+.footer-menu__list
+	display: flex
+	height: 100%
+	@media screen and (max-width: 800px)
+		flex-direction: column
+	li
+		height: 50px
+		margin-right: 30px
+		display: flex
+		align-items: center
+		&:last-child
+			margin-right: 0
+			margin-left: auto
+			@media screen and (max-width: 800px)
+				margin-left: 0
+	a
+		text-transform: capitalize
+
+#categories
+	background-color: #fff
+	ul
+		display: flex
+		background-color: #eeede9
+		margin-bottom: 5px
+	li
+		flex-grow: 1
+		flex-basis: 10%
+	a
+		display: flex
+		height: 100%
+		height: 100%
+		align-items: center
+		justify-content: center
+		padding: 0.5em 0.75em
+		text-align: center
+		&.category-active
+			border: 0
+			background-color: #009ee0
+			color: #fff
+	.category-no-content
+		display: none
+
+.decisionPathHeader	
+	font-weight: bold
+	margin-bottom: 8px
+	padding: 5px
+
+#page-main #content
+	max-width: 100%
+
+.module-glossary #content
+	width: 100%
+	@media screen and (max-width: 800px)
+		columns: 2
+	@media screen and (max-width: 600px)
+		columns: 1
+
+#categories + .alphabet
+	padding-top: 0
+
+.responsive-hidden
+	@media screen and (max-width: 800px)
+		display: none
+
+.alphabet
+	display: flex
+	width: 100%
+	border: 0
+	margin-bottom: 15px
+	background-color: #eeede9
+	@media screen and (max-width: 800px)
+		flex-wrap: wrap
+		justify-content: center
+	a, span
+		height: 25px
+		display: flex
+		align-items: center
+		justify-content: center
+		flex-grow: 1
+		color: #000
+		@media screen and (max-width: 800px)
+			width: 35px
+			height: 35px
+			flex-shrink: 0
+			border-bottom: 1px solid #f9f9f7
+		&.alphabet-letter-ghosted
+			color: #b2b1a8
+		&.alphabet-active-letter
+			background-color: #009ee0
+			color: #fff
+
+#page-main
+	width: 100%
+	display: flex
+	background-color: #fff
+	padding: 30px
+	@media screen and (max-width: 800px)
+		padding: 15px
+	@media screen and (max-width: 600px)
+		flex-direction: column
+
+#content.taxon-detail
+	padding: 30px
+	@media screen and (max-width: 800px)
+		padding: 15px
+
+.sidebar__container
+	width: 230px
+	margin-right: 30px
+	flex-shrink: 0
+	@media screen and (max-width: 800px)
+		width: 100%
+		margin-right: 0
+		margin-bottom: 30px
+
+.side-menu
+	margin: 0
+	padding: 12px 0
+	a
+		display: block
+		text-decoration: none
+		font-family: 'platform', Arial
+		font-feature-settings: "ss01"
+		color: #fff
+		padding: 12px 15px
+		border-bottom: 1px solid #2d2d2d
+		&.main-menu-selected
+			color: #e3004a
+			font-weight: normal
+		&:hover
+			text-decoration: none
+			color: #ce004a
+
+.menu-toggle
+	display: block
+	width: 60px
+	height: 50px
+	background-image: url('../img/menutoggle.png')
+	background-size: 30px 25px
+	background-repeat: no-repeat
+	background-position: center
+
+.category__container
+	background-color: #fff
+	margin-bottom: 30px
+	@media screen and (max-width: 800px)
+		background-color: #fff
+	.category-title
+		padding: 12px 15px
+		background-color: #009ee0
+		color: #fff
+	a
+		color: #000
+		display: block
+		padding: 12px 15px
+		&.category-active
+			color: #fff
+			background-color: #e3004a
+		&:hover
+			text-decoration: none
+			color: #fff
+			background-color: #ce004a
+	ul
+		@media screen and (max-width: 800px)
+			display: flex
+			flex-wrap: wrap
+			li
+				flex-grow: 1
+			a
+				text-align: center
+				width: 100%
+
+img + .step-content
+	margin-top: 5px
+
+
+
+
+#question
+	padding: 15px
+	background-color: #e2e1dd
+	margin-bottom: 30px
+	img
+		display: block
+
+#step
+	flex-grow: 1
+	flex-basis: 470px
+
+#panel
+	display: flex
+	flex-direction: column
+	margin-left: 30px
+	@media screen and (max-width: 600px)
+		margin-left: 0
+		margin-top: 30px
+
+.search-toggle
+	width: 60px
+	height: 50px
+	background-image: url('../img/search.svg')
+	background-size: 21px 21px
+	background-repeat: no-repeat
+	background-position: center
+	display: block
+
+#step #choices
+	margin: 0
+
+.l2_choice
+	margin: 0
+	padding: 0
+	background-color: #e2e1dd
+	width: 100%
+	margin-bottom: 30px
+	padding: 15px
+	line-height: 1.4
+	&:last-child
+		margin-bottom: 0
+
+#taxa
+	display: flex
+	flex-direction: column 
+	flex-grow: 0
+	width: 250px
+	@media screen and (max-width: 600px)
+		width: 100%
+	ul
+		padding-left: 7px
+		max-height: 400px
+		overflow-y: auto
+		flex-grow: 1
+	li
+		display: flex
+		margin-bottom: 5px
+		line-height: 1.4
+		&:last-child
+			margin-bottom: 0
+		&:before
+			content: "·"
+			font-size: 30px
+			line-height: 15px
+			margin-right: 5px
+	#remaining, #excluded, #decisionPathContainer
+		background-color: #eeede9
+		padding: 10px
+		flex-direction: column
+	#ul-remaining, #ul-excluded
+		flex-grow: 1
+		padding-bottom: 10px
+
+.advanced-search__form
+	background-color: #fff
+	+ #page-main
+		margin-top: 30px 
+
+.tabs
+	display: flex
+	li
+		&.tab-active
+			background-color: #009ee0
+			color: #fff
+			a
+				color: #fff
+		a
+			padding: 15px
+			display: flex
+			text-decoration: none
+		
+.search-tab-content
+	background-color: #eeede9
+	display: none
+	.alphabet
+		padding: 0
+		margin: 0
+	input[type=text]
+		box-shadow: none
+		border: 0
+		width: 100%
+	&.active
+		display: flex
+		flex-direction: column
+		overflow: hidden
+
+.glossary-filter
+	width: 100%
+
+.tabs-grow
+	width: 100%
+	li
+		flex-grow: 1
+
+.search-title-or-author
+	width: 100%
+	.search-input__container	
+		background-color: #eeede9
+.search-input__container
+	background-color: #009ee0
+	padding: 15px
+	display: flex
+	&.without-button
+		input[type=text]
+			border-bottom-right-radius: 4px
+			border-top-right-radius: 4px
+	input[type=text]
+		box-shadow: none
+		border: 0
+		width: 100%
+		border-top-right-radius: 0px
+		border-bottom-right-radius: 0px
+	input[type=submit]
+		width: 100px
+		background-color: #e3004a
+		font-size: 16px
+		border-top-left-radius: 0
+		border-top-right-radius: 4px
+		border-bottom-left-radius: 0
+		border-bottom-right-radius: 4px
+		outline-width: 0
+		&:hover
+			background-color: #ce004a
+
+.search-modules__container
+	padding: 15px
+
+.search-module__list
+	margin-top: 15px
+	display: flex
+	flex-wrap: wrap
+	li
+		margin-right: 30px
+		&:last-child
+			margin-right: 0
+
+label.checkbox-input
+	display: flex
+	position: relative
+	align-items: center
+	margin-bottom: 10px
+	.mock-checkbox
+		background-color: #ccc
+		width: 20px
+		height: 20px
+		display: block
+		flex-shrink: 0
+		flex-grow: 0
+		margin-right: 10px
+		border-radius: 8px
+	input[type=checkbox]
+		visibility: hidden
+		position: absolute
+		top: 0
+	input[type=checkbox]:checked + .mock-checkbox
+		background-image: url('../img/checkbox-checked.png')
+		background-size: cover
+		background-color: transparent
+
+
+#step .target
+	display: flex
+	justify-content: flex-end
+	color: #009ee0
+	i
+		margin-left: 15px
+
+#decisionPathContainer
+	display: none
+	.row
+		padding-top: 0
+
+#taxa-categories
+	a
+		height: 100%
+		align-items: center
+		padding: 0 15px
+		height: 30px
+		flex-grow: 1
+		display: flex
+		&.category-active
+			background-color: #eeede9
+		&#decision-path-icon
+			flex-grow: 0
+			padding: 0
+			display: flex
+			margin: 0
+			align-items: center
+			justify-content: center
+			width: 44px
+			&:before
+				font-size: 19px
+	li
+		flex-grow: 1
+		&:last-child
+			flex-grow: 0
+	ul
+		display: flex
+	.category-no-content
+		display: none
+
+#decisionPathContainer
+	.row
+		margin-bottom: 10px
+		&:last-child
+			margin-bottom: 0
+
+.searched-category-title
+	color: #e3004a
+	font-size: 21px
+	font-weight: light
+
+.highlight-list
+	margin-top: 15px
+	ul
+		display: flex
+		flex-wrap: wrap
+	.content
+		padding-top: 5px
+		width: 100%
+		font-size: 12px
+
+.page-title
+	background-color: #fff
+	padding: 30px
+	margin-bottom: 30px
+	color: #009ee0
+	font-size: 32px
+	@media screen and (max-width: 800px)
+		font-size: 21px
+		padding: 15px
+
+.search-match
+	font-weight: bold
+	color: #e3004a
+
+.media-grid__container
+	padding: 0 30px
+
+.l2_text
+	display: flex
+	.choice-image__container
+		margin-right: 15px
+		width: 30%
+		flex-shrink: 0
+	img
+		display: block
+		width: 100%
+
+#media-grid
+	margin: 0 -30px
+	display: flex
+	flex-wrap: wrap
+	.media-cell
+		flex-grow: 1
+		padding: 15px
+		margin: 15px
+	.media-caption
+		width: 100%
+		margin: 0 auto
+
+.language__li
+	display: flex
+	border-bottom: 1px solid #2d2d2d
+	a
+		border-bottom: 0
+		position: relative
+		cursor: pointer
+		text-transform: uppercase
+		&:before
+			content: ""
+			display: block
+			width: 1px
+			background-color: #2d2d2d
+			position: absolute
+			left: 0
+			top: 10px
+			bottom: 10px
+		&:first-child:before
+			display: none
+
+#legend label.checkbox-input
+	padding-left: 0
+	margin-bottom: 15px
+
+.remaining-count
+	display: block
+	margin-bottom: 5px
+
+.fancybox-title .child
+	white-space: wrap
+	margin-top: 5px
+
+.map-page
+	width: 100%
+
+.map-legend-container
+	display: flex
+	margin-top: 15px
+	@media screen and (max-width: 650px)
+		flex-direction: column
+	.map
+		flex-grow: 1
+	#legend
+		font-size: 12px
+		p
+			margin-bottom: 15px
+		.mapCellLegend
+			height: 10px
+			width: 10px
+			display: block
+	#mapName
+		display: flex
+		margin-bottom: 15px
+		align-items: center
+		justify-content: space-between
+	.mapContainer
+		position: absolute
+		left: 0
+		padding: 1px
+		right: 0
+		bottom: 0
+		top: 0
+		display: flex
+		flex-direction: column
+	.map-padding
+		position: relative
+		padding-top: 62.7%
+	#mapTable
+		flex-grow: 1
+		height: 100%!important
+		background-size: cover!important
+		width: 100%!important
+	.legend-container
+		width: 150px
+		flex-grow: 0
+		flex-shrink: 0
+		@media screen and (max-width: 650px)
+			width: 100%
+			margin-top: 20px
+	.mapCheckbox
+		margin-bottom: 10px
+		label
+			display: flex
+			padding-left: 0!important
+
+#taxonName
+	margin-top: 15px
+	display: block
+	border-bottom: 0
+.subtitle
+	display: block
+	color: #000
+	font-size: 12px

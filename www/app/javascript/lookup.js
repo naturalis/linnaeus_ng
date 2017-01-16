@@ -241,7 +241,6 @@ function allLookupBuildList(obj,txt)
 	allLookupClearDialogDiv();
 
 	if (obj.results) {
-
 		var textToAppend = Array();
 
 		var url = allLookupTargetUrl ? allLookupTargetUrl : obj.url;
@@ -251,7 +250,6 @@ function allLookupBuildList(obj,txt)
 			var d = obj.results[i];
 
 			if ((d.id || d.url) && d.label) {
-
 				if (allLookupSelectedId==d.id)  allLookupSelectedElement = 'allLookupListCell-'+i ;
 
 				textToAppend[i] =
@@ -431,11 +429,6 @@ function allLookupBindDialogKeyUp()
 
 function allLookupShowDialog(predefJSON)
 {
-	showDialog(
-		_(allLookupDialogTitle),
-		'<div id="lookupDialog"><input type="text" id="'+allLookupDialogInputName+'"></div><div id="'+allLookupDialogContentName+'"></div>'
-	);
-
 	allLookupBindDialogKeyUp();
 
 	if (predefJSON)
@@ -448,8 +441,6 @@ function allLookupShowDialog(predefJSON)
 	{
 		allLookupGetData('*',true);
 	}
-
-	$('#'+allLookupDialogInputName).focus();
 }
 
 function allLookupSetSelectedId(id)
@@ -483,6 +474,7 @@ function allLookupSetAlwaysFetch(state)
 
 $(document).ready(function()
 {
+	allLookupShowDialog();
 
 	$('body').click(function() {
 		allLookupHideDiv();

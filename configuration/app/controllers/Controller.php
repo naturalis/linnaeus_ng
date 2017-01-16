@@ -1819,7 +1819,7 @@ class Controller extends BaseClass
             session_start();
 
             /* DEBUG */
-        $_SESSION['app']['system']['server_addr'] = $_SERVER['SERVER_ADDR'];
+        // $_SESSION['app']['system']['server_addr'] = $_SERVER['SERVER_ADDR'];
     }
 
     private function getProjectDependentTemplates ()

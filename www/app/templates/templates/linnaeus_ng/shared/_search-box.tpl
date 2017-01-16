@@ -8,4 +8,3 @@
 	onkeyup="if (event.keyCode==13) { doSearch(); }"
 	required
 />
-<img onclick="doSearch()" src="{$projectUrls.systemMedia}search.gif" class="search-icon" />

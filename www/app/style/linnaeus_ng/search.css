@@ -33,7 +33,7 @@ h3, h4, h5, h6 {
 
 @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000346}}
 #search-results h3 {
-  font-weight: bold;
+
   margin-bottom: 2px; }
 
 @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000355}}
@@ -52,10 +52,4 @@ h3, h4, h5, h6 {
 #search-results .module {
   margin-bottom: 15px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000371}}
-#search-results .search-match {
-  background-color: #ffa; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000375}}
-#search-results .search-match {
-  background-color: #ffed00; }

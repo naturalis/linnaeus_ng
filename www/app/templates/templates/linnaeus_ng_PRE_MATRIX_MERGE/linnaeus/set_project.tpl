@@ -50,7 +50,7 @@
 </p>
 </div>
 
-</div ends="page-container">
+</div>
 <div id="footer-container"></div ends="footer-container">
 </div ends="body-container">
 

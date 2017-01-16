@@ -1,4 +1,3 @@
-<br style="clear:all" />
 {t}This taxon is keyed out in the following step of the single-entry key:{/t}
 <p>
 {foreach $content v k}
