@@ -52,55 +52,6 @@
 				{/if}
 			{/if}
 
-{* 
-		{elseif $activeCategory.tabname=='CTAB_NAMES' || $activeCategory.tabname=='TAB_NAAMGEVING'}
-
-			{include file="../species/_tab_naamgeving.tpl"}
-
-		{elseif $activeCategory.tabname=='CTAB_LITERATURE'}
-
-			{include file="../species/_tab_literatuur.tpl"}
-
-		{elseif $activeCategory.tabname=='CTAB_TAXON_LIST'}
-
-			{include file="../species/_tab_taxon_list.tpl"}
-
-		{elseif $activeCategory.tabname=='CTAB_CLASSIFICATION'}
-
-			{include file="../species/_tab_classificatie.tpl"}
-
-		{elseif $activeCategory.tabname=='CTAB_DICH_KEY_LINKS'}
-
-			{include file="../species/_tab_dich_key_links.tpl"}
-
-		{elseif $ext_template}
-
-			{include file=$ext_template}
-
-		{elseif $external_content && $external_content->template}
-
-			{include file="../species/`$external_content->template`"}
-
-		{elseif $external_content}
-
-			{include file='_webservice.tpl'}
-
-		{else}
-
-	        <br style="clear:all" />
-
-			{if $content|@is_array}
-			<ul>
-				{foreach from=$content item=v key=k}
-				{if $k>0}<li><a href="nsr_taxon.php?id={$v.id}">{$v.label}</a></li>{/if}
-				{/foreach}
-			</ul>
-			{else}
-			<p>
-				{$content}
-			</p>
-*}            
-
 			{if $rdf}
 				{include file="../species/_rdf_data.tpl"}
 			{/if}
@@ -159,13 +110,6 @@ $(document).ready(function()
 
 <div class="inline-templates" id="lookupDialogItem">
 	<p id="allLookupListCell-%COUNTER%" class="row%ROW-CLASS%" lookupId="%ID%" onclick="%ONCLICK%">
-<!-- 
-<<<<<<< HEAD
-    	<span style="cursor:pointer">%LABEL%<span class="allLookupListSource" style="%SOURCE-STYLE%"> (%SOURCE%)</span></span>
-=======
-    	%LABEL%<span class="allLookupListSource" style="%SOURCE-STYLE%"> (%SOURCE%)</span>
->>>>>>> orchids
--->
     	%LABEL%<span class="allLookupListSource" style="%SOURCE-STYLE%"> (%SOURCE%)</span>
 	</p>
 </div>
