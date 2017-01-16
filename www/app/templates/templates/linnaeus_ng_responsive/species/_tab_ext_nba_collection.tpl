@@ -24,6 +24,7 @@ var results=[];
 var maxresults=5;
 var totresults=0;
 var urls=[];
+var searchName="";
 
 function getSpecimens()
 {
@@ -64,6 +65,11 @@ function processBaseData( data )
 
 		if (!r.associatedSpecimen || r.associatedSpecimen.unitID.length==0) continue;
 
+		if (results.length==0)
+		{
+			searchName=r.associatedSpecimen.identifications[0].scientificName.fullScientificName;
+		}
+	
 		results.push({
 			specimen: {
 				unitID: r.associatedSpecimen.unitID,
@@ -141,6 +147,7 @@ function checkForExtraUrls()
 	else
 	{
 		printBaseData();
+		$('#searchName').val(searchName);
 	}
 }
 
@@ -226,12 +233,5 @@ $(document).ready(function()
 
 <form id="theForm" method="post" target="_blank" action="http://bioportal.naturalis.nl/nba/result">
 <input type="hidden" name="form_id" value="ndabio_advanced_taxonomysearch" />
-<!-- input type="hidden" name="term" value="{$names.nomen_no_formatting}" / -->
-{foreach $names.list v}
-{if $v.nametype && $v.nametype=='isValidNameOf'}
-<input type="hidden" name="m_andOr" value="0" />
-<input type="hidden" name="m_genusOrMonomial" value="{$v.uninomial}" />
-<input type="hidden" name="m_specificEpithet" value="{$v.specific_epithet}" />
-{/if}
-{/foreach}
+<input type="hidden" name="m_scientificName" id="searchName" value="{$names.nomen_no_formatting}" />
 </form>
