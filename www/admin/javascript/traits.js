@@ -793,7 +793,6 @@ taxonTraits.editTaxonTrait = function( d )
 		data: d,
 		success : function ( d )
 		{
-			//console.log( d );
 			taxonTraits.taxonTraitFormInit( $.parseJSON( d ) );
 			prettyDialog(
 			{

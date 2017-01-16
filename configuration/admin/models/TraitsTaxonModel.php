@@ -92,7 +92,7 @@ final class TraitsTaxonModel extends AbstractModel
 
 		if ( is_null($project_id) || is_null($language_id) || is_null($taxon_id) )
 			return;
-		
+
 		$query = "
 			select * from (
 			
@@ -246,9 +246,11 @@ final class TraitsTaxonModel extends AbstractModel
 					and _a.taxon_id=".$taxon_id."
 			
 			) as unionized
+			
+			where 1
 		
-			".( $group_id ? "where trait_group_id =".$group_id : "" )."
-			".( $trait_id ? "where trait_id =".$trait_id : "" )."
+			".( $group_id ? "and trait_group_id =".$group_id : "" )."
+			".( $trait_id ? "and trait_id =".$trait_id : "" )."
 
 			order by _show_order_1,_show_order_2
 		";

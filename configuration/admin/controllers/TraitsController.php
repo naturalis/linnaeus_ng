@@ -524,10 +524,11 @@ class TraitsController extends Controller
 		if ($format=="Y")
 		{
 			$d=date_parse($date);
-			if ($d['month']==0) $d['month']=1;
-			if ($d['day']==0) $d['day']=1;
+			if ($d['month']==0) $d['month']=1; // required to avoid underflow
+			if ($d['day']==0) $d['day']=1; // required to avoid underflow
 			$date=$d['year']."-".$d['month']."-".$d['day'];
 		}
+
 		return is_null($date) ? null : ltrim(date_format(date_create($date),$format),'0');
 	}
 
@@ -539,16 +540,14 @@ class TraitsController extends Controller
 		{
 			return
 				(!empty($r['year']) ? $r['year'] : '0000')."-".
-				(!empty($r['month']) ? sprintf('%02s',$r['month']) : '01')."-".
-				(!empty($r['day']) ? sprintf('%02s',$r['day']) : '01')." ".
+				(!empty($r['month']) ? sprintf('%02s',$r['month']) : '00')."-".
+				(!empty($r['day']) ? sprintf('%02s',$r['day']) : '00')." ".
 				(!empty($r['hour']) ? sprintf('%02s',$r['hour']) : '00').":".
 				(!empty($r['minute']) ? sprintf('%02s',$r['minute']) : '00').":".
 				(!empty($r['second']) ? sprintf('%02s',$r['second']) : '00')
 			;
 		}
 	}
-
-
 
 	private function getTraitgroupTraitValuesTaxonCount( $values )
 	{
