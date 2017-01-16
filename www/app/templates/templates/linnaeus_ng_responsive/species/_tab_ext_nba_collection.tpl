@@ -1,10 +1,12 @@
 {*
 
 	make a tab with the external URL:
+    http://api.biodiversitydata.nl/v0/multimedia/search/?scientificName=%SCI-NAME%
     http://api.biodiversitydata.nl/v0/multimedia/search/?scientificName=%NOMEN%
 
     add the substitute:
     %NOMEN% --> nomen
+    %SCI-NAME% --> scientific name
     
     choose "link or embed"-option
     embed parametrized URL only (no content, better performance)
@@ -17,10 +19,11 @@
 
 <script>
 var baseurl;
-var basedata={};
+//var basedata={};
 var results=[];
 var maxresults=5;
-var totresults;
+var totresults=0;
+var urls=[];
 
 function getSpecimens()
 {
@@ -33,9 +36,9 @@ function getSpecimens()
 		}),
 		success : function(data)
 		{
-			basedata=data;
-			processBaseData();
-			printBaseData();
+			//basedata=data;
+			processBaseData( data );
+			checkForExtraUrls();
 		},
 		complete : function( jqXHR, textStatus )
 		{
@@ -44,21 +47,20 @@ function getSpecimens()
 			{
 				$( '#results' ).html( fetchTemplate( 'errorOccurredTpl' ).replace( '%STATUS%', textStatus ) );
 				$( '.nba-source' ).toggle( false );
-				//console.log( baseurl );
 			}
 		}
 	});
 }
 
-function processBaseData()
+function processBaseData( data )
 {
-	if (!basedata.searchResults) return;
+	if (!data.searchResults) return;
 	
-	totresults=basedata.totalSize;
+	totresults+=data.totalSize;
 	
-	for(var i=0; i<basedata.searchResults.length; i++)
+	for(var i=0; i<data.searchResults.length; i++)
 	{
-		var r=basedata.searchResults[i].result;
+		var r=data.searchResults[i].result;
 
 		if (!r.associatedSpecimen || r.associatedSpecimen.unitID.length==0) continue;
 
@@ -101,7 +103,7 @@ function printBaseData()
 				.replace(/%UNIT-ID%/g,r.specimen.unitID)
 				.replace('%COLLECTION%',r.specimen.sourceSystem.name)
 				.replace('%RECORD-BASIS%',r.specimen.recordBasis)
-				.replace('%KIND_UNIT%',r.specimen.kindOfUnit)
+				.replace('%KIND_UNIT%',r.specimen.kindOfUnit ? ": " + r.specimen.kindOfUnit : "" )
 				.replace(/%IMG-SRC%/g,r.image.imgUrl)
 				.replace(/%THUMB-SRC%/g,r.image.imgUrl.replace('large','medium'))
 				.replace('%REL%','prettyPhoto[gallery]')
@@ -130,9 +132,25 @@ function printBaseData()
 
 }
 
+function checkForExtraUrls()
+{
+	if (baseurl = urls.shift())
+	{
+		getSpecimens();
+	}
+	else
+	{
+		printBaseData();
+	}
+}
+
 $(document).ready(function()
 {
-	baseurl = '{$external_content->full_url|@escape}';
+	{foreach item=v from="\n"|explode:$external_content->full_url}
+	urls.push('{$v|@trim|@escape}');
+    {/foreach} 
+	
+	baseurl = urls.shift();
 	getSpecimens();
 });
 
@@ -195,7 +213,7 @@ $(document).ready(function()
 	</div>
     <b><a href="%PURL%" target="_blank">%UNIT-ID%</a></b><br>
     %COLLECTION%<br />
-    %RECORD-BASIS%: %KIND_UNIT%
+    %RECORD-BASIS%%KIND_UNIT%
 </div>
 -->
 </div>
