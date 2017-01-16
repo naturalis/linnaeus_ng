@@ -229,7 +229,7 @@ $(document).ready(function()
 <!-- input type="hidden" name="term" value="{$names.nomen_no_formatting}" / -->
 {foreach $names.list v}
 {if $v.nametype && $v.nametype=='isValidNameOf'}
-<input type="hidden" name="m_andOr" value="1" />
+<input type="hidden" name="m_andOr" value="0" />
 <input type="hidden" name="m_genusOrMonomial" value="{$v.uninomial}" />
 <input type="hidden" name="m_specificEpithet" value="{$v.specific_epithet}" />
 {/if}
