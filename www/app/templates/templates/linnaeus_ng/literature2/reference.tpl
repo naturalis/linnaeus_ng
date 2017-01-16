@@ -2,11 +2,13 @@
 <div id="dialogRidge">
 	<div id="content" class="literature">
 	    <p id="header-titles-small">
-	    	<span id="mini-header-title">{$ref.author}, {$ref.date}</span>
+	    	<span id="mini-header-title">
+            {if $ref.author}{$ref.author}{/if}{if $ref.author && $ref.date}, {/if}{if $ref.date}{$ref.date}{/if}
+            </span>
 	    </p>
 	    <div id="page-main">
 	    	<div>
-				{if $ref.label}<div id="text">{$ref.label}</div>{/if}
+				{* if $ref.label}<div id="text">{$ref.label}</div>{/if *}
 				<table>
 					<tbody>
 						{if $ref.publication_type}
