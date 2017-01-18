@@ -147,6 +147,7 @@ function setSuggestionId(ele)
 	else
 	{
 		// new: no search button
+		$('#formSearchFacetsSpecies').append('<input type=hidden value="'+$('input[type=text][name=group]').val()+'" name=group>');
 		$('#formSearchFacetsSpecies').submit();
 	}
 }

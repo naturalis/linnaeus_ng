@@ -16,7 +16,10 @@
         </div>
         *}
      </fieldset>
+     
      <fieldset class="selectable-parameters">
+
+        {if $search_filter_presence}
         <div class="formrow">
            <label
               for="presenceStatusList" 
@@ -27,31 +30,35 @@
               <i class="ion-chevron-up up"></i>
            </label>
             
-						<ul id="presence-options-panel" class="selectableParametersPanel">
-              <li>
-                <!-- {if $search_presence_help_url}
-                  <a href="{$search_presence_help_url}" target="_blank"  title="{t}klik voor help over dit onderdeel{/t}" class="help">Meer informatie</a>
-                {/if} -->
-                <a href="http://www.nederlandsesoorten.nl/content/voorkomen" target="_blank" class="help">Meer informatie</a>
-              </li>
-							<li>
-								<select class="customSelect" id="presenceStatusList" name="presenceStatusList" onchange="addSearchParameter('presenceStatusList');">
-                 	<option value="">{t}maak een keuze{/t}</option>
-                 	{foreach from=$presence_statuses item=v}
-                 	<option id="established{$v.id}" value="presence[{$v.id}]" established="{$v.established}">
-			            	{$v.index_label}
-			             	{$v.information_short}
-           				</option>
-           				{/foreach}
-           </select>
-							</li>
-						</ul>
+            <ul id="presence-options-panel" class="selectableParametersPanel">
+	            <li>
+                    <!-- {if $search_presence_help_url}
+                    <a href="{$search_presence_help_url}" target="_blank"  title="{t}klik voor help over dit onderdeel{/t}" class="help">Meer informatie</a>
+                    {/if} -->
+                    <a href="http://www.nederlandsesoorten.nl/content/voorkomen" target="_blank" class="help">Meer informatie</a>
+    	        </li>
+                <li>
+                    <select class="customSelect" id="presenceStatusList" name="presenceStatusList" onchange="addSearchParameter('presenceStatusList');">
+                        <option value="">{t}maak een keuze{/t}</option>
+                        {foreach from=$presence_statuses item=v}
+                        <option id="established{$v.id}" value="presence[{$v.id}]" established="{$v.established}">
+                        {$v.index_label}
+                        {$v.information_short}
+                        </option>
+                        {/foreach}
+                    </select>
+                </li>
+            </ul>
            <p class="options-panel" id="" style="display:none">
               
            <a href="#" onclick="addEstablished();submitSearchParams();return false;">{t}gevestigde soorten{/t}</a> / 
            <a href="#" onclick="addNonEstablished();submitSearchParams();return false;">{t}niet gevestigde soorten{/t}</a>
            </p>
         </div>
+        {/if}
+
+
+        {if $search_filter_multimedia}
         <div class="formrow">
            <label
               for="multimedia-options" 
@@ -88,7 +95,9 @@
            	</li>
            </ul>
         </div>
-        {if !$suppressDnaBarcodes}
+        {/if}
+        
+        {if $search_filter_dna_barcodes}
         <div class="formrow">
            <label 
               for="dna-options"

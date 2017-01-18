@@ -98,9 +98,17 @@ class SearchControllerNSR extends SearchController
 
 		$this->_show_presence_in_results = $this->moduleSettings->getModuleSetting( [ 'setting'=>'show_presence_in_results','module'=>'utilities','subst'=>1 ] )==1;
 		$this->_show_all_preferred_names_in_results = $this->moduleSettings->getModuleSetting( [ 'setting'=>'show_all_preferred_names_in_results','module'=>'utilities','subst'=>1 ] )==1;
-		
+
+		$this->_search_filter_presence = $this->moduleSettings->getModuleSetting( [ 'setting'=>'search_filter_presence','module'=>'utilities','subst'=>0 ] )==1;
+		$this->_search_filter_multimedia = $this->moduleSettings->getModuleSetting( [ 'setting'=>'search_filter_multimedia','module'=>'utilities','subst'=>0 ] )==1;
+		$this->_search_filter_dna_barcodes = $this->moduleSettings->getModuleSetting( [ 'setting'=>'search_filter_dna_barcodes','module'=>'utilities','subst'=>0 ] )==1;
+
 		$this->smarty->assign( 'show_presence_in_results',$this->_show_presence_in_results );
 		$this->smarty->assign( 'show_all_preferred_names_in_results',$this->_show_all_preferred_names_in_results );
+
+		$this->smarty->assign( 'search_filter_presence',$this->_search_filter_presence );
+		$this->smarty->assign( 'search_filter_multimedia',$this->_search_filter_multimedia );
+		$this->smarty->assign( 'search_filter_dna_barcodes',$this->_search_filter_dna_barcodes );
 
 		$order=$this->models->TabOrder->_get([
 			'id'=>['project_id' => $this->getCurrentProjectId()],
@@ -193,7 +201,6 @@ class SearchControllerNSR extends SearchController
 					'charset'=>'utf-8',
 					'filename'=>'NSR-export-'.date('Ymd-his').$this->csvExportSettings['file-extension'])
 					);
-
 		}
 		else
 		{
