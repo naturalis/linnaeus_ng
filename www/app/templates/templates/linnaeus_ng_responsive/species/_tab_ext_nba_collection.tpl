@@ -18,6 +18,17 @@
 *}
 
 <script>
+
+$(document).ready(function()
+{
+	{foreach item=v from="\n"|explode:$external_content->full_url}
+	urls.push('{$v|@trim}');
+    {/foreach} 
+	
+	baseurl = urls.shift();
+	getSpecimens();
+});
+
 var baseurl;
 //var basedata={};
 var results=[];
@@ -53,11 +64,20 @@ function getSpecimens()
 	});
 }
 
+var searches=[];
+
 function processBaseData( data )
 {
+	//console.log(baseurl);
+	//console.dir(data);
+	
+	searches.push( { url:baseurl, search:data.queryParameters.scientificName[0], size:0 } );
+	
 	if (!data.searchResults) return;
 	
 	totresults+=data.totalSize;
+	
+	searches[searches.length-1].size=data.totalSize;
 	
 	for(var i=0; i<data.searchResults.length; i++)
 	{
@@ -65,9 +85,9 @@ function processBaseData( data )
 
 		if (!r.associatedSpecimen || r.associatedSpecimen.unitID.length==0) continue;
 
-		if (results.length==0)
+		if (!searches[searches.length-1].name)
 		{
-			searchName=r.associatedSpecimen.identifications[0].scientificName.fullScientificName;
+			searches[searches.length-1].name=r.associatedSpecimen.identifications[0].scientificName.fullScientificName;
 		}
 	
 		results.push({
@@ -147,19 +167,38 @@ function checkForExtraUrls()
 	else
 	{
 		printBaseData();
-		$('#searchName').val(searchName);
+		printBioPortalSearchTerm();
+		printLogInfo();
 	}
 }
 
-$(document).ready(function()
+function printBioPortalSearchTerm()
 {
-	{foreach item=v from="\n"|explode:$external_content->full_url}
-	urls.push('{$v|@trim}');
-    {/foreach} 
-	
-	baseurl = urls.shift();
-	getSpecimens();
-});
+	var s=0;
+	for(var i=0;i<searches.length;i++)
+	{
+		if (searches[i].size>s)
+		{
+			searchName=searches[i].search;
+			s=searches[i].size;
+		}
+	}
+	$('.searchName').val(searchName);
+}
+
+function printLogInfo()
+{
+	var d=[];
+	for(var i=0;i<searches.length;i++)
+	{
+		d.push("  &#149; " + searches[i].search + ": " + searches[i].size + "\n    (" + searches[i].url + ")");
+	}
+
+	$('#page-log').html( fetchTemplate( 'logTpl' ).replace('%URLS%',d.join("\n")).replace('%BIOP%',searchName) );
+}
+
+
+
 
 </script>
 
@@ -234,7 +273,21 @@ $(document).ready(function()
 -->
 </div>
 
+<div class="inline-templates" id="logTpl">
+<!--
+searches:
+%URLS%
+
+linked bioportal search:
+  m_scientificName="%BIOP%"
+-->
+</div>
+
+
 <form id="theForm" method="post" target="_blank" action="http://bioportal.naturalis.nl/nba/result">
 <input type="hidden" name="form_id" value="ndabio_advanced_taxonomysearch" />
-<input type="hidden" name="m_scientificName" id="searchName" value="{$names.nomen_no_formatting}" />
+<input type="hidden" name="m_scientificName" class="searchName" id="searchName" value="{$names.nomen_no_formatting}" />
 </form>
+
+<span id="page-log" style="display:none;">
+</span>
