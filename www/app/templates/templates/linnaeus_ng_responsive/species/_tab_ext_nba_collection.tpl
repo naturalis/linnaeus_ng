@@ -178,6 +178,7 @@ $(document).ready(function()
     </div>
     <div id="results" class="nba-data" style="margin-bottom:10px;">
     </div>
+    <br clear="all" />
     <div id="result-footer" style="margin-bottom:10px;">
     </div>
 
@@ -212,15 +213,17 @@ $(document).ready(function()
 
 <div class="inline-templates" id="specimenRowTpl">
 <!--
-<div style="margin-bottom:20px">
-	<div class="thumbContainer">
+<div style="margin-bottom:20px;margin-right:2px;float:left;padding:2px;">
+	<div class="thumbContainer" style="margin-bottom:2px;">
 		<a class="fancybox" ptitle="<div></div>" href="%IMG-SRC%/%UNIT-ID%.jpg" data-fancybox-group="gallery">
 			<img class="speciesimage" src="%THUMB-SRC%" title="%UNIT-ID%" alt="%UNIT-ID%" style="max-width:400px;max-height:200px;">
 		</a>
 	</div>
     <b><a href="%PURL%" target="_blank">%UNIT-ID%</a></b><br>
+    <span style="font-size:0.9em">
     %COLLECTION%<br />
     %RECORD-BASIS%%KIND_UNIT%
+    </span>
 </div>
 -->
 </div>
