@@ -38,7 +38,7 @@ class ModuleSettingsReaderController extends Controller
 	
     public function getModuleSetting( $p )
     {
-		if ( !$this->getAuthorisationState() ) return;
+		//if ( !$this->getAuthorisationState() ) return;
 
 		if ( is_array( $p ))
 		{
@@ -90,7 +90,7 @@ class ModuleSettingsReaderController extends Controller
 			$setting=$p;
 		}
 
-		if ( !$no_auth_check && !$this->getAuthorisationState() ) return;
+		//if ( !$no_auth_check && !$this->getAuthorisationState() ) return;
 		
 		$this->lastSettingId=null;
 
@@ -112,7 +112,7 @@ class ModuleSettingsReaderController extends Controller
 
 	public function assignModuleSettings( &$settings )
 	{
-		if ( !$this->getAuthorisationState() ) return;
+		//if ( !$this->getAuthorisationState() ) return;
 
 		$settings = new stdClass();
 		foreach((array)$this->getModuleSettingsValues() as $val)
@@ -130,7 +130,7 @@ class ModuleSettingsReaderController extends Controller
 
 	public function assignGeneralSettings( &$settings )
 	{
-		if ( !$this->getAuthorisationState() ) return;
+		//if ( !$this->getAuthorisationState() ) return;
 
 		$settings = new stdClass();
 		foreach((array)$this->getGeneralSettingsValues() as $val)
@@ -148,7 +148,7 @@ class ModuleSettingsReaderController extends Controller
 
     public function setUseDefaultWhenNoValue( $state )
     {
-		if ( !$this->getAuthorisationState() ) return;
+		//if ( !$this->getAuthorisationState() ) return;
 		if ( is_bool($state) ) $this->_usedefaultwhennovalue=$state;
     }
 

@@ -63,6 +63,12 @@
 		$this->UserRights->setDisableUserAccesModuleCheck( true );
 	- for pages that allow for the absence of a project ID, call
 		$this->UserRights->setAllowNoProjectId( true );
+	- for rare cases of non-module pages, checks can be run withou a module,
+	   by setting:
+		$this->UserRights->setNoModule( true );
+	  this disables all module-related checks (including canRead, canWrite
+	  etc.), effectively reducing checks to being logged in and being
+	  assigned to a project.
 
 */
 
@@ -75,6 +81,7 @@ class UserRights
 	private $controller;
 	private $moduleid;
 	private $moduletype;
+	private $nomodule=false;
 	private $usermoduleaccess;
 	private $itemid;
 	private $itemtype;
@@ -111,6 +118,7 @@ class UserRights
 		$this->setUser();
 		$this->setModuleId();
 		$this->setUserModuleAccess();
+		$this->setNoModule( false );
     }
 
     public function canAccessModule()
@@ -119,7 +127,9 @@ class UserRights
 		$u=isset( $this->userid );
 		$c=isset( $this->controller );
 		$m=isset( $this->moduleid );
-
+		
+		$this->setStatus( 'no access: unspecified error' );
+		
 		if ( !$u )
 		{
 			$this->setStatus( 'no access: user not logged in' );
@@ -150,16 +160,22 @@ class UserRights
 			$this->setAuthorizeState( false );
 		}
 		else
-		if ( $p && $u  && !$c && !$m )
+		if ( $p && $u  && !$c && !$m && !$this->getNoModule() )
 		{
 			$this->setStatus( 'access: accessing non-module page' );
 			$this->setAuthorizeState( true );
 		}
 		else
-		if ( $p && $u && $c && !$m && !$this->getDisableUserAccesModuleCheck() )
+		if ( $p && $u && $c && !$m && !$this->getNoModule() && !$this->getDisableUserAccesModuleCheck() )
 		{
 			$this->setStatus( 'no access: attempting access to unknown module' );
 			$this->setAuthorizeState( false );
+		}
+		else
+		if ( $p && $u && $c && !$m && $this->getNoModule() )
+		{
+			$this->setStatus( 'access: accessing a non-module page' );
+			$this->setAuthorizeState( true );
 		}
 		else
 		if ( $p && $u && $c && $m && !$this->getDisableUserAccesModuleCheck() && !$this->canUserAccessModule() )
@@ -319,12 +335,10 @@ class UserRights
 	public function setItemId( $id )
 	{
 		/*
-			be aware: currently we recognize only a single legal
-			itemType ('taxon') so for convenience sake, the item
-			type is set automatically at initialization. should
-			there ever be other item types, either all existing
-			calls to setItemId() should be preceded by a call to
-			setItemType('taxon'), or 'taxon' should  be made the
+			be aware: currently we recognize only a single legal itemType ('taxon') so for 
+			convenience sake, the item type is set automatically at initialization. should
+			there ever be other item types, either all existing calls to setItemId() should
+			be preceded by a call to setItemType('taxon'), or 'taxon' should  be made the
 			default value of item type.
 		*/
 		$this->itemid=$id;
@@ -404,8 +418,18 @@ class UserRights
 		}
 	}
 
+	public function setNoModule( $state )
+	{
+		if ( is_bool($state) )
+		{
+			$this->nomodule=$state;
+		}
+	}
 
-
+	public function getNoModule()
+	{
+		return $this->nomodule;
+	}
 
     private function setAuthorizeState( $state )
 	{
@@ -593,6 +617,7 @@ class UserRights
 
 	private function canUserPerformAction()
 	{
+		if ( $this->getNoModule() ) return true;
 		if ( $this->action==$this->getActionCreate() && $this->usermoduleaccess['can_write']==1 ) return true;
 		if ( $this->action==$this->getActionRead() && $this->usermoduleaccess['can_read']==1 ) return true;
 		if ( $this->action==$this->getActionUpdate() && $this->usermoduleaccess['can_write']==1 ) return true;
