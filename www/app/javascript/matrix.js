@@ -772,10 +772,13 @@ function printCountHeader()
 	else
 	if (matrixsettings.browseStyle=='paginate')
 	{
+		var rangeEnd = (matrixsettings.start+matrixsettings.perPage);
+		if (rangeEnd>resultset.length) rangeEnd = resultset.length;
+
 		$('#result-count').html(
 			fetchTemplate( 'counterPaginateHtmlTpl' )
 				.replace('%FIRST-NUMBER%', (matrixsettings.start+1))
-				.replace('%LAST-NUMBER%',(matrixsettings.start+matrixsettings.perPage))
+				.replace('%LAST-NUMBER%', rangeEnd)
 				.replace('%NUMBER-LABEL%',__('van'))
 				.replace('%NUMBER-TOTAL%',resultset.length)
 		);
