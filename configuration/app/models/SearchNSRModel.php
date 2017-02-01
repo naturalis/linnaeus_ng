@@ -728,7 +728,7 @@ final class SearchNSRModel extends AbstractModel
 		
 				".(isset($photographer)  ? "and ".$photographer : "")." 		
 				".(isset($validator)  ? "and ".$validator : "")." 		
-				".(!empty($group_id) ? "and  MATCH(_q.parentage) AGAINST ('".$group_id."' in boolean mode)"  : "")."
+				".(!empty($group_id) ? "and  ( MATCH(_q.parentage) AGAINST ('".$group_id."' in boolean mode) or _m.taxon_id = " .$group_id. ") "  : "")."
 				".(!empty($name_id) ? "and _m.taxon_id = ".intval($name_id)  : "")." 		
 				".(!empty($name) ? "and _j.name like '". $this->escapeString($name)."%'"  : "")."
 

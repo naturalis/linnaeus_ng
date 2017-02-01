@@ -318,12 +318,14 @@ class SearchControllerNSR extends SearchController
 
         if (!$this->rHasVal('action')) return;
 
+		/*
         if ($this->rHasVal('action','group_suggestions'))
 		{
 	        if (!$this->rHasVal('search')) return;
 			$this->smarty->assign('returnText',json_encode($this->getSuggestionsGroup($this->rGetAll())));
         }
 		else
+		*/
         if ($this->rHasVal('action','author_suggestions'))
 		{
 	        if (!$this->rHasVal('search')) return;
@@ -342,7 +344,7 @@ class SearchControllerNSR extends SearchController
 			$this->smarty->assign('returnText',json_encode($this->getSuggestionsValidator($this->rGetAll())));
         } 
 		else
-        if ($this->rHasVal('action','name_suggestions'))
+        if ($this->rHasVal('action','name_suggestions') || $this->rHasVal('action','group_suggestions'))
 		{
 	        if (!$this->rHasVal('search')) return;
 			$this->smarty->assign('returnText',json_encode($this->getSuggestionsName($this->rGetAll())));
