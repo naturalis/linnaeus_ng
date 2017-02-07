@@ -154,7 +154,30 @@ final class Literature2Model extends AbstractModel
 					        mysqli_real_escape_string($this->databaseConnection, intval($publicationTypeId)) ) :
 					"" )."";
 
-        return $this->freeQuery($query);
+        $data = $this->freeQuery($query);
+		
+		foreach((array)$data as $key=>$val)
+		{
+			$query="
+				select
+					_b.name
+	
+				from %PRE%literature2_authors _a
+	
+				left join %PRE%actors _b
+					on _a.actor_id = _b.id 
+					and _a.project_id=_b.project_id
+	
+				where
+					_a.project_id = ".$projectId."
+					and _a.literature2_id =".$val['id']."
+				order by _a.sort_order,_b.name
+			";
+		
+			$data[$key]['authors']=$this->freeQuery( $query );
+		}
+		
+		return $data;
     }
 
     public function getTitleAlphabet($params)

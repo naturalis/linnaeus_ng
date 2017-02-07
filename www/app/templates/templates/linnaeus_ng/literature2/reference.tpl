@@ -1,11 +1,7 @@
-{include file="../shared/header.tpl"}
+{include file="../shared/header.tpl" title="Literature"}
+
 <div id="dialogRidge">
 	<div id="content" class="literature">
-	    <p id="header-titles-small">
-	    	<span id="mini-header-title">
-            {if $ref.author}{$ref.author}{/if}{if $ref.author && $ref.date}, {/if}{if $ref.date}{$ref.date}{/if}
-            </span>
-	    </p>
 	    <div id="page-main">
 	    	<div>
 				{* if $ref.label}<div id="text">{$ref.label}</div>{/if *}
@@ -17,6 +13,8 @@
 								<td>{$ref.publication_type}</td>
 							</tr>
 						{/if}
+                        
+                        
 						{capture authors}
 		                    {foreach from=$ref.authors item=v key=k}
 		                        {$v.name}
@@ -29,12 +27,15 @@
 	                    		{/if}
 		                    {/foreach}
 						{/capture}
-						<tr>
+						
+                        {if $ref.author || ($smarty.capture.authors|@trim|@strlen)>0}
+                        <tr>
 							<td>{t}Auteur(s){/t}</td>
 							<td>
-								{if ($smarty.capture.authors|@trim|@strlen)>0}{$smarty.capture.authors|@trim}{else}{$ref.author}{/if}
+								{if $ref.author}{$ref.author}{elseif ($smarty.capture.authors|@trim|@strlen)>0}{$smarty.capture.authors|@trim}{/if}
 							</td>
 						</tr>
+                        {/if}
 						{if $ref.date}
 							<tr>
 								<td>{t}Jaar{/t}</td>
