@@ -1069,31 +1069,49 @@ class NsrTaxonController extends NsrController
 		}
 		else
 		if (($child_base_rank==NOTHOGENUS_RANK_ID || $child_base_rank==GENUS_RANK_ID) &&
-			($parent_base_rank!=FAMILIA_RANK_ID && $parent_base_rank!=SUBFAMILIA_RANK_ID))
+			(
+				$parent_base_rank!=FAMILIA_RANK_ID && 
+				$parent_base_rank!=SUBFAMILIA_RANK_ID && 
+				$parent_base_rank!=TRIBUS_RANK_ID
+			))
 		{
-			// genus moet onder subfamilie of familie
-			$error=array($ranks[FAMILIA_RANK_ID]['rank'],$ranks[SUBFAMILIA_RANK_ID]['rank']);
+			// genus moet onder familie, subfamilia of tribus
+			$error=array($ranks[FAMILIA_RANK_ID]['rank'],$ranks[SUBFAMILIA_RANK_ID]['rank'],$ranks[TRIBUS_RANK_ID]['rank']);
 		}
 		else
+		if (($child_base_rank==TRIBUS_RANK_ID && $parent_base_rank!=FAMILIA_RANK_ID) &&
+			($child_base_rank==TRIBUS_RANK_ID && $parent_base_rank!=SUBFAMILIA_RANK_ID))
+		{
+			// tribus moet onder familia of subfamilia
+			$error=array($ranks[FAMILIA_RANK_ID]['rank'],$ranks[SUBFAMILIA_RANK_ID]['rank']);
+		}
 		if ($child_base_rank==SUBFAMILIA_RANK_ID && $parent_base_rank!=FAMILIA_RANK_ID)
 		{
 			// subfamilie moet onder familie
 			$error=array($ranks[FAMILIA_RANK_ID]['rank']);
 		}
 		else
-		if (($child_base_rank==FAMILIA_RANK_ID && $parent_base_rank!=SUBORDO_RANK_ID) &&
+		if (($child_base_rank==FAMILIA_RANK_ID && $parent_base_rank!=INFRAORDER_RANK_ID) &&
+			($child_base_rank==FAMILIA_RANK_ID && $parent_base_rank!=SUBORDO_RANK_ID) &&
 			($child_base_rank==FAMILIA_RANK_ID && $parent_base_rank!=ORDO_RANK_ID) &&
 			($child_base_rank==FAMILIA_RANK_ID && $parent_base_rank!=SUPERFAMILIA_RANK_ID))
 		{
-			// familie moet onder suborde, orde of superfamilia
-			$error=array($ranks[SUBORDO_RANK_ID]['rank'],$ranks[ORDO_RANK_ID]['rank'],$ranks[SUPERFAMILIA_RANK_ID]['rank']);
+			// familie moet onder infraorder, suborde, orde of superfamilia
+			$error=array($ranks[INFRAORDER_RANK_ID]['rank'],$ranks[SUBORDO_RANK_ID]['rank'],$ranks[ORDO_RANK_ID]['rank'],$ranks[SUPERFAMILIA_RANK_ID]['rank']);
 		}
 		else
 		if (($child_base_rank==SUPERFAMILIA_RANK_ID && $parent_base_rank!=ORDO_RANK_ID) &&
+			($child_base_rank==SUPERFAMILIA_RANK_ID && $parent_base_rank!=INFRAORDER_RANK_ID) &&
 			($child_base_rank==SUPERFAMILIA_RANK_ID && $parent_base_rank!=SUBORDO_RANK_ID))
 		{
-			// superfamilia moet onder orde of subordo
-			$error=array($ranks[ORDO_RANK_ID]['rank'],$ranks[SUBORDO_RANK_ID]['rank']);
+			// superfamilia moet onder orde, subordo of infraorde
+			$error=array($ranks[ORDO_RANK_ID]['rank'],$ranks[SUBORDO_RANK_ID]['rank'],$ranks[INFRAORDER_RANK_ID]['rank']);
+		}
+		else
+		if ($child_base_rank==INFRAORDER_RANK_ID && $parent_base_rank!=SUBORDO_RANK_ID)
+		{
+			// infraorder moet onder subordo
+			$error=array($ranks[ORDO_RANK_ID]['rank']);
 		}
 		else
 		if ($child_base_rank==SUBORDO_RANK_ID && $parent_base_rank!=ORDO_RANK_ID)
