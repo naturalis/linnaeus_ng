@@ -123,8 +123,6 @@ $(document).ready(function()
     Layers (click to toggle):
     <ul id="urls"></ul>
 
-</div>
-
 
 {*
 
