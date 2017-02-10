@@ -3,12 +3,12 @@
 	<div class="search-title-or-author">
 		<ul class="tabs tabs-grow literature-tabs-js">
 			<li class="tab-active">
-				<a href="javascript:checkFirst();" class="select-tab-js" data-target="search-title">
+				<a href="#" onclick="checkFirst();" class="select-tab-js" data-target="search-title">
 					Search by title
 				</a>
 			</li>
 			<li>
-				<a href="javascript:checkFirst();" class="select-tab-js" data-target="search-author">
+				<a href="#" onclick="checkFirst();" class="select-tab-js" data-target="search-author">
 					Search by author
 				</a>
 			</li>
@@ -51,11 +51,21 @@
 
 function  checkFirst()
 {
-	if ($('.alphabet-active-letter:visible').length==0) $('.click-letter:visible:first').trigger('click');
+	var hasActive=false;
+	$('.click-letter:visible').each(function(index,element)
+	{
+		if ($(this).hasClass('alphabet-active-letter')) hasActive=true;
+	});
+
+	if (!hasActive)
+	{
+		$('.click-letter:visible:first').trigger('click');
+	}
 	return false;
 }
 
-$(document).ready(function() {
+$(document).ready(function()
+{
 	$('body').on('click', '.select-tab-js', function()
 	{
 		var target = $(this).attr('data-target');
@@ -63,6 +73,17 @@ $(document).ready(function() {
 		$('.tab-content-js[data-content="'+target+'"]').addClass('active');
 		$('.literature-tabs-js li').removeClass('tab-active');
 		$(this).parent().addClass('tab-active');
+
+		// great....		
+		if ($(this).attr('onclick'))
+		{
+			// function we want to run
+			var fnstring = $(this).attr('onclick').replace(/\(\);/,'');
+			// find object
+			var fn = window[fnstring];
+			// is object a function?
+			if (typeof fn === "function") fn();
+		}
 	});
 
 	{if $prevSearch.search_title!=''}
