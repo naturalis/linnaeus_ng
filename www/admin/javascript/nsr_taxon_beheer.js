@@ -790,8 +790,8 @@ function buildDropList(data,variable)
 				}
 				
 				var label=
-					
-					(authors ? authors+" " : (t.author ? t.author+" " : ""))+
+					//(authors ? authors+" " : (t.author ? t.author+" " : ""))+
+					(t.author ? t.author+" " : (authors ? authors+" " : ""))+
 					(t.date ? t.date+". " : "")+
 					(t.label);
 			}

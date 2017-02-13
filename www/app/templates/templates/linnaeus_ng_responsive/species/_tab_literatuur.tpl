@@ -12,10 +12,12 @@
         
         
 	        <li><a href="../literature2/reference.php?id={$v.id}">
+                {if $v.author}
+                {$v.author}
+                {else}
                 {if ($smarty.capture.authors|@trim|@strlen)>0}
                 {$smarty.capture.authors|@trim}
-                {else}
-                {if $v.author}{$v.author}{/if}
+                {/if}
                 {/if}
                 {if $v.date} {$v.date}{/if}{if $v.author_name || $v.date}. {/if}{$v.label}</a>
             </li>
@@ -37,10 +39,12 @@
 
             <li>
                 <a href="../literature2/reference.php?id={$v.id}">
+                {if $v.author}
+                {$v.author}
+                {else}
                 {if ($smarty.capture.authors|@trim|@strlen)>0}
                 {$smarty.capture.authors|@trim}
-                {else}
-                {if $v.author}{$v.author}{/if}
+                {/if}
                 {/if}
                 {if $v.date} {$v.date}{/if}{if $v.author_name || $v.date}. {/if}{$v.label}</a>
                 (<a href="?id={$v.referencing_taxon.id}">{$v.referencing_taxon.taxon}</a>)
