@@ -63,9 +63,9 @@ final class Literature2Model extends AbstractModel
             select
 				distinct
                     if(
-                        ord(substr(lower(_a.label),1,1))<97||ord(substr(lower(_a.label),1,1))>122,
+                        ord(substr(lower(fnStripTags(_a.label)),1,1))<97||ord(substr(lower(fnStripTags(_a.label)),1,1))>122,
                         '#',
-                        substr(lower(_a.label),1,1)
+                        substr(lower(fnStripTags(_a.label)),1,1)
                     )
                 as letter
 			from

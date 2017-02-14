@@ -1420,7 +1420,7 @@ class Literature2Controller extends NsrController
 			{
 				if ($matchStartOnly)
 				{
-					$match=$match ? true : (stripos($val['label'],$search)===0);
+					$match=$match ? true : (stripos(strip_tags($val['label']),$search)===0);
 
 					if (!$match)
 						$match=$match ? true : (stripos($tempauthors,$search)===0);
@@ -1430,7 +1430,7 @@ class Literature2Controller extends NsrController
 				}
 				else
 				{
-					$match=$match ? true : (stripos($val['label'],$search)!==false);
+					$match=$match ? true : (stripos(strip_tags($val['label']),$search)!==false);
 
 					if (!$match)
 						$match=$match ? true : (stripos($tempauthors,$search)!==false);
@@ -1446,16 +1446,16 @@ class Literature2Controller extends NsrController
 			{
 				if ($fetchNonAlpha)
 				{
-					$startLetterOrd=ord(substr(strtolower($val['label']),0,1));
+					$startLetterOrd=ord(substr(strtolower(strip_tags($val['label'])),0,1));
 					$match=$match ? true : ($startLetterOrd<97 || $startLetterOrd>122);
 				}
 				else
 				{
 					if ($matchStartOnly)
-						$match=$match ? true : (stripos($val['label'],$searchTitle)===0);
+						$match=$match ? true : (stripos(strip_tags($val['label']),$searchTitle)===0);
 					else
 					{
-						$match=$match ? true : (stripos($val['label'],$searchTitle)!==false);
+						$match=$match ? true : (stripos(strip_tags($val['label']),$searchTitle)!==false);
 					}
 				}
 
@@ -1523,7 +1523,7 @@ class Literature2Controller extends NsrController
 
 				if (strtolower($aa)==strtolower($bb))
 				{
-					return strtolower($a['label'])>strtolower($b['label']);
+					return strtolower(strip_tags($a['label']))>strtolower(strip_tags($b['label']));
 				}
 
 				return strtolower($aa)>strtolower($bb);
@@ -1531,7 +1531,7 @@ class Literature2Controller extends NsrController
 		}
 		else
 		{
-			usort($data,function($a,$b){ return strtolower($a['label'])>strtolower($b['label']); });
+			usort($data,function($a,$b){ return strtolower(strip_tags($a['label']))>strtolower(strip_tags($b['label'])); });
 		}
 
 		return $data;

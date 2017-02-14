@@ -73,7 +73,7 @@ function lit2BuildList(action,data)
 		if (!t.id)
 			continue;
 
-		var author='';
+		var author="";
 		if (t.authors)
 		{
 			for (var k=0;k<t.authors.length;k++)
@@ -81,7 +81,7 @@ function lit2BuildList(action,data)
 				author+=(k>0?', ':'')+t.authors[k].name;
 			}
 		}
-
+		
 		if (author.trim.length==0 && t.author)
 		{
 			author=t.author;
@@ -92,7 +92,8 @@ function lit2BuildList(action,data)
 			buffer.push(
 				'<li class="lit-index-item"><a href="'+getItemUrl()+'?id='+t.id+'">'+
 				t.label+
-				( author ? ', '+author : '' ) +
+				( t.label && author ? ', ' : '' ) +
+				author +
 				'</a></li>'
 				);
 		}
