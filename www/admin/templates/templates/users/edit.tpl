@@ -27,14 +27,14 @@ table tr th {
         <tr>
             <th>{t}Username:{/t}</th>
             <td>
-            {if $user.id==$current_user}
+            {if $user.id==$current_user || $can_edit}
             <input type="text" id="username" name="username" value="{$user.username}" />
             {else}
             {$user.username}
             {/if}
             </td>
         </tr>
-        {if $user.id==$current_user}
+        {if $user.id==$current_user || $can_edit}
         <tr>
             <th>{t}Password:{/t}</th>
             <td><input type="password" id="password" name="password" value="" /></td>
@@ -51,7 +51,7 @@ table tr th {
         <tr>
             <th>{t}First name:{/t}</th>
             <td>
-            {if $user.id==$current_user}
+            {if $user.id==$current_user || $can_edit}
             <input type="text" id="first_name" name="first_name" value="{$user.first_name}" />
             {else}
             {$user.first_name}
@@ -61,7 +61,7 @@ table tr th {
         <tr>
             <th>{t}Last name:{/t}</th>
             <td>
-            {if $user.id==$current_user}
+            {if $user.id==$current_user || $can_edit}
             <input type="text" id="last_name" name="last_name" value="{$user.last_name}" />
             {else}
             {$user.last_name}
@@ -71,7 +71,7 @@ table tr th {
         <tr>
             <th>{t}E-mail address:{/t}</th>
             <td>
-            {if $user.id==$current_user}
+            {if $user.id==$current_user || $can_edit}
             <input type="text" id="email_address" name="email_address" value="{$user.email_address}" />
             {else}
             {$user.email_address}

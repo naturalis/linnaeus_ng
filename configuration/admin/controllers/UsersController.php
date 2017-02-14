@@ -193,13 +193,12 @@ class UsersController extends Controller
 			$this->setAction( 'update' );
 			$this->setNewUserData( $this->rGetAll() );
 			$this->sanitizeNewUserData();
-
-			// Users are only allowed to edit their own data
-			if ($this->_userid == $this->getCurrentUserId()) {
-    			$this->userDataCheck();
-    			$this->userDataSave();
-    			$this->userPasswordCheck();
-    			$this->userPasswordSave();
+			
+			if ($this->currentUserCanEditUserData()) {
+				$this->userDataCheck();
+				$this->userDataSave();
+				$this->userPasswordCheck();
+				$this->userPasswordSave();
 			}
 
 			$this->userRoleCheck();
@@ -236,9 +235,11 @@ class UsersController extends Controller
 				$this->redirect( 'index.php ');
 			}
 		}
-
+		
+		
 		$this->smarty->assign( 'user', $this->getUser() );
 		$this->smarty->assign( 'current_user', $this->getCurrentUserId() );
+		$this->smarty->assign( 'can_edit', $this->currentUserCanEditUserData() );
 		$this->smarty->assign( 'roles', $this->getUserPermittedRoles() );
 		$this->smarty->assign( 'expert_role_id', $this->getExpertRoleId() );
 		$this->smarty->assign( 'modules', $this->getProjectModulesUser() );
@@ -1048,6 +1049,19 @@ class UsersController extends Controller
 		$this->helpers->PasswordEncoder->setPassword( $password );
 		$this->helpers->PasswordEncoder->encodePassword();
 		return $this->helpers->PasswordEncoder->getHash();
+    }
+    
+    /*
+     * LINNA-930: 
+     * sysadmins can always edit;
+     * lead experts and editors can only edit their own data
+     */
+     private function currentUserCanEditUserData () {
+     	if ($this->isCurrentUserSysAdmin() || 
+     		$this->_userid == $this->getCurrentUserId()) {
+     		return true;
+     	}
+    	return false;
     }
 
 	private function generateRandomPassword()
