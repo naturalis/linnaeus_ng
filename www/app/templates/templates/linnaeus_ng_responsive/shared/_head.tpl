@@ -19,9 +19,55 @@
 		<link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/ionicons.min.css" />
 		<link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/jquery.fancybox.css" />
 		<link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/inline_templates.css" />
-        {if $cssToLoad}{section name=i loop=$cssToLoad}
-		<link rel="stylesheet" type="text/css" href="{$cssToLoad[i]}" />
-        {/section}{/if}
+    <!-- <link rel="stylesheet" type="text/css" media="print" title="default" href="{$projectUrls.projectCSS}20120928_print.css" />
+    <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}20120928_default.css" />
+    <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}20120928_menu.css" />
+    <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}20120928_layout.css" /> -->
+
+
+    <!--[if lte IE 7]>
+    <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}20120928_ie7.css" />
+    <![endif]-->
+    <!--[if lte IE 6]>
+    <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}20120928_ie6.css" />
+	{literal}
+    <style type="text/css">
+        .iepngfix, .iepngfix img {  
+            behavior: url({$projectUrls.projectCSS}iepngfix.htc); 
+        }
+        .iepngfix a { 
+            position: relative;  /* belangrijk ivm bug AlphaImageLoader filter positionering ! */
+        }
+	</style>
+	{/literal}
+    <![endif]-->
+
+    <!-- <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}20120928_conceptcard.css"> -->
+    <!--[if lte IE 7]>
+	    <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}20120928_conceptcardIeOnly.css" />
+    <![endif]-->
+    <!-- <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}prettyPhoto/prettyPhoto.css" /> -->
+	<!-- <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}jquery-ui-1.10.0.custom.min.css" /> -->
+    <!-- <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}morris.css" /> -->
+
+<!-- {if $cssToLoad}
+{section name=i loop=$cssToLoad}
+	<link rel="stylesheet" type="text/css" href="{$cssToLoad[i]}" />
+{/section}
+{/if} -->
+    <!--[if IE]>
+        <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}ie.css" />
+    <![endif]-->
+    <!--[if IE 8]>
+        <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}ie7-8.css" />
+    <![endif]-->
+    <!--[if IE 7]>
+        <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}ie7.css" />
+    <![endif]-->
+
+    <!--[if IE]>
+        <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}soortenregister-ie.css" />
+    <![endif]-->
 
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-1.9.1.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.urlparser.2.1.1.js"></script>
