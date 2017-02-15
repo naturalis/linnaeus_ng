@@ -125,6 +125,7 @@ class Controller extends BaseClass
     private $_showAutomaticHybridMarkers=true;
     private $_showAutomaticInfixes=true;
 	private $_googleAnalyticsCode;
+	private $_generalHeaderSubtitle;
 
     public $viewName;
     public $controllerBaseName;
@@ -224,6 +225,7 @@ class Controller extends BaseClass
 		$this->setCssFiles();
 		$this->setOtherStuff();
 		$this->setGoogleAnalyticsCode();
+		$this->setGeneralHeaderSubtitle();
     }
 
     /**
@@ -1884,6 +1886,10 @@ class Controller extends BaseClass
 		$this->smarty->assign('current_url', $this->helpers->CurrentUrl->getParts());
 		$this->smarty->assign('show_advanced_search_in_public_menu', $this->getSetting('show_advanced_search_in_public_menu',1)==1 );
 		$this->smarty->assign('googleAnalyticsCode', $this->getGoogleAnalyticsCode());
+		$this->smarty->assign('generalHeaderSubtitle', $this->getGeneralHeaderSubtitle());
+		
+		
+		
     }
 
     public function loadControllerConfig ($controllerBaseName = null)
@@ -3146,5 +3152,19 @@ class Controller extends BaseClass
         return isset($abr) ? $abr : null;
 	}
 
+	protected function setGeneralHeaderSubtitle()
+	{
+		$d=$this->models->ControllerModel->getSetting(array(
+			'project_id' => $this->getCurrentProjectId(),
+			'module_id' => GENERAL_SETTINGS_ID,
+			'setting' => 'site_header_subtitle'
+		));
 
+		$this->_generalHeaderSubtitle = $d ? $d : null;
+	}
+
+	protected function getGeneralHeaderSubtitle()
+	{
+		return $this->_generalHeaderSubtitle;
+	}
 }
