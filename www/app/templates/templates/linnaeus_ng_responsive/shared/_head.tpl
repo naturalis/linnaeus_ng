@@ -19,12 +19,9 @@
 		<link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/ionicons.min.css" />
 		<link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/jquery.fancybox.css" />
 		<link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/inline_templates.css" />
-
-<!-- {if $cssToLoad}
-{section name=i loop=$cssToLoad}
-	<link rel="stylesheet" type="text/css" href="{$cssToLoad[i]}" />
-{/section}
-{/if} -->
+		{foreach $cssToLoad v}
+		<link rel="stylesheet" type="text/css" href="{$v}" />
+		{/forach}
 
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-1.9.1.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.urlparser.2.1.1.js"></script>
