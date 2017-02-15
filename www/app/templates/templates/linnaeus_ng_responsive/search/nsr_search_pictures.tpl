@@ -6,7 +6,7 @@
 
 	<div id="left">
 		<a class="filterSearchText">
-		  Filter zoekopdracht
+		  {t}Filter zoekopdracht{/t}
 		  <i class="ion-chevron-down"></i>
 		</a>
 		<div class="treebranchContainer filterPictures">
