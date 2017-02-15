@@ -12,7 +12,10 @@
 	// silent fail on missing project id or no URL
 	//if (is_null($pId) || is_null($url)) // rewrite of drupal search has no URL
 	if (is_null($pId))
-		return;
+	{
+		$pId=1;
+		//return;
+	}
 
 	$c=new Controller;
 	$file='../configuration/app/rewrite/rewrite-'.$c->getProjectFSCode($pId).'.php';
