@@ -12,19 +12,16 @@
 	<title>{$session.app.project.title|@strip_tags:false}</title>
 
     <link rel="Shortcut Icon" href="{$projectUrls.projectCSS}favicon.ico" type="image/x-icon" />
-	
-		<link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/flexslider.css" />
-		<link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/soortenregister.css" />
-		<link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/linnaeus.css" />
-		<link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/ionicons.min.css" />
-		<link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/jquery.fancybox.css" />
-		<link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/inline_templates.css" />
 
-<!-- {if $cssToLoad}
-{section name=i loop=$cssToLoad}
-	<link rel="stylesheet" type="text/css" href="{$cssToLoad[i]}" />
-{/section}
-{/if} -->
+    <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/flexslider.css" />
+    <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/soortenregister.css" />
+    <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/linnaeus.css" />
+    <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/ionicons.min.css" />
+    <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/jquery.fancybox.css" />
+    <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/inline_templates.css" />
+    {foreach $cssToLoad v}
+    <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$v}" />
+    {/foreach}
 
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-1.9.1.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.urlparser.2.1.1.js"></script>
