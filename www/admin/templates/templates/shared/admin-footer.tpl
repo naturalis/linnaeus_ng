@@ -3,7 +3,7 @@
 
 {if $GitVars->commit->hash && $session.admin.user._logged_in}
 <div class="git-info">
-<span title="{$GitVars->commit->hash}">[{$GitVars->describe}]</span>{if $GitVars->commit->hash!=$GitVars->origin_commit_hash}<span title="{t}commit differs from origin{/t}">&deg;</span>{/if} {if $GitVars->git_tags}[{$GitVars->git_tags|@implode:"; "}] {/if}({$GitVars->commit->date}) ({$GitVars->branch} branch @ {$server_name})
+<span title="{$GitVars->commit->hash}">[{$GitVars->describe}]</span>{if $GitVars->commit->hash!=$GitVars->origin_commit_hash}<span title="{t}commit differs from origin{/t}">&deg;</span>{/if} ({$GitVars->commit->date}) ({$GitVars->branch} branch @ {$server_name})
 </div>
 {/if}
 
