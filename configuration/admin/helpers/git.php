@@ -9,6 +9,7 @@ class Git {
 	private $git_commit;
 	private $git_origin_commit_hash;
 	private $git_tags;
+	private $git_describe;
 
     public function __construct ()
     {
@@ -32,6 +33,7 @@ class Git {
 		$this->setCommit();
 		$this->setOriginCommitHash();
 		$this->setTags();
+		$this->setDescribe();
 	}
 
     public function getBranch()
@@ -52,6 +54,11 @@ class Git {
     public function getTags()
     {
 		return $this->git_tags;
+    }
+	
+    public function getDescribe()
+    {
+		return $this->git_describe;
     }
 	
 	private function setExecPath()
@@ -115,5 +122,11 @@ class Git {
 		}
 	}
 
+	private function setDescribe()
+	{
+		if ( empty($this->git_branch) ) return;
+		$p=$this->exec_path . " describe";
+		$this->git_describe=trim(@shell_exec( $p ));
+	}
 }
 
