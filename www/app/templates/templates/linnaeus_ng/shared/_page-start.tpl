@@ -26,6 +26,9 @@
 						</div>
 					</div>
 				{/if}
+                
+				<div id="menu-bottom">{snippet}menu_bottom.html{/snippet}</div>
+                
 			</div>	
 		{/if}
 	{/if}
