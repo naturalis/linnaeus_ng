@@ -24,6 +24,10 @@
 	$compare->setCfgFile(dirname(__FILE__) . '/../configuration/admin/configuration.php');
 	$compare->setEmptyDbFile(dirname(__FILE__) . '/../database/empty_database.sql');
 	$compare->setOutputFile(dirname(__FILE__) . '/output/%s-modify-%s.sql');
+
+	$compare->setGeneralOutputFile(dirname(__FILE__) . '/output/latest-modify.sql');
+	$compare->setGeneralErrorFile(dirname(__FILE__) . '/output/latest-errors.txt');
+
 	$compare->setDoNotCreateTempDatabase(true);
 	$compare->setPreflightQueries(array(
         //'ALTER TABLE `literature2` DROP INDEX `project_id`;'
@@ -43,6 +47,8 @@
 		private $emptyDbFile='/var/www/linnaeusng/database/empty_database.sql';
 		private $outputFile='%s_modify_%s.sql';
 		private $errorFile;
+		private $generalOutputFile='latest-modify.sql';
+		private $generalErrorFile='latest-errors.txt';
 
 		private $start;
 
@@ -125,6 +131,16 @@
 			$this->outputFile=$p;
 		}
 
+		public function setGeneralOutputFile( $p )
+		{
+			$this->generalOutputFile=$p;
+		}
+
+		public function setGeneralErrorFile( $p )
+		{
+			$this->generalErrorFile=$p;
+		}
+
 		public function setDbUserOverride( $p )
 		{
 			$this->dbUserOverride=$p;
@@ -168,6 +184,7 @@
 			$this->dropTestDatabase();
 			$this->writeQueries();
 			$this->writeErrors();
+			$this->copyOutputFilesToGeneral();
 			$this->finish();
 		}
 
@@ -212,7 +229,13 @@
 			$this->start=new DateTime();
 			$this->outputFile = sprintf( $this->outputFile , $this->dbDb0, $this->start->format('Y-m-d_H-i-s') );
 			$this->errorFile = $this->outputFile . "-errors.txt";
+		
+			@unlink($this->generalOutputFile);
+			@unlink($this->generalErrorFile);
+
 		}
+
+
 
 		private function connectDatabase()
 		{
@@ -714,6 +737,20 @@
 				{
 					die( sprintf( "abnormal program termnination: could not open '%s' for writing", $this->errorFile ) );
 				}
+			}
+		}
+
+		private function copyOutputFilesToGeneral()
+		{
+			if ( !empty($this->queries) )
+			{
+				echo sprintf( "copying to general output file '%s'", $this->generalOutputFile ) ;
+				copy($this->outputFile,$this->generalOutputFile);
+			}
+			if ( !empty($this->errors) ) 
+			{
+				echo sprintf( "copying to general error file '%s'", $this->generalErrorFile ) ;
+				copy($this->errorFile,$this->generalErrorFile);
 			}
 		}
 
