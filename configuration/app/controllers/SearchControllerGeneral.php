@@ -266,7 +266,7 @@ class SearchControllerGeneral extends SearchController
         $this->printPage();
     }
 
-	private function tokenizeSearchString( $s )
+	private function tokenizeSearchString( $s, $skipMarkers = false )
 	{
 		/*
 			splits search string in groups delimited by ". if there's an uneven number of ", the last one is ignored.
@@ -302,9 +302,24 @@ class SearchControllerGeneral extends SearchController
 			}
 		}
 		// take out the empty ones and return
-		$t=array_filter($t);
+		$terms=array_filter($t);
 
-		return $t;
+        // Not so fast, first we're going to append terms stripped off infraspecific markers
+        if ($skipMarkers) {
+            $markers = $this->getProjectRanksAbbreviations();
+            if (!empty($markers)) {
+                foreach ($terms as $t) {
+                    foreach ($markers as $m) {
+                        if (strpos($t, ' ' . $m . ' ') !== false) {
+                            $strippedTerms[] = str_replace(' ' . $m . ' ', ' ', $t);
+                        }
+                    }
+                }
+                $terms = isset($strippedTerms) ? array_merge($terms, $strippedTerms) : $terms;
+            }
+        }
+
+		return $terms;
 
 	}
 
@@ -570,12 +585,16 @@ class SearchControllerGeneral extends SearchController
 		$freeModules=isset($p['freeModules']) ? $p['freeModules'] : null;
 		$extended=isset($p['extended']) ? $p['extended'] : true;
 
+		// Ruud 07-12-16: option to duplicate the search term WITHOUT infraspecific markers.
+		// Only applies to literal search strings and for markers present in project
+		// This is passed to $this->tokenizeSearchString as a second parameter
+		$skipMarkers = isset($p['skip_markers']) ? $p['skip_markers'] : true;
+
 		if (empty($search))
 			return null;
 
 		$searchAll=($modules=='*');
-
-		$tokenized = $this->tokenizeSearchString($search);
+		$tokenized = $this->tokenizeSearchString($search, $skipMarkers);
 		$liketxt = $this->prefabFullTextLikeString($tokenized);
 		$containsLiterals = $this->doesSearchStringContainLiterals($tokenized);
 
@@ -595,14 +614,14 @@ class SearchControllerGeneral extends SearchController
 		if ( $searchAll ||
 			(
 				( is_array($modules) && in_array('species',$modules) ) ||
-				( is_array($modules) && in_array('key',$modules) ) 
+				( is_array($modules) && in_array('key',$modules) )
 			)
 		)
 		{
 			$species=$this->searchSpecies( $p );
 			$p['species_results']=$species;
 		}
-		
+
 		$results =
 			array(
 				'introduction' =>
@@ -889,7 +908,7 @@ class SearchControllerGeneral extends SearchController
 			$numOfResults+=count((array)$content);
 
 		}
-		
+
 		/*
 
 		if (isset($synonyms))
@@ -919,7 +938,7 @@ class SearchControllerGeneral extends SearchController
 			$numOfResults+=count((array)$commonnames);
 
 		}
-		
+
 		*/
 
 		if (isset($names))
@@ -1165,7 +1184,7 @@ class SearchControllerGeneral extends SearchController
 
 	private function searchDichotomousKey( $p )
 	{
-		
+
 		$keysteps = $this->models->Keysteps->_get(
 			array(
 				'id' => array(
@@ -1192,7 +1211,7 @@ class SearchControllerGeneral extends SearchController
 					}
 				}
 			}
-		
+
 			if ( !empty($taxon_ids) )
 			{
 				$a=$this->translate('Step');
@@ -1225,7 +1244,7 @@ class SearchControllerGeneral extends SearchController
 						concat('".$a." ',_b.number,', ".$b." ',_a.show_order)
 
 					limit " . $p[self::S_RESULT_LIMIT_PER_CAT] . "
-					
+
 				");
 
 				//_c.taxon as ".__CONCAT_RESULT__."

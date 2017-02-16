@@ -144,7 +144,6 @@ class SearchController extends Controller
 	private function initialize()
 	{
 		$this->moduleSession=$this->helpers->SessionModuleSettings;
-
 		$this->moduleSettings=new ModuleSettingsReaderController;
 		$this->moduleSettings->setUseDefaultWhenNoValue( true );
 		$this->moduleSettings->assignModuleSettings( $this->settings );
@@ -165,12 +164,14 @@ class SearchController extends Controller
 		$this->_excerptPreMatchLength=$this->moduleSettings->getModuleSetting(array('setting'=>'excerpt_pre-match_length','subst'=>35,'module'=>'utilities'));
 		$this->_excerptPostMatchLength=$this->moduleSettings->getModuleSetting(array('setting'=>'excerpt_post-match_length','subst'=>35,'module'=>'utilities'));
 		$this->_excerptPrePostMatchString=$this->moduleSettings->getModuleSetting(array('setting'=>'excerpt_pre_post_match_string','subst'=>'...','module'=>'utilities'));
+
+		$this->UserRights->setNoModule( true );
 		
 	}
 
     public function indexAction ()
     {
-		$this->checkAuthorisation();
+        $this->checkAuthorisation();
 
 		$this->setPageName( $this->translate('Extensive search') );
 

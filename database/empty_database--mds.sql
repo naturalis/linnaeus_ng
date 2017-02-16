@@ -919,8 +919,6 @@ CREATE TABLE `literature2` (
   `publication_type` varchar(24) DEFAULT NULL,
   `publication_type_id` int(11) DEFAULT NULL,
   `actor_id` int(11) DEFAULT NULL,
-  `citation` varchar(1000) DEFAULT NULL,
-  `source` varchar(255) DEFAULT NULL,
   `publisher` varchar(255) DEFAULT NULL,
   `publishedin` varchar(255) DEFAULT NULL,
   `publishedin_id` int(11) DEFAULT NULL,

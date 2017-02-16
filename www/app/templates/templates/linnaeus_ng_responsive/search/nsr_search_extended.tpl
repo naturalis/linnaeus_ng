@@ -329,7 +329,7 @@ function submitSearchParams()
 		<div id="results" class="searchResultContainer"> 
 			<div class="searchHeader">
 	      <h2>
-	      	Zoekresultaten
+	      	{t}Zoekresultaten{/t}
 	      </h2>
           
 	      <div class="formrow orderList">

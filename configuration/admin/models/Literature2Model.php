@@ -63,9 +63,9 @@ final class Literature2Model extends AbstractModel
             select
 				distinct
                     if(
-                        ord(substr(lower(_a.label),1,1))<97||ord(substr(lower(_a.label),1,1))>122,
+                        ord(substr(lower(fnStripTags(_a.label)),1,1))<97||ord(substr(lower(fnStripTags(_a.label)),1,1))>122,
                         '#',
-                        substr(lower(_a.label),1,1)
+                        substr(lower(fnStripTags(_a.label)),1,1)
                     )
                 as letter
 			from
@@ -162,8 +162,6 @@ final class Literature2Model extends AbstractModel
 				_a.date,
 				_a.author,
 				_a.publication_type,
-				_a.citation,
-				_a.source,
 				ifnull(_a.publishedin,ifnull(_h.label,null)) as publishedin,
 				ifnull(_a.periodical,ifnull(_i.label,null)) as periodical,
 				_a.pages,
@@ -494,8 +492,6 @@ final class Literature2Model extends AbstractModel
 				_a.date,
 				_a.author,
 				_a.publication_type,
-				_a.citation,
-				_a.source,
 				ifnull(_a.publishedin,ifnull(_h.label,null)) as publishedin,
 				ifnull(_a.periodical,ifnull(_i.label,null)) as periodical,
 				_a.pages,

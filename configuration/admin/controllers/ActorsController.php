@@ -58,7 +58,7 @@ class ActorsController extends NsrController
 	{
 		$this->checkAuthorisation();
 		$this->setPageName($this->translate('Index'));
-	
+
 		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
 		$this->smarty->assign( 'can_create', $this->getAuthorisationState() );
 
@@ -160,7 +160,7 @@ class ActorsController extends NsrController
 
 		if (empty($name))
 		{
-			$this->addError('Geen naam. Actor niet opgeslagen.');
+			$this->addError('Name missing. Actor not saved.');
 			$this->setActorId(null);
 			return;
 		}
@@ -175,13 +175,13 @@ class ActorsController extends NsrController
 		{
 			$this->setActorId($this->models->Actors->getNewId());
 			$this->createNsrIds(array('id'=>$this->getActorId(),'type'=> 'actor', 'subtype'=> ( $this->rHasVal('is_company','1') ? 'organization' : 'person' )));
-			$this->addMessage('Nieuw actor aangemaakt.');
+			$this->addMessage('New actor created.');
 			$this->updateActor();
 			$this->logChange(array('after'=>$this->getActor(),'note'=>'new actor '.$name));
 		}
 		else
 		{
-			$this->addError('Aanmaak nieuwe actor mislukt.');
+			$this->addError('Could not create new actor.');
 		}
 	}
 
@@ -203,11 +203,11 @@ class ActorsController extends NsrController
 				if ($this->updateActorValue($field,$this->rGetVal($field)))
 				{
 					if ($this->models->Actors->getAffectedRows()!=0)
-						$this->addMessage($label.' opgeslagen.');
+						$this->addMessage($label.' saved.');
 				}
 				else
 				{
-					$this->addError($label.' niet opgeslagen.');
+					$this->addError($label.' not saved.');
 				}
 			}
 		}
@@ -227,7 +227,7 @@ class ActorsController extends NsrController
 
 		if (empty($id))
 		{
-			$this->addError("Geen ID.");
+			$this->addError("No ID.");
 			return;
 		}
 
@@ -274,44 +274,44 @@ class ActorsController extends NsrController
 			array('expert' => null),
 			array('expert_id'=>$id,'project_id'=>$this->getCurrentProjectId())
 		);
-		$this->addMessage("Expert verwijderd van ".$this->models->Names->getAffectedRows()." namen.");
+		$this->addMessage("Expert deleted from ".$this->models->Names->getAffectedRows()." names.");
 
 		$this->models->Names->update(
 		    array('organisation_id' => null),
 		    array('organisation_id'=>$id,'project_id'=>$this->getCurrentProjectId())
 		);
-		$this->addMessage("Organisatie verwijderd van ".$this->models->Names->getAffectedRows()." namen.");
+		$this->addMessage("Organisation deleted from ".$this->models->Names->getAffectedRows()." names.");
 
         $this->models->PresenceTaxa->update(
 		    array('actor_id' => null),
 		    array('actor_id'=>$id,'project_id'=>$this->getCurrentProjectId())
 		);
-		$this->addMessage("Expert verwijderd van ".$this->models->PresenceTaxa->getAffectedRows()." statussen.");
+		$this->addMessage("Expert deleted from ".$this->models->PresenceTaxa->getAffectedRows()." statuses.");
 
 		$this->models->PresenceTaxa->update(
 		    array('actor_org_id' => null),
 		    array('actor_org_id'=>$id,'project_id'=>$this->getCurrentProjectId())
 		);
-		$this->addMessage("Organisatie verwijderd van ".$this->models->PresenceTaxa->getAffectedRows()." statussen.");
+		$this->addMessage("Organisation deleted from ".$this->models->PresenceTaxa->getAffectedRows()." statuses.");
 
 		$this->models->Literature2Authors->delete(
 		    array('actor_id'=>$id,'project_id'=>$this->getCurrentProjectId())
 		);
-		$this->addMessage("Auteur ontkoppeld van ".$this->models->Literature2Authors->getAffectedRows()." literatuurreferenties.");
+		$this->addMessage("Actor detached from ".$this->models->Literature2Authors->getAffectedRows()." literature references.");
 
 		$this->models->Rdf->delete(
 		    array('object_id'=>$id,'object_type'=>'actor')
 		);
-		$this->addMessage("Auteur verwijderd van ".$this->models->Rdf->getAffectedRows()." tabbladen.");
+		$this->addMessage("Actor deleted from ".$this->models->Rdf->getAffectedRows()." tabs.");
 
 		$this->models->NsrIds->delete(
 		    array('lng_id'=>$id,'project_id'=>$this->getCurrentProjectId(),'item_type'=>'actor')
 		);
-		$this->addMessage("Actor NSR ID verwijderd.");
+		$this->addMessage("Actor NSR ID deleted.");
 
 		// Left this one because of the limit 1
 		$this->models->Actors->freeQuery("delete from %PRE%actors where project_id = ".$this->getCurrentProjectId()." and id = ".$id." limit 1");
-		$this->addMessage("Actor verwijderd.");
+		$this->addMessage("Actor deleted.");
 
 	}
 
@@ -440,7 +440,7 @@ class ActorsController extends NsrController
     		'languageId' => $this->getDefaultProjectLanguage(),
     		'expertId' => $id
 		));
-		
+
 		foreach((array)$presences as $key=>$val)
 		{
 			$presences[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );

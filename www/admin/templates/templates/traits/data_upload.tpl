@@ -22,6 +22,14 @@
             CSV-file to load: <input name="importFile" type="file" />&nbsp;*<br />
         {/if}
     </p>
+
+	<p>
+        {t}CSV field delimiter:{/t}
+        <label><input type="radio" name="delimiter" value="comma" checked="checked" />, {t}(comma){/t}</label>
+        <label><input type="radio" name="delimiter" value="semi-colon" />; {t}(semi-colon){/t}</label>
+        <label><input type="radio" name="delimiter" value="tab" />{t}tab stop{/t}</label>
+	</p>
+
     <p>   
     	<input type="submit" value="upload and parse" />
     </p>

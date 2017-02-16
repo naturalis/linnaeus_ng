@@ -125,6 +125,7 @@ class Controller extends BaseClass
     private $_showAutomaticHybridMarkers=true;
     private $_showAutomaticInfixes=true;
 	private $_googleAnalyticsCode;
+	private $_generalHeaderSubtitle;
 
     public $viewName;
     public $controllerBaseName;
@@ -209,10 +210,10 @@ class Controller extends BaseClass
         $this->loadSmartyConfig();
         $this->checkWriteableDirectories();
 		$this->setRankIdConstants();
-		$this->setNameTypeIds();
         $this->setRequestData();
 		$this->checkForProjectId();
         $this->checkGlobalAuthorization();
+		$this->setNameTypeIds();
         $this->startModuleSession();
         $this->restoreState();
         $this->setProjectLanguages();
@@ -224,6 +225,7 @@ class Controller extends BaseClass
 		$this->setCssFiles();
 		$this->setOtherStuff();
 		$this->setGoogleAnalyticsCode();
+		$this->setGeneralHeaderSubtitle();
     }
 
     /**
@@ -1073,7 +1075,7 @@ class Controller extends BaseClass
 			)
 		);
     }
-
+/*
     public function formatTaxon($p=null) //($taxon,$ranks=null)
     {
 
@@ -1222,6 +1224,139 @@ class Controller extends BaseClass
 		//$result=$this->addHybridMarkerAndInfixes(array('name'=> $result,'base_rank_id'=>$rankId));
 
 		return $result;
+    }
+*/
+    public function formatTaxon($p=null) //($taxon,$ranks=null)
+    {
+
+		if (is_null($p))
+			return;
+
+		// switching between $p being an array of parameters (taxon, ranks, rankpos) and $p just being the taxon (which is an array in itself)
+		if (isset($p['taxon']) && is_array($p['taxon'])) {
+			$taxon=$p['taxon'];
+		} else {
+			$taxon=$p;
+		}
+
+		$ranks=isset($p['ranks']) ? $p['ranks'] : null;
+		$rankpos=(isset($p['rankpos']) && in_array($p['rankpos'],array('pre','post','none')) ? $p['rankpos'] : null);
+
+		if (empty($taxon))
+			return;
+
+		$addInfixes = $this->getShowAutomaticInfixes();
+
+        $author = '';
+        // Strip author from taxon if present
+        if (isset($taxon['authorship']) &&
+            substr_compare($taxon['taxon'], $taxon['authorship'], -strlen($taxon['authorship'])) === 0) {
+            $taxon['taxon'] = trim(str_replace($taxon['authorship'], '', $taxon['taxon']));
+            $author = ' ' . $taxon['authorship'];
+        }
+
+		$e = explode(' ', $taxon['taxon']);
+        $r = is_null($ranks) ? $this->getProjectRanks() : $ranks;
+
+		if (!isset($taxon['rank_id'])||$taxon['rank_id']==0) { // shouldn't happen!
+			 return $taxon['taxon'];
+        }
+
+        if (isset($r[$taxon['rank_id']]['labels'][$this->getCurrentLanguageId()]))
+            $d = $r[$taxon['rank_id']]['labels'][$this->getCurrentLanguageId()];
+        else
+            $d = $r[$taxon['rank_id']]['rank'];
+
+        $rankId = $r[$taxon['rank_id']]['rank_id'];
+        $rankName = ucfirst($d);
+        $abbreviation = $r[$taxon['rank_id']]['abbreviation'];
+
+        // Rank level is above genus; no formatting
+        if ($rankId < GENUS_RANK_ID) {
+            switch ($rankpos) {
+                case 'none':
+                    return $taxon['taxon'] . $author;
+                case 'post':
+                    return $taxon['taxon'] . $author .', ' . $rankName;
+                default:
+                    return $rankName . ' ' . $taxon['taxon'] . $author;
+            }
+        }
+
+        // Genus or subgenus; add italics
+        if ($rankId < SPECIES_RANK_ID && count($e) == 1) {
+
+            // Species case for subgenus and section: append genus name
+            // Set constant for section, may not be present in constants.php yet...
+            $subscript = '';
+            if (((defined('SECTION_2_RANK_ID') && $rankId == SECTION_2_RANK_ID) ||
+                $rankId == SUBGENUS_RANK_ID) && isset($taxon['parent_id'])) {
+                $parent = $this->getTaxonById($taxon['parent_id']);
+                $subscript = ' <span class="italics">(' . $parent['taxon'] . ')</span>';
+             }
+
+            switch ($rankpos) {
+                case 'none':
+                    return '<span class="italics">' . $taxon['taxon'] . '</span>' . $author;
+                case 'post':
+                    return '<span class="italics">' . $taxon['taxon'] . '</span>' . $author . ', ' . $rankName . $subscript;
+                default:
+                    return $rankName . '  <span class="italics">' . $taxon['taxon'] . '</span>' . $author;
+            }
+        }
+
+        // Species
+        if ($rankId > GENUS_RANK_ID && count($e) == 2) {
+            $name = '<span class="italics">' . $taxon['taxon'] . '</span>';
+        }
+
+        // Regular infraspecies, name consists of three parts
+        if (count($e) == 3) {
+            $name = '<span class="italics">' . $e[0] . ' ' . $e[1] . (!empty($abbreviation) && $addInfixes ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[2] . '</span>';
+        }
+
+        // Single infraspecies with subgenus
+        if (count($e) == 4 && $e[1][0] == '(') {
+            $name = '<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] . (!empty($abbreviation) && $addInfixes ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[3] . '</span>';
+        }
+
+        // Return now if name has been set
+        if (isset($name)) {
+            return $this->addHybridMarker(array('name' => $name, 'base_rank_id' => $rankId)) . $author;
+        }
+
+        // Now we're handling more complicated cases. We need the parent before continuing
+        // say goodbye to the orphans
+		if (empty($taxon['parent_id'])) {
+            return $taxon['taxon'];
+        }
+
+        $parent = $this->getTaxonById($taxon['parent_id']);
+        // say goodbye to the misguided orphans
+        if (empty($parent['rank_id'])) {
+            return $taxon['taxon'];
+        }
+        $parentAbbreviation = $r[$parent['rank_id']]['abbreviation'];
+
+        // Double infraspecies
+        if (count($e) == 4) {
+            $name = '<span class="italics">' . $e[0] . ' ' . $e[1] . (!empty($parentAbbreviation) && $addInfixes ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') . $e[2] .
+             (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[3] . '</span>';
+        }
+
+        // Double infraspecies with subgenus
+        if (count($e) == 5 && $e[1][0] == '(') {
+            $name = '<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] . (!empty($parentAbbreviation) && $addInfixes ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') . $e[3] .
+             (!empty($abbreviation) && $addInfixes ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[4] . '</span>';
+        }
+
+        // Return now if name has been set
+        if (isset($name)) {
+			return $this->addHybridMarker(array('name' => $name, 'base_rank_id' => $rankId)) . $author;
+        }
+
+        // If we end up here something must be wrong, just return name sans formatting
+        return $taxon['taxon'];
     }
 
    private function setHybridMarker($name, $rankId, $isHybrid)
@@ -1686,7 +1821,7 @@ class Controller extends BaseClass
             session_start();
 
             /* DEBUG */
-        $_SESSION['app']['system']['server_addr'] = $_SERVER['SERVER_ADDR'];
+        // $_SESSION['app']['system']['server_addr'] = $_SERVER['SERVER_ADDR'];
     }
 
     private function getProjectDependentTemplates ()
@@ -1751,6 +1886,10 @@ class Controller extends BaseClass
 		$this->smarty->assign('current_url', $this->helpers->CurrentUrl->getParts());
 		$this->smarty->assign('show_advanced_search_in_public_menu', $this->getSetting('show_advanced_search_in_public_menu',1)==1 );
 		$this->smarty->assign('googleAnalyticsCode', $this->getGoogleAnalyticsCode());
+		$this->smarty->assign('generalHeaderSubtitle', $this->getGeneralHeaderSubtitle());
+		
+		
+		
     }
 
     public function loadControllerConfig ($controllerBaseName = null)
@@ -2738,8 +2877,15 @@ class Controller extends BaseClass
 			}
 			else
 			{
-				$ied=explode(' ', $name, 2);
+				/*
+				/$ied=explode(' ', $name, 2);
 				return $ied[0]. '  ' . $marker . $ied[1];
+				*/
+			    $f = strip_tags($name);
+			    $ied=explode(' ', $f, 2);
+				$r = $ied[0]. '  ' . $marker . $ied[1];
+				return str_replace($f, $r, $name);
+
 			}
 		}
 		else
@@ -2995,4 +3141,30 @@ class Controller extends BaseClass
 		return $this->_googleAnalyticsCode;
 	}
 
+	protected function getProjectRanksAbbreviations ()
+	{
+        $ranks = $this->getProjectRanks();
+        foreach ($ranks as $r) {
+            if (!empty($r['abbreviation'])) {
+                $abr[] = $r['abbreviation'];
+            }
+        }
+        return isset($abr) ? $abr : null;
+	}
+
+	protected function setGeneralHeaderSubtitle()
+	{
+		$d=$this->models->ControllerModel->getSetting(array(
+			'project_id' => $this->getCurrentProjectId(),
+			'module_id' => GENERAL_SETTINGS_ID,
+			'setting' => 'site_header_subtitle'
+		));
+
+		$this->_generalHeaderSubtitle = $d ? $d : null;
+	}
+
+	protected function getGeneralHeaderSubtitle()
+	{
+		return $this->_generalHeaderSubtitle;
+	}
 }

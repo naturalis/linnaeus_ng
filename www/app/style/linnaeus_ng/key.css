@@ -41,15 +41,8 @@
 #choice-table td.separator {
   height: 10px; }
 
-#decision-path-icon {
-  margin-left: 15px; }
-
 #back-to-search-icon {
   margin-right: -8px; }
-
-/* step */
-#step {
-  text-align: justify; }
 
 #step #question #head {
   font-size: 14px;
@@ -66,19 +59,6 @@
 
 #step #img-choices {
   position: relative; }
-
-.l2_choice {
-  cursor: pointer;
-  width: 270px;
-  min-height: 155px;
-  background-color: #eeede9;
-  margin-bottom: 8px;
-  padding: 5px;
-  margin: 5px;
-  font-size: 90%; }
-
-.l2_choice.no_image {
-  width: 535px; }
 
 #choice-table .choice-picture {
   width: auto; }
@@ -100,9 +80,6 @@
 
 #step .marker {
   font-weight: bold; }
-
-.l2_text {
-  min-height: 120px; }
 
 #step .text-choice-img {
   font-family: Arial, sans-serif;
@@ -134,23 +111,11 @@
   color: #ddd; }
 
 /* remaining taxa */
-#panel {
-  width: 230px;
-  float: right; }
   #panel #categories {
 	  font-size:0.8em;
     left: 0; }
     #panel #categories a {
       border-width: 0; }
-
-#taxa {
-  width: 240px;
-  overflow: auto;
-  background-color: #eeede9;
-  float: right;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  max-height: 500px; }
 
 #taxa #header {
   font-weight: bold;
@@ -159,32 +124,17 @@
 
 #taxa a {
   display: block;
-  max-width: 220px;
   text-align: left;
-  padding: 0 4px;
   font-size:12.5px;
  }
 
 #taxa a:link, #taxa a:visited, #taxa p.a:link, #taxa p.a:visited {
   color: #000;
-  text-decoration: none;
-  border: 1px solid transparent; }
-
-#taxa p {
-  margin-bottom: 0; }
+  text-decoration: none; }
 
 #taxa a:hover, #taxa p.a:hover {
   color: #009ee0; }
 
-#taxa p:last-child {
-  margin-bottom: 10px; }
-
-#categories {
-  position: relative;
-  left: 570px;
-  top: 10px; 
-  font-size:0.9em; 
-  width:auto; }
 #categories a.category-active {
 background-color: #eeede9 !important; }
 
@@ -195,8 +145,6 @@ background-color: #eeede9 !important; }
   border-bottom: 1px dotted #e3004a; }
 .module-key #lookup-DialogContent a:hover b {
   border-bottom: 1px dotted #009ee0; }
-.module-key #lookup-DialogContent .row {
-  margin-bottom: 1em; }
 
 .name_switch {
 	font-size:11px;

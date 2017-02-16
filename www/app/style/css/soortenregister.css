@@ -1730,7 +1730,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
         -ms-transform: translateY(-50%);
             transform: translateY(-50%);
     z-index: -1; }
-/*	
+/*
     @media screen and (max-width: 994px) {
       #taxonImage img {
         min-height: 100%;
@@ -2149,7 +2149,7 @@ table tr td {
   font-style: normal;
 }
 
-i, em {
+i, em, .italics {
   font-style: italic;
 }
 
@@ -2159,4 +2159,5 @@ strong {
 
 .whiteBox {
   max-width: 100%;
+  max-width: 735px; /* for IE only, but <!--[if !IE]> no longer detects IE >= v10 */
 }

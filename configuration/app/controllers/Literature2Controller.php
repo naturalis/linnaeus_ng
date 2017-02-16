@@ -19,7 +19,7 @@ class Literature2Controller extends Controller
 		'literature2',
 		'literature2_authors'
     );
-   
+
     public $controllerPublicName = 'Literary references';
 
 	public $cssToLoad = array(
@@ -59,7 +59,7 @@ class Literature2Controller extends Controller
     {
 
         parent::__destruct();
-    
+
     }
 
     public function indexAction()
@@ -75,7 +75,8 @@ class Literature2Controller extends Controller
 
 		$ref=$this->getReference( $this->rGetId() );
 
-		$this->setPageName($ref['label'].', '.$ref['source']);
+		//$this->setPageName($ref['label'].', '.$ref['source']);
+		$this->setPageName($ref['label']);
 
 		$this->smarty->assign( 'ref', $ref );
 		$this->smarty->assign( 'taxa', $this->getReferencedTaxa( $this->rGetId() ) );
@@ -105,10 +106,17 @@ class Literature2Controller extends Controller
 
 	private function getReferencedTaxa( $id )
 	{
-		return $this->models->Literature2Model->getReferencedTaxa(array(
+		$taxa = $this->models->Literature2Model->getReferencedTaxa(array(
             'project_id' => $this->getCurrentProjectId(),
     		'literature_id' => $id
 		));
+		foreach ((array)$taxa as $i => $taxon) {
+            $taxa[$i]['taxon'] = $this->addHybridMarkerAndInfixes(array(
+                'name' => $taxon['taxon'],
+                'base_rank_id' => $taxon['base_rank_id']
+            ));
+		}
+		return $taxa;
 	}
 
 	private function getTitleAlphabet()
@@ -282,7 +290,7 @@ class Literature2Controller extends Controller
 			{
 				$aa=isset($a['authors'][0]['name']) ? $a['authors'][0]['name'] : $a['author'];
 				$bb=isset($b['authors'][0]['name']) ? $b['authors'][0]['name'] : $b['author'];
-				
+
 				if (strtolower($aa)==strtolower($bb))
 				{
 					return strtolower($a['label'])>strtolower($b['label']);
@@ -303,7 +311,7 @@ class Literature2Controller extends Controller
     private function getReferenceLookupList($p)
     {
 		$data=$this->getReferences($p);
-		
+
         $maxResults=isset($p['max_results']) && (int)$p['max_results']>0 ? (int)$p['max_results'] : $this->_lookupListMaxResults;
 
 		return

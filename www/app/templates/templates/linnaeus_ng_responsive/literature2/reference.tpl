@@ -1,4 +1,5 @@
 {include file="../shared/header.tpl"}
+
 <div id="dialogRidge">	
 	<div id="content" class="literature">
 		<div class="whiteBox">
@@ -42,7 +43,7 @@
 					{if $ref.volume}<tr><td>{t}Volume{/t}</td><td>{$ref.volume}</td></tr>{/if}
 					{if $ref.pages}<tr><td>{t}Pagina's{/t}</td><td>{$ref.pages}</td></tr>{/if}
 					{if $ref.publisher}<tr><td>{t}Uitgever{/t}</td><td>{$ref.publisher}</td></tr>{/if}
-					{if $ref.external_link}<tr><td>{t}Link{/t}</td><td><a href="{$ref.external_link}" target="_blank">{$ref.external_link}</a></td></tr>{/if}
+					{if $ref.external_link}<tr><td>{t}Link{/t}</td><td><a href="{$ref.external_link}" style="overflow:hidden" target="_blank">{t}ga naar brondocument{/t}{*$ref.external_link|replace:'.':'.<wbr>&#8203;'*}</a></td></tr>{/if}
 					</tbody>
 				</table>
 

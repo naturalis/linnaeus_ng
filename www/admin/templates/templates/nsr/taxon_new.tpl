@@ -29,8 +29,8 @@
         	<th>{t}parent{/t}:</th>
 			<td style="vertical-align:bottom">
                 <span id="parent_taxon">{$parent.taxon}</span>
-                <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Ouder');return false;" rel="parent_taxon_id">{t}edit{/t}</a> *
-                <input type="hidden" id="parent_taxon_id" value="" mandatory="mandatory" onchange="getinheritablename();" label="{t}ouder{/t}" droplistminlength="3" />
+                <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Parent');return false;" rel="parent_taxon_id">{t}edit{/t}</a> *
+                <input type="hidden" id="parent_taxon_id" value="" mandatory="mandatory" onchange="getinheritablename();" label="{t}parent{/t}" droplistminlength="3" />
 			</td>
 		</tr>
 

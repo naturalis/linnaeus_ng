@@ -4,8 +4,8 @@
             <!-- <img src="{$projectUrls.projectCSS}../img/siteTitle.png" class="siteTitle" /> -->
             <img src="{$projectUrls.projectCSS}../img/logo-small-pink.png" class="logo" />
             <div class="siteTitle">
-                <h1>Nederlands Soortenregister</h1>
-                <h2>Overzicht van de Nederlandse biodiversiteit</h2>
+                <h1>{$session.app.project.title}</h1>
+                <h2>{$generalHeaderSubtitle}</h2>
             </div>
         </div>
     </div>

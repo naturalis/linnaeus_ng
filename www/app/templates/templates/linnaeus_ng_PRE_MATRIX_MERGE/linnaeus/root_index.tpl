@@ -56,7 +56,7 @@ To use an application, follow one of the following links:<br />
 <input type="hidden" name="rnd" value="{1|rand:99999999}" />
 </form>
 
-</div ends="page-container">
+</div>
 <div id="footer-container"></div ends="footer-container">
 </div ends="body-container">
 

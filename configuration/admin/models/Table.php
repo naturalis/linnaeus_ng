@@ -109,7 +109,7 @@ final class Table extends AbstractModel
 				else
 				if ($d['type'] == 'date' || $d['type'] == 'datetime' || $d['type'] == 'timestamp')
 				{
-                    if ($this->isDateTimeFunction($val)) {
+					if ($this->isDateTimeFunction($val)) {
                         $values .= $val . ", ";
                     }
                     else
@@ -189,7 +189,7 @@ final class Table extends AbstractModel
                 else
 				if ($d['type'] == 'datetime')
 				{
-                    $query .= " `" . $key . "` = " . $val . ", ";
+                    $query .= " `" . $key . "` = '" . $val . "', ";
                 }
                 else
 				{

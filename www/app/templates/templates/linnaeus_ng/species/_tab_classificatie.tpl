@@ -1,5 +1,3 @@
-<br style="clear:all" />
-
 <p>
 <b>{t}Classification{/t}</b><br />
 {foreach $content.classification v k classification}

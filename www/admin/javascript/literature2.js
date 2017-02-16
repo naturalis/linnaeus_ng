@@ -10,7 +10,7 @@ function getItemUrl()
 	return itemurl;
 }
 
-function lit2Lookup(caller,action,letter) 
+function lit2Lookup(caller,action,letter)
 {
 	if (!letter)
 	{
@@ -18,14 +18,14 @@ function lit2Lookup(caller,action,letter)
 		if (text.length<1)
 			return;
 	}
-	else 
+	else
 	{
 		var text=letter;
 	}
-	
+
 	$('#lit2-result-list').html('');
 	$('#result-count').html('');
-	
+
 	data={
 		'action' : 'reference_lookup' ,
 		'time' : allGetTimestamp()
@@ -46,7 +46,7 @@ function lit2Lookup(caller,action,letter)
 		data.search_author=text;
 	}
 
-	
+
 
 	$.ajax({
 		url : "ajax_interface.php",
@@ -64,7 +64,7 @@ function lit2Lookup(caller,action,letter)
 function lit2BuildList(action,data)
 {
 	var buffer=Array();
-	
+
 	//$('#result-count').html('Found '+data.results.length);
 
 	for(var i in data.results)
@@ -72,8 +72,8 @@ function lit2BuildList(action,data)
 		var t=data.results[i];
 		if (!t.id)
 			continue;
-			
-		var author='';
+
+		var author="";
 		if (t.authors)
 		{
 			for (var k=0;k<t.authors.length;k++)
@@ -86,13 +86,14 @@ function lit2BuildList(action,data)
 		{
 			author=t.author;
 		}
-	
+
 		if (action.indexOf('title')!=-1)
 		{
 			buffer.push(
 				'<li class="lit-index-item"><a href="'+getItemUrl()+'?id='+t.id+'">'+
 				t.label+
-				( author ? ', '+author : '' ) +
+				( t.label && author ? ', ' : '' ) +
+				author +
 				'</a></li>'
 				);
 		}
@@ -104,7 +105,7 @@ function lit2BuildList(action,data)
 	}
 
 	$('#lit2-result-list').html('<ul>'+buffer.join('')+'</ul>');
-	
+
 }
 
 var authors=Array();
@@ -128,7 +129,7 @@ function addAnyField(p)
 		if ($('#'+p.id_root+'-'+k).length==0)
 			break;
 	}
-	
+
 	var buffer=Array()
 	buffer.push('<option value="">-</option>');
 	for(var i in p.values)
@@ -145,7 +146,7 @@ function addAnyField(p)
 	$('#'+p.container).html(
 		$('#'+p.container).html()+
 		'<span id="'+p.id_root+'-'+k+'"><select name="'+p.id_root+'[]">'+buffer.join('')+'</select>'+
-		'<a class="edit" href="#" onclick="$(\'#'+p.id_root+'-'+k+'\').remove();return false;">verwijderen</a><br /></span>');
+		'<a class="edit" href="#" onclick="$(\'#'+p.id_root+'-'+k+'\').remove();return false;">delete</a><br /></span>');
 
 	$('select[name^='+p.id_root+']').each(function(i){
 		$(this).val(currVals[i]);

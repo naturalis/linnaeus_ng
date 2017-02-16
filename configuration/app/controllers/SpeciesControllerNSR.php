@@ -300,11 +300,11 @@ class SpeciesControllerNSR extends SpeciesController
         if ($this->rHasId())
 		{
 			$name=$this->getName(array('nameId'=>$this->rGetId()));
+
 			$name['nametype']=sprintf($this->Rdf->translatePredicate($name['nametype']),$name['language_label']);
 
 			$taxon=$this->getTaxonById($name['taxon_id']);
 			$taxon['taxon']=$this->addHybridMarkerAndInfixes( array('name'=>$taxon['taxon'],'base_rank_id'=>$taxon['base_rank_id']) );
-
 			if ( $this->show_nsr_specific_stuff )
 			{
 				$overview = $this->getTaxonOverviewImageNsr($taxon['id']);
@@ -553,7 +553,7 @@ class SpeciesControllerNSR extends SpeciesController
 				$i++;
 
 				$reference->subst_values[$key]=$sval;
-			
+
 			}
 		}
 
@@ -630,10 +630,32 @@ class SpeciesControllerNSR extends SpeciesController
 			else
 			if ( $reference->check_type=='output' )
 			{
-				if ( $remote_check ) 
+				if ( $remote_check )
 				{
 					$ctx=stream_context_create( [ 'http'=> [ 'timeout' => $this->_ext_tab_timeout ] ] );
-					$is_empty=empty( @json_decode( @file_get_contents( $full_url, false, $ctx ) ) );
+					
+					if (!empty($reference->query))
+					{
+						$output=@json_decode( @file_get_contents( $full_url, false, $ctx ), true );
+						$path=explode( "->", $reference->query );
+						foreach((array)$path as $bit)
+						{
+							if (isset($output[$bit]))
+							{
+								$output=$output[$bit];
+							}
+							else
+							{
+								break;
+							}
+						}
+					}
+					else
+					{
+						$output=@json_decode( @file_get_contents( $full_url, false, $ctx ) );
+					}
+
+					$is_empty=empty( $output );
 				}
 			}
 			else
@@ -866,7 +888,7 @@ class SpeciesControllerNSR extends SpeciesController
     		'taxonId' => $id
 		));
 
-		$d=current((array)$names);
+        $d=current((array)$names);
 		$base_rank_id=isset($d['taxon_base_rank_id']) ? $d['taxon_base_rank_id'] : null;
 
 		$preferredname=null;
@@ -905,7 +927,7 @@ class SpeciesControllerNSR extends SpeciesController
 				if ($base_rank_id>=GENUS_RANK_ID)
 				{
 					$nomen_no_formatting=trim($nomen);
-					$nomen='<i>'.$this->addHybridMarkerAndInfixes( array('name'=>trim($nomen),'base_rank_id'=>$base_rank_id) ).'</i>';
+					$nomen='<span class="italics">'.$this->addHybridMarkerAndInfixes( array('name'=>trim($nomen),'base_rank_id'=>$base_rank_id) ).'</span>';
 					$names[$key]['name']=trim($nomen.' '.$val['authorship']);
 				}
 
@@ -971,6 +993,17 @@ class SpeciesControllerNSR extends SpeciesController
 				$bb=!empty($b['authorship_year']) ? intval($b['authorship_year']) : intval(preg_replace('/\D/',"",$b['name']));
 				return ( $aa > $bb ? 1 : ( $aa < $bb ? -1 : 0 ) );
 			});
+
+			// Mark up synonyms with hybrid and infraspecific markers if they have been assigned a rank_id
+            foreach ($synonyms as $i => $syn) {
+                if (isset($syn['synonym_base_rank_id']) && !empty($syn['synonym_base_rank_id'])) {
+                    $synonyms[$i]['name'] = $this->addHybridMarkerAndInfixes(array(
+                        'name' => $syn['name'],
+                        'base_rank_id' => $syn['synonym_base_rank_id']
+                    ));
+                }
+            }
+
 			array_splice($names,$synonymStartIndex,0,$synonyms);
 		}
 
@@ -1268,7 +1301,10 @@ class SpeciesControllerNSR extends SpeciesController
     		'nameId' => $nameId
 		));
 
-		$d['name']=$this->addHybridMarkerAndInfixes( array('name'=>$d['name'],'base_rank_id'=>$d['base_rank_id']) );
+		if ($d['nametype']==PREDICATE_VALID_NAME && $d['language_id']==LANGUAGE_ID_SCIENTIFIC ||
+            isset($d['synonym_base_rank_id']) && !empty($d['synonym_base_rank_id'])) {
+		    $d['name']=$this->addHybridMarkerAndInfixes( array('name'=>$d['name'],'base_rank_id'=>$d['base_rank_id']) );
+		}
 
 		$d['addition']=$this->getNameAddition(array('name_id'=>$d['id']));
 
@@ -1416,6 +1452,7 @@ class SpeciesControllerNSR extends SpeciesController
 		else
 		if ( !empty($ref->full_url) && !empty($ref->link_embed) && ( $ref->link_embed=='embed' || $ref->link_embed=='template'  ) )
 		{
+			
 			if ( $ref->full_url_valid )
 			{
 				$external_content->content_raw=@file_get_contents( $ref->full_url );

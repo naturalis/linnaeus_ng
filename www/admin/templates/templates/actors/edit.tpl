@@ -107,7 +107,7 @@
 	<div id="links-literature" style="display:none">
 		<ul class="small">
             {foreach from=$links.literature item=v key=k}
-            <li><a href="../literature2/edit.php?id={$v.id}">{if 1==2 && $v.citation}{$v.citation}{else}{$v.label}{/if}</a></li>
+            <li><a href="../literature2/edit.php?id={$v.id}">{$v.label}</a></li>
             {/foreach}
 		</ul>
 	</div>

@@ -4,6 +4,9 @@
 	max-height: 250px;
 	border: 1px solid #ddd;
 }
+input[type=text] {
+	width:1200px;
+}
 </style>
 
 {include file="../shared/admin-header.tpl"}
@@ -23,12 +26,12 @@
     <table>
         <tr>
             <td>{t}Internal name{/t}:</td>
-            <td><input type="text" name="sys_name" value="{$state.sys_name}" maxlength="32" /></td>
+            <td><input type="text" name="sys_name" value="{$state.sys_name}" style="width:300px" maxlength="255" /></td>
         </tr>
     {foreach $languages v i}
         <tr>
             <td>{$v.language} {t}name{/t}:</td>
-            <td><input type="text" name="labels[{$v.language_id}]" value="{$state.labels[$v.language_id].label}" maxlength="64" /></td>
+            <td><input type="text" name="labels[{$v.language_id}]" value="{$state.labels[$v.language_id].label}" style="width:300px" maxlength="255" /></td>
         </tr>
     {/foreach}
 

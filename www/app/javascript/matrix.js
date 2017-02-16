@@ -772,10 +772,13 @@ function printCountHeader()
 	else
 	if (matrixsettings.browseStyle=='paginate')
 	{
+		var rangeEnd = (matrixsettings.start+matrixsettings.perPage);
+		if (rangeEnd>resultset.length) rangeEnd = resultset.length;
+
 		$('#result-count').html(
 			fetchTemplate( 'counterPaginateHtmlTpl' )
 				.replace('%FIRST-NUMBER%', (matrixsettings.start+1))
-				.replace('%LAST-NUMBER%',(matrixsettings.start+matrixsettings.perPage))
+				.replace('%LAST-NUMBER%', rangeEnd)
 				.replace('%NUMBER-LABEL%',__('van'))
 				.replace('%NUMBER-TOTAL%',resultset.length)
 		);
@@ -810,6 +813,8 @@ function printPaging()
 
 	setSetting({lastPage:Math.ceil(resultset.length / matrixsettings.perPage)});
 	setSetting({currPage:Math.floor(matrixsettings.start / matrixsettings.perPage)});
+
+	$("#paging-header > li").remove();
 
 	if (matrixsettings.lastPage > 1 && matrixsettings.currPage!=0)
 	{
@@ -1655,7 +1660,6 @@ function doRemoteLink( url, name, nameScientific, nameCommon )
 			dataType: "jsonp",
 			success : function ( data )
 			{
-				// data = {"pId":1,"taxon":"Ablattaria laevigata","cat":"163","striptags":false,"project":"Nederlands Soortenregister","exported":"2015-11-30T14:33:32+01:00","page":{"title":"Tekst determinatiesleutels","body":"<p><strong>Herkenning <\/strong>Te herkennen aan het zeer kleine formaat, ten hoogste 8 mm. Lijkt op een&nbsp;kleine versie van de gewone oorworm, met achtervleugels die onder de dekschilden&nbsp;uitsteken. De tangen van het mannetje zijn gebogen met enkele kleine knobbels, bij het&nbsp;vrouwtje vrij kort.&nbsp;<\/p>\n\n<p><strong>Voorkomen<\/strong> Waarschijnlijk vrij algemeen in heel Nederland, maar wordt, door het kleine&nbsp;formaat, onopvallende gedrag en afwijkend biotoop, weinig gezien.<\/p>\n\n<p><strong>Biotoop<\/strong> Planten zich voort in broeiende afvalhopen, mesthopen e.d. Worden, t.o.v.&nbsp;andere oorwormen relatief vaak vliegend waargenomen. &nbsp;&nbsp;<\/p>\n\n<p><strong>Fenologie adult<\/strong> Van april tot oktober, met een piek in hoogzomer.<\/p>\n","rdf":null}};
 				showMoreInfoOverlay( 
 					data.page.body, 
 					url,

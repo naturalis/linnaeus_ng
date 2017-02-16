@@ -589,46 +589,47 @@ class WebservicesModel extends AbstractModel
 		
 		$query="
 			select
-				_a.id
-			from taxa _a
+				count(distinct _a.id) as total
 
-			left join traits_taxon_values _ttv
+			from 
+				%PRE%taxa _a
+
+			left join %PRE%traits_taxon_values _ttv
 				on _a.project_id = _ttv.project_id
 				and _a.id = _ttv.taxon_id
 
-			left join traits_values _tv
+			left join %PRE%traits_values _tv
 				on _ttv.project_id = _tv.project_id
 				and _ttv.value_id = _tv.id
 
-			left join traits_traits _tt
+			left join %PRE%traits_traits _tt
 				on _tv.project_id = _tt.project_id
 				and _tv.trait_id = _tt.id
 				and _tt.trait_group_id=".$group_id."
 
-			left join traits_taxon_freevalues _ttf
+			left join %PRE%traits_taxon_freevalues _ttf
 				on _a.project_id = _ttf.project_id
 				and _a.id = _ttf.taxon_id
 
-			left join traits_traits _tt2
+			right join %PRE%traits_traits _tt2
 				on _ttf.project_id = _tt2.project_id
 				and _ttf.trait_id = _tt2.id
 				and _tt2.trait_group_id=".$group_id."
 
-			left join trash_can _trash
+			left join %PRE%trash_can _trash
 				on _a.project_id = _trash.project_id
 				and _a.id =  _trash.lng_id
 				and _trash.item_type='taxon'
 
 			where
-				_a.project_id =1
+				_a.project_id = " . $project_id ."
 				and ifnull(_trash.is_deleted,0)=0
-				group by _a.id
 				having count(_ttv.id)+count(_ttf.id) > 0
 		";
 
 		$d=$this->freeQuery( $query );
-
-		return $this->format_number(count($d));
+		
+		return $d[0]['total'];
 	}
 
     public function getSearchResults( $params )

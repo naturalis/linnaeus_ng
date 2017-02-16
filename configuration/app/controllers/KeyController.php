@@ -727,7 +727,7 @@ class KeyController extends Controller
 		
 		foreach((array)$steps as $key=>$val)
 		{
-			$steps[$key]['label']=$this->translate('Step').' '.$val['number'].(!empty($val['label']) && $val['label']!=$val['number'] ? ': '.$val['label'] : '');
+			$steps[$key]['label']=$this->translate('Step').' '.$val['number'].(!empty($val['label']) && $val['label']!=$val['number'] ? '. '.$val['label'] : '');
 		}
 		
 		$this->smarty->assign(

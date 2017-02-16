@@ -1,5 +1,5 @@
 <div id="allLookupList" class="allLookupListInvisible"></div>
-</div ends="page-container">
+</div>
 
 {if $controllerMenuOverride}
     {include file=$controllerMenuOverride}

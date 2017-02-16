@@ -189,7 +189,7 @@ final class Table extends AbstractModel
                 else
 				if ($d['type'] == 'datetime')
 				{
-                    $query .= " `" . $key . "` = " . $val . ", ";
+                    $query .= " `" . $key . "` = '" . $val . "', ";
                 }
                 else
 				{

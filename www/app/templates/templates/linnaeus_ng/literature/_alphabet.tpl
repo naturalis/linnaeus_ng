@@ -1,4 +1,4 @@
-<div id="alphabet">
+<div class="alphabet">
 	{assign var=foo value=$alpha|@count}
 	{foreach $alpha v k}
 		{if $letter==$v}

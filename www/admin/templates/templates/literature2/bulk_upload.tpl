@@ -49,10 +49,10 @@
             <p>
             select appropriate fields per column; mutiple columns of the same field will be concatenated.
             choose 'ignore' to skip a column, or click 'remove column' to ignore and hide it from view.
-            optionally, use "reference #" to indicate the column in your data with an ID that you need 
+            optionally, use "reference #" to indicate the column in your data with an ID that you need
             to match with.
             </p>
-            
+
             <table>
             {foreach from=$lines item=line key=k}{if $k<5}
                 {if $k==0}
@@ -82,7 +82,7 @@
 					{/if}
                     {/if}
                     {/foreach}
-                </tr>        
+                </tr>
                 {/if}
 				{if !$ignorefirst || ($ignorefirst && $k>0)}
                 <tr>
@@ -147,7 +147,7 @@
 
 		    {assign var=m value=$matches[$k]}
 		    {assign var=found_full_match value=false}
-			
+
             {if $m.labels|@count>0}
             {foreach from=$m.labels item=match}
             	<tr>
@@ -156,10 +156,10 @@
 	                        {if $match.match.label|@round==100 && $match.match.label|@round!= $match.match.label}&asymp;{/if}
        	        		    {$match.match.label|@round}%
         		            <input
-                            	type="radio"  
-                                data-id="{$k}" 
-                                name="match_ref[{$k}]" 
-                                value="{$match.id}" 
+                            	type="radio"
+                                data-id="{$k}"
+                                name="match_ref[{$k}]"
+                                value="{$match.id}"
                                 {if $match.match.label==100} checked="checked"{assign var=found_full_match value=true}{/if}
 							/>
 						</label>
@@ -193,7 +193,7 @@
 					</td>
 				</tr>
             {/if}
-            
+
 
 			{if $matching_publication_types[$k]==""}
             	<tr style="display:none" id="pub-type-warning-{$k}">
@@ -203,7 +203,7 @@
 					</td>
 				</tr>
 			{/if}
-            
+
 			</table>
 
             {if $i>1}
@@ -225,7 +225,7 @@
             {/if}
 		</div>
 		{/if}
-        
+
         {/foreach}
 
         <p>
@@ -279,7 +279,7 @@ $(document).ready(function()
 		}
 		e.preventDefault();
 	});
-	
+
 });
 </script>
 

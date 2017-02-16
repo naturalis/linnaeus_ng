@@ -1,4 +1,4 @@
-<div id="allNavigationPane">
+<!-- <div id="allNavigationPane">
 
 {include file="../shared/_back-to-search.tpl"}
 
@@ -30,7 +30,7 @@
     
     </div>
 
-</div>
+</div> -->
 
 <script type="text/javascript">
 $(document).ready(function()

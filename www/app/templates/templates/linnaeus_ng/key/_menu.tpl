@@ -4,7 +4,7 @@
 	allLookupSetSelectedId({$selectedChoice.id});
 </script>
 
-<div id="allNavigationPane">
+<!-- <div id="allNavigationPane">
 <div class="navigation-icon-wrapper">
 
 {assign var='totalSteps' value=$keypath|@count}
@@ -55,4 +55,4 @@
 
 
 	
-</div>
+</div> -->

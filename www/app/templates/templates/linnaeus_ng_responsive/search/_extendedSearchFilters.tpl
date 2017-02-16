@@ -1,5 +1,5 @@
 <a class="filterSearchText">
-  Filter zoekopdracht
+  {t}Filter zoekopdracht{/t}
 </a>
 <form method="get" action="" id="formSearchFacetsSpecies" name="formSearchFacetsSpecies">
   <div>
@@ -16,7 +16,10 @@
         </div>
         *}
      </fieldset>
+     
      <fieldset class="selectable-parameters">
+
+        {if $search_filter_presence}
         <div class="formrow">
            <label
               for="presenceStatusList" 
@@ -27,31 +30,35 @@
               <i class="ion-chevron-up up"></i>
            </label>
             
-						<ul id="presence-options-panel" class="selectableParametersPanel">
-              <li>
-                <!-- {if $search_presence_help_url}
-                  <a href="{$search_presence_help_url}" target="_blank"  title="{t}klik voor help over dit onderdeel{/t}" class="help">Meer informatie</a>
-                {/if} -->
-                <a href="http://www.nederlandsesoorten.nl/content/voorkomen" target="_blank" class="help">Meer informatie</a>
-              </li>
-							<li>
-								<select class="customSelect" id="presenceStatusList" name="presenceStatusList" onchange="addSearchParameter('presenceStatusList');">
-                 	<option value="">{t}maak een keuze{/t}</option>
-                 	{foreach from=$presence_statuses item=v}
-                 	<option id="established{$v.id}" value="presence[{$v.id}]" established="{$v.established}">
-			            	{$v.index_label}
-			             	{$v.information_short}
-           				</option>
-           				{/foreach}
-           </select>
-							</li>
-						</ul>
+            <ul id="presence-options-panel" class="selectableParametersPanel">
+	            <li>
+                    <!-- {if $search_presence_help_url}
+                    <a href="{$search_presence_help_url}" target="_blank"  title="{t}klik voor help over dit onderdeel{/t}" class="help">Meer informatie</a>
+                    {/if} -->
+                    <a href="http://www.nederlandsesoorten.nl/content/voorkomen" target="_blank" class="help">{t}Meer informatie{/t}</a>
+    	        </li>
+                <li>
+                    <select class="customSelect" id="presenceStatusList" name="presenceStatusList" onchange="addSearchParameter('presenceStatusList');">
+                        <option value="">{t}maak een keuze{/t}</option>
+                        {foreach from=$presence_statuses item=v}
+                        <option id="established{$v.id}" value="presence[{$v.id}]" established="{$v.established}">
+                        {$v.index_label}
+                        {$v.information_short}
+                        </option>
+                        {/foreach}
+                    </select>
+                </li>
+            </ul>
            <p class="options-panel" id="" style="display:none">
               
            <a href="#" onclick="addEstablished();submitSearchParams();return false;">{t}gevestigde soorten{/t}</a> / 
            <a href="#" onclick="addNonEstablished();submitSearchParams();return false;">{t}niet gevestigde soorten{/t}</a>
            </p>
         </div>
+        {/if}
+
+
+        {if $search_filter_multimedia}
         <div class="formrow">
            <label
               for="multimedia-options" 
@@ -71,7 +78,7 @@
               </select>
            	</li>
            	<li>
-              <label for="multimedia-distribution" class="normalLabel">Verspreidingskaart</label>
+              <label for="multimedia-distribution" class="normalLabel">{t}Verspreidingskaart{/t}</label>
            		<select class="customSelect" id="multimedia-distribution" onchange="addSearchParameter('multimedia-distribution');">
 								<option value="">{t}Verspreidingskaart{/t}</option>
 								<option value="distribution_on">{t}met verspreidingskaart{/t}</option>
@@ -79,7 +86,7 @@
               </select>
            	</li>
            	<li>
-              <label for="multimedia-trend" class="normalLabel">Trendgrafiek</label>
+              <label for="multimedia-trend" class="normalLabel">{t}Trendgrafiek{/t}</label>
            		<select class="customSelect" id="multimedia-trend" onchange="addSearchParameter('multimedia-trend');">
                 <option value="">{t}Trendgrafiek{/t}</option>
                 <option value="trend_on">{t}met trendgrafiek{/t}</option>
@@ -88,7 +95,9 @@
            	</li>
            </ul>
         </div>
-        {if !$suppressDnaBarcodes}
+        {/if}
+        
+        {if $search_filter_dna_barcodes}
         <div class="formrow">
            <label 
               for="dna-options"
@@ -100,7 +109,7 @@
            </label>
            <ul id="dna-options-panel" class="selectableParametersPanel">
             <li>
-              <a href="http://www.nederlandsesoorten.nl/content/dna-barcoding" target="_blank" title="{t}klik voor help over dit onderdeel{/t}" class="help">Meer informatie</a>
+              <a href="http://www.nederlandsesoorten.nl/content/dna-barcoding" target="_blank" title="{t}klik voor help over dit onderdeel{/t}" class="help">{t}Meer informatie{/t}</a>
             </li>
            	<li>
            		<select class="customSelect" id="dna-options" name="dna-options" onchange="addSearchParameter('dna-options');">
@@ -116,7 +125,7 @@
 
       {foreach from=$traits item=t key=k1}
       <div class="formrow">
-        <label class="clickable" panel="traits{$k1}-options">
+        <label class="clickable trait-panel-header" panel="traits{$k1}-options">
           <strong>{$t.name}</strong>
           <i class="ion-chevron-down down"></i>
           <i class="ion-chevron-up up"></i>
@@ -124,7 +133,7 @@
         <ul id="traits{$k1}-options" class="selectableParametersPanel">
           {if $t.help_link_url}
             <li>
-              <a href="{$t.help_link_url}" target="_blank"  title="{t}klik voor help over dit onderdeel{/t}" class="help">Meer informatie</a>
+              <a href="{$t.help_link_url}" target="_blank"  title="{t}klik voor help over dit onderdeel{/t}" class="help">{t}Meer informatie{/t}</a>
               </li>
           {/if}
           

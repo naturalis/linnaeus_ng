@@ -85,6 +85,14 @@ class TraitsDataController extends TraitsController
 		$this->smarty->assign('sysColReferences',$this->_sysColReferences);
 		$this->smarty->assign('sysColNsrId',$this->_sysColNsrId);
     }
+	
+	public function translateDelimiter( $label )
+	{
+		if ($label=="comma") return ",";
+		if ($label=="semi-colon") return ";";
+		if ($label=="tab") return "\t";
+		return $this->_inputFileFieldSeparator;
+	}
 
     public function dataUploadAction()
     {
@@ -104,7 +112,8 @@ class TraitsDataController extends TraitsController
 						'name'=>$this->requestDataFiles[0]['name'],
 						'status'=>'raw',
 						'traitgroup'=>$this->rGetVal('traitgroup'),
-						'lines'=>null
+						'lines'=>null,
+						'field_separator'=>$this->translateDelimiter($this->rGetVal('delimiter'))
 					)
 				);
             }
@@ -309,7 +318,6 @@ class TraitsDataController extends TraitsController
 	{
 		$file=$this->getDataSession();
 
-
 		//		$raw=file($file['path'],FILE_IGNORE_NEW_LINES);
 		/*
 			apparently, excelsheets use line feeds (Lf, chr(10)) for line breaks within cells. for
@@ -336,7 +344,9 @@ class TraitsDataController extends TraitsController
 				$line = ltrim($line,chr(239).chr(187).chr(191));  //BOM!
 			}
 				
-			$cell=explode($this->_inputFileFieldSeparator,$line);
+			//$cell=explode($this->_inputFileFieldSeparator,$line);
+			$cell=explode($file['field_separator'],$line);
+
 			$buffer=array();
 
 			for($i=count($cell)-1;$i>=0;$i--)

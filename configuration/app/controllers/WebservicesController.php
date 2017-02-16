@@ -924,54 +924,18 @@ parameters:
 				'label'=>$this->translate('Trendgrafieken')
 			);
 
-
-		$exotenGroupId=1;
-
-        $d=$this->models->Taxa->freeQuery("
-			select
-				_a.id
-			from taxa _a
-
-			left join traits_taxon_values _ttv
-				on _a.project_id = _ttv.project_id
-				and _a.id = _ttv.taxon_id
-
-			left join traits_values _tv
-				on _ttv.project_id = _tv.project_id
-				and _ttv.value_id = _tv.id
-
-			left join traits_traits _tt
-				on _tv.project_id = _tt.project_id
-				and _tv.trait_id = _tt.id
-				and _tt.trait_group_id=".$exotenGroupId."
-
-			left join traits_taxon_freevalues _ttf
-				on _a.project_id = _ttf.project_id
-				and _a.id = _ttf.taxon_id
-
-			left join traits_traits _tt2
-				on _ttf.project_id = _tt2.project_id
-				and _ttf.trait_id = _tt2.id
-				and _tt2.trait_group_id=".$exotenGroupId."
-
-			left join trash_can _trash
-				on _a.project_id = _trash.project_id
-				and _a.id =  _trash.lng_id
-				and _trash.item_type='taxon'
-
-			where
-				_a.project_id =1
-				and ifnull(_trash.is_deleted,0)=0
-				group by _a.id
-				having count(_ttv.id)+count(_ttf.id) > 0
-		");
+		$group=1;
 		
+		$count=$this->models->WebservicesModel->getExoticsPassportCount([
+			'project_id'=>$this->getCurrentProjectId(),
+			'group_id'=>$group
+			]);
+
 		$result['statistics']['exotics']=
 			array(
-				'count'=>format_number(count($d)),
+				'count'=>format_number($count),
 				'label'=>$this->translate('Exotenpaspoorten')
 			);
-
 
 		$this->setJSON(json_encode($result));
 		header('Content-Type: application/json');			

@@ -2,7 +2,7 @@
 	allLookupSetSelectedId({$taxon.id});
 </script>
 
-<div id="allNavigationPane">
+<!-- <div id="allNavigationPane">
 {include file="../shared/_back-to-search.tpl"}
 <div class="navigation-icon-wrapper">
 
@@ -33,3 +33,4 @@
 {/if}
 </div>
 </div>
+ -->

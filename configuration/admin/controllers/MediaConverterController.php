@@ -114,7 +114,7 @@ class MediaConverterController extends MediaController
         		));
             }
 
-            $this->addMessage(count($delete) . ' incorrectly linked media files were unlinked.');
+            $this->addMessage(count($delete) . ' incorrectly linked media files were detached.');
         }
     }
 

@@ -363,7 +363,8 @@ class SpeciesModel extends AbstractModel
 				_a.organisation,
 				_a.organisation_id,
 				_a.type_id,
-				_b.nametype,
+				_x.rank_id as synonym_base_rank_id,
+                _b.nametype,
 				_a.language_id,
 				_c.language,
 				_d.label as language_label,
@@ -388,7 +389,11 @@ class SpeciesModel extends AbstractModel
 				on _t.rank_id=_p.id
 				and _t.project_id=_p.project_id
 
-			left join %PRE%languages _c
+			left join %PRE%projects_ranks _x
+				on _a.rank_id=_x.id
+				and _a.project_id=_x.project_id
+
+            left join %PRE%languages _c
 				on _a.language_id=_c.id
 
 			left join %PRE%labels_languages _d
@@ -442,7 +447,8 @@ class SpeciesModel extends AbstractModel
 				_a.expert_id,
 				_a.organisation,
 				_a.organisation_id,
-				_b.nametype,
+				_x.rank_id as synonym_base_rank_id,
+                _b.nametype,
 				_a.language_id,
 				_c.language,
 				_d.label as language_label,
@@ -486,16 +492,17 @@ class SpeciesModel extends AbstractModel
 			left join %PRE%ranks _r
 				on _f.rank_id=_r.id
 
+    		left join %PRE%taxa _t
+    			on _a.taxon_id=_t.id
+    			and _a.project_id = _t.project_id
 
-		left join %PRE%taxa _t
-			on _a.taxon_id=_t.id
-			and _a.project_id = _t.project_id
+    		left join %PRE%projects_ranks _tf
+    			on _t.rank_id=_tf.id
+    			and _t.project_id = _tf.project_id
 
-		left join %PRE%projects_ranks _tf
-			on _t.rank_id=_tf.id
-			and _t.project_id = _tf.project_id
-
-
+			left join %PRE%projects_ranks _x
+				on _a.rank_id=_x.id
+				and _a.project_id=_x.project_id
 
 			left join %PRE%labels_projects_ranks _q
 				on _f.id=_q.project_rank_id
@@ -728,12 +735,22 @@ class SpeciesModel extends AbstractModel
 		$lower = isset($params['lower']) ? $params['lower'] : true;
 
 		if ( is_null($project_id) ) return;
-
+		
+		/*
+			query first orders by a "corrected" first character, which is the 
+			- ASCII-value of the first character of the lowercased value of the taxon if it's 
+				- a letter (ASCII val 97-122), 
+				- a number (ASCII val 48-57) or 
+				- a opening bracket ( (ASCII val 40).
+			- ASCII-value + 122 of the first character it's anything else
+			this will avoid the species opening with anything that starts with a strange character other than ( (like a ? for instance)
+		*/
 
         $query = "
 			select
-				_a.id
-
+				_a.id,
+				_a.taxon,
+				if(((ascii(lower(_a.taxon)) BETWEEN 0 AND 47) or (ascii(lower(_a.taxon)) BETWEEN 58 AND 96)) and (ascii(lower(_a.taxon))!=40),ascii(lower(_a.taxon))+122,ascii(lower(_a.taxon))) as first_letter_corrected
 			from
 				%PRE%taxa _a
 
@@ -755,9 +772,10 @@ class SpeciesModel extends AbstractModel
 				and _p.lower_taxon= " . ($lower ? "1" : "0" ) . "
 
 			order by
-				" . ($lower ? "_a.taxon" : "_p.rank_id asc, _a.taxon" ) . "
+				" . ($lower ? "first_letter_corrected,_a.taxon" : "_p.rank_id asc, first_letter_corrected,_a.taxon" ) . "
 
 			limit 1";
+
 
         $d = $this->freeQuery($query);
 
@@ -1377,8 +1395,6 @@ class SpeciesModel extends AbstractModel
 				_a.date,
 				_a.author,
 				_a.publication_type,
-				_a.citation,
-				_a.source,
 				ifnull(_a.publishedin,ifnull(_h.label,null)) as publishedin,
 				ifnull(_a.periodical,ifnull(_i.label,null)) as periodical,
 				_a.pages,
@@ -1426,21 +1442,21 @@ class SpeciesModel extends AbstractModel
 					_b.gender,
 					_b.is_company,
 					_b.employee_of_id
-	
+
 				from %PRE%literature2_authors _a
-	
+
 				left join %PRE%actors _b
 					on _a.actor_id = _b.id
 					and _a.project_id=_b.project_id
-	
+
 				where
 					_a.project_id = ".$project_id."
 					and _a.literature2_id =".$val['id']."
-	
+
 				order by
 					_a.sort_order,_b.name";
-				
-				$literature[$key]['authors']=$this->freeQuery($query);				
+
+				$literature[$key]['authors']=$this->freeQuery($query);
 		}
 
         return $literature;

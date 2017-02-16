@@ -282,6 +282,8 @@ class NsrTaxonController extends NsrController
 			$this->checkAuthorisation();
 
 			$this->setNameId($this->rGetId());
+			
+			$this->updateName();
 
 			if ($this->needParentChange()!=false && $this->canParentChange()!=false)
 			{
@@ -291,7 +293,6 @@ class NsrTaxonController extends NsrController
 			}
 			else
 			{
-				$this->updateName();
 				$this->updateConceptBySciName();
 				$this->doNameIntegrityChecks($this->getName(array('id'=>$this->getNameId())));
 			}
@@ -824,7 +825,7 @@ class NsrTaxonController extends NsrController
 		{
 			$taxa[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
 		}
-		
+
 		return $taxa;
 	}
 
@@ -870,9 +871,12 @@ class NsrTaxonController extends NsrController
 
 		foreach ((array) $taxa as $key => $val)
 		{
-
 			$taxa[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
-			$taxa[$key]['label']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['label'],'base_rank_id'=>$val['base_rank_id'] ) );
+
+			if ($val['nametype']==PREDICATE_VALID_NAME && $val['nametype']==PREDICATE_PREFERRED_NAME ||
+			    isset($val['synonym_base_rank_id']) && !empty($val['synonym_base_rank_id'])) {
+			    $taxa[$key]['label']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['label'],'base_rank_id'=>$val['base_rank_id'] ) );
+			}
 
 			if ($val['base_rank_id']==GENUS_RANK_ID)
 			{
@@ -993,7 +997,7 @@ class NsrTaxonController extends NsrController
 
 	private function checkParentChildRelationship($child_base_rank,$parent_id)
 	{
-		
+
 		$d=$this->getTaxonById($parent_id);
 
 		$parent_base_rank=$d['base_rank'];
@@ -1009,7 +1013,7 @@ class NsrTaxonController extends NsrController
 			{
 				$this->addError( $this->translate("Parent rank cannot be same as, or below concept rank (even with 'suppress_parent_child_relation_checks' setting in effect).") );
 				$this->addError( $this->translate("Concept not saved.") );
-				return false;			
+				return false;
 			}
 		}
 
@@ -1021,9 +1025,11 @@ class NsrTaxonController extends NsrController
 
 		$error=null;
 
-		if ($child_base_rank==NOTHOSPECIES_RANK_ID && $parent_base_rank!=NOTHOGENUS_RANK_ID)
+		if (($child_base_rank==NOTHOSPECIES_RANK_ID && $parent_base_rank!=NOTHOGENUS_RANK_ID) &&
+		   ($child_base_rank==NOTHOSPECIES_RANK_ID && $parent_base_rank!=GENUS_RANK_ID))
 		{
-			$error=array($ranks[NOTHOGENUS_RANK_ID]['rank']);
+			// nothospecies alleen onder nothogenus of genus
+			$error=array($ranks[NOTHOGENUS_RANK_ID]['rank'],$ranks[GENUS_RANK_ID]['rank']);
 		}
 		else
 		if (($child_base_rank==NOTHOSUBSPECIES_RANK_ID || $child_base_rank==NOTHOVARIETAS_RANK_ID) && $parent_base_rank!=NOTHOSPECIES_RANK_ID)
@@ -1050,10 +1056,10 @@ class NsrTaxonController extends NsrController
 		}
 		else
 		if (($child_base_rank==SPECIES_RANK_ID && $parent_base_rank!=GENUS_RANK_ID) &&
-			($child_base_rank==SPECIES_RANK_ID && $ranks[$parent_base_rank]['rank']!='subgenus'))
+			($child_base_rank==SPECIES_RANK_ID && $parent_base_rank!=SUBGENUS_RANK_ID))
 		{
 			// soort moet onder genus of subgenus
-			$error=array($ranks[GENUS_RANK_ID]['rank'],'subgenus');
+			$error=array($ranks[GENUS_RANK_ID]['rank'],$ranks[SUBGENUS_RANK_ID]['rank']);
 		}
 		else
 		if ($child_base_rank==SUBGENUS_RANK_ID && $parent_base_rank!=GENUS_RANK_ID)
@@ -1063,37 +1069,55 @@ class NsrTaxonController extends NsrController
 		}
 		else
 		if (($child_base_rank==NOTHOGENUS_RANK_ID || $child_base_rank==GENUS_RANK_ID) &&
-			($parent_base_rank!=FAMILIA_RANK_ID && $parent_base_rank!=SUBFAMILIA_RANK_ID))
+			(
+				$parent_base_rank!=FAMILIA_RANK_ID && 
+				$parent_base_rank!=SUBFAMILIA_RANK_ID && 
+				$parent_base_rank!=TRIBUS_RANK_ID
+			))
 		{
-			// genus moet onder subfamilie of familie
-			$error=array($ranks[FAMILIA_RANK_ID]['rank'],$ranks[SUBFAMILIA_RANK_ID]['rank']);
+			// genus moet onder familie, subfamilia of tribus
+			$error=array($ranks[FAMILIA_RANK_ID]['rank'],$ranks[SUBFAMILIA_RANK_ID]['rank'],$ranks[TRIBUS_RANK_ID]['rank']);
 		}
 		else
+		if (($child_base_rank==TRIBUS_RANK_ID && $parent_base_rank!=FAMILIA_RANK_ID) &&
+			($child_base_rank==TRIBUS_RANK_ID && $parent_base_rank!=SUBFAMILIA_RANK_ID))
+		{
+			// tribus moet onder familia of subfamilia
+			$error=array($ranks[FAMILIA_RANK_ID]['rank'],$ranks[SUBFAMILIA_RANK_ID]['rank']);
+		}
 		if ($child_base_rank==SUBFAMILIA_RANK_ID && $parent_base_rank!=FAMILIA_RANK_ID)
 		{
 			// subfamilie moet onder familie
 			$error=array($ranks[FAMILIA_RANK_ID]['rank']);
 		}
 		else
-		if (($child_base_rank==FAMILIA_RANK_ID && $parent_base_rank!=SUBORDO_RANK_ID) &&
+		if (($child_base_rank==FAMILIA_RANK_ID && $parent_base_rank!=INFRAORDER_RANK_ID) &&
+			($child_base_rank==FAMILIA_RANK_ID && $parent_base_rank!=SUBORDO_RANK_ID) &&
 			($child_base_rank==FAMILIA_RANK_ID && $parent_base_rank!=ORDO_RANK_ID) &&
 			($child_base_rank==FAMILIA_RANK_ID && $parent_base_rank!=SUPERFAMILIA_RANK_ID))
 		{
-			// familie moet onder suborde, orde of superfamilia
-			$error=array('subordo','ordo','superfamilia');
+			// familie moet onder infraorder, suborde, orde of superfamilia
+			$error=array($ranks[INFRAORDER_RANK_ID]['rank'],$ranks[SUBORDO_RANK_ID]['rank'],$ranks[ORDO_RANK_ID]['rank'],$ranks[SUPERFAMILIA_RANK_ID]['rank']);
 		}
 		else
 		if (($child_base_rank==SUPERFAMILIA_RANK_ID && $parent_base_rank!=ORDO_RANK_ID) &&
+			($child_base_rank==SUPERFAMILIA_RANK_ID && $parent_base_rank!=INFRAORDER_RANK_ID) &&
 			($child_base_rank==SUPERFAMILIA_RANK_ID && $parent_base_rank!=SUBORDO_RANK_ID))
 		{
-			// superfamilia moet onder orde of subordo
-			$error=array('ordo','subordo');
+			// superfamilia moet onder orde, subordo of infraorde
+			$error=array($ranks[ORDO_RANK_ID]['rank'],$ranks[SUBORDO_RANK_ID]['rank'],$ranks[INFRAORDER_RANK_ID]['rank']);
+		}
+		else
+		if ($child_base_rank==INFRAORDER_RANK_ID && $parent_base_rank!=SUBORDO_RANK_ID)
+		{
+			// infraorder moet onder subordo
+			$error=array($ranks[ORDO_RANK_ID]['rank']);
 		}
 		else
 		if ($child_base_rank==SUBORDO_RANK_ID && $parent_base_rank!=ORDO_RANK_ID)
 		{
 			// suborde moet onder orde
-			$error=array('ordo');
+			$error=array($ranks[ORDO_RANK_ID]['rank']);
 		}
 		else
 		if (($child_base_rank==ORDO_RANK_ID && $parent_base_rank!=SUBCLASSIS_RANK_ID) &&
@@ -1102,46 +1126,47 @@ class NsrTaxonController extends NsrController
 			)
 		{
 			// orde moet onder subklasse, klasse of superorder
-			$error=array('subclassis','classis','superorder');
+			$error=array($ranks[SUBCLASSIS_RANK_ID]['rank'],$ranks[CLASSIS_RANK_ID]['rank'],$ranks[SUPERORDER_RANK_ID]['rank']);
 		}
 		else
 		if (($child_base_rank==SUPERORDER_RANK_ID && $parent_base_rank!=CLASSIS_RANK_ID) &&
 			($child_base_rank==SUPERORDER_RANK_ID && $parent_base_rank!=SUBCLASSIS_RANK_ID))
 		{
 			// superordo moet onder klasse of subclassis
-			$error=array('classis','subclassis');
+			$error=array($ranks[CLASSIS_RANK_ID]['rank'],$ranks[SUBCLASSIS_RANK_ID]['rank']);
 		}
 		else
-		if ($ranks[$child_base_rank]['rank']=='subclassis' && $ranks[$parent_base_rank]['rank']!='classis')
+		if ($child_base_rank==SUBCLASSIS_RANK_ID && $parent_base_rank!=CLASSIS_RANK_ID)
 		{
 			// subklasse moet onder klasse
-			$error=array('classis');
+			$error=array($ranks[CLASSIS_RANK_ID]['rank']);
 		}
 		else
-		if (($ranks[$child_base_rank]['rank']=='classis' && $ranks[$parent_base_rank]['rank']!='subphylum') &&
-			($ranks[$child_base_rank]['rank']=='classis' && $ranks[$parent_base_rank]['rank']!='phylum'))
+		if (($child_base_rank==CLASSIS_RANK_ID && $parent_base_rank!=SUPERCLASSIS_RANK_ID) &&
+			($child_base_rank==CLASSIS_RANK_ID && $parent_base_rank!=SUBPHYLUM_RANK_ID) &&
+			($child_base_rank==CLASSIS_RANK_ID && $parent_base_rank!=PHYLUM_RANK_ID))
 		{
-			// klasse moet onder subphylum of phylum
-			$error=array('subphylum','phylum');
+			// klasse moet onder superclassis, subphylum of phylum
+			$error=array($ranks[SUPERCLASSIS_RANK_ID]['rank'],$ranks[SUBPHYLUM_RANK_ID]['rank'],$ranks[PHYLUM_RANK_ID]['rank']);
 		}
 		else
-		if ($ranks[$child_base_rank]['rank']=='subphylum' && $ranks[$parent_base_rank]['rank']!='phylum')
+		if ($child_base_rank==SUBPHYLUM_RANK_ID && $parent_base_rank!=PHYLUM_RANK_ID)
 		{
 			// subphylum moet onder phylum
-			$error=array('phylum');
+			$error=array($ranks[PHYLUM_RANK_ID]['rank']);
 		}
 		else
-		if (($ranks[$child_base_rank]['rank']=='phylum' && $ranks[$parent_base_rank]['rank']!='subregnum') &&
-			($ranks[$child_base_rank]['rank']=='phylum' && $ranks[$parent_base_rank]['rank']!='regnum'))
+		if (($child_base_rank==PHYLUM_RANK_ID && $parent_base_rank!=SUBREGNUM_RANK_ID) &&
+			($child_base_rank==PHYLUM_RANK_ID && $parent_base_rank!=REGNUM_RANK_ID))
 		{
 			// phylum moet moet onder subrijk of rijk
-			$error=array('subregnum','regnum');
+			$error=array($ranks[SUBREGNUM_RANK_ID]['rank'],$ranks[REGNUM_RANK_ID]['rank']);
 		}
 		else
-		if ($ranks[$child_base_rank]['rank']=='subregnum' && $ranks[$parent_base_rank]['rank']!='regnum')
+		if ($child_base_rank==SUBREGNUM_RANK_ID && $parent_base_rank!=REGNUM_RANK_ID)
 		{
 			// subrijk moet onder rijk
-			$error=array('regnum');
+			$error=array($ranks[REGNUM_RANK_ID]['rank']);
 		}
 		else
 		if ( $parent_base_rank >= $child_base_rank )
@@ -2730,6 +2755,8 @@ class NsrTaxonController extends NsrController
 			iii. verander hun geaccepteerde naam van type naar synoniem.
 
 		b) maak een nieuwe geaccepteerde naam aan op basis van BNN + authorship van de oude geaccepeerde naam;
+
+			verwijderd nav LINNA-577:
 			als authorship nog geen haakjes had, krijgt hij die nu.
 
 		c) update de naam van het concept op basis van de nieuwe geaccepeerde naam.
@@ -2815,10 +2842,10 @@ class NsrTaxonController extends NsrController
 				(!empty($val['name_author']) ? $val['name_author'] : null).
 				(!empty($val['name_author']) && !empty($val['authorship_year']) ? ', ' : '').
 				(!empty($val['authorship_year']) ? $val['authorship_year'] : null);
-
+/*
 			$authorship=
 				trim(!empty($authorship) ? '('.$authorship.')' : '');
-
+*/
 			$newName=
 				trim(
 					$uninomial.

@@ -17,17 +17,24 @@ table tr th {
 	{else}
     <h2>{t}new user{/t}</h2>
     {/if}
-    
+
     <form id="theForm" method="post" onsubmit="return submitUserEditForm();">
     <input id="id" name="id" value="{$user.id}" type="hidden" />
     <input type="hidden" name="action" id="action" value="save"  />
     <input type="hidden" name="rnd" value="{$rnd}" />
-    
+
     <table>
         <tr>
             <th>{t}Username:{/t}</th>
-            <td><input type="text" id="username" name="username" value="{$user.username}" /></td>
+            <td>
+            {if $user.id==$current_user || $can_edit}
+            <input type="text" id="username" name="username" value="{$user.username}" />
+            {else}
+            {$user.username}
+            {/if}
+            </td>
         </tr>
+        {if $user.id==$current_user || $can_edit}
         <tr>
             <th>{t}Password:{/t}</th>
             <td><input type="password" id="password" name="password" value="" /></td>
@@ -36,22 +43,40 @@ table tr th {
             <th>{t}Password (repeat):{/t}</th>
             <td><input type="password" id="password_repeat" name="password_repeat" value="" /></td>
         </tr>
-
         <tr>
             <td colspan="2">&nbsp;</td>
         </tr>
+		{/if}
 
         <tr>
             <th>{t}First name:{/t}</th>
-            <td><input type="text" id="first_name" name="first_name" value="{$user.first_name}" /></td>
+            <td>
+            {if $user.id==$current_user || $can_edit}
+            <input type="text" id="first_name" name="first_name" value="{$user.first_name}" />
+            {else}
+            {$user.first_name}
+            {/if}
+            </td>
         </tr>
         <tr>
             <th>{t}Last name:{/t}</th>
-            <td><input type="text" id="last_name" name="last_name" value="{$user.last_name}" /></td>
+            <td>
+            {if $user.id==$current_user || $can_edit}
+            <input type="text" id="last_name" name="last_name" value="{$user.last_name}" />
+            {else}
+            {$user.last_name}
+            {/if}
+            </td>
         </tr>
         <tr>
             <th>{t}E-mail address:{/t}</th>
-            <td><input type="text" id="email_address" name="email_address" value="{$user.email_address}" /></td>
+            <td>
+            {if $user.id==$current_user || $can_edit}
+            <input type="text" id="email_address" name="email_address" value="{$user.email_address}" />
+            {else}
+            {$user.email_address}
+            {/if}
+            </td>
         </tr>
 
         <tr>
@@ -126,7 +151,7 @@ table tr th {
     </p>
 
     </form>
-    
+
     <p>
         <a href="view.php?id={$user.id}">{t}back{/t}</a> | <a href="index.php">{t}index{/t}</a>
     </p>
@@ -143,9 +168,9 @@ $(document).ready(function()
 	roleID_editor={$smarty.const.ID_ROLE_EDITOR};
 
 	$('#username').focus();
-	
+
 	{if !$user.id}
-	
+
 	$('#roles').on('change',function()
 	{
 		if ($('#roles :selected').val() < {$smarty.const.ID_ROLE_EDITOR})
@@ -158,9 +183,9 @@ $(document).ready(function()
 		}
 		setPermissions();
 	});
-	
+
 	$('#roles').trigger('change');
-	
+
 	{/if}
 
 

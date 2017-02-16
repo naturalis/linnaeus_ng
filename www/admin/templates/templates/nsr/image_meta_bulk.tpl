@@ -23,6 +23,9 @@ th {
 .image-warning {
 	color:#F60;
 }
+.image-uncertain {
+	color:#F3C;
+}
 .meta-data-unassigned {
 	color:#999;
 }
@@ -65,15 +68,16 @@ th {
         <span class="raw" onclick="$('.raw').toggle();" style="display:none">show raw data</span>
         <span class="raw">
             <span onclick="$('.raw').toggle();">
-            	enter raw meta-data (TAB separated, like copy/pasted excel cells) in the area below.<br />
+            	enter raw metadata (TAB separated, like copy/pasted excel cells) in the area below.<br />
                 columns containing the file name and the NSR ID are mandatory, as is at least one column
-                with meta-data. images should be specified with their file name only, not full paths. the system will assume
+                with metadata. images should be specified with their file name only, not full paths. the system will assume
                 that they reside at {$taxon_main_image_base_url}; if they do not (yet) exist there, a warning is generated, but
-                the data is saved nonetheless. meta-data containing dates should be in the format DD-MM-YYYY.
+                the data is saved nonetheless. metadata containing dates should be in the format DD-MM-YYYY.
 			</span>
             <textarea name="raw" style="width:100%;height:200px;font-size:0.8em;overflow:scroll">{$raw}</textarea>
             <p>
-            <label><input type="checkbox" value="1" name="ignorefirst" {if $ignorefirst} checked="checked"{/if}/>first line has titles</label>
+            <label><input type="checkbox" value="1" name="ignorefirst" {if $ignorefirst} checked="checked"{/if}/>first line has titles</label><br />
+            <label><input type="checkbox" value="1" name="no_image_exist_check" {if $no_image_exist_check===false}{else}checked="checked"{/if}/>do not check file's existence (improves performance)</label>
             </p>
             <p>
             <input type="submit" value="parse" />
@@ -93,7 +97,7 @@ th {
             <p>
             select appropriate fields per column; mutiple columns of the same field will be concatenated using a comma as separator.
             </p>
-            
+
             <table>
             {foreach from=$lines item=line key=k}{if $k<5}
                 {if $k==0}
@@ -108,7 +112,7 @@ th {
                     {foreach from=$line item=cell key=c}
                     <td>{colselect data=$c}</td>
                     {/foreach}
-                </tr>       
+                </tr>
                 {/if}
 				{if !$ignorefirst || ($ignorefirst && $k>0)}
                 <tr>
@@ -147,7 +151,7 @@ th {
         <span class="image-warning">image does not exist at {$taxon_main_image_base_url}, but will be saved nonetheless</span><br />
         <span class="meta-data-unassigned">unassigned column, will be ignored</span><br />
         <span class="row-wont-save">row that won't be saved due to unresolved NSR ID</span><br />
-        <span class="meta-data-format-error">meta-data that will not be saved due to format errors</span><br />
+        <span class="meta-data-format-error">metadata that will not be saved due to format errors</span><br />
         </p>
 
 		<table class="image-meta-data">
@@ -174,23 +178,30 @@ th {
 					{assign var=class value="nsr-id-ok"}
 					{assign var=message value=$matches.taxa[$lsk].taxon}
                 {elseif $lk==$col_file_name && !$matches.files[$lsk].exists}
-					{assign var=class value="image-warning"}
-					{assign var=message value="image not found at\n%s\nline will be saved nonetheless. be sure to upload the image later!"}
+
+                    {if $no_image_exist_check===false}
+                        {assign var=class value="image-warning"}
+                        {assign var=message value="image not found at\n%s\nline will be saved nonetheless. be sure to upload the image later!"}
+                    {else}
+						{assign var=class value="image-uncertain"}
+                        {assign var=message value="didn't check the existence of:\n%s\nline will be saved nonetheless."}
+                    {/if}
+                
                 {elseif $lk==$col_file_name}
 					{assign var=class value="nsr-id-ok"}
 					{assign var=message value="image present at\n%s"}
                 {elseif $fields[$lk]==""}
 					{assign var=class value="meta-data-unassigned"}
-					{assign var=message value="field will not be stored as meta-data"}
+					{assign var=message value="field will not be stored as metadata"}
                 {else}
 					{assign var=class value=""}
 					{assign var=message value="field will be stored as $fields[$lk]"}
                 {/if}
-                
-                {if $wontsaverow && $lk!=$col_NSR_ID} 
+
+                {if $wontsaverow && $lk!=$col_NSR_ID}
 					{assign var=class value="$class row-wont-save"}
                 {/if}
-                
+
                 {if !$checks[$lsk][$lk]|@is_null && $checks[$lsk][$lk].pass==false}
 					{assign var=class value="$class meta-data-format-error"}
                     {assign var=message value="format error; field will not be saved"}

@@ -521,7 +521,7 @@ final class SearchNSRModel extends AbstractModel
 		;
 
 		$data=$this->freeQuery( $query );
-	
+
 		$count=$this->freeQuery( "select found_rows() as total" );
 
 		return array('data'=>$data,'count'=>$count[0]['total']);
@@ -728,7 +728,7 @@ final class SearchNSRModel extends AbstractModel
 		
 				".(isset($photographer)  ? "and ".$photographer : "")." 		
 				".(isset($validator)  ? "and ".$validator : "")." 		
-				".(!empty($group_id) ? "and  MATCH(_q.parentage) AGAINST ('".$group_id."' in boolean mode)"  : "")."
+				".(!empty($group_id) ? "and  ( MATCH(_q.parentage) AGAINST ('".$group_id."' in boolean mode) or _m.taxon_id = " .$group_id. ") "  : "")."
 				".(!empty($name_id) ? "and _m.taxon_id = ".intval($name_id)  : "")." 		
 				".(!empty($name) ? "and _j.name like '". $this->escapeString($name)."%'"  : "")."
 
@@ -1493,7 +1493,7 @@ final class SearchNSRModel extends AbstractModel
 					and _trait_values".$trait.".value_id in (".implode(",",$val).")
 			";
 		}
-
+	
 		foreach((array)$traits_free as $id=>$vals)
 		{		
 			$trait=$this->getTraitgroupTrait( [ "trait_id" => $id, "project_id" => $project_id ] );
@@ -1657,17 +1657,17 @@ final class SearchNSRModel extends AbstractModel
 					left join %PRE%traits_traits _tt
 						on _tv.project_id = _tt.project_id
 						and _tv.trait_id = _tt.id
+						and _tt.trait_group_id=".$group."
 		
 					left join %PRE%traits_taxon_freevalues _ttf
 						on _a.project_id = _ttf.project_id
 						and _a.id = _ttf.taxon_id
 		
-					left join %PRE%traits_traits _tt2
+					right join %PRE%traits_traits _tt2
 						on _ttf.project_id = _tt2.project_id
 						and _ttf.trait_id = _tt2.id
+						and _tt2.trait_group_id=".$group."
 					",
-				"where"=> "
-					and ( _tt.trait_group_id=".$group."  or _tt2.trait_group_id=".$group.")",
 				"having"=>
 					"having count(_ttv.id)+count(_ttf.id) > 0"
 			 ];

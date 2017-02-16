@@ -1,5 +1,5 @@
 <style>
-ul  {
+#urls  {
 	font-size:0.9em;
 	cursor:pointer;
 }​
@@ -122,8 +122,6 @@ $(document).ready(function()
     
     Layers (click to toggle):
     <ul id="urls"></ul>
-
-</div>
 
 
 {*

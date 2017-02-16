@@ -111,7 +111,7 @@
 					{if $v.logo}
 						<img src="{$v.logo}" {if $v.organisation}title="{$v.organisation}"{/if} />
 					{else}
-						<img src="http://www.nederlandsesoorten.nl/linnaeus_ng/shared/media/project/0001/ravon-logo.png" alt="">
+						<span style="padding-left:30px;">{$v.organisation}</span>
 					{/if}
 				{if $v.url}
 				</a>
@@ -128,7 +128,7 @@
 				{if $v.logo}
 					<img src="{$v.logo}" {if $v.organisation}title="{$v.organisation}"{/if} />
 				{else}
-					<img src="http://www.nederlandsesoorten.nl/linnaeus_ng/shared/media/project/0001/ravon-logo.png" alt="">
+					<span style="padding-left:30px;">{$v.organisation}</span>
 				{/if}
 			{if $v.url}
 			</a>

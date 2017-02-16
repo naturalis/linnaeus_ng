@@ -13,7 +13,7 @@
   ["type_allow_max_length"]=>
   ["type_allow_unit"]=>
   ["value_count"]=>
-  
+
 -->
 <style>
 
@@ -22,7 +22,6 @@ li.values:hover {
 }
 
 </style>
-
 
 <div id="page-main">
 
@@ -73,29 +72,29 @@ li.values:hover {
             </tr>
             {/foreach}
         </table>
-        
+
         <p>
         	referenties:
         	<ul id="references">
-			</ul>        
+			</ul>
         </p>
-        
+
         <a
-        	class="edit" 
-            style="margin-left:0" 
-            href="#" 
-            onclick="dropListDialog(this,'Publicatie');return false;" 
+        	class="edit"
+            style="margin-left:0"
+            href="#"
+            onclick="dropListDialog(this,'Publicatie');return false;"
             rel="presence_reference_id">
         	referentie toevoegen
 		</a>
 		<span id="presence_reference" style="display:none"></span>
-        <input 
-        	type="hidden" 
-            id="presence_reference_id" 
-            value="" 
+        <input
+        	type="hidden"
+            id="presence_reference_id"
+            value=""
             onchange="taxonTraits.setReference( { literature_id: $(this).val(), label: $('#presence_reference').html() } );taxonTraits.printReferences();"
 		/>
-        
+
     </p>
 
     <p>
@@ -103,8 +102,8 @@ li.values:hover {
     </p>
 
     <p>
-	    <a href="#" style="margin-left:0" class="edit" onclick="taxonTraits.deleteTraitsReferences();return false;">alle kenmerken & referenties verwijderen</a><br />
-	    <a href="../nsr/taxon.php?id={$concept.id}"  style="margin-left:0" class="edit">naar taxonconceptkaart</a>
+	    <a href="#" style="margin-left:0" class="edit" onclick="taxonTraits.deleteTraitsReferencesByGroup();return false;">delete traits and references for this taxon and trait group</a><br />
+	    <a href="../nsr/taxon.php?id={$concept.id}"  style="margin-left:0" class="edit">to taxon concept</a>
     </p>
 
 {/if}
@@ -163,9 +162,10 @@ $(document).ready(function()
 {
 	taxonTraits.setConcept( {$concept.id} );
 	taxonTraits.setGroup( {$group.id} );
-	
+	taxonTraits.setGroupLabel( '{$group.sysname|@escape}' );
+
 	$('a.values').each(function()
-	{ 
+	{
 		$(this).attr('href','#').on('click',function(e)
 		{
 			try

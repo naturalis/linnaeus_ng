@@ -27,9 +27,11 @@ li {
     <input type="hidden" id="action" name="action" value="save_translations">
 
 	<ul>
+
 	{foreach $publicationTypes v}
     	<li>
-        	{$v.sys_label}{if $v.total==0}
+    		{if $v.label != ''}{$v.label}{else}{$v.sys_label}{/if}
+        	{if $v.total==0}
             <a class='edit' href='#' onclick="$('#id').val({$v.id});$('#action2').val('delete');$('#theForm').submit();return false;">delete</a>
             {else}<a class='edit' href='index_by_type.php?id={$v.id}'>({$v.total})</a>
             {/if}

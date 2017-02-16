@@ -11,7 +11,8 @@ class DebugTools {}
 function q ($v,$d=false)
 {
 	echo '<pre>';
-    var_dump($v);
+    //var_dump($v);
+	print_r($v);
     if ($d) die();
 }
 

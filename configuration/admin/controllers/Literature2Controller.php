@@ -64,17 +64,15 @@ class Literature2Controller extends NsrController
 	private $lit2Columns=
 		array(
 			'-1'=>'',
-			'label'=>'titel',
-			'alt_label'=>'alt. titel',
-			'date'=>'datum',
-			'author'=>'auteur(s)',
-			'publication_type'=>'type publicatie',
-			'citation'=>'citatie',
-			'source'=>'bron',
-			'publishedin'=>'gepubliceerd in',
-			'publisher'=>'uitgever',
-			'periodical'=>'periodiek',
-			'pages'=>'pagina(s)',
+			'label'=>'title',
+			'alt_label'=>'alt. title',
+			'date'=>'date',
+			'author'=>'author(s)',
+			'publication_type'=>'publication type',
+			'publishedin'=>'published in',
+			'publisher'=>'publisher',
+			'periodical'=>'periodical',
+			'pages'=>'page(s)',
 			'volume'=>'volume',
 			'external_link'=>'link',
 			'-2'=>'',
@@ -1119,7 +1117,7 @@ class Literature2Controller extends NsrController
 
 		if (empty($label))
 		{
-			$this->addError('Geen titel. Referentie niet opgeslagen.');
+			$this->addError('Title missing. Reference could not be saved.');
 			$this->setReferenceId(null);
 			return;
 		}
@@ -1133,14 +1131,14 @@ class Literature2Controller extends NsrController
 		if ($d)
 		{
 			$this->setReferenceId($this->models->Literature2->getNewId());
-			$this->addMessage('Nieuw referentie aangemaakt.');
+			$this->addMessage('New reference created.');
 			$this->updateReference();
 			$this->saveReferenceTaxa();
 			$this->logChange(array('after'=>$this->getReference(),'note'=>'new reference '.$label));
 		}
 		else
 		{
-			$this->addError('Aanmaak nieuwe referentie mislukt.');
+			$this->addError('Failed to create new reference.');
 		}
 	}
 
@@ -1154,8 +1152,6 @@ class Literature2Controller extends NsrController
 			'author' => 'Auteur (verbatim)',
 			//'publication_type' => 'Publicatietype',
 			'publication_type_id' => 'Publicatievorm',
-			'citation' => 'Citatie',
-			'source' => 'Bron',
 			'publisher' => 'Uitgever',
 			'publishedin' => 'Publicatie (verbatim)',
 			'publishedin_id' => 'Publicatie',
@@ -1173,11 +1169,11 @@ class Literature2Controller extends NsrController
 				if ($this->updateReferenceValue($field,$this->rGetVal($field)))
 				{
 					if ($this->models->Literature2->getAffectedRows()!=0)
-						$this->addMessage($label.' opgeslagen.');
+						$this->addMessage($label.' saved.');
 				}
 				else
 				{
-					$this->addError($label.' niet opgeslagen.');
+					$this->addError($label.' could not be saved.');
 				}
 			}
 		}
@@ -1198,7 +1194,7 @@ class Literature2Controller extends NsrController
 				if (!in_array($actor['actor_id'],$new))
 				{
 					$this->deleteReferenceAuthor($actor['actor_id']);
-					$this->addMessage('Auteur verwijderd.');
+					$this->addMessage('Actor deleted.');
 				}
 				else
 				{
@@ -1211,7 +1207,7 @@ class Literature2Controller extends NsrController
 				if (!in_array($actor,$retain))
 				{
 					$this->saveReferenceAuthor($actor,$key);
-					$this->addMessage('Auteur toegevoegd.');
+					$this->addMessage('Actor added.');
 				}
 			}
 		}
@@ -1239,25 +1235,25 @@ class Literature2Controller extends NsrController
             array('reference_id' => null),
             array('project_id' => $this->getCurrentProjectId(), 'reference_id' => $id)
 		);
-		$this->addMessage("Referentie verwijderd van ".$this->models->Names->getAffectedRows()." namen.");
+		$this->addMessage("Reference deleted from ".$this->models->Names->getAffectedRows()." names.");
 
         $this->models->PresenceTaxa->update(
             array('reference_id' => null),
             array('project_id' => $this->getCurrentProjectId(), 'reference_id' => $id)
 		);
-		$this->addMessage("Referentie verwijderd van ".$this->models->PresenceTaxa->getAffectedRows()." statussen.");
+		$this->addMessage("Reference deleted from ".$this->models->PresenceTaxa->getAffectedRows()." statuses.");
 
 		$this->deleteReferenceTaxa();
 
-		$this->addMessage("Taxa ontkoppeld.");
+		$this->addMessage("Taxa detached.");
 
 		$this->deleteReferenceAuthors();
 
-		$this->addMessage("Auteurs ontkoppeld.");
+		$this->addMessage("Actors detached.");
 
 		$this->models->Literature2->freeQuery("delete from %PRE%literature2 where project_id = ".$this->getCurrentProjectId()." and id = ".$id." limit 1");
 
-		$this->addMessage("Referentie verwijderd.");
+		$this->addMessage("Reference deleted.");
 
 	}
 
@@ -1424,7 +1420,7 @@ class Literature2Controller extends NsrController
 			{
 				if ($matchStartOnly)
 				{
-					$match=$match ? true : (stripos($val['label'],$search)===0);
+					$match=$match ? true : (stripos(strip_tags($val['label']),$search)===0);
 
 					if (!$match)
 						$match=$match ? true : (stripos($tempauthors,$search)===0);
@@ -1434,7 +1430,7 @@ class Literature2Controller extends NsrController
 				}
 				else
 				{
-					$match=$match ? true : (stripos($val['label'],$search)!==false);
+					$match=$match ? true : (stripos(strip_tags($val['label']),$search)!==false);
 
 					if (!$match)
 						$match=$match ? true : (stripos($tempauthors,$search)!==false);
@@ -1450,16 +1446,16 @@ class Literature2Controller extends NsrController
 			{
 				if ($fetchNonAlpha)
 				{
-					$startLetterOrd=ord(substr(strtolower($val['label']),0,1));
+					$startLetterOrd=ord(substr(strtolower(strip_tags($val['label'])),0,1));
 					$match=$match ? true : ($startLetterOrd<97 || $startLetterOrd>122);
 				}
 				else
 				{
 					if ($matchStartOnly)
-						$match=$match ? true : (stripos($val['label'],$searchTitle)===0);
+						$match=$match ? true : (stripos(strip_tags($val['label']),$searchTitle)===0);
 					else
 					{
-						$match=$match ? true : (stripos($val['label'],$searchTitle)!==false);
+						$match=$match ? true : (stripos(strip_tags($val['label']),$searchTitle)!==false);
 					}
 				}
 
@@ -1527,7 +1523,7 @@ class Literature2Controller extends NsrController
 
 				if (strtolower($aa)==strtolower($bb))
 				{
-					return strtolower($a['label'])>strtolower($b['label']);
+					return strtolower(strip_tags($a['label']))>strtolower(strip_tags($b['label']));
 				}
 
 				return strtolower($aa)>strtolower($bb);
@@ -1535,7 +1531,7 @@ class Literature2Controller extends NsrController
 		}
 		else
 		{
-			usort($data,function($a,$b){ return strtolower($a['label'])>strtolower($b['label']); });
+			usort($data,function($a,$b){ return strtolower(strip_tags($a['label']))>strtolower(strip_tags($b['label'])); });
 		}
 
 		return $data;
@@ -1741,7 +1737,7 @@ class Literature2Controller extends NsrController
 
 		if (empty($type))
 		{
-			$this->addError('Geen naam. Publicatievorm niet opgeslagen.');
+			$this->addError('Name missing. Publication type could not be saved.');
 			return;
 		}
 
@@ -1753,7 +1749,7 @@ class Literature2Controller extends NsrController
 
 		if ($d)
 		{
-			$this->addError('Naam bestaat al. Publicatievorm niet opgeslagen.');
+			$this->addError('Name already exists. Publication type could not be saved.');
 			return;
 		}
 
@@ -1763,7 +1759,7 @@ class Literature2Controller extends NsrController
 			'sys_label' => $type
 		));
 
-		$this->addMessage(sprintf('Publicatievorm "%s" opgeslagen.',$type));
+		$this->addMessage(sprintf('Publication type "%s" saved.',$type));
 
 	}
 
@@ -1784,7 +1780,7 @@ class Literature2Controller extends NsrController
 
 			if ( $val['id']==$id && $val['total']>0 )
 			{
-				$this->addError(sprintf('Er zijn %s referenties met deze publicatievorm. Publicatievorm niet verwijderd.',$val['total']));
+				$this->addError(sprintf('There are %s references with this publication type. Publication type not deleted.',$val['total']));
 				return;
 			}
 		}
@@ -1801,7 +1797,7 @@ class Literature2Controller extends NsrController
 			'id' => $id,
 		));
 
-		$this->addMessage(sprintf('Publicatievorm %s verwijderd.',$label));
+		$this->addMessage(sprintf('Publication type %s deleted.',$label));
 
 	}
 
@@ -1829,7 +1825,7 @@ class Literature2Controller extends NsrController
 						);
 
 						if ($this->models->Literature2PublicationTypesLabels->getAffectedRows()!=0)
-							$this->addMessage('Vertaling verwijderd.');
+							$this->addMessage('Translation deleted.');
 
 						continue;
 					}
@@ -1855,7 +1851,7 @@ class Literature2Controller extends NsrController
 									)
 								);
 
-								$this->addMessage(sprintf('Vertaling "%s" opgeslagen.',$translation));
+								$this->addMessage(sprintf('Translation "%s" saved.',$translation));
 							}
 						}
 						else
@@ -1868,7 +1864,7 @@ class Literature2Controller extends NsrController
 								'label' => $translation
 							));
 
-							$this->addMessage(sprintf('Vertaling "%s" opgeslagen.',$translation));
+							$this->addMessage(sprintf('Translation "%s" saved.',$translation));
 						}
 					}
 				}
