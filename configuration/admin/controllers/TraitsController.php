@@ -528,7 +528,6 @@ class TraitsController extends Controller
 			if ($d['day']==0) $d['day']=1;
 			$date=$d['year']."-".$d['month']."-".$d['day'];
 		}
-
 		return is_null($date) ? null : ltrim(date_format(date_create($date),$format),'0');
 	}
 
