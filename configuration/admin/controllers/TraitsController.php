@@ -524,8 +524,8 @@ class TraitsController extends Controller
 		if ($format=="Y")
 		{
 			$d=date_parse($date);
-			if ($d['month']==0) $d['month']=1; // required to avoid underflow
-			if ($d['day']==0) $d['day']=1; // required to avoid underflow
+			if ($d['month']==0) $d['month']=1;
+			if ($d['day']==0) $d['day']=1;
 			$date=$d['year']."-".$d['month']."-".$d['day'];
 		}
 
