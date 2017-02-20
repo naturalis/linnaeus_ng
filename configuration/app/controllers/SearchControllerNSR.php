@@ -134,6 +134,7 @@ class SearchControllerNSR extends SearchController
 		
 
 		$this->models->SearchNSRModel->setNameTypeIds($this->_nameTypeIds);
+		$this->setRobotsDirective( ["index","nofollow"] );
 
     }
 

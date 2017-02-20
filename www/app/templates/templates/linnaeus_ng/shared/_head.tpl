@@ -5,11 +5,15 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="keywords" content="{$session.app.project.keywords}" />
 	<meta name="description" content="{$session.app.project.description}" />
-	<meta name="robots" content="all" />
+
+	{if $robotsDirective}<meta name="robots" content="{$robotsDirective|@implode:","}">{/if}
+    
 	<meta name="lng-project-id" content="{$session.app.project.id}" />
 	<meta name="server" content="{$server_name}" />
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+
 	<title>{$session.app.project.title|@strip_tags:false}{if $pageName}: {$pageName|@strip_tags:false}{/if}</title>
+
     <link href="{$baseUrl}app/style/naturalis/images/favicon.ico" rel="shortcut icon" >
     <link href="{$baseUrl}app/style/naturalis/images/favicon.ico" rel="icon" type="image/x-icon">
 	<link rel="stylesheet" type="text/css" media="screen" href="{$projectUrls.projectCSS}dialog/jquery.modaldialog.css" />

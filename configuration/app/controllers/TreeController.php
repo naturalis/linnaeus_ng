@@ -45,6 +45,7 @@ class TreeController extends Controller
 		$this->moduleSettings=new ModuleSettingsReaderController;
 		$this->_tree_taxon_count_style = $this->moduleSettings->getModuleSetting( [ 'setting'=>'tree_taxon_count_style','module'=>'species', 'subst'=>'species_established' ] );
 		$this->_tree_initital_expand_levels = $this->moduleSettings->getModuleSetting( [ 'setting'=>'tree_initital_expand_levels','module'=>'species' ] );
+		$this->setRobotsDirective( ["index","nofollow"] );
 	}
 
     public function __destruct()

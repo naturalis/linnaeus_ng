@@ -126,6 +126,7 @@ class Controller extends BaseClass
     private $_showAutomaticInfixes=true;
 	private $_googleAnalyticsCode;
 	private $_generalHeaderSubtitle;
+	private $_robotsDirective;
 
     public $viewName;
     public $controllerBaseName;
@@ -1861,6 +1862,10 @@ class Controller extends BaseClass
         if (isset($_SESSION['app'][$this->spid()]['project']['languages']))
             $this->smarty->assign('languages', $_SESSION['app'][$this->spid()]['project']['languages']);
 
+        if (!empty($this->getRobotsDirective()))
+			$this->smarty->assign('robotsDirective', $this->getRobotsDirective());	
+
+
         $this->smarty->assign('currentLanguageId', $this->getCurrentLanguageId());
         $this->smarty->assign('menu', $this->getMainMenu());
         $this->smarty->assign('controllerMenuExists', $this->includeLocalMenu && file_exists($this->smarty->getTemplateDir(0) . '_menu.tpl'));
@@ -1887,9 +1892,6 @@ class Controller extends BaseClass
 		$this->smarty->assign('show_advanced_search_in_public_menu', $this->getSetting('show_advanced_search_in_public_menu',1)==1 );
 		$this->smarty->assign('googleAnalyticsCode', $this->getGoogleAnalyticsCode());
 		$this->smarty->assign('generalHeaderSubtitle', $this->getGeneralHeaderSubtitle());
-		
-		
-		
     }
 
     public function loadControllerConfig ($controllerBaseName = null)
@@ -3167,4 +3169,17 @@ class Controller extends BaseClass
 	{
 		return $this->_generalHeaderSubtitle;
 	}
+	
+	
+	protected function setRobotsDirective( $r )
+	{
+		$this->_robotsDirective=$r;
+	}
+
+	protected function getRobotsDirective()
+	{
+		if (!is_null($this->_robotsDirective)) return is_array($this->_robotsDirective) ? $this->_robotsDirective : [$this->_robotsDirective];
+	}
+
+
 }

@@ -9,10 +9,11 @@
 
 {snippet}development_no_follow.html{/snippet}
 
+	{if $robotsDirective}<meta name="robots" content="{$robotsDirective|@implode:","}">{/if}
+
 	<title>{$session.app.project.title|@strip_tags:false}</title>
 
     <link rel="Shortcut Icon" href="{$projectUrls.projectCSS}favicon.ico" type="image/x-icon" />
-
     <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/flexslider.css" />
     <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/soortenregister.css" />
     <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/linnaeus.css" />
