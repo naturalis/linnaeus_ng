@@ -1346,7 +1346,7 @@ class Controller extends BaseClass
         }
 
         // Double infraspecies with subgenus
-        if (count($e) == 5 && $e[1][0] == '(') {
+        if (count($e) == 5 && (isset($e[1][0]) && $e[1][0] == '(')) {
             $name = '<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] . (!empty($parentAbbreviation) && $addInfixes ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') . $e[3] .
              (!empty($abbreviation) && $addInfixes ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[4] . '</span>';
         }
