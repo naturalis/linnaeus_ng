@@ -1929,7 +1929,7 @@ CREATE TABLE IF NOT EXISTS `user_module_access` (
 	last_change timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	created datetime NOT NULL,
 	UNIQUE KEY user_module_access_u1 (project_id,module_id,module_type,user_id)
-);
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `user_item_access`;
 CREATE TABLE IF NOT EXISTS `user_item_access` (
@@ -1941,7 +1941,7 @@ CREATE TABLE IF NOT EXISTS `user_item_access` (
 	last_change timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	created datetime NOT NULL,
 	UNIQUE KEY user_item_access_u1 (project_id,user_id,item_id,item_type)
-);
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `variations_labels`;
 CREATE TABLE IF NOT EXISTS `variations_labels` (
