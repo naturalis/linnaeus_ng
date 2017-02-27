@@ -777,7 +777,6 @@ class SpeciesControllerNSR extends SpeciesController
 
 		$taxon_categories=array();
 		$start_category=null;
-		$taxon=null;
 		$cat=null;
 
 		if (is_numeric($requestedTab))
