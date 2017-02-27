@@ -1,10 +1,10 @@
-{include file="../shared/header.tpl" title="Advanced search"}
+{include file="../shared/header.tpl" title="{t}Advanced search{/t}"}
 <form id="searchForm" class="advanced-search__form" method="get" action="" onsubmit="return searchDoSearchForm()">	    	
 	<input type="hidden" name="extended" value="1" />
 	<div class="page-generic-div">
 		<ul class="tabs">
 			<li class="tab-active">
-				<a href="#">Advanced search</a>
+				<a href="#">{t}Advanced search{/t}</a>
 			</li>
 		</ul>
 		<div class="search-input__container">
