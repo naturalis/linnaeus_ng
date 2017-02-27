@@ -130,7 +130,7 @@ class SpeciesControllerNSR extends SpeciesController
 			$template = $this->rGetVal('headless',1) ? 'taxon_headless' : 'taxon' ;
 
 			$categories=$this->getTaxonCategories( [
-				'taxon' => $taxon['id'],
+				'taxon' => $taxon,
 				'base_rank' => $taxon['base_rank_id'],
 				'requestedTab'=>$this->rGetVal('cat'),
 				'forceEmptyTab'=>$this->rGetVal('force_empty',1)
@@ -331,9 +331,9 @@ class SpeciesControllerNSR extends SpeciesController
 		return $this->tmp;
 	}
 
-    public function getTaxonById( $id )
+    public function getTaxonById( $id,$formatTaxon=true )
     {
-        $taxon=parent::getTaxonById( $id );
+        $taxon=parent::getTaxonById( $id, $formatTaxon );
 
 		if ( $this->show_nsr_specific_stuff )
 		{
@@ -697,11 +697,11 @@ class SpeciesControllerNSR extends SpeciesController
 
     private function getCategories($p=null)
     {
-		$taxon_id = isset($p['taxon']) ? $p['taxon'] : null;
+		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
 
 		$categories = $this->models->{$this->_model}->getCategories(array(
             'project_id' => $this->getCurrentProjectId(),
-    		'taxon_id' => $taxon_id,
+    		'taxon_id' => $taxon['id'],
     		'language_id' => $this->getCurrentLanguageId()
 		));
 
@@ -767,7 +767,7 @@ class SpeciesControllerNSR extends SpeciesController
 
     private function getTaxonCategories($p=null)
     {
-		$taxon_id = isset($p['taxon']) ? $p['taxon'] : null;
+		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
 		$baseRank = isset($p['base_rank']) ? $p['base_rank'] : null;
 		$requestedTab = isset($p['requestedTab']) ? $p['requestedTab'] : null;
 		$forceEmptyTab = isset($p['forceEmptyTab']) ? $p['forceEmptyTab'] : null;
@@ -793,13 +793,13 @@ class SpeciesControllerNSR extends SpeciesController
 
 			if ($val['type']=='auto')
 			{
-				$val['is_empty']=$this->isAutoTabEmpty( ['tab'=>$val['tabname'], 'taxon_id'=>$taxon_id ] );
+				$val['is_empty']=$this->isAutoTabEmpty( ['tab'=>$val['tabname'], 'taxon_id'=>$taxon['id'] ] );
 			}
 
 			// parametrize external reference URLs
 			if ( isset($val['external_reference']) )
 			{
-				$taxon=is_null($taxon) ? $this->getTaxonById( $taxon_id ) : $taxon;
+				//$taxon=is_null($taxon) ? $this->getTaxonById( $taxon_id ) : $taxon;
 				$ref=json_decode( $val['external_reference'] );
 
 				$d=$this->parseExternalReference( array('taxon'=>$taxon,'reference'=>$ref,'remote_check'=>(!$val['suppress'] && !$val['always_hide']) ) );
