@@ -55,7 +55,6 @@ function run()
 		}),
 		success : function(data)
 		{
-			console.dir(data);
 			results=data.results;
 			postProcess();
 			draw();
@@ -65,7 +64,7 @@ function run()
 			//"success", "notmodified", "nocontent", "error", "timeout", "abort", "parsererror"
 			if( textStatus != "success" )
 			{
-				$( '#results' ).html( fetchTemplate( 'errorOccurredTpl' ).replace( '%STATUS%', textStatus ) );
+				$( '#results' ).html( fetchTemplate( 'errorOccurredTpl' ).replace( '%STATUS%', jqXHR.responseText ? jqXHR.responseText : textStatus ) );
 			}
 		}
 	});
