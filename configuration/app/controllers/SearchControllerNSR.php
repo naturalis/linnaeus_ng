@@ -430,15 +430,22 @@ class SearchControllerNSR extends SearchController
 		if (!empty($p['group_id']))
 		{
 			$d=$this->getSuggestionsGroup(array('id'=>(int)trim($p['group_id']),'match'=>'id'));
+			if (empty($d))
+			{
+				$ancestor_id=$p['group_id'];
+			}
+			else
+			{
+				$ancestor_id=$d ? $d[0]['id'] : null;
+			}
 		}
 		else
 		if (!empty($p['group']))
 		{
 			$d=$this->getSuggestionsGroup(array('search'=>$p['group'],'match'=>'exact'));
+			$ancestor_id=$d ? $d[0]['id'] : null;
 		}
 
-		$ancestor=$d ? $d[0] : null;
-		
 		$images_on=(!empty($p['images_on']) && $p['images_on']=='on' ? true : null);
 		$images_off=(!empty($p['images_off']) && $p['images_off']=='on' ? true : null);
 		$images=!is_null($images_on) || !is_null($images_off);
@@ -491,7 +498,7 @@ class SearchControllerNSR extends SearchController
 			"language_id"=>$this->getCurrentLanguageId(),
 			"project_id"=>$this->getCurrentProjectId(),
 			"specific_rank"=>$just_species ? SPECIES_RANK_ID : null,
-			"ancestor_id"=>$ancestor['id'],
+			"ancestor_id"=>$ancestor_id,
 			"presence"=>$pres,
 			"sort"=>$sort,
 			"limit"=>$limit,

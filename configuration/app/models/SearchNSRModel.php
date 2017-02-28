@@ -487,7 +487,7 @@ final class SearchNSRModel extends AbstractModel
 				_a.project_id =".$project_id."
 				and ifnull(_trash.is_deleted,0)=0
 				".(isset($specific_rank) ? "and _f.rank_id=" . $specific_rank : "and _f.lower_taxon=1" )." 
-				".(isset($ancestor_id) ? "and MATCH(_q.parentage) AGAINST ('".$ancestor_id."' in boolean mode)" : "")."
+				".(isset($ancestor_id) ? "and (MATCH(_q.parentage) AGAINST ('".$ancestor_id."' in boolean mode) or _a.id = ".$ancestor_id.")" : "")."
 				".(isset($presence) ? "and _g.presence_id in (".implode(',',$presence).")" : "")."
 				".(isset($auth) ? "and _m.authorship like '". $this->escapeString($auth)."%'" : "")."
 				".($dna ? "and number_of_barcodes ".($dna_insuff ? "between 1 and 3" : "> 0") : "")."
