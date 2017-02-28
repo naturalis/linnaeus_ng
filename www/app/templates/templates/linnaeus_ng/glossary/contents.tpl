@@ -17,4 +17,11 @@
 	</div>
 </div>
 
+<script>
+$(document).ready(function()
+{
+	allLookupShowDialog();
+});
+</script>
+
 {include file="../shared/footer.tpl"}

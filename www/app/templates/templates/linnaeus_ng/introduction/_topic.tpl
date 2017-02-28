@@ -11,3 +11,10 @@
 		{$page.content}
 	</div>
 </div>
+
+<script>
+$(document).ready(function()
+{
+	allLookupShowDialog();
+});
+</script>

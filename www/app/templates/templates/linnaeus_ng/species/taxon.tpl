@@ -104,7 +104,7 @@ $(document).ready(function()
 	allLookupSetListMax(250);
 	allLookupSetAlwaysFetch(true);
 	allLookupSetExtraVar( { name:'lower',value:{if $taxon.lower_taxon==1}1{else}0{/if} } );
-
+	allLookupShowDialog();
 } );
 </script>
 

@@ -59,6 +59,10 @@ $(".inline-image").click(function (e)
 {
     e.stopPropagation();
 });
+$(document).ready(function()
+{
+	allLookupShowDialog();
+});
 </script>
 
 {include file="../shared/footer.tpl"}

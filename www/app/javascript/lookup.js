@@ -474,8 +474,6 @@ function allLookupSetAlwaysFetch(state)
 
 $(document).ready(function()
 {
-	allLookupShowDialog();
-
 	$('body').click(function() {
 		allLookupHideDiv();
 	});
