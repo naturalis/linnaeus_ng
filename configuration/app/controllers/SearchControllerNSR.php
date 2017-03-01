@@ -498,7 +498,7 @@ class SearchControllerNSR extends SearchController
 			"language_id"=>$this->getCurrentLanguageId(),
 			"project_id"=>$this->getCurrentProjectId(),
 			"specific_rank"=>$just_species ? SPECIES_RANK_ID : null,
-			"ancestor_id"=>$ancestor_id,
+			"ancestor_id"=>isset($ancestor_id) ? $ancestor_id : null,
 			"presence"=>$pres,
 			"sort"=>$sort,
 			"limit"=>$limit,
