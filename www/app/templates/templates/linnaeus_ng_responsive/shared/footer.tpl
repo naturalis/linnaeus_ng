@@ -10,8 +10,6 @@
 <div id="tmpcontent" title="" class="ui-helper-hidden"></div>
 <div id="hint-box" style="display:none"></div>
 
-<H1>{$googleAnalyticsCode}</H1>
-
 {if $googleAnalyticsCode}{include file="../shared/_google_analytics_code.tpl"}{/if}
 
 <script type="text/javascript">
