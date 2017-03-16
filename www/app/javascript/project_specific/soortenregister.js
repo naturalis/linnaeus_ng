@@ -473,7 +473,19 @@ function submitSearchParams()
 
 	var form=$('<form method="get"></form>').appendTo('body');
 	form.append('<input type="hidden" name="group_id" value="'+$('#group_id').val()+'" />');
-	form.append('<input type="hidden" name="group" value="'+$('#group').val()+'" />');
+
+
+	var g="";
+	$('input[type=text]').each(function()
+	{
+		if($(this).attr('name') && $(this).is(':visible'))
+		{
+			g=$(this).val();
+		}
+	});
+	form.append('<input type="hidden" name="group" value="'+g+'" />');
+	//form.append('<input type="hidden" name="group" value="'+$('#group').val()+'" />');
+
 	//form.append('<input type="hidden" name="author_id" value="'+$('#author_id').val()+'" />');
 	//form.append('<input type="hidden" name="author" value="'+$('#author').val()+'" />');
 	form.append('<input type="hidden" name="sort" value="'+$('#sort').val()+'" />');

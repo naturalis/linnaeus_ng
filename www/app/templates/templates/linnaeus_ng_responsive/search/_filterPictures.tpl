@@ -44,6 +44,22 @@
 					<div class="input">
 						<input type="text" class="field" value="{$search.photographer}" id="photographer" name="photographer" autocomplete="off">	
 					</div>
+                    
+                    <a class="filterSearchText">
+                    	<div style="display:inline-block;font-size:1.1em;font-weight:bold;margin-bottom:6px;">{t}Top 5 fotografen{/t}</div>
+                        <div style="display:inline-block;font-size:0.9em;">{t}Fotograaf{/t} ({t}foto’s{/t}/{t}soorten{/t})</div>
+                    </a>
+
+                    <ul>
+                    {foreach $photographers v foo}
+                        {if $smarty.foreach.foo.index < 5}
+                        <li>
+                            <a href="nsr_search_pictures.php?photographer={$v.photographer}">{$v.photographer} ({$v.total}/{$v.taxon_count})</a>
+                        </li>
+                        {/if}
+                    {/foreach}
+                    </ul>
+
 					<a href="nsr_photographers.php" class="completeList">{t}Bekijk volledige lijst{/t}</a>
 				</div>
 				<div id="photographer_suggestion" class="suggestion" match="like" class="auto_complete" style="display:none;"></div>
@@ -59,6 +75,23 @@
 					<div class="input">
 						<input type="text" class="field" value="{$search.validator}" id="validator" name="validator" autocomplete="off">
 					</div>
+
+                    <a class="filterSearchText">
+                    	<div style="display:inline-block;font-size:1.1em;font-weight:bold;margin-bottom:6px;">{t}Top 5 validatoren{/t}</div>
+                        <div style="display:inline-block;font-size:0.9em;">{t}Validator{/t} ({t}foto’s{/t}/{t}soorten{/t})</div>
+                    </a>
+
+                    <ul>
+                    {foreach $validators v foo}
+                        {if $smarty.foreach.foo.index < 5}
+                        <li>
+                            <a href="nsr_search_pictures.php?validator={$v.validator}">{$v.validator} ({$v.total}/{$v.taxon_count})</a>
+                        </li>
+                        {/if}
+                    {/foreach}
+                    </ul>
+
+
 					<a href="nsr_validators.php" class="completeList">{t}Bekijk volledige lijst{/t}</a>
 				</div>
 				<div id="validator_suggestion" class="suggestion" match="like" class="auto_complete" style="display: none;"></div>

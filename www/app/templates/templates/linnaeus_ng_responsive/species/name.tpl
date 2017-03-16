@@ -10,16 +10,18 @@
 				<h1 class="no-subtitle main-display-name">{$names.nomen}</h1>
 				<h2></h2>
 			{/if}
+			{if $overviewImage.photographer}
 			<div id="taxonImageCredits">
-				<span class="photographer-title">{*{if $names.preffered_name}{$names.preffered_name} ({$names.nomen}){else}{$names.nomen}{/if} - *}{t}Foto{/t}</span> {$overviewImage.label} 
+				{t}Foto:{/t} {$overviewImage.photographer} 
 			</div>
+			{/if}
 		</div>
 	</div>
-	<div id="taxonImage">
-		<img src="{$taxon_base_url_images_overview}{$overviewImage.image}" />
+	<div id="taxonImage" style="background-image: url('{$taxon_base_url_images_overview}{$overviewImage.image}');">
 		<div class="imageGradient"></div>
 	</div>
 </div>
+
 {/if}
 <style>
 table tr  td:first-child {

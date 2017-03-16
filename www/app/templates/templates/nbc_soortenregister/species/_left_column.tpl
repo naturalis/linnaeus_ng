@@ -133,10 +133,11 @@
 				{if $v.species_count.total>0 && $tree_taxon_count_style!='none'}
 				<span class="classification-count">
                     {if $tree_taxon_count_style=='species_only'}
-                        ({$v.species_count.total})</span>
+                        ({$v.species_count.total})
                     {else}
-                        ({$v.species_count.total}/{$v.species_count.established})</span>
+                        ({$v.species_count.total}/{$v.species_count.established})
                     {/if}
+                </span>
 				{/if}
 			</div>
 			{/foreach}			

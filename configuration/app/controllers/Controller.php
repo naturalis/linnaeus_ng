@@ -2985,7 +2985,10 @@ class Controller extends BaseClass
 			'setting' => 'google_analytics_code'
 		));
 
-		$this->_googleAnalyticsCode = $d ? $d : null;
+		if ($d)
+		{
+			$this->_googleAnalyticsCode = empty(json_decode($d)) ? $d : json_decode($d);
+		}
 	}
 
 	protected function getGoogleAnalyticsCode()

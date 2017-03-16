@@ -26,6 +26,8 @@ $(document).ready(function() {
 	{if $session.admin.project.title}
 	setTopLevelLabel('{$session.app.project.title|@escape}');
 	{/if}
+
+	setTaxonCountStyle('{$tree_taxon_count_style}');
 	
 	{if $tree}
 		$( "#"+container ).html( {$tree} );

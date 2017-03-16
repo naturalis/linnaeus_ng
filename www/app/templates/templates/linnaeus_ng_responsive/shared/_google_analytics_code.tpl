@@ -5,7 +5,14 @@
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
   } )(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-  ga('create', '{$googleAnalyticsCode}', 'auto');
-  ga('send', 'pageview');
+  {if $googleAnalyticsCode|is_array}
+  {foreach $googleAnalyticsCode v k}
+	ga('create', '{$v->code}', 'auto'{if $k>0}, 'clientTracker{$k}'{/if});
+	ga('{if $k>0}clientTracker{$k}.{/if}send', 'pageview');
+  {/foreach}
+  {else}
+	ga('create', '{$googleAnalyticsCode}', 'auto');
+	ga('send', 'pageview');
+  {/if}
 
 </script>
