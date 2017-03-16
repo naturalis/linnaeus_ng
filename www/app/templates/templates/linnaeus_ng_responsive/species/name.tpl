@@ -17,11 +17,11 @@
 			{/if}
 		</div>
 	</div>
-	<div id="taxonImage">
-		<img src="{$taxon_base_url_images_overview}{$overviewImage.image}" />
+	<div id="taxonImage" style="background-image: url('{$taxon_base_url_images_overview}{$overviewImage.image}');">
 		<div class="imageGradient"></div>
 	</div>
 </div>
+
 {/if}
 <style>
 table tr  td:first-child {
