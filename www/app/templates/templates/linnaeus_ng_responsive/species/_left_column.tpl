@@ -58,13 +58,31 @@
 						</span>
 						{assign var=rank_id value=$classification[taxon].rank_id}
 						<span class="classification-rank">[{$classification[taxon].rank_label}]</span>
+
 						{if $classification[taxon].species_count.total>0}
 						
-						{if $smarty.section.taxon.index==$start}
-							<br /><span class="classification-count">({$classification[taxon].species_count.total} {t}soorten in totaal{/t} / {$classification[taxon].species_count.established} {t}gevestigd{/t})</span>
-						{else}
-							<span class="classification-count">({$classification[taxon].species_count.total}/{$classification[taxon].species_count.established})</span>
-						{/if}
+                            {if $tree_taxon_count_style!='none'}
+                           
+                                {if $smarty.section.taxon.index==$start}
+                                    <br /><span class="classification-count">
+                                    {if $tree_taxon_count_style=='species_only'}
+                                        ({$classification[taxon].species_count.total} {t}soorten{/t})
+                                    {else}
+                                        ({$classification[taxon].species_count.total} {t}soorten in totaal{/t} / {$classification[taxon].species_count.established} {t}gevestigd{/t})
+                                    {/if}
+                                    </span>
+                                {else}
+                                    <span class="classification-count">
+                                    {if $tree_taxon_count_style=='species_only'}
+                                        ({$classification[taxon].species_count.total})
+                                    {else}
+                                        ({$classification[taxon].species_count.total}/{$classification[taxon].species_count.established})
+                                    {/if}
+                                    </span>
+                                {/if}
+        
+                            {/if}
+                        
 						{/if}
 					</div>
 				</td></tr>
@@ -93,9 +111,15 @@
               </a>
             </span>
 						<span class="classification-rank">[{$v.rank_label}]</span>
-						{if $v.species_count.total>0}
-							<span class="classification-count">({$v.species_count.total}/{$v.species_count.established})</span>
-						{/if}
+                        {if $v.species_count.total>0 && $tree_taxon_count_style!='none'}
+                        <span class="classification-count">
+                            {if $tree_taxon_count_style=='species_only'}
+                                ({$v.species_count.total})
+                            {else}
+                                ({$v.species_count.total}/{$v.species_count.established})
+                            {/if}
+                        </span>
+                        {/if}
 					</div>
 				</td>
 			</tr>
@@ -173,11 +197,28 @@
 						<span class="classification-rank">[{$classification[taxon].rank_label}]</span>
 						{if $classification[taxon].species_count.total>0}
 						
-						{if $smarty.section.taxon.index==$start}
-							<br /><span class="classification-count">({$classification[taxon].species_count.total} {t}soorten in totaal{/t} / {$classification[taxon].species_count.established} {t}gevestigd{/t})</span>
-						{else}
-							<span class="classification-count">({$classification[taxon].species_count.total}/{$classification[taxon].species_count.established})</span>
-						{/if}
+                        {if $tree_taxon_count_style!='none'}
+
+                            {if $smarty.section.taxon.index==$start}
+                                <br /><span class="classification-count">
+                                {if $tree_taxon_count_style=='species_only'}
+                                    ({$classification[taxon].species_count.total} {t}soorten{/t})
+                                {else}
+                                    ({$classification[taxon].species_count.total} {t}soorten in totaal{/t} / {$classification[taxon].species_count.established} {t}gevestigd{/t})
+                                {/if}
+                                </span>
+                            {else}
+                                <span class="classification-count">
+                                {if $tree_taxon_count_style=='species_only'}
+                                    ({$classification[taxon].species_count.total})
+                                {else}
+                                    ({$classification[taxon].species_count.total}/{$classification[taxon].species_count.established})
+                                {/if}
+                                </span>
+                            {/if}
+    
+                        {/if}
+
 						{/if}
 					</div>
 				</td></tr>
@@ -206,9 +247,15 @@
               </a>
             </span>
 						<span class="classification-rank">[{$v.rank_label}]</span>
-						{if $v.species_count.total>0}
-							<span class="classification-count">({$v.species_count.total}/{$v.species_count.established})</span>
-						{/if}
+                        {if $v.species_count.total>0 && $tree_taxon_count_style!='none'}
+                        <span class="classification-count">
+                            {if $tree_taxon_count_style=='species_only'}
+                                ({$v.species_count.total})</span>
+                            {else}
+                                ({$v.species_count.total}/{$v.species_count.established})</span>
+                            {/if}
+                        {/if}
+
 					</div>
 				</td>
 			</tr>

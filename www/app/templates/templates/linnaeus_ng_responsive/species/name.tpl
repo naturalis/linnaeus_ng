@@ -10,9 +10,11 @@
 				<h1 class="no-subtitle main-display-name">{$names.nomen}</h1>
 				<h2></h2>
 			{/if}
+			{if $overviewImage.photographer}
 			<div id="taxonImageCredits">
-				<span class="photographer-title">{*{if $names.preffered_name}{$names.preffered_name} ({$names.nomen}){else}{$names.nomen}{/if} - *}{t}Foto{/t}</span> {$overviewImage.label} 
+				{t}Foto:{/t} {$overviewImage.photographer} 
 			</div>
+			{/if}
 		</div>
 	</div>
 	<div id="taxonImage">

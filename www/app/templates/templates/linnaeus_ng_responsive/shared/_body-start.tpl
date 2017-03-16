@@ -1,6 +1,6 @@
 <body id="body" class="conceptcard">
     <div class="logoContainer">
-        <div class="container">
+        <div class="container" style="cursor:pointer;" onClick="window.open('/','_top')">
             <!-- <img src="{$projectUrls.projectCSS}../img/siteTitle.png" class="siteTitle" /> -->
             <img src="{$projectUrls.projectCSS}../img/logo-small-pink.png" class="logo" />
             <div class="siteTitle">
