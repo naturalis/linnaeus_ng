@@ -14,7 +14,7 @@
         	{foreach from=$v->values item=l key=k}
             {capture "value"}{$l->value_start}{if $l->value_end} - {$l->value_end}{/if}{/capture}
 			<tr>
-				<td class="legend-cell">{if $k==0}{$v->trait->name}{/if}</td>
+				<td style="width:165px;">{if $k==0}{$v->trait->name}{/if}</td>
                 <td>{if $v->values|@count>1}<li>{/if}{$smarty.capture.value}</li></td>
 			</tr>
             {/foreach}

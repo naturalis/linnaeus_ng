@@ -76,11 +76,16 @@
         <li class="result">
         	<a href="../species/nsr_taxon.php?id={$v.taxon_id}" class="clicklink"></a>	
           <a href="../species/nsr_taxon.php?id={$v.id}">{$v.taxon}</a>
-          {if $v.common_name}
-          	<span class="commonName">
-          		{$v.common_name}
-						</span>
-      		{/if}
+	          	<span class="commonName">
+				{if $show_all_preferred_names_in_results}
+					{foreach $v.common_names n nk}
+                    {$n.name}
+                    {if $nk<$v.common_names|@count}<br />{/if}
+					{/foreach}
+                {else}
+					{if $v.common_name}{$v.common_name}<br />{/if}
+				{/if}
+			</span>
       		<span class="status">
             {if $show_presence_in_results}
                 {if $v.presence_information_index_label || $v.presence_information_title}
@@ -190,7 +195,7 @@ $(document).ready(function()
 	{if $search.panels}
 
 	var h=$.parseJSON(decodeURIComponent('{$search.panels}'));
-	console.log(h);
+
 	$.each(h, function(i,v)
 	{
 		if (v.visible)
