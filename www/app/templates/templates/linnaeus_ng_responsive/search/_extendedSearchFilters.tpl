@@ -77,6 +77,7 @@
 								<option value="images_off">{t}zonder foto{/t}</option>
               </select>
            	</li>
+            {if $show_nsr_specific_stuff}
            	<li>
               <label for="multimedia-distribution" class="normalLabel">{t}Verspreidingskaart{/t}</label>
            		<select class="customSelect" id="multimedia-distribution" onchange="addSearchParameter('multimedia-distribution');">
@@ -93,6 +94,7 @@
                 <option value="trend_off">{t}zonder trendgrafiek{/t}</option>
               </select>
            	</li>
+            {/if}
            </ul>
         </div>
         {/if}

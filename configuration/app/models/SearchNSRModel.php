@@ -1663,7 +1663,7 @@ final class SearchNSRModel extends AbstractModel
 						on _a.project_id = _ttf.project_id
 						and _a.id = _ttf.taxon_id
 		
-					right join %PRE%traits_traits _tt2
+					left join %PRE%traits_traits _tt2
 						on _ttf.project_id = _tt2.project_id
 						and _ttf.trait_id = _tt2.id
 						and _tt2.trait_group_id=".$group."
