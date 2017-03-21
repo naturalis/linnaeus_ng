@@ -515,7 +515,7 @@ final class SearchNSRModel extends AbstractModel
 				" . ( isset($traitgroup_joins['having']) ? $traitgroup_joins['having'] : "" ) . "
 
 			order by
-			" . (isset($sort) && $sort=='name-pref-nl' ? "common_name,_a.taxon" : "_a.taxon")."
+			" . (isset($sort) && $sort=='name-pref-nl' ? "ifnull(common_name,'zzzz'),_a.taxon" : "_a.taxon")."
 			" . (isset($limit) ? "limit ".$limit : "")."
 			" . (isset($offset) & isset($limit) ? "offset ".$offset : "")
 		;
