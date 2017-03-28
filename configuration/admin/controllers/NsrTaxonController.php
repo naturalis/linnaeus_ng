@@ -74,7 +74,7 @@ class NsrTaxonController extends NsrController
 			'columns'=>'id',
 			'fieldAsIndex'=>'rank_id'
 		));
-
+		
 		$this->moduleSettings=new ModuleSettingsReaderController;
 		$this->_taxon_main_image_base_url=$this->moduleSettings->getGeneralSetting( 'taxon_main_image_base_url' );
 		$this->smarty->assign( 'taxon_main_image_base_url',$this->_taxon_main_image_base_url );
@@ -1142,12 +1142,12 @@ class NsrTaxonController extends NsrController
 			$error=array($ranks[CLASSIS_RANK_ID]['rank']);
 		}
 		else
-		if (($child_base_rank==CLASSIS_RANK_ID && $parent_base_rank!=SUPERCLASSIS_RANK_ID) &&
+		if (($child_base_rank==CLASSIS_RANK_ID && $parent_base_rank!=SUPERCLASS_RANK_ID) &&
 			($child_base_rank==CLASSIS_RANK_ID && $parent_base_rank!=SUBPHYLUM_RANK_ID) &&
 			($child_base_rank==CLASSIS_RANK_ID && $parent_base_rank!=PHYLUM_RANK_ID))
 		{
 			// klasse moet onder superclassis, subphylum of phylum
-			$error=array($ranks[SUPERCLASSIS_RANK_ID]['rank'],$ranks[SUBPHYLUM_RANK_ID]['rank'],$ranks[PHYLUM_RANK_ID]['rank']);
+			$error=array($ranks[SUPERCLASS_RANK_ID]['rank'],$ranks[SUBPHYLUM_RANK_ID]['rank'],$ranks[PHYLUM_RANK_ID]['rank']);
 		}
 		else
 		if ($child_base_rank==SUBPHYLUM_RANK_ID && $parent_base_rank!=PHYLUM_RANK_ID)
