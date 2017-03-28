@@ -16,7 +16,7 @@
 				</select>
 			</div>
 			{if $search.search}
-			<div class="search-term">Zoekterm: {$search.search}</div>
+			<div class="search-term">{t}Zoekterm:{/t} {$search.search}</div>
 			{/if}
 			<span id="resultcount-header">{$results.count}</span>
 			{if $results.data}
