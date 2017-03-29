@@ -1015,38 +1015,8 @@ class SpeciesControllerNSR extends SpeciesController
 				'preffered_name'=>$preferredname,
 				'hybrid_marker'=>$this->addHybridMarkerAndInfixes( array('base_rank_id'=>$base_rank_id) ),
 				'list'=>$names,
-				'list_non_nsr'=> $this->setNamesNonNsr($names),
 			    'language_has_preferredname'=>$language_has_preferredname
 			);
-	}
-
-	private function setNamesNonNsr ($names)
-	{
-	    $d = array(
-	       'valid_names' => null,
-	       'synonyms' => null,
-	       'common_names' => null,
-	    );
-
-	    foreach ($names as $id => $name) {
-	        $name['nametype_label'] = $this->nameTypeToEnglish($name['nametype']);
-            if ($name['nametype'] == PREDICATE_VALID_NAME) {
-                $d['valid_names'][] = $name;
-            } else if ($name['nametype'] == PREDICATE_PREFERRED_NAME ||
-                $name['nametype'] == PREDICATE_ALTERNATIVE_NAME) {
-                $d['common_names'][] = $name;
-            } else {
-                $d['synonyms'][] = $name;
-            }
-	    }
-
-	    return $d;
-	}
-
-	private function nameTypeToEnglish ($type)
-	{
-        $parts = preg_split('/(?=[A-Z])/', substr($type, 2, -2), -1, PREG_SPLIT_NO_EMPTY);
-        return implode(' ', array_map('strtolower', $parts));
 	}
 
 	private function getActor( $id )

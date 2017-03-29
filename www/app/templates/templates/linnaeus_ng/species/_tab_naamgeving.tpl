@@ -1,116 +1,92 @@
-	<p>
+{assign names $content}
 
-		{assign var=names value=$content}
+<h2 id="name-header"><b>{t}Naamgeving{/t}</b></h2>
 
-	    <p>
-	    {foreach from=$names.list_non_nsr.valid_names item=v}
-            {capture extras}
-            {if $v.rank_label}[{$v.rank_label}]{/if}
-            {if $v.addition[$currentLanguageId].addition}({$v.addition[$currentLanguageId].addition}){/if}
-            {/capture}
-            <b>{$v.name}</b>{$smarty.capture.extras}
-            {if $v.expert != ''}{t}Expert{/t}: {$v.expert}<br>{/if}
-            {if $v.organisation_name != ''}{t}Organisation{/t}: {$v.organisation_name}<br>{/if}
-		{/foreach}
-		</p>
-
-		{if !empty($names.list_non_nsr.synonyms)}
-			<p><b>{t}Synonyms{/t}</b>:<br>
-		    {foreach from=$names.list_non_nsr.synonyms item=v}
-	            {capture extras}
-	            {if $v.rank_label}[{$v.rank_label}]{/if}
-	            {if $v.addition[$currentLanguageId].addition}({$v.addition[$currentLanguageId].addition}){/if}
-	            {/capture}
-				{assign var=another_name value="`$v.uninomial` `$names.hybrid_marker``$v.specific_epithet` `$v.infra_specific_epithet`"}
-                {if $another_name!='' && $v.uninomial!=''}
-                   <i>{$another_name}</i> {$v.authorship}{$smarty.capture.extras}<br>
-                 {elseif $v.uninomial==''}
-                     {assign var=another_name value=$v.name|@replace:$v.authorship:''}
-                     <i>{$another_name}</i> {$v.authorship}{$smarty.capture.extras}<br>
-                 {else}
-                    {$v.name}{$smarty.capture.extras}
-                {/if}
-                {if $v.nametype != $smarty.const.PREDICATE_SYNONYM} [{$v.nametype_label}]{/if}
-            {/foreach}
-		{/if}
-
-		{if !empty($names.list_non_nsr.common_names)}
-			<p><b>{t}Common names{/t}</b>:<br>
-		    {foreach from=$names.list_non_nsr.common_names item=v}
-                {$v.name} [{t}{$v.language}{/t}; {t}{$v.nametype_label}{/t}]<br>
-           {/foreach}
-           </p>
-		{/if}
-
-<!--
-		<table id="names-table">
-			{foreach from=$names.list item=v}
-
-                {if $v.expert.name}{assign var=expert value=$v.expert.name}{/if}
-                {if $v.organisation.name}{assign var=organisation value=$v.organisation.name}{/if}
-                {capture extras}
-                {if $v.rank_label}[{$v.rank_label}]{/if}
-                {if $v.language_id!=$smarty.const.LANGUAGE_ID_SCIENTIFIC} ({$v.language}){/if}
-                {if $v.addition[$currentLanguageId].addition}({$v.addition[$currentLanguageId].addition}){/if}
-                {/capture}
-
-	            <tr>
-                    {if $v.nametype==$smarty.const.PREDICATE_VALID_NAME && $taxon.base_rank_id<$smarty.const.SPECIES_RANK_ID}
-						<td style="white-space:nowrap">
-                        	{t}{$v.nametype_label}{/t}
-                         </td>
-                         <td>
-                         	<b>{$v.name}</b>{$smarty.capture.extras}
-                         </td>
-					{else}
-                        {if $v.language_id==$smarty.const.LANGUAGE_ID_SCIENTIFIC && $v.nametype!=$smarty.const.PREDICATE_VALID_NAME}
-                            {assign var=another_name value="`$v.uninomial` `$names.hybrid_marker``$v.specific_epithet` `$v.infra_specific_epithet`"}
-                            {if $another_name!='' && $v.uninomial!=''}
-                                <td style="white-space:nowrap">
-                                    {t}{$v.nametype_label}{/t}
-                                </td>
-                                <td>
-                                    <a href="name.php?id={$v.id}"><i>{$another_name}</i> {$v.authorship}</a>{$smarty.capture.extras}
-                                </td>
-                            {elseif $v.uninomial==''}
-                                {assign var=another_name value=$v.name|@replace:$v.authorship:''}
-                                <td style="white-space:nowrap">
-                                    {t}{$v.nametype_label}{/t}
-                                </td>
-                                <td>
-                                    <a href="name.php?id={$v.id}"><i>{$another_name}</i> {$v.authorship}</a>{$smarty.capture.extras}
-                                 </td>
-                            {else}
-                                <td style="white-space:nowrap">
-                                    {t}{$v.nametype_label}{/t}
-                                </td>
-                                <td>
-                                    <a href="name.php?id={$v.id}">{$v.name}</a>{$smarty.capture.extras}
-                                </td>
-                            {/if}
-                        {else}
-                            <td style="white-space:nowrap">
-                                {if $v.nametype==$smarty.const.PREDICATE_ALTERNATIVE_NAME && $names.language_has_preferredname[$v.language_id]!=true && $v.alt_alt_nametype_label}
-                                {$v.alt_alt_nametype_label|@ucfirst}
-                                {else}
-                                {t}{$v.nametype_label}{/t}
-                                {/if}
-                            </td>
-                            <td>
-                                <a href="name.php?id={$v.id}">{$v.name}</a>{$smarty.capture.extras}
-                            </td>
-                        {/if}
-                    {/if}
-                </tr>
-			{/foreach}
-			{if $expert || $organisation}
-				{if $expert}
-				<tr><td>{t}Expert{/t}</td><td colspan="2">{$expert}{if $organisation} ({$organisation}){/if}</td></tr>
+<table id="names-table">
+	{foreach from=$names.list item=v}
+		{if $v.expert.name}{assign var=expert value=$v.expert.name}{/if}
+		{if $v.organisation.name}{assign var=organisation value=$v.organisation.name}{/if}
+		{if $v.nametype=='isValidNameOf' && $taxon.base_rank_id<$smarty.const.SPECIES_RANK_ID}
+			<tr><td>{$v.nametype_label|@ucfirst}</td><td><b>{$v.name}</b></td></tr>
+		{else}
+			{if $v.language_id==$smarty.const.LANGUAGE_ID_SCIENTIFIC && $v.nametype!='isValidNameOf'}
+				{assign var=another_name value="`$v.uninomial` `$v.specific_epithet` `$v.infra_specific_epithet`"}
+				{if $another_name!='' && $v.uninomial!=''}
+					<tr><td>{$v.nametype_label|@ucfirst}</td><td><a href="name.php?id={$v.id}"><i>{$another_name}</i> {$v.authorship}</a></td></tr>
+				{elseif $v.uninomial==''}
+					{assign var=another_name value=$v.name|@replace:$v.authorship:''}
+					<tr><td>{$v.nametype_label|@ucfirst}</td><td><a href="name.php?id={$v.id}"><i>{$another_name}</i> {$v.authorship}</a></td></tr>
 				{else}
-				<tr><td>{t}Organisation{/t}</td><td colspan="2">{$organisation}</td></tr>
+					<tr><td>{$v.nametype_label|@ucfirst}</td><td><a href="name.php?id={$v.id}">{$v.name}</a></td></tr>
 				{/if}
+			{else}
+				<tr>
+					<td>
+            {if $v.nametype=='isAlternativeNameOf' && $names.language_has_preferredname[$v.language_id]!=true && $v.alt_alt_nametype_label}
+              {$v.alt_alt_nametype_label|@ucfirst}
+            {else}
+	            {$v.nametype_label|@ucfirst}
+            {/if}
+          </td>
+          <td>
+          	<a href="name.php?id={$v.id}">{$v.name}</a>
+            {if $v.addition[$currentLanguageId].addition}({$v.addition[$currentLanguageId].addition}){/if}
+	        </td>
+        </tr>
 			{/if}
-		</table>
--->
+		{/if}
+	{/foreach}
+	{if $expert || $organisation}
+		{if $expert}
+		<tr><td>Expert</td><td colspan="2">{$expert}{if $organisation} ({$organisation}){/if}</td></tr>
+		{else}
+		<tr><td>Organisatie</td><td colspan="2">{$organisation}</td></tr>
+		{/if}
+	{/if}
+</table>
 
+{if $classification}
+	<p>
+		<h2>{t}Indeling{/t}</h2>
+		<ul class="taxonoverzicht">
+			<li class="root">
+			{foreach from=$classification item=v key=x}
+			{if $v.parent_id!=null}{* skipping top most level "life" *}
+				<span class="classification-preffered-name"><a href="nsr_taxon.php?id={$v.id}">{$v.taxon}</a>&nbsp;<span class="classification-rank">[{$v.rank_label}]</span></span>
+				{if $v.common_name}
+				<span class="classification-accepted-name">{$v.common_name}</span>{/if}
+				<ul class="taxonoverzicht">
+					<li>
+			{/if}
+			{/foreach}
+			{foreach from=$classification item=v key=x}
+			{if $v.parent_id!=null}{* skipping top most level "life" *}
+			</li></ul>
+			{/if}
+			{/foreach}
+			</li>				
+		</ul>
 	</p>
+{/if}
+
+<script type="text/JavaScript">
+$(document).ready(function()
+{
+
+	{if $taxon.nsr_id!=''}
+	$('#name-header').on( 'click' , function(event) { 
+	
+		if ($('#nsr-id-row').html()==undefined)
+		{
+			if (event.altKey!==true) return;
+			$('#names-table tr:last').after('<tr id="nsr-id-row"><td>NSR ID</td><td>{$taxon.nsr_id}</td></tr>');
+		}
+		else
+		{
+			$('#nsr-id-row').toggle();
+		}
+	});
+	{/if}
+
+} );
+</script>
