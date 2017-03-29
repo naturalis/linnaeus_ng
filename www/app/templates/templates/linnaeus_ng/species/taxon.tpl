@@ -6,12 +6,6 @@
 	<div id="content" class="taxon-detail">
     	<div>
         	{if $is_nsr && $overviewImage && !($activeCategory.id==$smarty.const.TAB_BEELD_EN_GELUID || $activeCategory.id==$smarty.const.CTAB_MEDIA)}
-	            <div id="taxonImage" style="float:right">
-	                <img src="{$projectUrls['projectMedia']}{$overviewImage.image}" />
-	                <div id="taxonImageCredits">
-	                    <span class="photographer-title">{*{if $names.preffered_name}{$names.preffered_name} ({$names.nomen}){else}{$names.nomen}{/if} - *}{if $overviewImage.label}{t}Foto{/t}</span> {$overviewImage.label}{/if}
-	                </div>
-	            </div>
         	{elseif $overviewImage && $activeCategory.show_overview_image}
            		<div id="overview-image" style="background: url('{$overviewImage}');"></div>
         	{/if}
@@ -39,6 +33,17 @@
 			{elseif $external_content}
 				{include file='_webservice.tpl'}
 			{else}
+
+                {if $is_nsr && $overviewImage && !($activeCategory.id==$smarty.const.TAB_BEELD_EN_GELUID || $activeCategory.id==$smarty.const.CTAB_MEDIA)}
+                    <div id="taxonImage" style="float:right">
+                        <img src="{$projectUrls['projectMedia']}{$overviewImage.image}" />
+                        <div id="taxonImageCredits">
+                            <span class="photographer-title">{*{if $names.preffered_name}{$names.preffered_name} ({$names.nomen}){else}{$names.nomen}{/if} - *}{if $overviewImage.label}{t}Foto{/t}</span> {$overviewImage.label}{/if}
+                        </div>
+                    </div>
+                {elseif $overviewImage && $activeCategory.show_overview_image}
+                {/if}
+    
 				{if $content|@is_array}
 				<ul>
 					{foreach from=$content item=v key=k}
