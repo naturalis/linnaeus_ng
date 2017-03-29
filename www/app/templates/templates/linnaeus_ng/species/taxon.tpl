@@ -9,7 +9,7 @@
 	            <div id="taxonImage" style="float:right">
 	                <img src="{$projectUrls['projectMedia']}{$overviewImage.image}" />
 	                <div id="taxonImageCredits">
-	                    <span class="photographer-title">{*{if $names.preffered_name}{$names.preffered_name} ({$names.nomen}){else}{$names.nomen}{/if} - *}{t}Foto{/t}</span> {$overviewImage.label}
+	                    <span class="photographer-title">{*{if $names.preffered_name}{$names.preffered_name} ({$names.nomen}){else}{$names.nomen}{/if} - *}{if $overviewImage.label}{t}Foto{/t}</span> {$overviewImage.label}{/if}
 	                </div>
 	            </div>
         	{elseif $overviewImage && $activeCategory.show_overview_image}
