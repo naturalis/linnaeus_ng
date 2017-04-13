@@ -686,7 +686,7 @@ class MatrixKeyController extends Controller
 			"matrix_id"=>$this->getCurrentMatrixId(),
 			"preferred_nametype_id"=>$this->getNameTypeId(PREDICATE_PREFERRED_NAME)
         ));
-
+		
 		$taxa=array();
 		$ranks=$this->getProjectRanks() ;
 

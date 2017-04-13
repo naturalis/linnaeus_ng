@@ -1,4 +1,6 @@
 <?php
+
+	require_once( dirname(__FILE__) . '/../configuration/admin/constants.php' );
 	$cfg = dirname(__FILE__) . '/../configuration/admin/configuration.php';
 
 	// Get external settings
@@ -66,7 +68,7 @@
             }
 
             // language_id may be missing in languages_projects; if so default to English
-            $language_id = isset($languages[$row['project_id']]) ? $languages[$row['project_id']] : 26;
+            $language_id = isset($languages[$row['project_id']]) ? $languages[$row['project_id']] : LANGUAGE_ID_ENGLISH;
 
             $q = 'INSERT INTO `literature2` (`id`, `project_id`, `language_id`, `actor_id`, `label`,
                       `date`, `author`, `created`)

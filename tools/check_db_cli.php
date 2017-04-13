@@ -1,44 +1,4 @@
 <?php
-	$compare = new DatabaseTableCompare;
-
-	/* Linnaeus server settings */
-
-	/*
-	// example configuration statments:
-	//$compare->setConstFile( 'C:\www\linnaeus_ng\configuration\admin\constants.php' );
-	//$compare->setCfgFile( 'C:\www\linnaeus_ng\configuration\admin\configuration.php' );
-	//$compare->setEmptyDbFile( 'C:\www\linnaeus_ng\database\empty_database.sql' );
-	$compare->setOutputFile( '/home/maarten.schermer/testdata/%s-modify-%s.sql' );
-	//$compare->setDbUserOverride( ['user'=>'root','password'=>'secret','host'=>'localhost' ] );
-	$compare->setDoNotCreateTempDatabase( true );
-	$compare->setPreflightQueries(array(
-        'ALTER TABLE `literature2` DROP INDEX `project_id`;'
-	));
-	$compare->setPostflightQueries(array(
-        'ALTER TABLE `literature2` ADD KEY `project_id` (`project_id`, `label`(250));'
-	));
-
-	*/
-
-	$compare->setConstFile(dirname(__FILE__) . '/../configuration/admin/constants.php');
-	$compare->setCfgFile(dirname(__FILE__) . '/../configuration/admin/configuration.php');
-	$compare->setEmptyDbFile(dirname(__FILE__) . '/../database/empty_database.sql');
-	$compare->setOutputFile(dirname(__FILE__) . '/output/%s-modify-%s.sql');
-
-	$compare->setGeneralOutputFile(dirname(__FILE__) . '/output/latest-modify.sql');
-	$compare->setGeneralErrorFile(dirname(__FILE__) . '/output/latest-errors.txt');
-
-	$compare->setDoNotCreateTempDatabase(true);
-	$compare->setPreflightQueries(array(
-        //'ALTER TABLE `literature2` DROP INDEX `project_id`;'
-        "SET sql_mode = '';"
-	));
-	$compare->setPostflightQueries(array(
-        //'ALTER TABLE `literature2` ADD KEY `project_id` (`project_id`, `label`(250));'
-	));
-	$compare->run();
-
-
 
 	class DatabaseTableCompare {
 
@@ -324,15 +284,49 @@
 
 		private function createTestTables()
 		{
-			foreach ( explode( ";", file_get_contents( $this->emptyDbFile ) ) as $stmnt )
-			{
-				if ( mysqli_query( $this->conn1, $stmnt ) !=1 )
-				{
-					//echo mysqli_error( $this->conn1 );
-					$this->errors[]=$stmnt . ( substr(trim($stmnt),-1)!=";" ? ";" : "" );
-				}
+			
+			$raw = file_get_contents( $this->emptyDbFile );
+			$delimiter = ";";
 
+			if (stripos($raw,"DELIMITER ")!==false)
+			{
+				$parts = preg_split('/DELIMITER(.*)/i',"/* auto dummy */\n" . $raw,0,PREG_SPLIT_DELIM_CAPTURE);
+				
+				foreach($parts as $key=>$part)
+				{
+					if ($key%2==1)
+					{
+						$delimiter = trim($part);
+						mysqli_query( $this->conn1, "delimiter " .$delimiter );
+					}
+					else
+					{
+						foreach ( explode( $delimiter, $part ) as $stmnt )
+						{
+							if (strlen(trim($stmnt))==0) continue;
+
+							if ( mysqli_query( $this->conn1, $stmnt ) !=1 )
+							{
+								print_r( mysqli_error( $this->conn1 ) );
+								$this->errors[]=$stmnt . ( substr(trim($stmnt),-1)!=$delimiter ? $delimiter : "" );
+							}			
+						}
+					}
+				}
 			}
+			else
+			{
+				foreach ( explode( ";", $raw ) as $stmnt )
+				{
+					if (strlen(trim($stmnt))==0) continue;
+
+					if ( mysqli_query( $this->conn1, $stmnt ) !=1 )
+					{
+						print_r( mysqli_error( $this->conn1 ) );
+						$this->errors[]=$stmnt . ( substr(trim($stmnt),-1)!=$delimiter ? $delimiter : "" );
+					}
+				}
+			}			
 		}
 
 		private function compareTables()
@@ -762,4 +756,47 @@
 		}
 
 	}
+
+
+
+	$compare = new DatabaseTableCompare;
+
+	/* Linnaeus server settings */
+
+	/*
+	// example configuration statments:
+	//$compare->setConstFile( 'C:\www\linnaeus_ng\configuration\admin\constants.php' );
+	//$compare->setCfgFile( 'C:\www\linnaeus_ng\configuration\admin\configuration.php' );
+	//$compare->setEmptyDbFile( 'C:\www\linnaeus_ng\database\empty_database.sql' );
+	$compare->setOutputFile( '/home/maarten.schermer/testdata/%s-modify-%s.sql' );
+	//$compare->setDbUserOverride( ['user'=>'root','password'=>'secret','host'=>'localhost' ] );
+	$compare->setDoNotCreateTempDatabase( true );
+	$compare->setPreflightQueries(array(
+        'ALTER TABLE `literature2` DROP INDEX `project_id`;'
+	));
+	$compare->setPostflightQueries(array(
+        'ALTER TABLE `literature2` ADD KEY `project_id` (`project_id`, `label`(250));'
+	));
+
+	*/
+
+	$compare->setConstFile(dirname(__FILE__) . '/../configuration/admin/constants.php');
+	$compare->setCfgFile(dirname(__FILE__) . '/../configuration/admin/configuration.php');
+	$compare->setEmptyDbFile(dirname(__FILE__) . '/../database/empty_database.sql');
+	$compare->setOutputFile(dirname(__FILE__) . '/output/%s-modify-%s.sql');
+
+	$compare->setGeneralOutputFile(dirname(__FILE__) . '/output/latest-modify.sql');
+	$compare->setGeneralErrorFile(dirname(__FILE__) . '/output/latest-errors.txt');
+
+	$compare->setDoNotCreateTempDatabase(true);
+	$compare->setPreflightQueries(array(
+        //'ALTER TABLE `literature2` DROP INDEX `project_id`;'
+        "SET sql_mode = '';"
+	));
+	$compare->setPostflightQueries(array(
+        //'ALTER TABLE `literature2` ADD KEY `project_id` (`project_id`, `label`(250));'
+	));
+	$compare->run();
+
+
 
