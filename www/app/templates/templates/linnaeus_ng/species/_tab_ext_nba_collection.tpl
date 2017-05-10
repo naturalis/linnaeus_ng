@@ -246,7 +246,7 @@ function printLogInfo()
 
 <div class="inline-templates" id="remarkTpl">
 <!--
-    <span style="display:inline-block;margin-top:3px;">Dit is een selectie uit de gedigitaliseerde museumobjecten van Naturalis Biodiversity Center. Deze selectie geeft niet per se een compleet beeld.</div>
+    <span style="display:inline-block;margin-top:3px;">{t}Dit is een selectie uit de gedigitaliseerde museumobjecten van Naturalis Biodiversity Center. Deze selectie geeft niet per se een compleet beeld.{/t}</span>
 -->
 </div>
 
