@@ -448,7 +448,9 @@
 					_meta2.meta_data as short_description,
 					_meta3.meta_data as geography,
 					_meta5.meta_data as copyright,
-					_meta7.meta_data as maker_adress
+					_meta7.meta_data as maker_adress,
+					if (upper(substring(_meta10.meta_data,1,2))='CC',_meta10.meta_data,if(_c.meta_data is null,'','All rights reserved')) as licence,
+					if (upper(substring(_meta10.meta_data,1,2))='CC','Copyright',if(_c.meta_data is null,'','Copyright')) as licence_type
 				
 				from  ".$this->connector->prefix."media_taxon _m
 				
@@ -487,7 +489,12 @@
 					and _m.project_id=_meta7.project_id
 					and _meta7.sys_label='beeldbankAdresMaker'
 					and _meta7.language_id=".$this->languageId."
-	
+
+				left join ".$this->connector->prefix."media_meta _meta10
+					on _m.id=_meta10.media_id
+					and _m.project_id=_meta10.project_id
+					and _meta10.sys_label='beeldbankLicentie'
+
 				where
 					_m.project_id = ".$this->connector->project_id."
 					and _m.taxon_id = ".$id
