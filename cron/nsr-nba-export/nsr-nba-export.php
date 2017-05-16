@@ -586,7 +586,7 @@
 
 		private function cleanImageLicence($a)
 		{
-			if (strpos('CC',$a)==0)
+			if (strpos($a,'CC')==0)
 			{
 				return preg_replace_callback('/^(((CC[ 0]+)(.*))(\())(.*)/', function($matches) { return trim($matches[2]); }, $a);
 			}
