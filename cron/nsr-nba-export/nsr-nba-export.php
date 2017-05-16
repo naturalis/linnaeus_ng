@@ -584,6 +584,15 @@
 			}
 		}		
 
+		private function cleanImageLicence($a)
+		{
+			if (strpos('CC',$a)==0)
+			{
+				return preg_replace_callback('/^(((CC[ 0]+)(.*))(\())(.*)/', function($matches) { return trim($matches[2]); }, $a);
+			}
+			return $a;
+		}
+					
 		private function writeData()
 		{
 			$this->feedback( "writing data" );
@@ -620,21 +629,12 @@
 
 				if ( $this->includeImages )
 				{
-					function cleanLicence($a)
-					{
-						if (strpos('CC',$a)==0)
-						{
-							return preg_replace_callback('/^(((CC[ 0]+)(.*))(\())(.*)/', function($matches) { return trim($matches[2]); }, $a);
-						}
-						return $a;
-					}
-					
 					$c=$this->getImages( $val['id'] );
 					$l=0;
 					$images=array();
 					foreach((array)$c as $buytjyuy) 
 					{
-						$buytjyuy['licence']=cleanLicence($buytjyuy['licence']);
+						$buytjyuy['licence']=$this->cleanImageLicence($buytjyuy['licence']);
 						$images['image__'.($l++)]=$buytjyuy;
 					}
 				}
