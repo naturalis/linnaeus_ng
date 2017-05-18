@@ -588,47 +588,55 @@ class WebservicesModel extends AbstractModel
 			return;
 		
 		$query="
-			select
-				count(distinct _a.id) as total
+			select count(distinct taxon_id) as total from
+				(select
+					_ttv.taxon_id
+	
+				from %PRE%traits_taxon_values _ttv
+	
+				right join %PRE%traits_values _tv
+					on _ttv.project_id = _tv.project_id
+					and _ttv.value_id = _tv.id
+	
+				right join %PRE%traits_traits _tt1
+					on _tv.project_id = _tt1.project_id
+					and _tv.trait_id = _tt1.id
+					and _tt1.trait_group_id=".$group_id."
+	
+				left join %PRE%trash_can _trash
+					on _ttv.project_id = _trash.project_id
+					and _ttv.taxon_id =  _trash.lng_id
+					and _trash.item_type='taxon'
+	
+				where
+					_ttv.project_id = " . $project_id ."
+					and ifnull(_trash.is_deleted,0)=0
 
-			from 
-				%PRE%taxa _a
+				union
 
-			left join %PRE%traits_taxon_values _ttv
-				on _a.project_id = _ttv.project_id
-				and _a.id = _ttv.taxon_id
-
-			left join %PRE%traits_values _tv
-				on _ttv.project_id = _tv.project_id
-				and _ttv.value_id = _tv.id
-
-			left join %PRE%traits_traits _tt1
-				on _tv.project_id = _tt1.project_id
-				and _tv.trait_id = _tt1.id
-				and _tt1.trait_group_id=".$group_id."
-
-			left join %PRE%traits_taxon_freevalues _ttf
-				on _a.project_id = _ttf.project_id
-				and _a.id = _ttf.taxon_id
-
-			right join %PRE%traits_traits _tt2
-				on _ttf.project_id = _tt2.project_id
-				and _ttf.trait_id = _tt2.id
-				and _tt2.trait_group_id=".$group_id."
-
-			left join %PRE%trash_can _trash
-				on _a.project_id = _trash.project_id
-				and _a.id =  _trash.lng_id
-				and _trash.item_type='taxon'
-
-			where
-				_a.project_id = " . $project_id ."
-				and ifnull(_trash.is_deleted,0)=0
-				having count(_tt1.id)+count(_tt2.id) > 0
+				select
+					_ttf.taxon_id
+	
+				from %PRE%traits_taxon_freevalues _ttf
+	
+				right join %PRE%traits_traits _tt2
+					on _ttf.project_id = _tt2.project_id
+					and _ttf.trait_id = _tt2.id
+					and _tt2.trait_group_id=".$group_id."
+		
+				left join %PRE%trash_can _trash
+					on _ttf.project_id = _trash.project_id
+					and _ttf.taxon_id =  _trash.lng_id
+					and _trash.item_type='taxon'
+	
+				where
+					_ttf.project_id = " . $project_id ."
+					and ifnull(_trash.is_deleted,0)=0
+				) as unionized
 		";
 
 		$d=$this->freeQuery( $query );
-		
+
 		return $d[0]['total'];
 	}
 
