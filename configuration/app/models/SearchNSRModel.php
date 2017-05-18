@@ -336,7 +336,6 @@ final class SearchNSRModel extends AbstractModel
 		$specific_rank=isset($params['specific_rank']) ? $params['specific_rank'] : null;
 		$this->_operators=isset($params['operators']) ? $params['operators'] : null;
 
-
 		if ( is_null($project_id) ||  is_null($language_id) )
 			return;
 
@@ -1654,10 +1653,10 @@ final class SearchNSRModel extends AbstractModel
 						on _ttv.project_id = _tv.project_id
 						and _ttv.value_id = _tv.id
 		
-					left join %PRE%traits_traits _tt
-						on _tv.project_id = _tt.project_id
-						and _tv.trait_id = _tt.id
-						and _tt.trait_group_id=".$group."
+					left join %PRE%traits_traits _tt1
+						on _tv.project_id = _tt1.project_id
+						and _tv.trait_id = _tt1.id
+						and _tt1.trait_group_id=".$group."
 		
 					left join %PRE%traits_taxon_freevalues _ttf
 						on _a.project_id = _ttf.project_id
@@ -1669,7 +1668,7 @@ final class SearchNSRModel extends AbstractModel
 						and _tt2.trait_group_id=".$group."
 					",
 				"having"=>
-					"having count(_ttv.id)+count(_ttf.id) > 0"
+					"having count(_tt1.id)+count(_tt2.id) > 0"
 			 ];
 	}
 
