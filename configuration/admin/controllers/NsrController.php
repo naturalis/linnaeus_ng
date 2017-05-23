@@ -305,7 +305,7 @@ class NsrController extends Controller
 			'columns'=>'nsr_id'
 		));
 
-		return str_replace('tn.nlsr.concept/','',$data[0]['nsr_id']);
+		return ltrim(str_replace('tn.nlsr.concept/','',$data[0]['nsr_id']),'0');
 	}
 
 	public function getConcept($id)
@@ -420,7 +420,7 @@ class NsrController extends Controller
 
 	private function generateNsrCode()
 	{
-		$c='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+		$c='ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789';
 		$r='';
 		while(strlen($r)<11)
 		{
