@@ -341,7 +341,9 @@
 		{
 			$query="
 				select
-					_x2.title,_x1.content as text,_x3.language
+					_x2.title,_x1.content as text,
+					if (_x2.title='Summary','English',_x3.language) as language
+
 				from
 					".$this->connector->prefix."content_taxa _x1
 	
