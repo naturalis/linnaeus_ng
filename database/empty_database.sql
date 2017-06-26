@@ -79,6 +79,7 @@ CREATE TABLE IF NOT EXISTS `actors_addresses` (
 DROP TABLE IF EXISTS `beelduitwisselaar_batches`;
 CREATE TABLE `beelduitwisselaar_batches` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `batch_identifier` varchar(32),
   `project_id` int(11) NOT NULL,
   `number_in_feed` int(5) NOT NULL DEFAULT '0',
   `number_downloaded` int(5) NOT NULL DEFAULT '0',
