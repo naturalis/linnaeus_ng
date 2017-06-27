@@ -164,6 +164,10 @@ class AbstractModel extends BaseClass
 		);
     }
 
+    public function resetAffectedRows()
+    {
+		$this->_affectedRows = 0;
+    }
 
 	/* DEBUG */
     public function q()

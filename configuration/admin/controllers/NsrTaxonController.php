@@ -282,19 +282,36 @@ class NsrTaxonController extends NsrController
 			$this->checkAuthorisation();
 
 			$this->setNameId($this->rGetId());
-			
-			$this->updateName();
+		
 
-			if ($this->needParentChange()!=false && $this->canParentChange()!=false)
+			// check whether a concept already exist with the new name *before* updating the valid name (and subsequently the concept)
+			$name=$this->getName(array('id'=>$this->getNameId()));
+			$exist=$this->getTaxonByName($this->rGetVal('name_name')['new']);
+			
+			if (
+				!empty($name['type_id']) && 
+				$name['type_id']==$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'] && 
+				$this->rHasVar('name_name') &&
+				!empty($exist)
+			)
 			{
-				$this->doParentChange();
-				$name=$this->getName(array('id'=>$this->getNameId()));
-				$this->saveTaxonParentage($name['taxon_id']);
+				$this->addError(sprintf($this->translate('Name already exists for') . ' <a target="_new" href="taxon.php?id=%s">' . $this->translate('another taxon concept') . '</a>.',$exist['id']));
 			}
 			else
 			{
-				$this->updateConceptBySciName();
-				$this->doNameIntegrityChecks($this->getName(array('id'=>$this->getNameId())));
+				$this->updateName();
+	
+				if ($this->needParentChange()!=false && $this->canParentChange()!=false)
+				{
+					$this->doParentChange();
+					$name=$this->getName(array('id'=>$this->getNameId()));
+					$this->saveTaxonParentage($name['taxon_id']);
+				}
+				else
+				{
+					$this->updateConceptBySciName();
+					$this->doNameIntegrityChecks($this->getName(array('id'=>$this->getNameId())));
+				}
 			}
 		}
 		else
@@ -424,9 +441,18 @@ class NsrTaxonController extends NsrController
 
 		if ( $this->rHasVal('action','save') && !$this->isFormResubmit())
 		{
-			$this->updateName();
-			$this->addMessage($this->translate('Name saved'));
-			$this->resetTree();
+			// check whether a concept already exist with the new name *before* updating the valid name (and subsequently the concept)
+			$exist=$this->getTaxonByName($this->rGetVal('name_name')['new']);
+			if ( !empty($exist) )
+			{
+				$this->addError(sprintf($this->translate('Name already exists for') . ' <a target="_new" href="taxon.php?id=%s">' . $this->translate('another taxon concept') . '</a>.',$exist['id']));
+			}
+			else
+			{
+				$this->updateName();
+				$this->addMessage($this->translate('Name saved'));
+				$this->resetTree();
+			}
 		}
 
 		$this->smarty->assign('concept',$concept);
@@ -528,8 +554,6 @@ class NsrTaxonController extends NsrController
 		$this->smarty->assign('treetop',$this->treeGetTop());
 		$this->printPage();
 	}
-
-
 
     public function ajaxInterfaceAction()
     {
@@ -1530,6 +1554,8 @@ class NsrTaxonController extends NsrController
 			'id'=>array('id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId()),
 			'columns'=>'taxon'
 		));
+
+		$this->models->Taxa->resetAffectedRows();
 
 		$result=$this->models->Taxa->update(
 			array('taxon'=>trim($values['new'])),
