@@ -25,7 +25,8 @@
 
 <h2><span style="font-size:12px;font-style:normal">{t}concept card{/t}:</span> {$concept.taxon}</h2>
 {if $concept.is_deleted}<span style="color:red;font-weight:bold">{t}CONCEPT IS MARKED AS DELETED{/t}</span><br />
-<a href="#" onclick="deletedataform(false);" class="edit" style="margin:0">{t}undo deletion{/t}</a>
+<a href="#" onclick="deletedataform(false);" class="edit" style="margin:0">{t}undo deletion{/t}</a><br />
+<a href="#" onclick="irrevocablydelete();" class="edit" style="margin:0">{t}delete this taxon irrevocably{/t}</a>
 {/if}
 
 <form id="data" onsubmit="return false;">
@@ -237,7 +238,7 @@
     </p>
 
 {if $concept.is_deleted}
-    <a href="taxon_deleted.php" style="margin:0">{t}show deleted taxa{/t}</a><br />
+    <a href="taxon_deleted.php" class="edit" style="margin:0">{t}show taxa marked as deleted{/t}</a><br />
 {/if}
 
     <!-- p>

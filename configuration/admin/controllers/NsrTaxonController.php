@@ -441,6 +441,14 @@ class NsrTaxonController extends NsrController
 
 		if ( $this->rHasVal('action','save') && !$this->isFormResubmit())
 		{
+
+			$this->updateName();
+			$this->addMessage($this->translate('Name saved'));
+			$this->resetTree();
+
+			/*
+			see: https://jira.naturalis.nl/browse/LINNA-588
+			
 			// check whether a concept already exist with the new name *before* updating the valid name (and subsequently the concept)
 			$exist=$this->getTaxonByName($this->rGetVal('name_name')['new']);
 			if ( !empty($exist) )
@@ -453,6 +461,7 @@ class NsrTaxonController extends NsrController
 				$this->addMessage($this->translate('Name saved'));
 				$this->resetTree();
 			}
+			*/
 		}
 
 		$this->smarty->assign('concept',$concept);

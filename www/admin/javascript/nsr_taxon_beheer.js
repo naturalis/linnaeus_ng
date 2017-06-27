@@ -453,6 +453,27 @@ function deletedataform(style)
 
 }
 
+function irrevocablydelete()
+{
+	if (!confirm(_("Are you sure you want to irrevocably delete this taxon and its associated data?"))) return;
+
+	if (dataid)
+	{
+		form = $('<form method=post action="taxon_irrevocably_delete.php"></form>');
+		form.append('<input type="hidden" name="rnd" value="'+$('#rnd').val()+'" />');
+		form.append('<input type="hidden" name="id" value="'+dataid+'" />');
+
+		$(window).unbind('beforeunload');
+		$('body').append(form);
+		form.submit();
+	}
+	else
+	{
+		alert(_("An error occurred: could not locate an ID."));
+	}
+
+}
+
 function deleteform()
 {
 	if (!dataid) return;
