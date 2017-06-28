@@ -67,5 +67,7 @@ $(document).ready(function(){
 	
 	$('title').html('{t}Zoekresultaten{/t} - '+$('title').html());
 
+	bindKeys();
+
 });
 </script>
