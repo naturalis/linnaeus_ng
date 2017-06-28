@@ -13,7 +13,7 @@
 .language-labels input {
 	font-size:0.9em;
 	margin:0 10px 0 2px;
-	width:125px;
+	width:225px;
 }
 </style>
 

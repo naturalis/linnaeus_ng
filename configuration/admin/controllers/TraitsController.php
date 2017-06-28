@@ -554,7 +554,7 @@ class TraitsController extends Controller
 		if ( empty($values) )
 			return $values;
 
-		$ra=$this->models->TraitsTaxonValues->_get(
+		$r=$this->models->TraitsTaxonValues->_get(
 			array(
 				'columns'=>'count(distinct taxon_id) as taxon_count,count(taxon_id) as total_count',
 				'id'=>array('project_id'=>$this->getCurrentProjectId()),

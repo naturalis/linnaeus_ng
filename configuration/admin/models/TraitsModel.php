@@ -111,7 +111,7 @@ final class TraitsModel extends AbstractModel
 		
 		if ( is_null($project_id) || is_null($language_id) || is_null($trait_group_id) )
 			return;
-		
+
 		$query="
 			select
 				_a.*,
@@ -170,8 +170,10 @@ final class TraitsModel extends AbstractModel
 			where
 				_a.project_id=" . $project_id."
 				and _a.trait_group_id=" . $trait_group_id . "
-			group by _a.id
-			order by _a.show_order,_a.sysname
+			group by 
+				_a.id, _b.translation, _c.translation, _d.translation
+			order by
+				_a.show_order,_a.sysname
 		";
 
 		return $this->freeQuery($query);

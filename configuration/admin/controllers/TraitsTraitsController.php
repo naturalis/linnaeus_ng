@@ -250,10 +250,11 @@ class TraitsTraitsController extends TraitsController
 		$this->checkAuthorisation();
 		
 		if (!$this->rHasId() && !$this->rHasVar('trait'))
+		{
 			$this->redirect('index.php');
+		}
 		
         $this->setPageName($this->translate('Trait values'));
-
 
 		if ($this->rHasVal('action','save'))
 		{
