@@ -12,3 +12,7 @@ table tr td {
 	margin-left:10px;
 	float:right;
 }
+
+.larger-ion-icon {
+	font-size:2em;
+}

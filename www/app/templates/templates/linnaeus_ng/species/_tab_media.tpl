@@ -20,7 +20,7 @@
 			<div class="media-cell media-type-{$v.category}" id="media-cell-{$k}">
 				{if $v.rs_id == ''}
 					<a
-					rel="fancybox"
+					data-fancybox="gallery" 
 					class="image-wrap "
 					title="{$v.description}"
 					href="{$smarty.capture.fullImgUrl}"
@@ -58,21 +58,23 @@
 					</a>
 				{else}
 					{if $v.category == 'image'}
-						<a href="{$smarty.capture.fullImgUrl}" title="{$v.description}" rel="fancybox" class="fancy-box" alt="">
+						<a href="{$smarty.capture.fullImgUrl}" title="{$v.description}" data-fancybox="gallery" alt="">
 						<img src="{$smarty.capture.fullImgUrl}" alt="{$v.description}" id="media-{$k}" class="image-full" />
 						</a><br/>
 						{$name}
 					{else if $v.category == 'audio' or $v.category == 'video'}
-						<a href="#inline-media-{$k}" rel="fancybox" class="fancy-box fancy-box-video"><i class="ion-ios-videocam"></i></a>
-						<div id="inline-media-{$k}" style="display: none;">
-							<{$v.category} src="{$smarty.capture.fullImgUrl}" alt="{$v.description}" id="media-{$k}" controls
-								{if $v.width != '' && $v.height != ''}style="width: {$v.width}px; height: {$v.height}px;"{/if}/>
-								<a href="{$smarty.capture.fullImgUrl}">Play {$v.original_name}</a>
-							</{$v.category}><br>
-							{$name}
-						</div>
+                        <div style="display:none;" id="hidden-media-{$k}">
+                            <audio controls>
+                                <source src="{$smarty.capture.fullImgUrl}" type="audio/mpeg">
+                                Your browser does not support the audio element.
+                            </audio> 
+                        </div>
+                        
+                        <a data-fancybox="gallery" data-src="#hidden-media-{$k}" href="javascript:;" class="{if $v.category=='audio'}ion-volume-medium{else}ion-videocamera{/if} larger-ion-icon">
+                            {$name}
+                        </a> 
 					{else}
-						<a href="{$smarty.capture.fullImgUrl}">
+						<a href="{$smarty.capture.fullImgUrl}" title="{$v.description}" data-fancybox="gallery">
 							<img src="{$v.rs_thumb_medium}" alt="{$v.description}" /><br>
 							{$name}
 						</a>
