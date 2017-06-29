@@ -12,6 +12,7 @@ class SearchControllerNSR extends SearchController
 	private $_resSpeciesPerPage=50;
 	private $_nameTypeIds;
 	private $conceptIdPrefix='tn.nlsr.concept/';
+	private $httpHost;
 
 	private $_operators=array(
 		'=='=>array('label'=>'is gelijk aan','range'=>false),
@@ -135,6 +136,8 @@ class SearchControllerNSR extends SearchController
 
 		$this->models->SearchNSRModel->setNameTypeIds($this->_nameTypeIds);
 		$this->setRobotsDirective( ["index","nofollow"] );
+		
+		$this->httpHost = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ?  $_SERVER['HTTP_X_FORWARDED_HOST'] : $_SERVER("HTTP_HOST");
 
     }
 
@@ -165,7 +168,7 @@ class SearchControllerNSR extends SearchController
 			$search['limit']=1000;
 			$template='export_search';
 			$this->smarty->assign('csvExportSettings',$this->csvExportSettings);
-			$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/nsr/concept/');
+			$this->smarty->assign('url_taxon_detail',"http://". $this->httpHost.'/nsr/concept/');
 			$this->downloadHeaders(
 				array(
 					'mime'=>'text/csv',
@@ -179,7 +182,7 @@ class SearchControllerNSR extends SearchController
 			$this->smarty->assign('querystring',$this->reconstructQueryString(array('search'=>$search,'ignore'=>array('page'))));
 			$this->smarty->assign('type',$searchType);
 			$this->smarty->assign('searchHR',$this->makeReadableQueryString());
-			$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
+			$this->smarty->assign('url_taxon_detail',"http://". $this->httpHost.'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
 		}
 
         $this->printPage($template);
@@ -194,7 +197,7 @@ class SearchControllerNSR extends SearchController
 			$search['limit']=1000;
 			$template='export_search_extended';
 			$this->smarty->assign('csvExportSettings',$this->csvExportSettings);
-			$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/nsr/concept/');
+			$this->smarty->assign('url_taxon_detail',"http://". $this->httpHost.'/nsr/concept/');
 
 			$this->downloadHeaders(
 				array(
@@ -208,7 +211,7 @@ class SearchControllerNSR extends SearchController
 			$this->smarty->assign('search',$search);
 			$this->smarty->assign('querystring',$this->reconstructQueryString(array('search'=>$search,'ignore'=>array('page'))));
 			$this->smarty->assign('presence_statuses',$this->getPresenceStatuses());
-			$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
+			$this->smarty->assign('url_taxon_detail',"http://". $this->httpHost.'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
 			$template=null;
 		}
 
@@ -254,7 +257,7 @@ class SearchControllerNSR extends SearchController
 			$search['limit']=1000;
 			$template='export_search_pictures';
 			$this->smarty->assign('csvExportSettings',$this->csvExportSettings);
-			$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/nsr/concept/');
+			$this->smarty->assign('url_taxon_detail',"http://". $this->httpHost.'/nsr/concept/');
 			$this->downloadHeaders(
 				array(
 					'mime'=>'text/csv',
@@ -268,7 +271,7 @@ class SearchControllerNSR extends SearchController
 			$this->smarty->assign('photographers',$this->getPhotographersPictureCount($search));
 			$this->smarty->assign('validators',$this->getValidatorPictureCount($search));
 			$this->smarty->assign('searchHR',$this->makeReadableQueryString());
-			$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
+			$this->smarty->assign('url_taxon_detail',"http://". $this->httpHost.'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
 			$this->smarty->assign('imageExport',true);
 		}
 
