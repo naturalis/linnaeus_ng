@@ -27,6 +27,7 @@ class FreeModuleController extends Controller
         'IE' => array()
     );
 
+    public $usedHelpers = array('old_show_media_link_replacer');
 
 
     /**
@@ -65,23 +66,22 @@ class FreeModuleController extends Controller
      *
      * @access    public
      */
-    public function indexAction ()
+    public function indexAction()
     {
-
         // set a new module id, if any (switching between multiple modules)
-        if ($this->rHasVal('modId')) {
-
+        if ($this->rHasVal('modId'))
+		{
             $this->setCurrentModule($this->getFreeModule($this->rGetVal('modId')));
         }
 
         // if no module has been set, raise an error
-        if (!$this->getCurrentModuleId()) {
-
+        if (!$this->getCurrentModuleId())
+		{
             $this->addError($this->translate('Unknown module ID.'));
             $this->printPage();
         }
-        else {
-
+        else
+		{
             $this->setStoreHistory(false);
 
             // two ways of requesting a specific page
@@ -89,17 +89,14 @@ class FreeModuleController extends Controller
 
             $page = $this->getPage($id);
 
-            if (!empty($page)) {
-
+            if (!empty($page))
+			{
                 $id = $page['id'];
-
 				$mId = $this->checkPageInModule($id);
-				if ($mId!==true)
-					$this->setCurrentModule($mId);
-
+				if ($mId!==true) $this->setCurrentModule($mId);
             }
-            else {
-
+            else
+			{
                 $page = $this->getFirstModulePage();
                 $id = $page['id'];
             }
@@ -115,48 +112,49 @@ class FreeModuleController extends Controller
      *
      * @access    public
      */
-    public function topicAction ()
+    public function topicAction()
     {
 
-        if ($this->rHasVal('modId')) {
-
+        if ($this->rHasVal('modId'))
+		{
             $this->setCurrentModule($this->getFreeModule($this->rGetVal('modId')));
         }
 
         $module = $this->getCurrentModule();
 
-        if ($this->rHasVal('letter') && $module['show_alpha'] == '1') {
-
+        if ($this->rHasVal('letter') && $module['show_alpha'] == '1')
+		{
             $refs = $this->getPagesByLetter(strtolower($this->rGetVal('letter')));
-
             $id = $refs[0]['id'];
         }
-        else if ($this->rHasId()) {
-
+        else
+		if ($this->rHasId())
+		{
             $id = $this->rGetId();
         }
-        else {
-
+        else
+		{
             $this->addError($this->translate('No page ID specified.'));
-
             $id = null;
         }
 
-        if ($id) {
+        if ($id)
+		{
             $mId = $this->checkPageInModule($id);
 
-            if ($mId!==true) {
-
+            if ($mId!==true)
+			{
 				$this->setCurrentModule($this->getFreeModule($mId));
             	$module = $this->getCurrentModule();
             }
         }
 
-        if (!is_null($id)) {
-
+        if (!is_null($id))
+		{
             $page = $this->getPage($id);
 
-			if (!empty($page)) {
+			if (!empty($page))
+			{
 				$this->smarty->assign('page', $page);
 				$this->smarty->assign('adjacentItems', $this->getAdjacentPages($id));
 			}
@@ -182,9 +180,13 @@ class FreeModuleController extends Controller
         $this->smarty->assign('module', $module);
 
 		if ($this->rHasVal('style','inner'))
+		{
 	        $this->printPage('_topic');
+		}
 		else
+		{
 	        $this->printPage();
+		}
     }
 
 
@@ -199,8 +201,8 @@ class FreeModuleController extends Controller
         if (!$this->rHasVal('action'))
             return;
 
-        if ($this->rHasVal('action', 'get_lookup_list') && !empty($this->rGetVal('search'))) {
-
+        if ($this->rHasVal('action', 'get_lookup_list') && !empty($this->rGetVal('search')))
+		{
             $this->getLookupList($this->rGetAll());
         }
 
@@ -314,12 +316,11 @@ class FreeModuleController extends Controller
 
 
 
-    private function getPage ($id)
+    private function getPage( $id )
     {
-        if (!isset($id))
-            return;
+        if (!isset($id)) return;
 
-        $fmp = $this->models->FreeModulesPages->_get(array(
+        $t = $this->models->FreeModulesPages->_get(array(
             'id' => array(
                 'id' => $id,
                 'module_id' => $this->getCurrentModuleId(),
@@ -327,53 +328,42 @@ class FreeModuleController extends Controller
             )
         ));
 
-        if (!$fmp) {
+        if (!$t) return;
 
-            return;
-        }
-        else {
+		$page = $t[0];
 
-            $page = $fmp[0];
+		$t = $this->models->ContentFreeModules->_get(
+		array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(),
+				'module_id' => $this->getCurrentModuleId(),
+				'language_id' => $this->getCurrentLanguageId(),
+				'page_id' => $id
+			)
+		));
 
-            $cfm = $this->models->ContentFreeModules->_get(
-            array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId(),
-                    'module_id' => $this->getCurrentModuleId(),
-                    'language_id' => $this->getCurrentLanguageId(),
-                    'page_id' => $id
-                )
-            ));
+		$page['topic']=$t[0]['topic'];
+		$page['content']=$t[0]['content'];
 
-            $page['topic'] = $cfm[0]['topic'];
-            $page['content'] = $this->matchHotwords($cfm[0]['content']);
+		if (!is_null($this->helpers->OldShowMediaLinkReplacer))
+		{
+			$this->helpers->OldShowMediaLinkReplacer->setContent( $page['content'] );
+			$this->helpers->OldShowMediaLinkReplacer->replaceLinks();
+			$page['content']=$this->helpers->OldShowMediaLinkReplacer->getTransformedContent();
+		}
 
-            /*
+		$page['content'] = $this->matchHotwords( $page['content'] );
 
-            $fmm = $this->models->FreeModuleMedia->_get(array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId(),
-                    'page_id' => $id
-                )
-            ));
+		$this->_mc->setItemId($id);
+		$media = $this->_mc->getItemMediaFiles();
 
-            if ($fmm) {
+		if ($media)
+		{
+			$page['image'] = $media[0]['rs_original'];
+		}
 
-                $page['image']['file_name'] = $fmm[0]['file_name'];
-                $page['image']['thumb_name'] = $fmm[0]['thumb_name'];
-            }
+		return $page;
 
-            */
-
-            $this->_mc->setItemId($id);
-            $media = $this->_mc->getItemMediaFiles();
-
-            if ($media) {
-                $page['image'] = $media[0]['rs_original'];
-            }
-
-            return $page;
-        }
     }
 
 

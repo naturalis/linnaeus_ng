@@ -20,7 +20,8 @@
 			<div class="media-cell media-type-{$v.category}" id="media-cell-{$k}">
 				{if $v.rs_id == ''}
 					<a
-					data-fancybox="gallery" 
+					data-fancybox="gallery"
+                    data-caption="{$v.description}"
 					class="image-wrap "
 					title="{$v.description}"
 					href="{$smarty.capture.fullImgUrl}"
@@ -70,11 +71,11 @@
                             </audio> 
                         </div>
                         
-                        <a data-fancybox="gallery" data-src="#hidden-media-{$k}" href="javascript:;" class="{if $v.category=='audio'}ion-volume-medium{else}ion-videocamera{/if} larger-ion-icon">
+                        <a data-fancybox="gallery" data-src="#hidden-media-{$k}" href="javascript:;" class="{if $v.category=='audio'}ion-volume-medium{else}ion-videocamera{/if} larger-ion-icon" data-caption="{$name}">
                             {$name}
                         </a> 
 					{else}
-						<a href="{$smarty.capture.fullImgUrl}" title="{$v.description}" data-fancybox="gallery">
+						<a href="{$smarty.capture.fullImgUrl}" title="{$v.description}" data-fancybox="gallery" data-caption="{$name}">
 							<img src="{$v.rs_thumb_medium}" alt="{$v.description}" /><br>
 							{$name}
 						</a>

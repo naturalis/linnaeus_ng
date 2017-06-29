@@ -1033,10 +1033,13 @@ class Controller extends BaseClass
         $exprNoLink = '|(\[no\])(.*)(\[\/no\])|i';
         $processed = preg_replace_callback($exprNoLink, array($this,'embedNoLink'), $processed);
 
-		// replacing existing open-tags
-		$expr = '/<([A-Z][A-Z0-9]*)\b[^>]*>/siU';
+		// replacing existing a-tags
+		$expr = '/\<a([^\>]*?)\>(.*)(\<\/a\>)/iUms';
 		$processed = preg_replace_callback($expr, array($this,'embedNoLink'), $processed);
 
+		// replacing remaining existing open-tags
+		$expr = '/<([A-Z][A-Z0-9]*)\b[^>]*>/siU';
+		$processed = preg_replace_callback($expr, array($this,'embedNoLink'), $processed);
 
 		$currUrl = $this->getCurrentPathWithProjectlessQuery();
 
