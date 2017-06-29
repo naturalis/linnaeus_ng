@@ -202,26 +202,23 @@ function printLogInfo()
 
 </script>
 
-<p>
-    <h2 id="name-header">{$requested_category.title}</h2>
+<h2 id="name-header">{$requested_category.title}</h2>
 
-    {if $content}
-    <p>{$content}</p>
-    {/if}
-    
-    <div class="nba-data" style="display:none">
-    {t}Geen collectie-exemplaren gevonden in de{/t} <a href="http://bioportal.naturalis.nl/" target="_new">Naturalis Bioportal</a>.
-    </div>
-    
-    <div id="result-header" style="margin-bottom:10px;">
-    </div>
-    <div id="results" class="nba-data" style="margin-bottom:10px;">
-    </div>
-    <br clear="all" />
-    <div id="result-footer" style="margin-bottom:10px;">
-    </div>
+{if $content}
+<p>{$content}</p>
+{/if}
 
-</p>
+<div class="nba-data" style="display:none">
+{t}Geen collectie-exemplaren gevonden in de{/t} <a href="http://bioportal.naturalis.nl/" target="_new">Naturalis Bioportal</a>.
+</div>
+
+<div id="result-header" style="margin-bottom:10px;">
+</div>
+<div id="results" class="nba-data" style="margin-bottom:10px;">
+</div>
+<br clear="all" />
+<div id="result-footer" style="margin-bottom:10px;">
+</div>
 
 <!-- templates -->
 
