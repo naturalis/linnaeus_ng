@@ -157,7 +157,6 @@
 				$this->checkEssentials();
 				$this->connectDatabase();
 				$this->setTaxa();
-				$this->generateOutFile();
 				$this->writeData();
 				$this->printStats();
 				$this->cleanUp();
@@ -607,7 +606,7 @@
 		private function writeData()
 		{
 			$this->feedback( "writing data" );
-
+			
 			set_time_limit( $this->executionTimeOut );
 			
 			if ( empty($this->taxa) )
@@ -615,6 +614,8 @@
 				throw new Exception( 'Found no taxa.' );
 			}
 			
+			$this->generateOutFile();
+
 			$this->startXmlDocument();
 			
 			$batch=0;

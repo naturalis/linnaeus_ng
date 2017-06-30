@@ -4,6 +4,7 @@
 	$outfilebasename = "nsr-export";
 	$filelist = "filelist";
 	$compressor = "compress.sh";
+	$tag = date('Y.m.d--H.i.s');
 	 
 
 	$files = glob( $outdir . $outfilebasename .'*');
@@ -20,12 +21,10 @@
 	$fp = fopen( $outdir . $filelist, "w" );
 	fclose($fp);
 
-	return;
+
 
 	include_once("/var/www/linnaeusng/configuration/admin/constants.php");
 	include_once("/var/www/linnaeusng/configuration/admin/configuration.php");
-//	include_once("C:\www\linnaeus_ng\configuration\admin\constants.php");
-//	include_once("C:\www\linnaeus_ng\configuration\admin\configuration.php");
 
 	$c=new configuration;
 	$conn=$c->getDatabaseSettings();
@@ -44,15 +43,23 @@
 	$b->setXmlRootelementName( 'nederlands_soortenregister' );
 	$b->setFileNameBase( $outfilebasename );
 	$b->setMaxBatchSize( 10000 ); // records per output file (files are numbered -00, -01 etc)
-//	$b->setExportFolder( "C:\\data\\export\\" );
 	$b->setExportFolder( $outdir );
 	$b->run();
 	
-
-	echo "compressing\n";
-	echo shell_exec( "sh " . $outdir . $compressor);
-
 	echo "writing to " . $outdir . $filelist ."\n";
 	file_put_contents( $outdir . $filelist, implode( PHP_EOL, $b->getFilelist() ) );
 
-	
+	echo "compressing\n";
+	echo shell_exec( "sh " . $outdir . $compressor );
+
+	echo "adding\n";
+	echo shell_exec( "cd " . $outdir ."; git add -A" );
+
+	echo "tagging ".$tag."\n";
+	echo shell_exec( "cd " . $outdir ."; git tag " . $tag );
+
+	echo "committing\n";
+	echo shell_exec( "cd " . $outdir ."; git commit" );
+	echo shell_exec( "cd " . $outdir ."; git push origin " . $tag );
+
+

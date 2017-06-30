@@ -4,6 +4,7 @@
 	$outfilebasename = "nsr-export";
 	$filelist = "filelist";
 	$compressor = "compress.sh";
+	$tag = date('Y.m.d--H.i.s');
 	 
 
 	$files = glob( $outdir . $outfilebasename .'*');
@@ -45,11 +46,20 @@
 	$b->setExportFolder( $outdir );
 	$b->run();
 	
-
-	echo "compressing\n";
-	echo shell_exec( "sh " . $outdir . $compressor);
-
 	echo "writing to " . $outdir . $filelist ."\n";
 	file_put_contents( $outdir . $filelist, implode( PHP_EOL, $b->getFilelist() ) );
 
-	
+	echo "compressing\n";
+	echo shell_exec( "sh " . $outdir . $compressor );
+
+	echo "adding\n";
+	echo shell_exec( "cd " . $outdir ."; git add -A" );
+
+	echo "tagging ".$tag."\n";
+	echo shell_exec( "cd " . $outdir ."; git tag " . $tag );
+
+	echo "committing\n";
+	echo shell_exec( "cd " . $outdir ."; git commit" );
+	echo shell_exec( "cd " . $outdir ."; git push origin " . $tag );
+
+	echo "committing\n";
