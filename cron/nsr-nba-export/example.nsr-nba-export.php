@@ -1,22 +1,7 @@
 <?php
 
-	$outdir = "/var/opt/nba-brondata-nsr/filelist/";
-	$outfilebasename = "nsr-export";
-
-
-	$files = glob( $outdir . $outfilebasename .'*');
-	foreach($files as $file)
-	{
-		echo $file . "\n";
-		//if(is_file($file)) unlink($file);
-	}
-	
-	return;
-
 	include_once("/var/www/linnaeusng/configuration/admin/constants.php");
 	include_once("/var/www/linnaeusng/configuration/admin/configuration.php");
-//	include_once("C:\www\linnaeus_ng\configuration\admin\constants.php");
-//	include_once("C:\www\linnaeus_ng\configuration\admin\configuration.php");
 
 	$c=new configuration;
 	$conn=$c->getDatabaseSettings();
@@ -33,14 +18,9 @@
 //	$b->setRanksToExport( ['ranks'=>74,'style'=>'and_lower'] );
 //	$b->setLimit( 1000 );  // limit on number of taxa
 	$b->setXmlRootelementName( 'nederlands_soortenregister' );
-	$b->setFileNameBase( $outfilebasename );
+	$b->setFileNameBase( "nsr-export" );
 	$b->setMaxBatchSize( 10000 ); // records per output file (files are numbered -00, -01 etc)
-//	$b->setExportFolder( "C:\\data\\export\\" );
-	$b->setExportFolder( $outdir );
+	$b->setExportFolder( "/home/maarten.schermer/export/" );
 	$b->run();
-	
-	$b->getFilelist();
-	
-	
 
 

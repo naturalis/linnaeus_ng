@@ -117,3 +117,4 @@ configuration/app/custom-configuration.php
 configuration/admin/custom-configuration.php
 www/app/templates/templates/linnaeus_ng/index/index--IMPROVED (work in progress).tpl
 t
+cron/nsr-nba-export/nsr-nba-export.php
