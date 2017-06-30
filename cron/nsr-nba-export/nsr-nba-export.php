@@ -3,6 +3,8 @@
 	$outdir = "/var/opt/nba-brondata-nsr/";
 	$outfilebasename = "nsr-export";
 	$filelist = "filelist";
+	$compressor = "compress.sh";
+	 
 
 	$files = glob( $outdir . $outfilebasename .'*');
 	foreach($files as $file)
@@ -14,6 +16,7 @@
 		}
 	}
 
+	echo "truncating " . $outdir . $filelist ."\n";
 	$fp = fopen( $outdir . $filelist, "w" );
 	fclose($fp);
 
@@ -45,8 +48,11 @@
 	$b->setExportFolder( $outdir );
 	$b->run();
 	
-	$b->getFilelist();
-	
-	
 
+	echo "compressing\n";
+	echo shell_exec( "sh " . $outdir . $compressor);
 
+	echo "writing to " . $outdir . $filelist ."\n";
+	file_put_contents( $outdir . $filelist, implode( PHP_EOL, $b->getFilelist() ) );
+
+	
