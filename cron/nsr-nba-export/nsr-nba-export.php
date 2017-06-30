@@ -50,7 +50,7 @@
 	file_put_contents( $outdir . $filelist, implode( PHP_EOL, $b->getFilelist() ) );
 
 	echo "compressing\n";
-	echo shell_exec( "sh " . $outdir . $compressor );
+	echo shell_exec( "cd " . $outdir ."; sh ./" . $compressor );
 
 	echo "adding\n";
 	echo shell_exec( "cd " . $outdir ."; git add -A" );
