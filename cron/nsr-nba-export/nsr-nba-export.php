@@ -59,7 +59,8 @@
 	echo shell_exec( "cd " . $outdir ."; git tag " . $tag );
 
 	echo "committing\n";
-	echo shell_exec( "cd " . $outdir ."; git commit" );
+	echo shell_exec( "cd " . $outdir ."; git commit -m \"new dataset " . $tag ."\"" );
+	echo shell_exec( "cd " . $outdir ."; git push" );
 	echo shell_exec( "cd " . $outdir ."; git push origin " . $tag );
 
 	echo "committing\n";
