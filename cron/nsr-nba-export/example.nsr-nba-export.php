@@ -60,7 +60,7 @@
 
 	echo "committing\n";
 	echo shell_exec( "cd " . $outdir ."; git commit -m \"new dataset " . $tag ."\"" );
-	echo shell_exec( "cd " . $outdir ."; git push" );
-	echo shell_exec( "cd " . $outdir ."; git push origin " . $tag );
-
+	echo shell_exec( "cd " . $outdir ."; ssh-agent bash -c 'ssh-add /root/.ssh/githubkey_nba_data; git push git@github.com:naturalis/nba-brondata-nsr.git'" );
+//  not working properly
+//	echo shell_exec( "cd " . $outdir ."; ssh-agent bash -c 'ssh-add /root/.ssh/githubkey_nba_data; git push origin " . $tag . " git@github.com:naturalis/nba-brondata-nsr.git'" );
 	echo "committing\n";
