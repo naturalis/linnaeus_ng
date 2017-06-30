@@ -138,6 +138,62 @@ final class NsrTreeModel extends AbstractModel
 		$base_rank=isset($params['base_rank']) ? $params['base_rank'] : null;
 		$node_id=isset($params['node_id']) ? $params['node_id'] : null;
 		
+//		if( !isset( $project_id ) || !isset( $base_rank ) || !isset( $node_id ) )
+		if( !isset( $project_id ) || !isset( $node_id ) )
+		{
+			return;
+		}
+		
+		$query="
+			select
+				count(_sq.taxon_id) as total,
+				_sq.taxon_id,
+				_sp.presence_id,
+				ifnull(_sr.established,'undefined') as established
+			from 
+				%PRE%taxon_quick_parentage _sq
+			
+			left join %PRE%presence_taxa _sp
+				on _sq.project_id=_sp.project_id
+				and _sq.taxon_id=_sp.taxon_id
+			
+			left join %PRE%presence _sr
+				on _sp.project_id=_sr.project_id
+				and _sp.presence_id=_sr.id
+	
+			left join %PRE%taxa _e
+				on _sq.taxon_id = _e.id
+				and _sq.project_id = _e.project_id
+	
+			left join %PRE%trash_can _trash
+				on _e.project_id = _trash.project_id
+				and _e.id = _trash.lng_id
+				and _trash.item_type='taxon'
+			
+			left join %PRE%projects_ranks _f
+				on _e.rank_id=_f.id
+				and _e.project_id = _f.project_id
+			
+			where
+				_sq.project_id=".$project_id."
+				and ifnull(_trash.is_deleted,0)=0
+				and _sp.presence_id is not null
+				" . (!is_null($base_rank) ? "and _f.rank_id".($base_rank>=SPECIES_RANK_ID ? ">=" : "=")." ".SPECIES_RANK_ID : "" ) ."
+				and MATCH(_sq.parentage) AGAINST ('".$node_id."' in boolean mode)
+			group by 
+				_sr.established";
+			
+			return $this->freeQuery( array('query'=> $query, 'fieldAsIndex' => 'established') );
+			
+	}
+
+/*
+	public function getSpeciesCount( $params )
+	{
+		$project_id=isset($params['project_id']) ? $params['project_id'] : null;
+		$base_rank=isset($params['base_rank']) ? $params['base_rank'] : null;
+		$node_id=isset($params['node_id']) ? $params['node_id'] : null;
+		
 		if( !isset( $project_id ) || !isset( $base_rank ) || !isset( $node_id ) )
 		{
 			return;
@@ -185,6 +241,7 @@ final class NsrTreeModel extends AbstractModel
 			return $this->freeQuery( array('query'=> $query, 'fieldAsIndex' => 'established') );
 			
 	}
+*/
 
 	public function getTaxonChildCount( $params )
 	{
