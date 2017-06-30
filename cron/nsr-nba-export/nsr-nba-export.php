@@ -20,12 +20,10 @@
 	$fp = fopen( $outdir . $filelist, "w" );
 	fclose($fp);
 
-	return;
+
 
 	include_once("/var/www/linnaeusng/configuration/admin/constants.php");
 	include_once("/var/www/linnaeusng/configuration/admin/configuration.php");
-//	include_once("C:\www\linnaeus_ng\configuration\admin\constants.php");
-//	include_once("C:\www\linnaeus_ng\configuration\admin\configuration.php");
 
 	$c=new configuration;
 	$conn=$c->getDatabaseSettings();
@@ -44,7 +42,6 @@
 	$b->setXmlRootelementName( 'nederlands_soortenregister' );
 	$b->setFileNameBase( $outfilebasename );
 	$b->setMaxBatchSize( 10000 ); // records per output file (files are numbered -00, -01 etc)
-//	$b->setExportFolder( "C:\\data\\export\\" );
 	$b->setExportFolder( $outdir );
 	$b->run();
 	
