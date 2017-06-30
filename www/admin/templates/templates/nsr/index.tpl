@@ -16,6 +16,16 @@
 
 </div>
 
+
+<div class="inline-templates" id="localListItemTpl">
+<!--
+    <li>
+        <a href="#"onclick="setAutoExpand(%ID%);return false;">%LABEL%</a>%COMMON% %TAXON% &nbsp;&nbsp;<a href="taxon.php?id=%ID%">&nbsp;&rarr;&nbsp;</a>
+    </li>
+-->
+</div>
+
+
 <script>
 function localList(obj,txt)
 {
@@ -30,14 +40,14 @@ function localList(obj,txt)
 
 			if (d.id && d.label)
 			{
-				buffer.push(
-					'<li> \
-						<a href="#"onclick="setAutoExpand('+d.id+');return false;">'+d.label+'</a> \
-						'+ (d.common_name && d.common_name!=d.name ? "("+d.common_name+")": "" ) +' \
-						'+ (d.nametype=='isPreferredNameOf' && d.taxon ? "("+d.taxon+")": "" ) +' \
-						&nbsp;&nbsp;<a href="taxon.php?id='+d.id+'">&nbsp;&rarr;&nbsp;</a> \
-					</li>'
-				);
+				buffer.push( 
+					fetchTemplate( 'localListItemTpl' )
+						.replace('/%ID%/g',d.id)
+						.replace('%LABEL%',d.label)
+						.replace('%COMMON%',(d.common_name && d.common_name!=d.name ? "("+d.common_name+")": "" ))
+						.replace('%TAXON%',(d.nametype=='isPreferredNameOf' && d.taxon ? "("+d.taxon+")": "" ))
+					
+					 );
 			}
 		}
 		$('#'+allLookupListName).append('<ul>'+buffer.join('')+'</ul>');
@@ -51,7 +61,7 @@ $(document).ready(function()
 	{if $session.admin.project.title}
 	setRootNodeLabel('{$session.admin.project.title|@escape}');
 	{/if}
-
+/*
 	{if $tree}
 		$( "#"+container ).html( {$tree} );
 	{elseif $nodes}
@@ -61,7 +71,9 @@ $(document).ready(function()
 		buildtree(false);
 		//restoretree();
 	{/if}
-
+*/
+buildtree(false);
+		
 	allLookupNavigateOverrideUrl(taxonTargetUrl);
 	allLookupNavigateOverrideListFunction(localList);
 

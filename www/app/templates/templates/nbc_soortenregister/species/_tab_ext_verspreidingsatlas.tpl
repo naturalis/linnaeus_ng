@@ -1,4 +1,4 @@
-<script type="text/javascript" src="../../../app/javascript/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../app/javascript/jquery-3.0.0.min.js"></script>
 <script>
 function parsexml( data )
 {

@@ -39,9 +39,9 @@ $(document).ready(function()
 {
 	//http://fancyapps.com/fancybox/3/docs/#options
 	$('[data-fancybox]').fancybox({
-			arrows : false,
-			infobar : true,
-			animationEffect : false
+		arrows : false,
+		infobar : true,
+		animationEffect : false
 	});
 
 	$(".inline-video").each(function()

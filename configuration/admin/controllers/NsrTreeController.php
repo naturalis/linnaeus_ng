@@ -180,7 +180,7 @@ class NsrTreeController extends NsrController
 
 			if ($count=='taxon')
 			{
-				$d=$this->models->NsrTreeModel->getTaxonCount(array(
+				$d=$this->models->NsrTreeModel->getBranchSpeciesCount(array(
 					"project_id"=>$this->getCurrentProjectId(),
 					"node_id"=>$val['id']
 				));
@@ -190,7 +190,7 @@ class NsrTreeController extends NsrController
 			else
 			if ($count=='species')
 			{
-				$d=$this->models->NsrTreeModel->getSpeciesCount(array(
+				$d=$this->models->NsrTreeModel->getBranchTaxonCount(array(
 					"project_id"=>$this->getCurrentProjectId(),
 					"base_rank"=>$val['base_rank'],
 					"node_id"=>$val['id']
@@ -213,24 +213,6 @@ class NsrTreeController extends NsrController
 			{
 				$val['child_count']=null;
 			}
-/*
-			if ($val['base_rank']>=SPECIES_RANK_ID)
-			{
-				if ($val['authorship']!='')
-				{
-					$val['taxon']=
-						'<i>'.
-						str_replace($val['authorship'],'',$val['taxon']).
-						'</i>'.' '.$val['authorship'];
-				}
-				else
-				{
-					$val['taxon']=$this->formatTaxon(array_merge($val, [ 'ranks'=>$ranks ]));
-				}
-			}
-
-			$val['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank'] ) );
-*/
 
 			$val['taxon'] = $this->formatTaxon(array_merge($val, ['ranks' => $ranks, 'rankpos' => 'none']));
 			$val['label']=empty($val['name']) ? $val['taxon'] : $val['name'].' ('.$val['taxon'].')';

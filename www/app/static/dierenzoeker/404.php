@@ -11,7 +11,7 @@
 	<link href="/linnaeus_ng/app/media/system/skins/dierenzoeker/favicon.ico" type="image/x-icon" rel="icon" />
     <link href="/linnaeus_ng/app/media/system/skins/dierenzoeker/favicon.ico" type="image/x-icon" rel="shortcut icon" />        
 
-		<script type="text/javascript" src="/linnaeus_ng/app/javascript/jquery-1.9.1.min.js"></script>
+		<script type="text/javascript" src="/linnaeus_ng/app/javascript/jquery-3.0.0.min.js"></script>
 		<script type="text/javascript" src="/linnaeus_ng/app/javascript/project_specific/backstretch.js"></script>
 		</head>
     <body style="background-position-y:115px;background: url('/linnaeus_ng/app/media/system/skins/dierenzoeker/background_blurry.jpg');">       

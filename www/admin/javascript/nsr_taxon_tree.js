@@ -88,7 +88,7 @@ function detailLink( id, label )
 function buildtree(node)
 {
 	activeNode=node;
-
+	
 	$.ajax({
 		url : ajaxTreeUrl,
 		type: "POST",
@@ -100,7 +100,7 @@ function buildtree(node)
 		}),
 		success : function (data)
 		{
-			//console.log(data);
+			console.log(data);
 			var data=$.parseJSON(data);
 			growbranches(data);
 			storetree();

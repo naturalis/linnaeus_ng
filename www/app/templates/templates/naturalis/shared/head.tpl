@@ -9,7 +9,7 @@
 	<link rel="stylesheet" type="text/css" href="{$cssToLoad[i]}" />
 {/section}
 {/if}
-	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-1.9.1.min.js"></script>
+	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-3.0.0.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-ui/jquery-ui-1.10.3.custom.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/sprintf-0.7-beta1.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/naturalis/matrix.js"></script>

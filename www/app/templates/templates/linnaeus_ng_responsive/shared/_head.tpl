@@ -24,7 +24,7 @@
     <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$v}" />
     {/foreach}
 
-	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-1.9.1.min.js"></script>
+	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-3.0.0.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.urlparser.2.1.1.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/sprintf-0.7-beta1.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-sortelements.js"></script>
@@ -35,7 +35,11 @@
 	<script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/soortenregister.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/morris.js-0.4.3/morris.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/raphael/raphael-min.js"></script>
-	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.fancybox.pack.js"></script>
+
+	<!-- script type="text/javascript" src="{$baseUrl}app/javascript/jquery.fancybox.pack.js"></script -->
+
+	<link rel="stylesheet" type="text/css" href="{$baseUrl}app/javascript/fancybox-3/jquery.fancybox.min.css">
+    <script type="text/javascript" src="{$baseUrl}app/javascript/fancybox-3/jquery.fancybox.min.js"></script>
 
 	{foreach $javascriptsToLoad.all v}
 	{if $v|strpos:"http:"===false && $v|strpos:"https:"===false}

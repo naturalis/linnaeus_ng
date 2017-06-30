@@ -14,10 +14,8 @@
 <div id="allLookupList" class="allLookupList"></div>
 
 <script type="text/JavaScript">
-var hasSearchResults=false;
-</script>
 
-<script type="text/JavaScript">
+var hasSearchResults=false;
 
 $(document).ready(function()
 {
@@ -47,6 +45,8 @@ $(document).ready(function()
 			allSetSomething('search-float-position',[pos.top,pos.left]);
 		}, cancel:'#werwerwerwe'});
 	}
+	
+	acquireInlineTemplates();
 	
 })
 
