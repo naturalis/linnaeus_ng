@@ -1,16 +1,22 @@
 <?php
 
-	$outdir = "/var/opt/nba-brondata-nsr/filelist/";
+	$outdir = "/var/opt/nba-brondata-nsr/";
 	$outfilebasename = "nsr-export";
-
+	$filelist = "filelist";
 
 	$files = glob( $outdir . $outfilebasename .'*');
 	foreach($files as $file)
 	{
-		echo $file . "\n";
-		//if(is_file($file)) unlink($file);
+		if(is_file($file))
+		{
+			echo "deleting " . $file ."\n";
+			unlink($file);
+		}
 	}
-	
+
+	$fp = fopen( $outdir . $filelist, "w" );
+	fclose($fp);
+
 	return;
 
 	include_once("/var/www/linnaeusng/configuration/admin/constants.php");
