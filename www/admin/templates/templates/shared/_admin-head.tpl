@@ -37,7 +37,7 @@
 {/if}
 
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/jquery-3.0.0.min.js"></script>
-	<script type="text/javascript" src="{$baseUrl}admin/javascript/jquery-ui/jquery-ui-1.9.1.min.js"></script>
+	<script type="text/javascript" src="{$baseUrl}admin/javascript/jquery-ui/jquery-ui.min.js"></script>
 
 	<!-- script type="text/javascript" src="{$baseUrl}admin/javascript/jquery.tools.min.js"></script -->
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/jquery.extras.js"></script>
