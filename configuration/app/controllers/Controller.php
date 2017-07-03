@@ -184,10 +184,12 @@ class Controller extends BaseClass
     );
 	private $_maxBackSteps=100;
 
-	public $_hybridMarker='×';
-	public $_varietyMarker='var.';
-	public $_subspeciesMarker='subsp.';
-	public $_formaMarker='f.';
+	protected $_hybridMarker='&#215;';
+	protected $_varietyMarker='var.';
+	protected $_subspeciesMarker='subsp.';
+	protected $_formaMarker='f.';
+	protected $_hybridMarker_graftChimaera='+';
+
 	private $_nameTypeIds=array();
 
     /**
@@ -1215,14 +1217,16 @@ class Controller extends BaseClass
 
    private function setHybridMarker($name, $rankId, $isHybrid)
     {
-        if ($isHybrid == 0) {
+        if ($isHybrid == 0)
+		{
             return $name;
         }
 
-        $marker = ($rankId == GRAFT_CHIMAERA_RANK_ID ? '+' : '&#215;');
+        $marker = ($rankId == GRAFT_CHIMAERA_RANK_ID ? $this->_hybridMarker_graftChimaera : $this->_hybridMarker );
 
         // intergeneric hybrid
-        if ($isHybrid == 2 || $rankId < SPECIES_RANK_ID) {
+        if ($isHybrid == 2 || $rankId < SPECIES_RANK_ID)
+		{
             return $marker . ' ' . $name;
         }
 
@@ -3039,3 +3043,6 @@ class Controller extends BaseClass
 
 
 }
+ 
+ 
+ 

@@ -9,7 +9,7 @@
 </p>
 <p>
 	{t}taxonomic tree:{/t}
-	<div id="tree-container"></div>
+	<div id="tree-container">&#9632; &hellip;</div>
 </p>
 
 {include file="../shared/left_column_admin_menu.tpl"}
@@ -61,7 +61,7 @@ $(document).ready(function()
 	{if $session.admin.project.title}
 	setRootNodeLabel('{$session.admin.project.title|@escape}');
 	{/if}
-/*
+
 	{if $tree}
 		$( "#"+container ).html( {$tree} );
 	{elseif $nodes}
@@ -71,8 +71,6 @@ $(document).ready(function()
 		buildtree(false);
 		//restoretree();
 	{/if}
-*/
-buildtree(false);
 		
 	allLookupNavigateOverrideUrl(taxonTargetUrl);
 	allLookupNavigateOverrideListFunction(localList);

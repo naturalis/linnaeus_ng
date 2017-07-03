@@ -274,11 +274,16 @@ class TreeController extends Controller
 			}
 		}
 
+		$x1=$this->_hybridMarker;
+		$x2=$this->_hybridMarker_graftChimaera;
+
 		usort(
 			$progeny,
-			function($a,$b)
+			function($a,$b) use ($x1,$x2)
 			{
-				return (strtolower($a['label'])==strtolower($b['label']) ? 0 : (strtolower($a['label'])>strtolower($b['label']) ? 1 : -1));
+				$aa=strtolower(str_replace([$x1,$x2,' '], '' , strip_tags($a['label'])));
+				$bb=strtolower(str_replace([$x1,$x2,' '], '' , strip_tags($b['label'])));
+				return ($aa==$bb ? 0 : ($aa>$bb ? 1 : -1));
 			}
 		);
 

@@ -93,10 +93,11 @@ class Controller extends BaseClass
 	protected $moduleSession;
 	protected $baseSession;
 
-	protected $_hybridMarker='×';
+	protected $_hybridMarker='&#215;';
 	protected $_varietyMarker='var.';
 	protected $_subspeciesMarker='subsp.';
 	protected $_formaMarker='f.';
+	protected $_hybridMarker_graftChimaera='+';
 
     /**
      * Constructor, calls parent's constructor and all initialisation functions
@@ -1382,14 +1383,16 @@ class Controller extends BaseClass
 
     private function setHybridMarker ($name, $rankId, $isHybrid)
     {
-        if ($isHybrid == 0) {
+        if ($isHybrid == 0)
+		{
             return $name;
         }
 
-        $marker = ($rankId == GRAFT_CHIMAERA_RANK_ID ? '+' : '&#215;');
+        $marker = ($rankId == GRAFT_CHIMAERA_RANK_ID ? $this->_hybridMarker_graftChimaera : $this->_hybridMarker);
 
         // intergeneric hybrid
-        if ($isHybrid == 2 || $rankId < SPECIES_RANK_ID) {
+        if ($isHybrid == 2 || $rankId < SPECIES_RANK_ID)
+		{
             return $marker . ' ' . $name;
         }
 
