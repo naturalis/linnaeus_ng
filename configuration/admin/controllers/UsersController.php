@@ -378,12 +378,12 @@ class UsersController extends Controller
 			'project_id'=>$this->getCurrentProjectId(),
 			'user_id'=>$userid
 		));
-
+		
 		foreach((array)$d as $key=>$val)
 		{
 			$d[$key]['label']=$this->formatTaxon( $val );
-   			$d[$key]['label']=$this->addHybridMarkerAndInfixes( array( 'name'=>$d[$key]['label'],'base_rank_id'=>$val['base_rank_id'] ) );
-   			$d[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+   			$d[$key]['label']=$this->addHybridMarkerAndInfixes( [ 'name'=>$d[$key]['label'],'base_rank_id'=>$val['base_rank_id'], 'taxon_id'=>$val['taxon_id'],'parent_id'=>$val['parent_id'] ] );
+   			$d[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'], 'taxon_id'=>$val['taxon_id'],'parent_id'=>$val['parent_id'] ] );
 		}
 
 		return $d;

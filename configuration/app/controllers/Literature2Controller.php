@@ -110,11 +110,15 @@ class Literature2Controller extends Controller
             'project_id' => $this->getCurrentProjectId(),
     		'literature_id' => $id
 		));
-		foreach ((array)$taxa as $i => $taxon) {
-            $taxa[$i]['taxon'] = $this->addHybridMarkerAndInfixes(array(
+
+		foreach ((array)$taxa as $i => $taxon)
+		{
+            $taxa[$i]['taxon'] = $this->addHybridMarkerAndInfixes( [
                 'name' => $taxon['taxon'],
-                'base_rank_id' => $taxon['base_rank_id']
-            ));
+                'base_rank_id' => $taxon['base_rank_id'],
+                'taxon_id' => $taxon['id'],
+                'parent_id' => $taxon['parent_id']
+            ] );
 		}
 		return $taxa;
 	}

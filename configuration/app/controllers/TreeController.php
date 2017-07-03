@@ -228,27 +228,6 @@ class TreeController extends Controller
 				$val['child_count']=null;
 			}
 
-			/*
-			if ($val['base_rank_id']>=SPECIES_RANK_ID && $val['base_rank_id']!=NOTHOGENUS_RANK_ID )
-			{
-				if ($val['authorship']!='')
-				{
-					$val['taxon']=
-						'<i>'.
-						$this->addHybridMarkerAndInfixes(array('name'=>str_replace($val['authorship'],'',$val['taxon']),'base_rank_id'=>$val['base_rank_id'])).
-						'</i>'.' '.$val['authorship'];
-				}
-				else
-				{
-					$val['taxon']=$this->formatTaxon($val);
-				}
-			}
-			else
-			{
-				$val['taxon']=$this->addHybridMarkerAndInfixes(array('name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id']));
-			}
-			*/
-
 			$val['taxon'] = $this->formatTaxon(array_merge($val, ['ranks' => $ranks, 'rankpos' => 'none']));
 			$val['label']=empty($val['name']) ? $val['taxon'] : $val['name'].' ('.$val['taxon'].')';
 

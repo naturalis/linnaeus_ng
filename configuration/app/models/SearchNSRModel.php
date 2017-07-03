@@ -152,6 +152,7 @@ final class SearchNSRModel extends AbstractModel
 				_b.nametype,
 				_e.taxon,
 				_e.rank_id,
+				_e.parent_id,
 				_x.id as base_rank_id,
 				_f.lower_taxon,
 				_k.name as common_name,
@@ -347,6 +348,7 @@ final class SearchNSRModel extends AbstractModel
 				SQL_CALC_FOUND_ROWS
 				_a.id,
 				_a.id as taxon_id,
+				_a.parent_id,
 				_f.rank_id as base_rank_id,
 				_a.taxon,
 				_k.name as common_name,
@@ -1012,6 +1014,7 @@ final class SearchNSRModel extends AbstractModel
 				_a.taxon_id as id,
 				concat(_d.taxon,if(_c.name is null,'',concat(' - ',_c.name)),' [',ifnull(_g.label,_r.rank),']') as label,
 				_d.taxon as scientific_name,
+				_d.parent_id,
 				_c.name as common_name,
 				trim(replace(_sci.name,_sci.authorship,'')) as nomen,
 				_r.id as base_rank_id,

@@ -2708,8 +2708,10 @@ class Controller extends BaseClass
 		$name=isset($p['name']) ? $p['name'] : null;
 		$uninomial=isset($p['uninomial']) ? $p['uninomial'] : null;
 		$specific_epithet=isset($p['specific_epithet']) ? $p['specific_epithet'] : null;
+		$taxon_id=isset($p['taxon_id']) ? $p['taxon_id'] : null;
+		$parent_id=isset($p['parent_id']) ? $p['parent_id'] : null;
 
-		$marker = $this->getShowAutomaticHybridMarkers() ? $this->_hybridMarker : '';
+		$marker=$this->getShowAutomaticHybridMarkers() ? $this->_hybridMarker : '';
 
 		if ( $base_rank_id==NOTHOGENUS_RANK_ID )
 		{
@@ -2720,6 +2722,8 @@ class Controller extends BaseClass
 			 $base_rank_id==NOTHOSUBSPECIES_RANK_ID ||
 			 $base_rank_id==NOTHOVARIETAS_RANK_ID )
 		{
+
+			
 			if ( !empty($specific_epithet) )
 			{
 				return $marker . $specific_epithet;
@@ -2729,7 +2733,22 @@ class Controller extends BaseClass
 			{
 				return $marker . $uninomial;
 			}
-			else
+
+
+			if ( is_null($parent_id) && !is_null($taxon_id) )
+			{
+				$parent_id=$this->getTaxonById($this->getTaxonById($taxon_id)['parent_id'])['id'];
+			}
+
+			if ( !is_null($parent_id) )
+			{
+				$parent=$this->getTaxonById($parent_id);
+				if ($parent['base_rank_id']==NOTHOGENUS_RANK_ID)
+				{
+					return $marker . ( isset($uninomial) ? $uninomial : $name );
+				}
+			}
+
 			if ( empty($name) )
 			{
 				return $marker;

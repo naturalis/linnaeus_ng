@@ -132,6 +132,7 @@ final class ActorsModel extends AbstractModel
 				_c.language,
 				_d.label as language_label,
 				_g.taxon,
+				_g.parent_id,
 				_p.rank_id as base_rank_id
 
 			from %PRE%names _a
@@ -180,6 +181,7 @@ final class ActorsModel extends AbstractModel
             select
 				_a.taxon_id,
 				_g.taxon,
+				_g.parent_id,
 				_a.presence_id,
 				_b.label as presence_label,
 				_a.reference_id,
@@ -225,6 +227,8 @@ final class ActorsModel extends AbstractModel
 				_a.subject_type,
 				_a.predicate,
 				_c.taxon,
+				_c.id as taxon_id,
+				_c.parent_id,
 				_d.title,
 				_b.taxon_id,
 				_p.rank_id as base_rank_id

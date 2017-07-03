@@ -166,14 +166,15 @@ class SpeciesControllerNSR extends SpeciesController
 				}
 			}
 
+			$classification=$this->getTaxonClassification($taxon['id']);
+			$classification=$this->getClassificationSpeciesCount(array('classification'=>$classification,'taxon'=>$taxon['id']));
+			$children=$this->getTaxonChildren(array('taxon'=>$taxon['id'],'include_count'=>true));
+			$names=$this->getNames( [ 'id'=>$taxon['id'] ] );
+
 			if ( $this->show_nsr_specific_stuff )
 			{
 				$taxon['NsrId'] = $this->getNSRId(array('id'=>$this->rGetVal('id')));
 				$overview = $this->getTaxonOverviewImageNsr($taxon['id']);
-				$classification=$this->getTaxonClassification($taxon['id']);
-				$classification=$this->getClassificationSpeciesCount(array('classification'=>$classification,'taxon'=>$taxon['id']));
-				$children=$this->getTaxonChildren(array('taxon'=>$taxon['id'],'include_count'=>true));
-				$names=$this->getNames( [ 'id'=>$taxon['id'] ] );
 
 				if (defined('TAB_VERSPREIDING') && $categories['start']['tabname']=='TAB_VERSPREIDING')
 				{
@@ -304,7 +305,7 @@ class SpeciesControllerNSR extends SpeciesController
 			$name['nametype']=sprintf($this->Rdf->translatePredicate($name['nametype']),$name['language_label']);
 
 			$taxon=$this->getTaxonById($name['taxon_id']);
-			$taxon['taxon']=$this->addHybridMarkerAndInfixes( array('name'=>$taxon['taxon'],'base_rank_id'=>$taxon['base_rank_id']) );
+			$taxon['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$taxon['taxon'],'base_rank_id'=>$taxon['base_rank_id'],'taxon_id'=>$taxon['id'],'parent_id'=>$taxon['parent_id'] ] );
 			if ( $this->show_nsr_specific_stuff )
 			{
 				$overview = $this->getTaxonOverviewImageNsr($taxon['id']);
@@ -926,11 +927,11 @@ class SpeciesControllerNSR extends SpeciesController
 				if ($base_rank_id>=GENUS_RANK_ID)
 				{
 					$nomen_no_formatting=trim($nomen);
-					$nomen='<span class="italics">'.$this->addHybridMarkerAndInfixes( array('name'=>trim($nomen),'base_rank_id'=>$base_rank_id) ).'</span>';
+					$nomen='<span class="italics">'.$this->addHybridMarkerAndInfixes( [ 'name'=>trim($nomen),'base_rank_id'=>$base_rank_id,'taxon_id'=>$id ] ).'</span>';
 					$names[$key]['name']=trim($nomen.' '.$val['authorship']);
 				}
 
-				$scientific_name=$this->addHybridMarkerAndInfixes( array('name'=>trim($val['name']),'base_rank_id'=>$base_rank_id) );
+				$scientific_name=$this->addHybridMarkerAndInfixes( [ 'name'=>trim($val['name']),'base_rank_id'=>$base_rank_id,'taxon_id'=>$id, 'fuck'=>'off' ] );
 
 			}
 
@@ -994,12 +995,11 @@ class SpeciesControllerNSR extends SpeciesController
 			});
 
 			// Mark up synonyms with hybrid and infraspecific markers if they have been assigned a rank_id
-            foreach ($synonyms as $i => $syn) {
-                if (isset($syn['synonym_base_rank_id']) && !empty($syn['synonym_base_rank_id'])) {
-                    $synonyms[$i]['name'] = $this->addHybridMarkerAndInfixes(array(
-                        'name' => $syn['name'],
-                        'base_rank_id' => $syn['synonym_base_rank_id']
-                    ));
+            foreach ($synonyms as $i => $syn)
+			{
+                if (isset($syn['synonym_base_rank_id']) && !empty($syn['synonym_base_rank_id']))
+				{
+                    $synonyms[$i]['name'] = $this->addHybridMarkerAndInfixes( [ 'name' => $syn['name'], 'base_rank_id' => $syn['synonym_base_rank_id'] ] );
                 }
             }
 
@@ -1013,7 +1013,7 @@ class SpeciesControllerNSR extends SpeciesController
 				'nomen_no_tags'=>trim(strip_tags($nomen)),
 				'nomen_no_formatting'=>isset($nomen_no_formatting) ? $nomen_no_formatting : trim(strip_tags($nomen)),
 				'preffered_name'=>$preferredname,
-				'hybrid_marker'=>$this->addHybridMarkerAndInfixes( array('base_rank_id'=>$base_rank_id) ),
+				'hybrid_marker'=>$this->addHybridMarkerAndInfixes( [ 'base_rank_id'=>$base_rank_id, 'taxon_id'=> $id ] ),
 				'list'=>$names,
 			    'language_has_preferredname'=>$language_has_preferredname
 			);
@@ -1070,9 +1070,9 @@ class SpeciesControllerNSR extends SpeciesController
 
 		foreach((array)$data as $key=>$val)
 		{
-			$data[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
-			$data[$key]['name']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['name'],'base_rank_id'=>$val['base_rank_id'] ) );
-			$data[$key]['nomen']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['nomen'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$data[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'], 'taxon_id' => $val['taxon_id'], 'parent_id' => $val['parent_id'] ] );
+			$data[$key]['name']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['name'],'base_rank_id'=>$val['base_rank_id'], 'taxon_id' => $val['taxon_id'], 'parent_id' => $val['parent_id'] ] );
+			$data[$key]['nomen']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['nomen'],'base_rank_id'=>$val['base_rank_id'], 'taxon_id' => $val['taxon_id'], 'parent_id' => $val['parent_id'] ] );
 		}
 
 		return
@@ -1142,10 +1142,10 @@ class SpeciesControllerNSR extends SpeciesController
 
 		if ($taxon)
 		{
-			$taxon['name']=$this->addHybridMarkerAndInfixes(array('name'=>$taxon['name'],'base_rank_id'=>$taxon['rank_id']));
-			$taxon['taxon']=$this->addHybridMarkerAndInfixes(array('name'=>$taxon['taxon'],'base_rank_id'=>$taxon['rank_id']));
-			$taxon['uninomial']=$this->addHybridMarkerAndInfixes(array('uninomial'=>$taxon['uninomial'],'base_rank_id'=>$taxon['rank_id']));
-			$taxon['specific_epithet']=$this->addHybridMarkerAndInfixes(array('specific_epithet'=>$taxon['specific_epithet'],'base_rank_id'=>$taxon['rank_id']));
+			$taxon['name']=$this->addHybridMarkerAndInfixes( [ 'name'=>$taxon['name'],'base_rank_id'=>$taxon['rank_id'], 'taxon_id' => $taxon['id'], 'parent_id' => $taxon['parent_id'] ] );
+			$taxon['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$taxon['taxon'],'base_rank_id'=>$taxon['rank_id'], 'taxon_id' => $taxon['id'], 'parent_id' => $taxon['parent_id'] ] );
+			$taxon['uninomial']=$this->addHybridMarkerAndInfixes( [ 'uninomial'=>$taxon['uninomial'],'base_rank_id'=>$taxon['rank_id'], 'taxon_id' => $taxon['id'], 'parent_id' => $taxon['parent_id'] ] );
+			$taxon['specific_epithet']=$this->addHybridMarkerAndInfixes( [ 'specific_epithet'=>$taxon['specific_epithet'],'base_rank_id'=>$taxon['rank_id'], 'taxon_id' => $taxon['id'], 'parent_id' => $taxon['parent_id'] ] );
 
 			array_unshift($this->tmp,$taxon);
 
@@ -1207,13 +1207,12 @@ class SpeciesControllerNSR extends SpeciesController
 
 		foreach((array)$data as $key=>$val)
 		{
-			$data[$key]['name']=$this->addHybridMarkerAndInfixes(array('name'=>$val['name'],'base_rank_id'=>$val['rank_id']));
-			$data[$key]['taxon']=$this->addHybridMarkerAndInfixes(array('name'=>$val['taxon'],'base_rank_id'=>$val['rank_id']));
-			$data[$key]['uninomial']=$this->addHybridMarkerAndInfixes(array('uninomial'=>$val['uninomial'],'base_rank_id'=>$val['rank_id']));
-			$data[$key]['specific_epithet']=$this->addHybridMarkerAndInfixes(array('specific_epithet'=>$val['specific_epithet'],'base_rank_id'=>$val['rank_id']));
+			$data[$key]['name']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['name'], 'base_rank_id'=>$val['rank_id'], 'taxon_id' => $val['id'], 'parent_id' => $val['parent_id'] ] );
+			$data[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'], 'base_rank_id'=>$val['rank_id'], 'taxon_id' => $val['id'], 'parent_id' => $val['parent_id'] ] );
+			$data[$key]['uninomial']=$this->addHybridMarkerAndInfixes( [ 'uninomial'=>$val['uninomial'], 'base_rank_id'=>$val['rank_id'], 'taxon_id' => $val['id'], 'parent_id' => $val['parent_id'] ] );
+			$data[$key]['specific_epithet']=$this->addHybridMarkerAndInfixes( [ 'specific_epithet'=>$val['specific_epithet'], 'base_rank_id'=>$val['rank_id'], 'taxon_id' => $val['id'], 'parent_id' => $val['parent_id'] ] );
 
-			if ($include_count)
-				$data[$key]['species_count']=$this->getSpeciesCount(array('id'=>$val['id'],'rank'=>$val['rank_id']));
+			if ($include_count) $data[$key]['species_count']=$this->getSpeciesCount(array('id'=>$val['id'],'rank'=>$val['rank_id']));
 		}
 
 		return $data;
@@ -1272,7 +1271,7 @@ class SpeciesControllerNSR extends SpeciesController
 
 		if ($d['nametype']==PREDICATE_VALID_NAME && $d['language_id']==LANGUAGE_ID_SCIENTIFIC ||
             isset($d['synonym_base_rank_id']) && !empty($d['synonym_base_rank_id'])) {
-		    $d['name']=$this->addHybridMarkerAndInfixes( array('name'=>$d['name'],'base_rank_id'=>$d['base_rank_id']) );
+		    $d['name']=$this->addHybridMarkerAndInfixes([ 'name'=>$d['name'],'base_rank_id'=>$d['base_rank_id'], 'taxon_id' => $taxonId ] );
 		}
 
 		$d['addition']=$this->getNameAddition(array('name_id'=>$d['id']));

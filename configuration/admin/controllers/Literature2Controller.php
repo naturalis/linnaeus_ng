@@ -1557,7 +1557,7 @@ class Literature2Controller extends NsrController
 		{
 			$names[$key]['nametype_label']=sprintf($this->Rdf->translatePredicate($val['nametype']),$val['language_label']);
 			$names[$key]['name']=
-				$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'nametype'=>$val['nametype'] ) );
+				$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'nametype'=>$val['nametype'],'taxon_id'=>$val['taxon_id'],'parent_id'=>$val['parent_id'] ] );
 		}
 
 
@@ -1570,7 +1570,7 @@ class Literature2Controller extends NsrController
 
 		foreach((array)$presences as $key=>$val)
 		{
-			$presences[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$presences[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['taxon_id'],'parent_id'=>$val['parent_id'] ] );
 		}
 
 
@@ -1584,7 +1584,7 @@ class Literature2Controller extends NsrController
 		foreach((array)$taxa as $key=>$val)
 		{
 			$taxa[$key]['taxon']=
-				$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+				$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['taxon_id'],'parent_id'=>$val['parent_id'] ] );
 		}
 
 
@@ -1601,7 +1601,7 @@ class Literature2Controller extends NsrController
 				array(
 					'group_id'=>$val['trait_group_id'],
 					'taxon_id'=>$val['taxon_id'],
-					'taxon'=>$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) )
+					'taxon'=>$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['taxon_id'],'parent_id'=>$val['parent_id'] ] )
 				);
 		}
 

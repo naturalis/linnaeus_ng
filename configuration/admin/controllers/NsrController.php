@@ -329,12 +329,13 @@ class NsrController extends Controller
 			if ( isset($c['label']) )
 			{
 				$c['label_no_infix']=$c['label'];
-				$c['label']=$this->addHybridMarkerAndInfixes( array( 'name'=>$c['label'],'base_rank_id'=>$c['base_rank'] ) );
+				$c['label']=$this->addHybridMarkerAndInfixes( [ 'name'=>$c['label'],'base_rank_id'=>$c['base_rank'],'taxon_id'=>$c['id'],'parent_id'=>$c['parent_id'] ] );
 			}
 			if ( isset($c['parent']['label']) )
 			{
 				$c['parent']['label_no_infix']=$c['parent']['label'];
-				$c['parent']['label']=$this->addHybridMarkerAndInfixes( array( 'name'=>$c['parent']['label'],'base_rank_id'=>$c['parent']['base_rank'] ) );
+				$c['parent']['label']=
+					$this->addHybridMarkerAndInfixes( [ 'name'=>$c['parent']['label'],'base_rank_id'=>$c['parent']['base_rank'],'taxon_id'=>$c['parent']['id'],'parent_id'=>$c['parent']['parent_id'] ] );
 			}
 		}
 

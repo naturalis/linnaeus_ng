@@ -45,6 +45,7 @@ class MatrixKeyModel extends AbstractModel
 					select
 						_b.id,
 						_b.taxon,
+						_b.parent_id,
 						_c.rank_id as base_rank_id
 			
 					from %PRE%matrices_taxa _a
@@ -139,6 +140,7 @@ class MatrixKeyModel extends AbstractModel
 					
 						_b.id,
 						_b.taxon,
+						_b.parent_id,
 						_c.keypath_endpoint,
 						_c.lower_taxon,
 						_c.rank_id as base_rank_id,

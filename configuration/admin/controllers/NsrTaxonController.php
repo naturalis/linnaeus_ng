@@ -722,12 +722,12 @@ class NsrTaxonController extends NsrController
 
 			if ($val['language_id']==LANGUAGE_ID_SCIENTIFIC && $val['nametype']==PREDICATE_VALID_NAME)
 			{
-				$names[$key]['name_no_tags']=$this->addHybridMarkerAndInfixes( array( 'name'=>$names[$key]['name_no_tags'],'base_rank_id'=>$base_rank_id ) );
+				$names[$key]['name_no_tags']=$this->addHybridMarkerAndInfixes( [ 'name'=>$names[$key]['name_no_tags'],'base_rank_id'=>$base_rank_id,'taxon_id'=>$taxon_id ] );
 			}
 			else
 			if ($val['language_id']==LANGUAGE_ID_SCIENTIFIC && $val['nametype']!=PREDICATE_VALID_NAME && isset($val['rank_id']))
 			{
-				$names[$key]['name_no_tags']=$this->addHybridMarkerAndInfixes( array( 'name'=>$names[$key]['name_no_tags'],'base_rank_id'=>$val['rank_id'] ) );
+				$names[$key]['name_no_tags']=$this->addHybridMarkerAndInfixes( [ 'name'=>$names[$key]['name_no_tags'],'base_rank_id'=>$val['rank_id'],'taxon_id'=>$taxon_id ] );
 			}
 
 			$names[$key]['addition']=$this->getNameAddition(array('name_id'=>$val['id']));
@@ -839,24 +839,21 @@ class NsrTaxonController extends NsrController
 
 	private function getDeletedSpeciesList()
 	{
-		$taxa=$this->models->NsrTaxonModel->getDeletedSpeciesList(array(
-			"project_id"=>$this->getCurrentProjectId()
-		));
+		$taxa=$this->models->NsrTaxonModel->getDeletedSpeciesList( [ "project_id"=>$this->getCurrentProjectId() ] );
 		foreach((array)$taxa as $key=>$val)
 		{
-			$taxa[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$taxa[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['id'],'parent_id'=>$val['parent_id'] ] );
 		}
 		return $taxa;
 	}
 
 	private function getOrphanedSpeciesList()
 	{
-		$taxa=$this->models->NsrTaxonModel->getOrphanedSpeciesList(array(
-			"project_id"=>$this->getCurrentProjectId()
-		));
+		$taxa=$this->models->NsrTaxonModel->getOrphanedSpeciesList([ "project_id"=>$this->getCurrentProjectId() ] );
+
 		foreach((array)$taxa as $key=>$val)
 		{
-			$taxa[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$taxa[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['taxon_id'],'taxon_id'=>$val['id'],'parent_id'=>$val['parent_id'] ] );
 		}
 
 		return $taxa;
@@ -902,13 +899,13 @@ class NsrTaxonController extends NsrController
 			"offset"=>$offset,
 		));
 
-		foreach ((array) $taxa as $key => $val)
+		foreach ((array)$taxa as $key => $val)
 		{
-			$taxa[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$taxa[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['id'],'parent_id'=>$val['parent_id'] ] );
 
 			if ($val['nametype']==PREDICATE_VALID_NAME && $val['nametype']==PREDICATE_PREFERRED_NAME ||
 			    isset($val['synonym_base_rank_id']) && !empty($val['synonym_base_rank_id'])) {
-			    $taxa[$key]['label']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['label'],'base_rank_id'=>$val['base_rank_id'] ) );
+			    $taxa[$key]['label']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['label'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['id'],'parent_id'=>$val['parent_id'] ] );
 			}
 
 			if ($val['base_rank_id']==GENUS_RANK_ID)

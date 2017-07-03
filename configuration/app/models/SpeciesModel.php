@@ -276,6 +276,7 @@ class SpeciesModel extends AbstractModel
             select
 				_a.id,
 				_a.taxon,
+				_a.parent_id,
 				if (
 					length(
 						trim(
@@ -866,6 +867,8 @@ class SpeciesModel extends AbstractModel
 				file_name as image,
 				file_name as thumb,
 				_k.taxon,
+				_k.id as taxon_id,
+				_k.parent_id,
 				ifnull(_zz.name,_z.name) as common_name,
 				_j.name,
 				trim(replace(_j.name,ifnull(_j.authorship,''),'')) as nomen,

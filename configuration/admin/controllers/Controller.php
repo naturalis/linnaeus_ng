@@ -726,22 +726,22 @@ class Controller extends BaseClass
 
     public function getTaxonById( $id )
     {
-		$taxon=$this->models->ControllerModel->getTaxon(['project_id'=>$this->getCurrentProjectId(),'taxon_id'=>$id]);
+		$taxon=$this->models->ControllerModel->getTaxon( [ 'project_id'=>$this->getCurrentProjectId(),'taxon_id'=>$id ] );
 		if ( !empty($taxon['taxon']) )
 		{
 			$taxon['taxon_no_infix']=$taxon['taxon'];
-			$taxon['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$taxon['taxon'],'base_rank_id'=>$taxon['base_rank_id'] ) );
+			$taxon['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$taxon['taxon'],'base_rank_id'=>$taxon['base_rank_id'],'taxon_id'=>$taxon['id'],'parent_id'=>$taxon['parent_id'] ] );
 		}
 		return $taxon;
     }
 
     public function getTaxonByName($name)
     {
-		$taxon=$this->models->ControllerModel->getTaxon(['project_id'=>$this->getCurrentProjectId(),'name'=>trim($name)]);
+		$taxon=$this->models->ControllerModel->getTaxon( [ 'project_id'=>$this->getCurrentProjectId(),'name'=>trim($name) ] );
 		if ( !empty($taxon['taxon']) )
 		{
 			$taxon['taxon_no_infix']=$taxon['taxon'];
-			$taxon['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$taxon['taxon'],'base_rank_id'=>$taxon['base_rank_id'] ) );
+			$taxon['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$taxon['taxon'],'base_rank_id'=>$taxon['base_rank_id'],'taxon_id'=>$taxon['id'],'parent_id'=>$taxon['parent_id'] ] );
 		}
 		return $taxon;
     }
@@ -2870,8 +2870,10 @@ class Controller extends BaseClass
 		$name=isset($p['name']) ? $p['name'] : null;
 		$uninomial=isset($p['uninomial']) ? $p['uninomial'] : null;
 		$specific_epithet=isset($p['specific_epithet']) ? $p['specific_epithet'] : null;
+		$taxon_id=isset($p['taxon_id']) ? $p['taxon_id'] : null;
+		$parent_id=isset($p['parent_id']) ? $p['parent_id'] : null;
 
-		$marker = $this->getShowAutomaticHybridMarkers() ? $this->_hybridMarker : '';
+		$marker=$this->getShowAutomaticHybridMarkers() ? $this->_hybridMarker : '';
 
 		if ( $base_rank_id==NOTHOGENUS_RANK_ID )
 		{
@@ -2882,6 +2884,21 @@ class Controller extends BaseClass
 			 $base_rank_id==NOTHOSUBSPECIES_RANK_ID ||
 			 $base_rank_id==NOTHOVARIETAS_RANK_ID )
 		{
+
+			if ( is_null($parent_id) && !is_null($taxon_id) )
+			{
+				$parent_id=$this->getTaxonById($this->getTaxonById($taxon_id)['parent_id'])['parent_id'];
+			}
+
+			if ( !is_null($parent_id) )
+			{
+				$parent=$this->getTaxonById($parent_id);
+				if ($parent['rank_id']==NOTHOGENUS_RANK_ID)
+				{
+					return $marker . ( isset($uninomial) ? $uninomial : $name );
+				}
+			}
+			
 			if ( !empty($specific_epithet) )
 			{
 				return $marker . $specific_epithet;

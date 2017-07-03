@@ -149,6 +149,7 @@ class KeyModel extends AbstractModel
 					select
 						_a.id,
 						_a.taxon,
+						_a.parent_id,
 						_a.rank_id,
 						_b.res_taxon_id,
 						_d.rank,
@@ -268,6 +269,7 @@ class KeyModel extends AbstractModel
 				select
 					_a.id,
 					_a.taxon,
+					_a.parent_id,
 					_c.rank_id as base_rank_id
 				from
 					%PRE%taxa _a
