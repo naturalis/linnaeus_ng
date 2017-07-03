@@ -54,6 +54,7 @@ class Controller extends BaseClass
 	public $wikiPageOverride;
 	private $_adminMessageFadeOutDelay;
 	private $_gitVars;
+	private $_nameTypeIds=array();
 
 	private $usedModelsBase = array(
 		'activity_log',
@@ -126,6 +127,7 @@ class Controller extends BaseClass
         $this->checkLastVisitedPage();
         $this->setSmartySettings();
 		$this->setRankIdConstants();
+		$this->setNameTypeIds();
         $this->setRequestData();
         $this->doLanguageChange();
         $this->checkModuleActivationStatus();
@@ -2745,6 +2747,37 @@ class Controller extends BaseClass
 				if (!defined($const)) define($const,$val['id']);
 			}
 		}
+	}
+
+	private function setNameTypeIds()
+	{
+		$this->_nameTypeIds=$this->models->NameTypes->_get(array(
+			'id'=>array(
+				'project_id'=>$this->getCurrentProjectId()
+			),
+			'columns'=>'id,nametype',
+			'fieldAsIndex'=>'nametype'
+		));
+	}
+
+	protected function getNameTypeId( $predicate )
+	{
+		
+		//$this->getNameTypeId(PREDICATE_PREFERRED_NAME),
+
+		/*
+			PREDICATE_VALID_NAME
+			PREDICATE_PREFERRED_NAME
+			PREDICATE_HOMONYM
+			PREDICATE_BASIONYM
+			PREDICATE_SYNONYM
+			PREDICATE_SYNONYM_SL
+			PREDICATE_MISSPELLED_NAME
+			PREDICATE_INVALID_NAME
+			PREDICATE_ALTERNATIVE_NAME
+		*/
+
+		if ( isset($this->_nameTypeIds[$predicate]) ) return $this->_nameTypeIds[$predicate]['id'];
 	}
 
 	protected function getWikiUrl()

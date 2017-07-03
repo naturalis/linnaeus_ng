@@ -100,7 +100,7 @@ function buildtree(node)
 		}),
 		success : function (data)
 		{
-			console.log(data);
+			//console.log(data);
 			var data=$.parseJSON(data);
 			growbranches(data);
 			storetree();
@@ -129,10 +129,10 @@ function growbranches(data)
 				(shouldHighlight ? '<span class="highlight-node">' : '' )+
 				(d.has_children ?'<a href="#" onclick="buildtree('+d.id+');return false;">'+d.label+'</a>':d.label)+
 				(d.rank_label ? '<span class="rank">'+d.rank_label+'</span>' : '' )+
-				(nodeCountType=='species' && d.child_count && d.child_count.total>0 ?
-					'<span class="child-count">'+d.child_count.total+'/'+d.child_count.established+'</span>' : '')+
-				(nodeCountType=='taxon' && d.child_count && d.child_count>0 ?
-					'<span class="child-count">'+d.child_count+'</span>' : '' )+
+//				(nodeCountType=='species' && d.child_count && d.child_count.total>0 ?
+//					'<span class="child-count">'+d.child_count.total+'/'+d.child_count.established+'</span>' : '')+
+//				(nodeCountType=='taxon' && d.child_count && d.child_count>0 ?
+				(d.child_count && d.child_count>0 ? '<span class="child-count">' + d.child_count+ '</span>' : '' )+
 				(shouldHighlight ? '</span>' : '' )+
 				'<a href="#" onclick="detailLink('+d.id+',\''+escape(d.label)+'\');return false;" class="detail-link">'+detailLinkLabel+'</a> \
 			</li>';
@@ -148,6 +148,7 @@ function growbranches(data)
 						(data.node.parent_id==null && getShowUpperTaxon()==false && getRootNodeLabel()!="" ? getRootNodeLabel() : data.node.label)+'</a>' :
 					'<a href="#" onclick="$( \'#children-'+data.node.id+'\' ).toggle();return false">'+data.node.label+'</a>'
 				)+
+				/*
 				( (data.node.parent_id==null && getShowUpperTaxon()==false) || data.node.rank_label.length==0 ? 
 					'' :
 					'<span class="rank">'+data.node.rank_label+'</span>'
@@ -168,6 +169,18 @@ function growbranches(data)
 					'<span class="child-count">'+data.node.child_count+'</span>' :
 					'' 
 				)+
+				*/
+				(data.node.child_count && data.node.child_count>0 && !activeNode ?
+					'<span class="child-count">'+data.node.child_count+' '+_('species')+'</span>' :
+					'' 
+				)+
+				(data.node.child_count && data.node.child_count>0 && activeNode ?
+					'<span class="child-count">'+data.node.child_count+'</span>' :
+					'' 
+				)+
+
+
+
 				(!activeNode && getShowUpperTaxon()==false ?
 					'':
 					'<a href="#" onclick="detailLink('+data.node.id+',\''+escape(data.node.label)+'\');return false;" class="detail-link">'+detailLinkLabel+'</a>'

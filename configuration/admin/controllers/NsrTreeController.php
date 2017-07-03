@@ -71,11 +71,6 @@ class NsrTreeController extends NsrController
 
 		$this->checkAuthorisation();
 
-q( $this->getTreeNode(), 1 );
-die();
-
-
-
         $this->setPageName($this->translate('Index'));
 
 		$this->_growTree();
@@ -158,72 +153,41 @@ die();
 
 	private function getTreeNode( $p=null )
 	{
-		$node=isset($p['node']) && $p['node']!==false ? $p['node'] : $this->treeGetTop();
+		
+		$topNode=isset($p['node']) && $p['node']!==false ? $p['node'] : $this->treeGetTop();
 
-		if (is_null($node)) return;
+		if (is_null($topNode)) return;
 
-		$nameTypeIdPreferred=!empty($this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']) ? $this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id'] : -1;
-		$nameTypeIdValid=!empty($this->_nameTypeIds[PREDICATE_VALID_NAME]['id']) ? $this->_nameTypeIds[PREDICATE_VALID_NAME]['id'] : -1;
-
-		$taxa=
+		$nodeChildren=
 			$this->models->NsrTreeModel->getTreeNodeTaxa( [
-				"language_id"=>$this->getDefaultProjectLanguage(),
-				"type_id_preferred"=>$nameTypeIdPreferred,
-				"type_id_valid"=>$nameTypeIdValid,
-				"project_id"=>$this->getCurrentProjectId(),
-				"node_id"=>$node
+				'language_id' => $this->getDefaultProjectLanguage(),
+				'type_id_preferred' => $this->getNameTypeId(PREDICATE_PREFERRED_NAME),
+				'type_id_valid' => $this->getNameTypeId(PREDICATE_VALID_NAME),
+				'project_id' => $this->getCurrentProjectId(),
+				'node_id' => $topNode
 			] );
 
         $ranks=$this->newGetProjectRanks();
 
 		$taxon=$progeny=array();
 
-		foreach((array)$taxa as $key=>$val)
+		foreach((array)$nodeChildren as $key=>$val)
 		{
-			$d=$this->models->NsrTreeModel->getSpeciesCount(array(
-				"project_id"=>$this->getCurrentProjectId(),
-				"node_id"=>$val['id']
-			));
-
-			$val['child_count']['taxon']=$d[0]['total'];
-				
-			/*
-			if ($count=='taxon')
-			{
-				$d=$this->models->NsrTreeModel->getSpeciesCount(array(
-					"project_id"=>$this->getCurrentProjectId(),
-					"node_id"=>$val['id']
-				));
-
-				$val['child_count']['taxon']=$d[0]['total'];
-			}
-			else
-			if ($count=='species')
-			{
-				$d=$this->models->NsrTreeModel->getTaxonCount(array(
-					"project_id"=>$this->getCurrentProjectId(),
-					"base_rank"=>$val['base_rank'],
-					"node_id"=>$val['id']
-				));
-
-				$val['child_count']=
-					array(
-						'total'=>
-							(int)
-								(isset($d['undefined']['total'])?$d['undefined']['total']:0)+
-								(isset($d[0]['total'])?$d[0]['total']:0)+
-								(isset($d[1]['total'])?$d[1]['total']:0),
-						'established'=>
-								(int)(isset($d[1]['total'])?$d[1]['total']:0),
-						'not_established'=>
-								(int)(isset($d[0]['total'])?$d[0]['total']:0)
-					);
-
-			} else
-			{
-				$val['child_count']=null;
-			}
+			$childCount=$this->models->NsrTreeModel->getTaxonBranchTaxonCount( [
+				'project_id' => $this->getCurrentProjectId(),
+				'node_id' => $val['id'],
+				'min_rank' => SPECIES_RANK_ID,
+				'min_rank_style' => 'EQ'
+			] );
 			
+			$val['child_count']=$childCount;
+
+			/*
+			$establishedSpeciesCount=$this->models->NsrTreeModel->getTaxonBranchEstablishedSpeciesCount( [
+				'project_id' => $this->getCurrentProjectId(),
+				'node_id' => $val['id']
+			] );
+			$val['child_count_established']=$establishedSpeciesCount;
 			*/
 
 			$val['taxon'] = $this->formatTaxon(array_merge($val, ['ranks' => $ranks, 'rankpos' => 'none']));
@@ -234,20 +198,16 @@ die();
 			unset($val['rank_id']);
 			unset($val['base_rank']);
 
-			if ($val['id']==$node)
+			if ($val['id']==$topNode)
 			{
 				$taxon=$val;
 			}
 			else
 			{
-				$d=$this->models->NsrTreeModel->getTaxonChildCount(array(
-					"project_id"=>$this->getCurrentProjectId(),
-					"parent_id"=>$val['id']
-				));
-
-				$val['has_children']=$d[0]['total']>0;
+				$val['has_children']=$childCount>0;
 				$progeny[]=$val;
 			}
+
 		}
 
 		usort(
@@ -264,110 +224,5 @@ die();
 
 	}
 
-	/*
-	private function getTreeNode($p)
-	{
-		$node=isset($p['node']) && $p['node']!==false ? $p['node'] : $this->treeGetTop();
-		$count=isset($p['count']) && in_array($p['count'],array('none','taxon','species')) ? $p['count'] : 'none';
 
-		if (is_null($node))
-			return;
-
-		$nameTypeIdPreferred=!empty($this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']) ? $this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id'] : -1;
-		$nameTypeIdValid=!empty($this->_nameTypeIds[PREDICATE_VALID_NAME]['id']) ? $this->_nameTypeIds[PREDICATE_VALID_NAME]['id'] : -1;
-
-		$taxa=
-			$this->models->NsrTreeModel->getTreeNodeTaxa(array(
-				"language_id"=>$this->getDefaultProjectLanguage(),
-				"type_id_preferred"=>$nameTypeIdPreferred,
-				"type_id_valid"=>$nameTypeIdValid,
-				"project_id"=>$this->getCurrentProjectId(),
-				"node_id"=>$node
-			));
-
-        $ranks=$this->newGetProjectRanks();
-
-		$taxon=$progeny=array();
-
-		foreach((array)$taxa as $key=>$val)
-		{
-
-			if ($count=='taxon')
-			{
-				$d=$this->models->NsrTreeModel->getSpeciesCount(array(
-					"project_id"=>$this->getCurrentProjectId(),
-					"node_id"=>$val['id']
-				));
-
-				$val['child_count']['taxon']=$d[0]['total'];
-			}
-			else
-			if ($count=='species')
-			{
-				$d=$this->models->NsrTreeModel->getTaxonCount(array(
-					"project_id"=>$this->getCurrentProjectId(),
-					"base_rank"=>$val['base_rank'],
-					"node_id"=>$val['id']
-				));
-
-				$val['child_count']=
-					array(
-						'total'=>
-							(int)
-								(isset($d['undefined']['total'])?$d['undefined']['total']:0)+
-								(isset($d[0]['total'])?$d[0]['total']:0)+
-								(isset($d[1]['total'])?$d[1]['total']:0),
-						'established'=>
-								(int)(isset($d[1]['total'])?$d[1]['total']:0),
-						'not_established'=>
-								(int)(isset($d[0]['total'])?$d[0]['total']:0)
-					);
-
-			} else
-			{
-				$val['child_count']=null;
-			}
-
-			$val['taxon'] = $this->formatTaxon(array_merge($val, ['ranks' => $ranks, 'rankpos' => 'none']));
-			$val['label']=empty($val['name']) ? $val['taxon'] : $val['name'].' ('.$val['taxon'].')';
-
-			//unset($val['parent_id']);
-			unset($val['is_hybrid']);
-			unset($val['rank_id']);
-			unset($val['base_rank']);
-
-			if ($val['id']==$node)
-			{
-				$taxon=$val;
-			}
-			else
-			{
-				$d=$this->models->NsrTreeModel->getTaxonChildCount(array(
-					"project_id"=>$this->getCurrentProjectId(),
-					"parent_id"=>$val['id']
-				));
-
-				$val['has_children']=$d[0]['total']>0;
-				$progeny[]=$val;
-			}
-		}
-
-		usort(
-			$progeny,
-			function($a,$b)
-			{
-				return
-					(strtolower($a['label'])==strtolower($b['label']) ?
-						0 : (strtolower($a['label'])>strtolower($b['label']) ? 1 : -1));
-			}
-		);
-
-		return
-			array(
-				'node'=>$taxon,
-				'progeny'=>$progeny
-			);
-
-	}
-	*/
 }
