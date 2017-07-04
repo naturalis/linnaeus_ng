@@ -927,18 +927,28 @@ class NsrTaxonController extends NsrController
 			unset($taxa[$key]['uninomial']);
 			unset($taxa[$key]['specific_epithet']);
 
+
+
+
 			if ($val['nametype']!=PREDICATE_VALID_NAME && $val['nametype']!=PREDICATE_PREFERRED_NAME)
 			{
+				$taxa[$key]['label']=
+					$this->addHybridMarkerAndInfixes( [ 'name'=>$val['name'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['id'],'parent_id'=>$val['parent_id'] ] ) . $val['label_suffix'];
 				$taxa[$key]['label']=sprintf($taxa[$key]['label'],'; '.sprintf($this->Rdf->translatePredicate($val['nametype']),$val['language_label']));
+				
 			}
 			else
 			{
+				$taxa[$key]['label']=
+					$this->addHybridMarkerAndInfixes( [ 'name'=>$val['name'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['id'],'parent_id'=>$val['parent_id'] ] ) . $val['label_suffix'];
 				$taxa[$key]['label']=sprintf($taxa[$key]['label'],'');
 			}
 
 			if (!$formatted)
 			{
 				$taxa[$key]['label']=strip_tags($taxa[$key]['label']);
+				
+				
 			}
 
 		}

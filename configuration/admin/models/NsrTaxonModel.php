@@ -522,6 +522,7 @@ final class NsrTaxonModel extends AbstractModel
 			select
 				_a.taxon_id as id,
 				concat(_a.name,' [',ifnull(_q.label,_x.rank),'%s]') as label,
+				concat(' [',ifnull(_q.label,_x.rank),'%s]') as label_suffix,
 				_e.rank_id,
 				_e.taxon,
 				_e.parent_id,

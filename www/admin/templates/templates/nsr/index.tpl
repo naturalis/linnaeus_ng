@@ -20,7 +20,7 @@
 <div class="inline-templates" id="localListItemTpl">
 <!--
     <li>
-        <a href="#"onclick="setAutoExpand(%ID%);return false;">%LABEL%</a>%COMMON% %TAXON% &nbsp;&nbsp;<a href="taxon.php?id=%ID%">&nbsp;&rarr;&nbsp;</a>
+        <a href="#"onclick="setAutoExpand(%ID%);return false;">%LABEL%</a> %COMMON% %TAXON% &nbsp;&nbsp;<a href="taxon.php?id=%ID%">&nbsp;&rarr;&nbsp;</a>
     </li>
 -->
 </div>
