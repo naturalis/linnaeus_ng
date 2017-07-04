@@ -843,14 +843,15 @@ class SpeciesController extends Controller
 		$id = isset($p['id']) ? $p['id'] : null;
 		$inclOverviewImage = isset($p['inclOverviewImage']) ? $p['inclOverviewImage'] : false;
 
-        if ($mt = $this->getlastVisitedCategory($taxon, CTAB_MEDIA)) {
+        if ($mt = $this->getlastVisitedCategory($taxon, CTAB_MEDIA))
+		{
             return $mt;
         }
 
 	    $this->_mc->setItemId(isset($taxon) ? $taxon : $id);
 	    $mt = $this->_mc->getItemMediaFiles();
 		$this->_mc->reformatOutput($mt, $inclOverviewImage);
-
+		
 		$this->setlastVisitedCategory($taxon, CTAB_MEDIA, $mt);
 
 		return $mt;

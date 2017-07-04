@@ -44,6 +44,7 @@
 							onclick="showMedia('{$smarty.capture.fullImgUrl}','{$v.original_name}');"
 							class="media-video-icon" />
 					{elseif $v.category=='audio'}
+                    
 						<object
 							id="media-{$k}"
 							alt="{$v.description}"
@@ -72,7 +73,7 @@
                         </div>
                         
                         <a data-fancybox="gallery" data-src="#hidden-media-{$k}" href="javascript:;" class="{if $v.category=='audio'}ion-volume-medium{else}ion-videocamera{/if} larger-ion-icon" data-caption="{$name}">
-                            {$name}
+                            {if $name}{$name}{else}{if $v.title}{$v.title}{else}{if $v.name}{$v.name}{/if}{/if}{/if}
                         </a> 
 					{else}
 						<a href="{$smarty.capture.fullImgUrl}" title="{$v.description}" data-fancybox="gallery" data-caption="{$name}">
