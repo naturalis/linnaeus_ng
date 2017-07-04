@@ -42,7 +42,7 @@ function localList(obj,txt)
 			{
 				buffer.push( 
 					fetchTemplate( 'localListItemTpl' )
-						.replace('/%ID%/g',d.id)
+						.replace(/%ID%/g,d.id)
 						.replace('%LABEL%',d.label)
 						.replace('%COMMON%',(d.common_name && d.common_name!=d.name ? "("+d.common_name+")": "" ))
 						.replace('%TAXON%',(d.nametype=='isPreferredNameOf' && d.taxon ? "("+d.taxon+")": "" ))
