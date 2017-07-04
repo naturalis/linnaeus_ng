@@ -2649,26 +2649,22 @@ class Controller extends BaseClass
 	{
 		$base_rank_id=isset($p['base_rank_id']) ? $p['base_rank_id'] : null;
 
-		if ( $base_rank_id==NOTHOGENUS_RANK_ID ||
-			 $base_rank_id==NOTHOSPECIES_RANK_ID ||
-			 $base_rank_id==NOTHOSUBSPECIES_RANK_ID ||
-			 $base_rank_id==NOTHOVARIETAS_RANK_ID )
+		if ( $base_rank_id==NOTHOVARIETAS_RANK_ID )
 		{
-			$result=$this->addHybridMarker( $p );
-
-			if ( $base_rank_id==NOTHOSUBSPECIES_RANK_ID || $base_rank_id==NOTHOVARIETAS_RANK_ID )
-			{
-				$r=$this->models->Ranks->_get( [ "id" => [ "id" =>$base_rank_id ], "columns" => "abbreviation" ] );
-				$abbr=$r ? " ".$r[0]["abbreviation"] : "";
-				$boom=explode(" ",$result);
-				if ( isset($boom[2]) )
-				{
-					$boom[2].=$abbr;
-					$result=implode(" ",$boom);
-				}
-			}
-
-			return $result;
+			$p['name']=$this->addHybridMarker( $p );
+			return $this->addVarietasInfix( $p );
+		}
+		else
+		if ( $base_rank_id==NOTHOSUBSPECIES_RANK_ID )
+		{
+			$p['name']=$this->addHybridMarker( $p );
+			return $this->addSubspeciesInfix( $p );
+		}
+		else
+		if ( $base_rank_id==NOTHOGENUS_RANK_ID ||
+			 $base_rank_id==NOTHOSPECIES_RANK_ID )
+		{
+			return $this->addHybridMarker( $p );
 		}
 		else
 		if ( $base_rank_id==VARIETAS_RANK_ID  )
@@ -2792,7 +2788,7 @@ class Controller extends BaseClass
 		$specific_epithet=isset($p['specific_epithet']) ? $p['specific_epithet'] : null;
 		$infra_specific_epithet=isset($p['infra_specific_epithet']) ? $p['infra_specific_epithet'] : null;
 
-		$marker=$this->getShowAutomaticInfixes() ? $this->_varietyMarker . ' ' : '';
+		$marker=$this->getShowAutomaticInfixes() ? $this->_varietyMarker : '';
 
 		if ( $base_rank_id==VARIETAS_RANK_ID )
 		{
@@ -2808,6 +2804,24 @@ class Controller extends BaseClass
 				return implode(' ',$ied);
 			}
 		}
+		else
+		if ( $base_rank_id==NOTHOVARIETAS_RANK_ID )
+		{
+			$marker=$this->getShowAutomaticInfixes() ? 'notho' . $marker : '';
+
+			if ( !empty($infra_specific_epithet) )
+			{
+				return $marker . $specific_epithet;
+			}
+			else
+			if ( !empty($name) && strpos($name,' ')!==false )
+			{
+				$ied=explode( ' ',  $name );
+				$ied[3] = '<span class="no-italics">' . $marker . '</span>' . ' ' . $ied[3];
+				return implode(' ',$ied);
+			}
+		}
+
 		return $name;
 	}
 
@@ -2819,7 +2833,7 @@ class Controller extends BaseClass
 		$specific_epithet=isset($p['specific_epithet']) ? $p['specific_epithet'] : null;
 		$infra_specific_epithet=isset($p['infra_specific_epithet']) ? $p['infra_specific_epithet'] : null;
 
-		$marker=$this->getShowAutomaticInfixes() ? $this->_subspeciesMarker . ' ' : '';
+		$marker=$this->getShowAutomaticInfixes() ? $this->_subspeciesMarker : '';
 
 		if ( $base_rank_id==SUBSPECIES_RANK_ID )
 		{
@@ -2835,6 +2849,32 @@ class Controller extends BaseClass
 				return implode(' ',$ied);
 			}
 		}
+		else
+		if ( $base_rank_id==NOTHOSUBSPECIES_RANK_ID )
+		{
+			$marker=$this->getShowAutomaticInfixes() ? 'notho' . $marker : '';
+			
+			if ( !empty($infra_specific_epithet) )
+			{
+				return $marker . $specific_epithet;
+			}
+			else
+			if ( !empty($name) && strpos($name,' ')!==false )
+			{
+				$ied=explode( ' ',  $name );
+				if ( isset($ied[3]) )
+				{
+					$ied[3] = '<span class="no-italics">' . $marker . '</span>' . ' ' . $ied[3];
+					return implode(' ',$ied);
+				}
+				else
+				{
+					return $name;
+				}
+
+			}
+		}
+		
 		return $name;
 	}
 

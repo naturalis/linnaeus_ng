@@ -724,13 +724,16 @@ class Controller extends BaseClass
 		$array=$this->helpers->CustomArraySort->getSortedArray();
     }
 
-    public function getTaxonById( $id )
+    public function getTaxonById( $id, $addNoMarkers=false )
     {
 		$taxon=$this->models->ControllerModel->getTaxon( [ 'project_id'=>$this->getCurrentProjectId(),'taxon_id'=>$id ] );
 		if ( !empty($taxon['taxon']) )
 		{
 			$taxon['taxon_no_infix']=$taxon['taxon'];
-			$taxon['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$taxon['taxon'],'base_rank_id'=>$taxon['base_rank_id'],'taxon_id'=>$taxon['id'],'parent_id'=>$taxon['parent_id'] ] );
+			if (!$addNoMarkers)
+			{
+				$taxon['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$taxon['taxon'],'base_rank_id'=>$taxon['base_rank_id'],'taxon_id'=>$taxon['id'],'parent_id'=>$taxon['parent_id'] ] );
+			}
 		}
 		return $taxon;
     }
@@ -2825,15 +2828,25 @@ class Controller extends BaseClass
 	{
 		$base_rank_id=isset($p['base_rank_id']) ? $p['base_rank_id'] : null;
 
+		if ( $base_rank_id==NOTHOVARIETAS_RANK_ID )
+		{
+			$p['name']=$this->addHybridMarker( $p );
+			return $this->addVarietasInfix( $p );
+		}
+		else
+		if ( $base_rank_id==NOTHOSUBSPECIES_RANK_ID )
+		{
+			$p['name']=$this->addHybridMarker( $p );
+			return $this->addSubspeciesInfix( $p );
+		}
+		else
 		if ( $base_rank_id==NOTHOGENUS_RANK_ID ||
-			 $base_rank_id==NOTHOSPECIES_RANK_ID ||
-			 $base_rank_id==NOTHOSUBSPECIES_RANK_ID ||
-			 $base_rank_id==NOTHOVARIETAS_RANK_ID )
+			 $base_rank_id==NOTHOSPECIES_RANK_ID )
 		{
 			return $this->addHybridMarker( $p );
 		}
 		else
-		if ( $base_rank_id==VARIETAS_RANK_ID  )
+		if ( $base_rank_id==VARIETAS_RANK_ID )
 		{
 			return $this->addVarietasInfix( $p );
 		}
@@ -2887,7 +2900,7 @@ class Controller extends BaseClass
 
 			if ( is_null($parent_id) && !is_null($taxon_id) )
 			{
-				$parent_id=$this->getTaxonById($this->getTaxonById($taxon_id)['parent_id'])['parent_id'];
+				$parent_id=$this->getTaxonById($this->getTaxonById($taxon_id,true)['parent_id'],true)['parent_id'];
 			}
 
 			if ( !is_null($parent_id) )
@@ -2953,7 +2966,7 @@ class Controller extends BaseClass
 		$specific_epithet=isset($p['specific_epithet']) ? $p['specific_epithet'] : null;
 		$infra_specific_epithet=isset($p['infra_specific_epithet']) ? $p['infra_specific_epithet'] : null;
 
-		$marker=$this->getShowAutomaticInfixes() ? $this->_varietyMarker . ' ' : '';
+		$marker=$this->getShowAutomaticInfixes() ? $this->_varietyMarker : '';
 
 		if ( $base_rank_id==VARIETAS_RANK_ID )
 		{
@@ -2969,6 +2982,24 @@ class Controller extends BaseClass
 				return implode(' ',$ied);
 			}
 		}
+		else
+		if ( $base_rank_id==NOTHOVARIETAS_RANK_ID )
+		{
+			$marker=$this->getShowAutomaticInfixes() ? 'notho' . $marker : '';
+
+			if ( !empty($infra_specific_epithet) )
+			{
+				return $marker . $specific_epithet;
+			}
+			else
+			if ( !empty($name) && strpos($name,' ')!==false )
+			{
+				$ied=explode( ' ',  $name );
+				$ied[3] = '<span class="no-italics">' . $marker . '</span>' . ' ' . $ied[3];
+				return implode(' ',$ied);
+			}
+		}
+
 		return $name;
 	}
 
@@ -2980,7 +3011,7 @@ class Controller extends BaseClass
 		$specific_epithet=isset($p['specific_epithet']) ? $p['specific_epithet'] : null;
 		$infra_specific_epithet=isset($p['infra_specific_epithet']) ? $p['infra_specific_epithet'] : null;
 
-		$marker=$this->getShowAutomaticInfixes() ? $this->_subspeciesMarker . ' ' : '';
+		$marker=$this->getShowAutomaticInfixes() ? $this->_subspeciesMarker : '';
 
 		if ( $base_rank_id==SUBSPECIES_RANK_ID )
 		{
@@ -3004,6 +3035,32 @@ class Controller extends BaseClass
 
 			}
 		}
+		else
+		if ( $base_rank_id==NOTHOSUBSPECIES_RANK_ID )
+		{
+			$marker=$this->getShowAutomaticInfixes() ? 'notho' . $marker : '';
+			
+			if ( !empty($infra_specific_epithet) )
+			{
+				return $marker . $specific_epithet;
+			}
+			else
+			if ( !empty($name) && strpos($name,' ')!==false )
+			{
+				$ied=explode( ' ',  $name );
+				if ( isset($ied[3]) )
+				{
+					$ied[3] = '<span class="no-italics">' . $marker . '</span>' . ' ' . $ied[3];
+					return implode(' ',$ied);
+				}
+				else
+				{
+					return $name;
+				}
+
+			}
+		}
+
 		return $name;
 	}
 
