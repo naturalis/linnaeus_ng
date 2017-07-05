@@ -204,7 +204,7 @@
         {if $concept.base_rank==$smarty.const.GENUS_RANK_ID || $concept.base_rank==$smarty.const.SUBGENUS_RANK_ID}
             <a href="taxon_new.php?parent={$concept.id}&newrank={$rank_id_species}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t _s1=$concept.taxon}add species to "%s"{/t}</a><br />
         {elseif $concept.base_rank >= $smarty.const.SUBGENUS_RANK_ID}
-            <a href="taxon_new.php?parent={$concept.id}&newrank={$rank_id_subspecies}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t _s1=$concept.taxon}add subspecies to "%s"{/t}</a><br />
+            <a href="taxon_new.php?parent={$concept.id}&newrank={$rank_id_subspecies}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t _s1=$concept.taxon}add infraspecific taxon to "%s"{/t}</a><br />
         {elseif $concept.base_rank < $smarty.const.GENUS_RANK_ID}
             <a href="taxon_new.php?parent={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t _s1=$concept.taxon}add child taxon to "%s"{/t}</a><br />
         {/if}
