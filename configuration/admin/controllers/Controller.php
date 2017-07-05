@@ -2824,7 +2824,7 @@ class Controller extends BaseClass
 			);
 	}
 
-	public function addHybridMarkerAndInfixes( $p )
+	protected function addHybridMarkerAndInfixes( $p )
 	{
 		$base_rank_id=isset($p['base_rank_id']) ? $p['base_rank_id'] : null;
 

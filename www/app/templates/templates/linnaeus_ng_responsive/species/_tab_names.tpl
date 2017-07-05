@@ -10,7 +10,7 @@
 			{if $v.language_id==$smarty.const.LANGUAGE_ID_SCIENTIFIC && $v.nametype!='isValidNameOf'}
 				{assign var=another_name value="`$v.uninomial` `$v.specific_epithet` `$v.infra_specific_epithet`"}
 				{if $another_name!='' && $v.uninomial!=''}
-					<tr><td>{$v.nametype_label|@ucfirst}</td><td><a href="name.php?id={$v.id}"><i>{$another_name}</i> {$v.authorship}</a></td></tr>
+					<tr><td>{$v.nametype_label|@ucfirst}</td><td><a href="name.php?id={$v.id}"><i>{$v.nomen}</i> {$v.authorship}</a></td></tr>
 				{elseif $v.uninomial==''}
 					{assign var=another_name value=$v.name|@replace:$v.authorship:''}
 					<tr><td>{$v.nametype_label|@ucfirst}</td><td><a href="name.php?id={$v.id}"><i>{$another_name}</i> {$v.authorship}</a></td></tr>

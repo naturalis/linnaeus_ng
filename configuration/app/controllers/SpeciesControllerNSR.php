@@ -305,7 +305,9 @@ class SpeciesControllerNSR extends SpeciesController
 			$name['nametype']=sprintf($this->Rdf->translatePredicate($name['nametype']),$name['language_label']);
 
 			$taxon=$this->getTaxonById($name['taxon_id']);
+
 			$taxon['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$taxon['taxon'],'base_rank_id'=>$taxon['base_rank_id'],'taxon_id'=>$taxon['id'],'parent_id'=>$taxon['parent_id'] ] );
+
 			if ( $this->show_nsr_specific_stuff )
 			{
 				$overview = $this->getTaxonOverviewImageNsr($taxon['id']);
@@ -910,6 +912,7 @@ class SpeciesControllerNSR extends SpeciesController
 			{
 				if ($synonymStartIndex==-1) $synonymStartIndex=$i;
 				$synonymCount++;
+			    $names[$key]['name']=$this->addHybridMarkerAndInfixes([ 'name'=>$val['name'],'base_rank_id'=>$val['synonym_base_rank_id'] ] );
 			}
 
 			if ($val['nametype']==PREDICATE_PREFERRED_NAME && $val['language_id']==$this->getDefaultLanguageId())
@@ -994,14 +997,15 @@ class SpeciesControllerNSR extends SpeciesController
 				return ( $aa > $bb ? 1 : ( $aa < $bb ? -1 : 0 ) );
 			});
 
-			// Mark up synonyms with hybrid and infraspecific markers if they have been assigned a rank_id
+
             foreach ($synonyms as $i => $syn)
 			{
                 if (isset($syn['synonym_base_rank_id']) && !empty($syn['synonym_base_rank_id']))
 				{
-                    $synonyms[$i]['name'] = $this->addHybridMarkerAndInfixes( [ 'name' => $syn['name'], 'base_rank_id' => $syn['synonym_base_rank_id'] ] );
+                    $synonyms[$i]['nomen'] = trim(str_replace($syn['authorship'],'',$syn['name']));
                 }
             }
+
 
 			array_splice($names,$synonymStartIndex,0,$synonyms);
 		}
@@ -1269,9 +1273,14 @@ class SpeciesControllerNSR extends SpeciesController
     		'nameId' => $nameId
 		));
 
-		if ($d['nametype']==PREDICATE_VALID_NAME && $d['language_id']==LANGUAGE_ID_SCIENTIFIC ||
-            isset($d['synonym_base_rank_id']) && !empty($d['synonym_base_rank_id'])) {
+		if ($d['nametype']==PREDICATE_VALID_NAME && $d['language_id']==LANGUAGE_ID_SCIENTIFIC)
+		{
 		    $d['name']=$this->addHybridMarkerAndInfixes([ 'name'=>$d['name'],'base_rank_id'=>$d['base_rank_id'], 'taxon_id' => $taxonId ] );
+		}
+		else
+		if (isset($d['synonym_base_rank_id']) && !empty($d['synonym_base_rank_id']))
+		{
+		    $d['name']=$this->addHybridMarkerAndInfixes([ 'name'=>$d['name'],'base_rank_id'=>$d['synonym_base_rank_id'], 'taxon_id' => $taxonId ] );
 		}
 
 		$d['addition']=$this->getNameAddition(array('name_id'=>$d['id']));
