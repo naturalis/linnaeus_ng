@@ -53,10 +53,26 @@ class SearchController extends Controller
 		$this->_maxSearchLength = null !== $this->moduleSettings->getModuleSetting( 'max_search_length' ) ? $this->moduleSettings->getModuleSetting( 'max_search_length' ) : 50;
 	}
 
-	public function validateSearchString($s)
+	protected function validateSearchString($s)
 	{
 		return
 			(strlen($s)>=$this->_minSearchLength) &&  // is it long enough?
 			(strlen($s)<=$this->_maxSearchLength);    // is it short enough?
+	}
+
+	// removes interfering noise from search term
+	protected function removeSearchNoise( $search )
+	{
+		$noise = [
+			$this->_hybridMarker,
+			$this->_formaMarker,
+			$this->_hybridMarker_graftChimaera,
+			$this->_varietyMarker,
+			$this->_subspeciesMarker,
+			$this->_nothoInfixPrefix . $this->_varietyMarker,
+			$this->_nothoInfixPrefix . $this->_subspeciesMarker,
+		];
+		 
+		return preg_replace('/(\s+)/',' ',str_replace($noise,' ', $search));
 	}
 }

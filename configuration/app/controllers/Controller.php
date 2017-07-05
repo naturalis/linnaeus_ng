@@ -185,10 +185,11 @@ class Controller extends BaseClass
 	private $_maxBackSteps=100;
 
 	protected $_hybridMarker='&#215;';
-	protected $_varietyMarker='var.';
-	protected $_subspeciesMarker='subsp.';
 	protected $_formaMarker='f.';
 	protected $_hybridMarker_graftChimaera='+';
+	protected $_varietyMarker='var.';
+	protected $_subspeciesMarker='subsp.';
+	protected $_nothoInfixPrefix='notho';
 
 	private $_nameTypeIds=array();
 
@@ -2807,7 +2808,7 @@ class Controller extends BaseClass
 		else
 		if ( $base_rank_id==NOTHOVARIETAS_RANK_ID )
 		{
-			$marker=$this->getShowAutomaticInfixes() ? 'notho' . $marker : '';
+			$marker=$this->getShowAutomaticInfixes() ? $this->_nothoInfixPrefix . $marker : '';
 
 			if ( !empty($infra_specific_epithet) )
 			{
@@ -2852,7 +2853,7 @@ class Controller extends BaseClass
 		else
 		if ( $base_rank_id==NOTHOSUBSPECIES_RANK_ID )
 		{
-			$marker=$this->getShowAutomaticInfixes() ? 'notho' . $marker : '';
+			$marker=$this->getShowAutomaticInfixes() ? $this->_nothoInfixPrefix . $marker : '';
 			
 			if ( !empty($infra_specific_epithet) )
 			{

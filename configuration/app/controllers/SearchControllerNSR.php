@@ -143,7 +143,7 @@ class SearchControllerNSR extends SearchController
 
     public function searchAction()
     {
-		
+
 		$search=null;
 		
 		if ($this->rHasVal('search'))
@@ -151,11 +151,11 @@ class SearchControllerNSR extends SearchController
 			$search=$this->rGetAll();
 
 			$search['search_original']=$search['search'];
-			$search['search']=str_replace($this->_hybridMarker,'',$search['search']);
+			$search['search']=$this->removeSearchNoise($search['search']);
 
 			$results=$this->doSearch($search);
 
-			$search['search']=htmlspecialchars($search['search']);
+			$search['search']=htmlspecialchars($search['search_original']);
 
 			$this->smarty->assign('search', $search);
 			$this->smarty->assign('results',$results);
@@ -240,7 +240,7 @@ class SearchControllerNSR extends SearchController
 				)
 			));
 		}
-
+		
 		$this->smarty->assign('searchHR',$this->makeReadableQueryString());
 		$this->smarty->assign('results',$this->doExtendedSearch($search));
 		$this->smarty->assign('search_presence_help_url',$this->_search_presence_help_url);
@@ -841,8 +841,10 @@ class SearchControllerNSR extends SearchController
 
 	private function getSuggestionsName( $p )
 	{
+		$search=$this->removeSearchNoise($p['search']);
+		
 		$data=$this->models->SearchNSRModel->getSuggestionsName(array(
-			"search"=>$p['search'],
+			"search"=>$search,
 			"order"=>isset($p['order']) ? $p['order'] : null,
 			"project_id"=>$this->getCurrentProjectId(),
 			"limit"=>$this->_suggestionListItemMax,
