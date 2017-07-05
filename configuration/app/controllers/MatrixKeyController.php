@@ -686,7 +686,7 @@ class MatrixKeyController extends Controller
 			"matrix_id"=>$this->getCurrentMatrixId(),
 			"preferred_nametype_id"=>$this->getNameTypeId(PREDICATE_PREFERRED_NAME)
         ));
-		
+
 		$taxa=array();
 		$ranks=$this->getProjectRanks() ;
 
@@ -697,9 +697,11 @@ class MatrixKeyController extends Controller
 			$d=$val;
 
 			if (
-				(isset($this->settings->allow_empty_species) && $this->settings->allow_empty_species) ||
-				(!isset($val['is_empty'])) ||
-				(!$this->settings->allow_empty_species && $val['is_empty']==1))
+				!isset($val['is_empty']) ||
+				!isset($this->settings->allow_empty_species) ||
+				(isset($this->settings->allow_empty_species) && $this->settings->allow_empty_species==true) ||
+				(isset($this->settings->allow_empty_species) && $this->settings->allow_empty_species==false && $val['is_empty']==0)
+			)
 			{
 				$d['type']='taxon';
 				if (
