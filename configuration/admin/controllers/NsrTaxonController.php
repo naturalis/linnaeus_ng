@@ -793,7 +793,7 @@ class NsrTaxonController extends NsrController
 			only by 'presence82_id', and are therefore also obsolete.
 			these statuses get a index_label of 99, based on the fact that
 			they, and they alone, have no actual index_label, and are
-			subsequently excluded from the list in the wehre-statement.
+			subsequently excluded from the list in the where-statement.
 		*/
 
 		return $this->models->NsrTaxonModel->getStatuses(array(

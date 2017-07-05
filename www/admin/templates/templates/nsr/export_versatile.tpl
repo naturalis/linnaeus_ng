@@ -507,7 +507,7 @@ function doSubmit()
 
         <span class=remark>
         	{t}The default values generate a CSV file that can be opened in Excel.{/t}<br />
-            {t}Do not open de file directly in Excel, but first save it and ubsequently open it in an empty Excel sheet through 'Data' > 'From text'.{/t}
+            {t}Do not open de file directly in Excel, but first save it and subsequently open it in an empty Excel sheet through 'Data' > 'From text'.{/t}
         </span>
 
 	</fieldset>
