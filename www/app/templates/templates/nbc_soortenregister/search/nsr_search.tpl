@@ -36,7 +36,7 @@
 					<img src="{$taxon_base_url_images_thumb_s}{$v.overview_image}"/>
 					{/if}
 					<strong><a href="../species/nsr_taxon.php?id={$v.taxon_id}">{$v.taxon}</a></strong>
-					{if $v.common_rank} ({$v.common_rank}){/if}<br />
+					{if $show_taxon_rank_in_results && $v.common_rank} ({$v.common_rank}){/if}<br />
 
 				{if $show_all_preferred_names_in_results}
 					{foreach $v.common_names n nk}
