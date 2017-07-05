@@ -660,8 +660,63 @@ final class SearchNSRModel extends AbstractModel
 				_f.rank_id as base_rank_id,
 				_k.taxon,
 				_k.taxon as validName,
+				_j.name,
+				trim(replace(_j.name,ifnull(_j.authorship,''),'')) as nomen,
 
-				date_format(_meta4.meta_date,'%e %M %Y') as meta_datum_plaatsing
+				case
+					when
+						date_format(_meta1.meta_date,'%e %M %Y') is not null
+						and DAYOFMONTH(_meta1.meta_date)!='0'
+					then
+						date_format(_meta1.meta_date,'%e %M %Y')
+					when
+						date_format(_meta1.meta_date,'%M %Y') is not null
+					then
+						date_format(_meta1.meta_date,'%M %Y')
+					when
+						date_format(_meta1.meta_date,'%Y') is not null
+						and YEAR(_meta1.meta_date)!='0000'
+					then
+						date_format(_meta1.meta_date,'%Y')
+					when
+						YEAR(_meta1.meta_date)='0000'
+					then
+						null
+					else
+						_meta1.meta_date
+				end as meta_datum,
+
+				_meta2.meta_data as meta_short_desc,
+				_meta3.meta_data as meta_geografie,
+
+				case
+					when
+						date_format(_meta4.meta_date,'%e %M %Y') is not null
+						and DAYOFMONTH(_meta4.meta_date)!=0
+					then
+						date_format(_meta4.meta_date,'%e %M %Y')
+					when
+						date_format(_meta4.meta_date,'%M %Y') is not null
+					then
+						date_format(_meta4.meta_date,'%M %Y')
+					when
+						date_format(_meta4.meta_date,'%Y') is not null
+						and YEAR(_meta4.meta_date)!='0000'
+					then
+						date_format(_meta4.meta_date,'%Y')
+					when
+						YEAR(_meta4.meta_date)='0000'
+					then
+						null
+					else
+						_meta4.meta_date
+				end as meta_datum_plaatsing,
+
+				_meta5.meta_data as meta_copyrights,
+				_meta6.meta_data as meta_validator,
+				_meta7.meta_data as meta_adres_maker,
+				_meta8.meta_data as photographer,
+				_meta10.meta_data as meta_license
 
 			from  %PRE%media_taxon _m
 			
@@ -678,20 +733,55 @@ final class SearchNSRModel extends AbstractModel
 				and _k.id =  _trash.lng_id
 				and _trash.item_type='taxon'
 
+			left join %PRE%media_meta _meta1
+				on _m.id=_meta1.media_id
+				and _m.project_id=_meta1.project_id
+				and _meta1.sys_label='beeldbankDatumVervaardiging'
+
+			left join %PRE%media_meta _meta2
+				on _m.id=_meta2.media_id
+				and _m.project_id=_meta2.project_id
+				and _meta2.sys_label='beeldbankOmschrijving'
+
+			left join %PRE%media_meta _meta3
+				on _m.id=_meta3.media_id
+				and _m.project_id=_meta3.project_id
+				and _meta3.sys_label='beeldbankLokatie'
+
 			left join %PRE%media_meta _meta4
 				on _m.id=_meta4.media_id
 				and _m.project_id=_meta4.project_id
 				and _meta4.sys_label='beeldbankDatumAanmaak'
 
-			left join %PRE%media_meta _meta1
-				on _m.id=_meta1.media_id
-				and _m.project_id=_meta1.project_id
-				and _meta1.sys_label='beeldbankDatumVervaardiging'
-			
+			left join %PRE%media_meta _meta5
+				on _m.id=_meta5.media_id
+				and _m.project_id=_meta5.project_id
+				and _meta5.sys_label='beeldbankCopyright'
+
+			left join %PRE%media_meta _meta6
+				on _m.id=_meta6.media_id
+				and _m.project_id=_meta6.project_id
+				and _meta6.sys_label='beeldbankValidator'
+
+			left join %PRE%media_meta _meta7
+				on _m.id=_meta7.media_id
+				and _m.project_id=_meta7.project_id
+				and _meta7.sys_label='beeldbankAdresMaker'
+
+			left join %PRE%media_meta _meta8
+				on _m.id=_meta8.media_id
+				and _m.project_id=_meta8.project_id
+				and _meta8.sys_label='beeldbankFotograaf'
+
 			left join %PRE%media_meta _meta9
 				on _m.id=_meta9.media_id
 				and _m.project_id=_meta9.project_id
 				and _meta9.sys_label='verspreidingsKaart'
+
+			left join %PRE%media_meta _meta10
+				on _m.id=_meta10.media_id
+				and _m.project_id=_meta10.project_id
+				and _meta10.sys_label='beeldbankLicentie'
 
 			".(!empty($group_id) ? 
 				"right join %PRE%taxon_quick_parentage _q
@@ -699,28 +789,16 @@ final class SearchNSRModel extends AbstractModel
 					and _m.project_id=_q.project_id
 				" : "" )."
 
-			".(!empty($name) ? 
-				"left join %PRE%names _j
+				left join %PRE%names _j
 					on _m.taxon_id=_j.taxon_id
 					and _m.project_id=_j.project_id
 					and _j.type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
 					and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
-				" : "" )."
 
-
-			".(isset($photographer) ? 
-				"left join %PRE%media_meta _c
+				left join %PRE%media_meta _c
 					on _m.project_id=_c.project_id
 					and _m.id = _c.media_id
 					and _c.sys_label = 'beeldbankFotograaf'
-				" : "" )."
-					
-			".(isset($validator) ? 
-				"left join %PRE%media_meta _meta6
-					on _m.id=_meta6.media_id
-					and _m.project_id=_meta6.project_id
-					and _meta6.sys_label='beeldbankValidator'
-				" : "" )."					
 
 			where _m.project_id = ".$project_id."
 
@@ -741,7 +819,7 @@ final class SearchNSRModel extends AbstractModel
 		$data=$this->freeQuery( $query );
 		//SQL_CALC_FOUND_ROWS
 		$count=$this->freeQuery( "select found_rows() as total" );
-		
+
 		return array('data'=>$data,'count'=>$count[0]['total']);
 
 	}

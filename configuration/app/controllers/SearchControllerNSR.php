@@ -673,84 +673,10 @@ class SearchControllerNSR extends SearchController
 
 		foreach((array)$data as $key=>$val)
 		{
+			
 			$data[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name' => $val['taxon'], 'base_rank_id' => $val['base_rank_id'], 'taxon_id' => $val['taxon_id'] ] );
 			$data[$key]['validName']=$this->addHybridMarkerAndInfixes( [ 'name' => $val['validName'], 'base_rank_id' => $val['base_rank_id'], 'taxon_id' => $val['taxon_id'] ] );
-
-			$meta=$this->models->MediaMeta->_get( [
-				"id"=> [
-					"project_id" => $this->getCurrentProjectId(),
-					"media_id" => $val["id"]
-				],
-				"columns" =>
-					"*, trim(concat(
-						trim(substring(meta_data, locate(',',meta_data)+1)),' ',
-						trim(substring(meta_data, 1, locate(',',meta_data)-1))
-					)) as photographer"
-			 ] );
-			 
-			$data[$key]['photographer']="";
-			$data[$key]['meta_datum']="";
-			$data[$key]['meta_short_desc']="";
-			$data[$key]['meta_geografie']="";
-			$data[$key]['meta_copyrights']="";
-			$data[$key]['meta_validator']="";
-			$data[$key]['meta_adres_maker']="";
-			$data[$key]['meta_license']="";
-
-			foreach((array)$meta as $m)
-			{
-				if ($m['sys_label']=='beeldbankFotograaf')
-				{
-					//$data[$key]['photographer']=$m['meta_data'];
-					$data[$key]['photographer']=$m['photographer'];
-				}
-				else
-				if ($m['sys_label']=='beeldbankDatumVervaardiging')
-				{
-					// REFAC2015: well...
-					if (strtoupper(substr(PHP_OS, 0, 3))==='WIN')
-					{
-						setlocale(LC_ALL,'nld_nld'); // windows only
-						$data[$key]['meta_datum']=strftime( '%d %B %Y',strtotime($m['meta_date']));
-					}
-					else
-					{
-						if (!setlocale(LC_ALL,'nl_NL'))
-							setlocale(LC_ALL,'nl_NL.utf8');
-						$data[$key]['meta_datum']=strftime( '%e %B %Y',strtotime($m['meta_date']));
-					}
-				}
-				else
-				if ($m['sys_label']=='beeldbankOmschrijving')
-				{
-					$data[$key]['meta_short_desc']=$m['meta_data'];
-				}
-				else
-				if ($m['sys_label']=='beeldbankLokatie')
-				{
-					$data[$key]['meta_geografie']=$m['meta_data'];
-				}
-				else
-				if ($m['sys_label']=='beeldbankCopyright')
-				{
-					$data[$key]['meta_copyrights']=$m['meta_data'];
-				}
-				else
-				if ($m['sys_label']=='beeldbankValidator')
-				{
-					$data[$key]['meta_validator']=$m['meta_data'];
-				}
-				else
-				if ($m['sys_label']=='beeldbankAdresMaker')
-				{
-					$data[$key]['meta_adres_maker']=$m['meta_data'];
-				}
-				else
-				if ($m['sys_label']=='beeldbankLicentie')
-				{
-					$data[$key]['meta_license']=$m['meta_data'];
-				}
-			}
+			$data[$key][0] = $this->NSRFunctions->formatPictureResults( [$val] );
 
 			$names=$this->models->Names->_get(array("id"=>
 				array(

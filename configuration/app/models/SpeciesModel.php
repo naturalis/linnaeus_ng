@@ -1003,13 +1003,11 @@ class SpeciesModel extends AbstractModel
 				on _m.id=_meta6.media_id
 				and _m.project_id=_meta6.project_id
 				and _meta6.sys_label='beeldbankValidator'
-				and _meta6.language_id=".$languageId."
 
 			left join %PRE%media_meta _meta7
 				on _m.id=_meta7.media_id
 				and _m.project_id=_meta7.project_id
 				and _meta7.sys_label='beeldbankAdresMaker'
-				and _meta7.language_id=".$languageId."
 
 			left join %PRE%media_meta _meta8
 				on _m.id=_meta8.media_id

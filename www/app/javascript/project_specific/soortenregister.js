@@ -4,7 +4,7 @@ var activesuggestion=-1;
 var suggestionsCallback;
 
 function nbcPrettyPhotoInit() {
-
+	/*
  	$("a[rel^='prettyPhoto']").prettyPhoto({
 		allow_resize:true,
 		animation_speed:50,
@@ -13,6 +13,15 @@ function nbcPrettyPhotoInit() {
  		overlay_gallery: false,
  		social_tools: false
  	});
+	*/
+
+	$('[data-fancybox]').fancybox({
+		arrows : false,
+		infobar : true,
+		animationEffect : false
+	});
+		
+	console.log('fuck');
 
 }
 
