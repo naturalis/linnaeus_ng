@@ -93,7 +93,7 @@ class Controller extends BaseClass
 	protected $moduleSession;
 	protected $baseSession;
 
-	protected $_hybridMarker='&#215;';
+	protected $_hybridMarkerHtml='&#215;';
 	protected $_varietyMarker='var.';
 	protected $_subspeciesMarker='subsp.';
 	protected $_formaMarker='f.';
@@ -1396,7 +1396,7 @@ class Controller extends BaseClass
             return $name;
         }
 
-        $marker = ($rankId == GRAFT_CHIMAERA_RANK_ID ? $this->_hybridMarker_graftChimaera : $this->_hybridMarker);
+        $marker = ($rankId == GRAFT_CHIMAERA_RANK_ID ? $this->_hybridMarker_graftChimaera : $this->_hybridMarkerHtml);
 
         // intergeneric hybrid
         if ($isHybrid == 2 || $rankId < SPECIES_RANK_ID)
@@ -2891,7 +2891,7 @@ class Controller extends BaseClass
 		$taxon_id=isset($p['taxon_id']) ? $p['taxon_id'] : null;
 		$parent_id=isset($p['parent_id']) ? $p['parent_id'] : null;
 
-		$marker=$this->getShowAutomaticHybridMarkers() ? $this->_hybridMarker : '';
+		$marker=$this->getShowAutomaticHybridMarkers() ? $this->_hybridMarkerHtml : '';
 
 		if ( $base_rank_id==NOTHOGENUS_RANK_ID )
 		{

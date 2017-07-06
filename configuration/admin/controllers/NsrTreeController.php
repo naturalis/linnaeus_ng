@@ -210,7 +210,7 @@ class NsrTreeController extends NsrController
 
 		}
 
-		$x1=$this->_hybridMarker;
+		$x1=$this->_hybridMarkerHtml;
 		$x2=$this->_hybridMarker_graftChimaera;
 
 		usort(

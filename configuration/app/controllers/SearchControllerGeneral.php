@@ -185,7 +185,7 @@ class SearchControllerGeneral extends SearchController
     {
 		if ($this->rHasVal('search'))
 		{
-			$modified_search=str_replace($this->_hybridMarker,'',$this->rGetVal('search'));
+			$modified_search=$this->removeSearchNoise( $this->rGetVal('search') );
 			$this->moduleSession->setModuleSetting( array('setting'=>'search','value'=>$modified_search) );
 			$this->moduleSession->setModuleSetting( array('setting'=>'search_original','value'=>$this->rGetVal('search')) );
 			$this->moduleSession->setModuleSetting( array('setting'=>'modules','value'=>$this->rHasVal('modules') ? $this->rGetVal('modules') : null) );

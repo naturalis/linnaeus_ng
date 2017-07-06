@@ -65,6 +65,7 @@ class SearchController extends Controller
 	{
 		$noise = [
 			$this->_hybridMarker,
+			$this->_hybridMarkerHtml,
 			$this->_formaMarker,
 			$this->_hybridMarker_graftChimaera,
 			$this->_varietyMarker,
