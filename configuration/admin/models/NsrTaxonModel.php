@@ -917,7 +917,7 @@ final class NsrTaxonModel extends AbstractModel
 
 			where
 				_a.project_id = ".$project_id."
-				and MATCH(_a.parentage) AGAINST ('".$parent_id."' in boolean mode)
+				and MATCH(_a.parentage) AGAINST ('". $this->generateTaxonParentageId( $parent_id ) ."' in boolean mode)
 		";
 
 		return $this->freeQuery( $query );

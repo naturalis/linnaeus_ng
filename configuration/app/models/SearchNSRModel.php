@@ -488,7 +488,7 @@ final class SearchNSRModel extends AbstractModel
 				_a.project_id =".$project_id."
 				and ifnull(_trash.is_deleted,0)=0
 				".(isset($specific_rank) ? "and _f.rank_id=" . $specific_rank : "and _f.lower_taxon=1" )." 
-				".(isset($ancestor_id) ? "and (MATCH(_q.parentage) AGAINST ('".$ancestor_id."' in boolean mode) or _a.id = ".$ancestor_id.")" : "")."
+				".(isset($ancestor_id) ? "and (MATCH(_q.parentage) AGAINST ('". $this->generateTaxonParentageId( $ancestor_id ) ."' in boolean mode) or _a.id = ".$ancestor_id.")" : "")."
 				".(isset($presence) ? "and _g.presence_id in (".implode(',',$presence).")" : "")."
 				".(isset($auth) ? "and _m.authorship like '". $this->escapeString($auth)."%'" : "")."
 				".($dna ? "and number_of_barcodes ".($dna_insuff ? "between 1 and 3" : "> 0") : "")."
@@ -807,7 +807,7 @@ final class SearchNSRModel extends AbstractModel
 		
 				".(isset($photographer)  ? "and ".$photographer : "")." 		
 				".(isset($validator)  ? "and ".$validator : "")." 		
-				".(!empty($group_id) ? "and  ( MATCH(_q.parentage) AGAINST ('".$group_id."' in boolean mode) or _m.taxon_id = " .$group_id. ") "  : "")."
+				".(!empty($group_id) ? "and  ( MATCH(_q.parentage) AGAINST ('". $this->generateTaxonParentageId( $group_id )."' in boolean mode) or _m.taxon_id = " .$group_id. ") "  : "")."
 				".(!empty($name_id) ? "and _m.taxon_id = ".intval($name_id)  : "")." 		
 				".(!empty($name) ? "and _j.name like '". $this->escapeString($name)."%'"  : "")."
 

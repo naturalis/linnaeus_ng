@@ -248,7 +248,7 @@ class SpeciesModel extends AbstractModel
 
 			where
 				_sq.project_id=".$projectId."
-				and MATCH(_sq.parentage) AGAINST ('".$taxonId."' in boolean mode)
+				and MATCH(_sq.parentage) AGAINST ('". $this->generateTaxonParentageId( $taxonId ) ."' in boolean mode)
 				/* and _sp.presence_id is not null */
 				and _f.rank_id".($rankId >= $speciesRankId ? ">=" : "=")." ".$speciesRankId."
 				and ifnull(_trash.is_deleted,0)=0
@@ -1199,7 +1199,7 @@ class SpeciesModel extends AbstractModel
 
 			where
 				_q.project_id=".$projectId."
-				and (MATCH(_q.parentage) AGAINST ('".$taxonId."' in boolean mode))
+				and (MATCH(_q.parentage) AGAINST ('". $this->generateTaxonParentageId( $taxonId )."' in boolean mode))
 				and ifnull(_trash.is_deleted,0)=0
 
 			order by taxon
@@ -1254,7 +1254,7 @@ class SpeciesModel extends AbstractModel
 			where
 				_q.project_id=".$projectId."
 				and ifnull(_meta9.meta_data,0)!=1
-				and (MATCH(_q.parentage) AGAINST ('".$taxonId."' in boolean mode))
+				and (MATCH(_q.parentage) AGAINST ('". $this->generateTaxonParentageId( $taxonId ) ."' in boolean mode))
 				and ifnull(_trash.is_deleted,0)=0";
 
         $d = $this->freeQuery($query);

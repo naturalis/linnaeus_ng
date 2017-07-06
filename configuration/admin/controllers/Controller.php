@@ -984,6 +984,11 @@ class Controller extends BaseClass
 			)
 		);
 	}
+	
+	static function generateTaxonParentageId( $id ) 
+	{
+		return sprintf('%05s',$id);
+	}
 
 
     private function getTaxonChildren($id,$alphabeticalTree)

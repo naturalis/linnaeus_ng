@@ -171,6 +171,8 @@ class SpeciesControllerNSR extends SpeciesController
 			$children=$this->getTaxonChildren(array('taxon'=>$taxon['id'],'include_count'=>true));
 			$names=$this->getNames( [ 'id'=>$taxon['id'] ] );
 
+//q( $names,1);
+
 			if ( $this->show_nsr_specific_stuff )
 			{
 				$taxon['NsrId'] = $this->getNSRId(array('id'=>$this->rGetVal('id')));

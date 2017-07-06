@@ -97,7 +97,6 @@ final class NsrTreeModel extends AbstractModel
 		
 	}
 
-
 	public function getTaxonBranchTaxonCount( $p )
 	{
 		$project_id=isset($p['project_id']) ? $p['project_id'] : null;
@@ -135,7 +134,7 @@ final class NsrTreeModel extends AbstractModel
 			where 
 				_sq.project_id = ".$project_id."
 				and ifnull(_trash.is_deleted,0)=0
-				and MATCH(_sq.parentage) AGAINST ('".$node_id."' in boolean mode)
+				and MATCH(_sq.parentage) AGAINST ('".$this->generateTaxonParentageId( $node_id )."' in boolean mode)
 				" . ( !is_null($min_rank) ? "and _f.rank_id".($min_rank_style=='LTE' ? ">=" : "=")." ".$min_rank : "" )
 			;
 
@@ -187,7 +186,7 @@ final class NsrTreeModel extends AbstractModel
 				and ifnull(_trash.is_deleted,0)=0
 				and _sr.established = 1
 				and _f.rank_id".($include_subspecies_etc ? ">=" : "=")." ".SPECIES_RANK_ID."
-				and MATCH(_sq.parentage) AGAINST ('".$node_id."' in boolean mode)
+				and MATCH(_sq.parentage) AGAINST ('". $this->generateTaxonParentageId( $node_id ) ."' in boolean mode)
 			";
 
 		$d = $this->freeQuery( $query );

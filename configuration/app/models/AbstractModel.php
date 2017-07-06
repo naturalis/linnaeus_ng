@@ -359,5 +359,39 @@ class AbstractModel extends BaseClass
         $this->freeQuery("SET lc_time_names = '". mysqli_real_escape_string($this->databaseConnection, $locale)."'");
     }
 
+    public function getLanguagesUsed ($projectId = null)
+    {
+        if (is_null($projectId)) {
+			return null;
+		}
+
+        $query = "
+            select count(id) as `count`, language_id
+			from %PRE%names
+			where project_id=".$projectId."
+			group by language_id
+			order by `count` asc";
+
+        return $this->freeQuery($query);
+
+    }
+
+    public function arrayHasData ($p = array())
+    {
+        foreach ($p as $k => $v) {
+            if (is_array($v)) {
+                $this->arrayHasData($v);
+            }
+            if ($v != '') {
+                return true;
+            }
+        }
+        return false;
+    }
+	
+	public function generateTaxonParentageId( $id )
+	{
+		return Controller::generateTaxonParentageId( $id );
+	}
 
 }

@@ -176,8 +176,8 @@ class NsrTreeController extends NsrController
 			$childCount=$this->models->NsrTreeModel->getTaxonBranchTaxonCount( [
 				'project_id' => $this->getCurrentProjectId(),
 				'node_id' => $val['id'],
-				'min_rank' => SPECIES_RANK_ID,
-				'min_rank_style' => 'EQ'
+//				'min_rank' => SPECIES_RANK_ID,
+//				'min_rank_style' => 'EQ'
 			] );
 			
 			$val['child_count']=$childCount;

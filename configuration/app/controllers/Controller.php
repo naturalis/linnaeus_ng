@@ -1216,6 +1216,16 @@ class Controller extends BaseClass
         return $taxon['taxon'];
     }
 
+    public function formatSynonym ($name)
+    {
+        return '<span class="italics">' . $name . '</span>';
+    }
+
+	static function generateTaxonParentageId( $id ) 
+	{
+		return sprintf('%05s',$id);
+	}
+
    private function setHybridMarker($name, $rankId, $isHybrid)
     {
         if ($isHybrid == 0)
@@ -1234,11 +1244,6 @@ class Controller extends BaseClass
         // interspecific hybrid; string is already formatted so take second space!!
         return implode(' ' . $marker . ' ', explode(' ', $name, 3));
 
-    }
-
-    public function formatSynonym ($name)
-    {
-        return '<span class="italics">' . $name . '</span>';
     }
 
     private function getMainMenu ()

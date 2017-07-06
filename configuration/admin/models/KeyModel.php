@@ -177,7 +177,7 @@ class KeyModel extends AbstractModel
 					where
 						_a.project_id = " . $project_id . "
 						and (
-							MATCH(_sq.parentage) AGAINST ('" . $top . "' in boolean mode)
+							MATCH(_sq.parentage) AGAINST ('" . $this->generateTaxonParentageId( $top ) . "' in boolean mode)
 							or _a.id=" . $top . " 
 						)	
 				");

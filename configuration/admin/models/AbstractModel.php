@@ -402,5 +402,10 @@ class AbstractModel extends BaseClass
         }
         return false;
     }
+	
+	public function generateTaxonParentageId( $id )
+	{
+		return Controller::generateTaxonParentageId( $id );
+	}
 
 }
