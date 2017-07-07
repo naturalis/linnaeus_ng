@@ -93,12 +93,15 @@ class Controller extends BaseClass
 	protected $moduleSession;
 	protected $baseSession;
 
+	protected $_hybridMarker='×';
 	protected $_hybridMarkerHtml='&#215;';
-	protected $_varietyMarker='var.';
-	protected $_subspeciesMarker='subsp.';
 	protected $_formaMarker='f.';
 	protected $_hybridMarker_graftChimaera='+';
+	protected $_varietyMarker='var.';
+	protected $_subspeciesMarker='subsp.';
+	protected $_nothoInfixPrefix='notho';
 
+			
     /**
      * Constructor, calls parent's constructor and all initialisation functions
      *
@@ -1146,119 +1149,8 @@ class Controller extends BaseClass
             ''
         ), $title) . '.css');
     }
-/*
-    public function formatTaxon($p=null) //($taxon,$ranks=null)
-    {
 
-		if (is_null($p))
-			return;
-
-		// switching between $p being an array of parameters (taxon, ranks, rankpos) and $p just being the taxon (which is an array in itself)
-		if (isset($p['taxon']) && is_array($p['taxon'])) {
-
-			$taxon=$p['taxon'];
-			$ranks=isset($p['ranks']) ? $p['ranks'] : null;
-			$rankpos=(isset($p['rankpos']) && in_array($p['rankpos'],array('pre','post')) ? $p['rankpos'] : 'pre');
-
-		} else {
-
-			$taxon=$p;
-			$ranks=null;
-			$rankpos='pre';
-
-		}
-
-		if (empty($taxon))
-			return;
-
-
-		$add_hybrid_marker=isset($p['add_hybrid_marker']) ? $p['add_hybrid_marker'] : true;
-		$add_infixes=isset($p['add_infixes']) ? $p['add_infixes'] : true;
-
-        $e = explode(' ', $taxon['taxon']);
-        $r = is_null($ranks) ? $this->newGetProjectRanks() : $ranks;
-
-		if (!isset($taxon['rank_id'])||$taxon['rank_id']==0) // shouldn't happen!
-			 return $taxon['taxon'];
-
-        if (isset($r[$taxon['rank_id']]['labels'][$this->getDefaultProjectLanguage()]))
-            $d = $r[$taxon['rank_id']]['labels'][$this->getDefaultProjectLanguage()];
-        else
-            $d = $r[$taxon['rank_id']]['rank'];
-
-        $rankId = $r[$taxon['rank_id']]['rank_id'];
-        $rankName = ucfirst($d);
-        $abbreviation = $r[$taxon['rank_id']]['abbreviation'];
-
-        // Rank level is above genus; no formatting
-        if ($rankId < GENUS_RANK_ID) {
-			return ($rankpos=='post' ? $taxon['taxon'].', '.$rankName : $rankName . ' ' . $taxon['taxon']);
-            //return $rankName . ' ' . $taxon['taxon'];
-        }
-
-        // Genus or subgenus; add italics
-        if ($rankId < SPECIES_RANK_ID && count($e) == 1) {
-			$name = ($rankpos=='post' ? '<span class="italics">' . $taxon['taxon'] . '</span>, '.$rankName : $rankName . '  <span class="italics">' . $taxon['taxon'] . '</span>');
-            //$name = $rankName . ' <span class="italics">' . $taxon['taxon'] . '</span>';
-        }
-
-        // Species
-        if ($rankId > GENUS_RANK_ID && count($e) == 2) {
-            $name = '<span class="italics">' . $taxon['taxon'] . '</span>';
-        }
-
-        // Regular infraspecies, name consists of three parts
-        if (count($e) == 3) {
-            $name = '<span class="italics">' . $e[0] . ' ' . $e[1] . (!empty($abbreviation) && $add_infixes ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[2] . '</span>';
-        }
-
-        // Single infraspecies with subgenus
-        if (count($e) == 4 && $e[1][0] == '(') {
-            $name = '<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] . (!empty($abbreviation) && $add_infixes ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[3] . '</span>';
-        }
-
-        // Return now if name has been set
-        if (isset($name)) {
-			return $add_hybrid_marker ? $this->setHybridMarker($name, $rankId, isset($taxon['is_hybrid']) ? $taxon['is_hybrid'] : 0): $name;
-        }
-
-
-        // Now we're handling more complicated cases. We need the parent before continuing
-        // say goodbye to the orphans
-		if (empty($taxon['parent_id'])) {
-            return $taxon['taxon'];
-        }
-
-        $parent = $this->getTaxonById($taxon['parent_id']);
-        // say goodbye to the misguided orphans
-        if (empty($parent['rank_id'])) {
-            return $taxon['taxon'];
-        }
-        $parentAbbreviation = $r[$parent['rank_id']]['abbreviation'];
-
-        // Double infraspecies
-        if (count($e) == 4) {
-            $name = '<span class="italics">' . $e[0] . ' ' . $e[1] . (!empty($parentAbbreviation) && $add_infixes ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') . $e[2] .
-             (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[3] . '</span>';
-        }
-
-        // Double infraspecies with subgenus
-        if (count($e) == 5 && $e[1][0] == '(') {
-            $name = '<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] . (!empty($parentAbbreviation) && $add_infixes ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') . $e[3] .
-             (!empty($abbreviation) && $add_infixes ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[4] . '</span>';
-        }
-
-        // Return now if name has been set
-        if (isset($name)) {
-            return $add_hybrid_marker ? $this->setHybridMarker($name, $rankId, $taxon['is_hybrid']) : $name;
-        }
-
-        // If we end up here something must be wrong, just return name sans formatting
-        return $taxon['taxon'];
-    }
-*/
-
-    public function formatTaxon($p=null) //($taxon,$ranks=null)
+    public function formatTaxon($p=null)
     {
 
 		if (is_null($p))
@@ -1270,6 +1162,7 @@ class Controller extends BaseClass
 		} else {
 			$taxon=$p;
 		}
+
 		$ranks=isset($p['ranks']) ? $p['ranks'] : null;
 		$rankpos=(isset($p['rankpos']) && in_array($p['rankpos'],array('pre','post','none')) ? $p['rankpos'] : null);
 
@@ -1279,6 +1172,7 @@ class Controller extends BaseClass
 		$addInfixes = $this->getShowAutomaticInfixes();
 
         $author = '';
+        // Strip author from taxon if present
         if (isset($taxon['authorship']) &&
             substr_compare($taxon['taxon'], $taxon['authorship'], -strlen($taxon['authorship'])) === 0) {
             $taxon['taxon'] = trim(str_replace($taxon['authorship'], '', $taxon['taxon']));
@@ -1325,13 +1219,16 @@ class Controller extends BaseClass
                 $subscript = ' <span class="italics">(' . $parent['taxon'] . ')</span>';
              }
 
+			//$txn=$taxon['taxon'];
+			$txn=$this->addHybridMarkerAndInfixes(array('name' => $taxon['taxon'], 'base_rank_id' => $rankId, 'taxon_id' => $taxon['id'], 'parent_id' => $taxon['parent_id']));
+
             switch ($rankpos) {
                 case 'none':
-                    return '<span class="italics">' . $taxon['taxon'] . '</span>' . $author;
+                    return '<span class="italics">' . $txn . '</span>' . $author;
                 case 'post':
-                    return '<span class="italics">' . $taxon['taxon'] . '</span>' . $author . ', ' . $rankName . $subscript;
+                    return '<span class="italics">' . $txn . '</span>' . $author . ', ' . $rankName . $subscript;
                 default:
-                    return $rankName . '  <span class="italics">' . $taxon['taxon'] . '</span>' . $author;
+                    return $rankName . '  <span class="italics">' . $txn . '</span>' . $author;
             }
         }
 
@@ -1352,7 +1249,7 @@ class Controller extends BaseClass
 
         // Return now if name has been set
         if (isset($name)) {
-            return $this->addHybridMarker(array('name' => $name, 'base_rank_id' => $rankId)) . $author;
+            return $this->addHybridMarker(array('name' => $name, 'base_rank_id' => $rankId, 'taxon_id' => $p['id'])) . $author;
         }
 
         // Now we're handling more complicated cases. We need the parent before continuing
@@ -1361,7 +1258,7 @@ class Controller extends BaseClass
             return $taxon['taxon'];
         }
 
-        $parent = $this->getTaxonById($taxon['parent_id']);
+        $parent = $this->getTaxonById($taxon['parent_id'],true);
         // say goodbye to the misguided orphans
         if (empty($parent['rank_id'])) {
             return $taxon['taxon'];
@@ -1375,21 +1272,22 @@ class Controller extends BaseClass
         }
 
         // Double infraspecies with subgenus
-        if (count($e) == 5 && $e[1][0] == '(') {
+        if (count($e) == 5 && (isset($e[1][0]) && $e[1][0] == '(')) {
             $name = '<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] . (!empty($parentAbbreviation) && $addInfixes ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') . $e[3] .
              (!empty($abbreviation) && $addInfixes ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[4] . '</span>';
         }
 
         // Return now if name has been set
         if (isset($name)) {
-			return $this->addHybridMarker(array('name' => $name, 'base_rank_id' => $rankId)) . $author;
+            return $this->addHybridMarkerAndInfixes(array('name' => $name, 'base_rank_id' => $rankId, 'taxon_id' => $taxon['id'], 'parent_id' => $taxon['parent_id'])) . $author;
+			//return $this->addHybridMarker(array('name' => $name, 'base_rank_id' => $rankId)) . $author;
         }
 
         // If we end up here something must be wrong, just return name sans formatting
         return $taxon['taxon'];
     }
 
-    private function setHybridMarker ($name, $rankId, $isHybrid)
+    private function setHybridMarker($name, $rankId, $isHybrid)
     {
         if ($isHybrid == 0)
 		{
@@ -2905,7 +2803,7 @@ class Controller extends BaseClass
 
 			if ( is_null($parent_id) && !is_null($taxon_id) )
 			{
-				$parent_id=$this->getTaxonById($this->getTaxonById($taxon_id,true)['parent_id'],true)['parent_id'];
+				$parent_id=$this->getTaxonById($taxon_id,true)['parent_id'];
 			}
 
 			if ( !is_null($parent_id) )
@@ -2926,7 +2824,22 @@ class Controller extends BaseClass
 			{
 				return $marker . $uninomial;
 			}
-			else
+
+
+			if ( is_null($parent_id) && !is_null($taxon_id) )
+			{
+				$parent_id=$this->getTaxonById($this->getTaxonById($taxon_id)['parent_id'])['id'];
+			}
+
+			if ( !is_null($parent_id) )
+			{
+				$parent=$this->getTaxonById($parent_id);
+				if ($parent['base_rank_id']==NOTHOGENUS_RANK_ID)
+				{
+					return $marker . ( isset($uninomial) ? $uninomial : $name );
+				}
+			}
+
 			if ( empty($name) )
 			{
 				return $marker;

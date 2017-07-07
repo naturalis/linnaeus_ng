@@ -181,6 +181,22 @@ class NsrController extends Controller
 
     }
 
+	// removes interfering noise from search term
+	protected function removeSearchNoise( $search )
+	{
+		$noise = [
+			$this->_hybridMarker,
+			$this->_hybridMarkerHtml,
+			$this->_formaMarker,
+			$this->_hybridMarker_graftChimaera,
+			$this->_varietyMarker,
+			$this->_subspeciesMarker,
+			$this->_nothoInfixPrefix . $this->_varietyMarker,
+			$this->_nothoInfixPrefix . $this->_subspeciesMarker,
+		];
+		 
+		return preg_replace('/(\s+)/',' ',str_replace($noise,' ', $search));
+	}
 
 
 	private function storeParentage($p)

@@ -1084,7 +1084,7 @@ class Controller extends BaseClass
 		);
     }
 
-    public function formatTaxon($p=null) //($taxon,$ranks=null)
+    public function formatTaxon($p=null)
     {
 
 		if (is_null($p))
@@ -1153,13 +1153,16 @@ class Controller extends BaseClass
                 $subscript = ' <span class="italics">(' . $parent['taxon'] . ')</span>';
              }
 
+			//$txn=$taxon['taxon'];
+			$txn=$this->addHybridMarkerAndInfixes(array('name' => $taxon['taxon'], 'base_rank_id' => $rankId, 'taxon_id' => $taxon['id'], 'parent_id' => $taxon['parent_id']));
+
             switch ($rankpos) {
                 case 'none':
-                    return '<span class="italics">' . $taxon['taxon'] . '</span>' . $author;
+                    return '<span class="italics">' . $txn . '</span>' . $author;
                 case 'post':
-                    return '<span class="italics">' . $taxon['taxon'] . '</span>' . $author . ', ' . $rankName . $subscript;
+                    return '<span class="italics">' . $txn . '</span>' . $author . ', ' . $rankName . $subscript;
                 default:
-                    return $rankName . '  <span class="italics">' . $taxon['taxon'] . '</span>' . $author;
+                    return $rankName . '  <span class="italics">' . $txn . '</span>' . $author;
             }
         }
 
@@ -1180,7 +1183,7 @@ class Controller extends BaseClass
 
         // Return now if name has been set
         if (isset($name)) {
-            return $this->addHybridMarker(array('name' => $name, 'base_rank_id' => $rankId)) . $author;
+            return $this->addHybridMarker(array('name' => $name, 'base_rank_id' => $rankId, 'taxon_id' => $p['id'])) . $author;
         }
 
         // Now we're handling more complicated cases. We need the parent before continuing
@@ -1210,7 +1213,8 @@ class Controller extends BaseClass
 
         // Return now if name has been set
         if (isset($name)) {
-			return $this->addHybridMarker(array('name' => $name, 'base_rank_id' => $rankId)) . $author;
+            return $this->addHybridMarkerAndInfixes(array('name' => $name, 'base_rank_id' => $rankId, 'taxon_id' => $taxon['id'], 'parent_id' => $taxon['parent_id'])) . $author;
+			//return $this->addHybridMarker(array('name' => $name, 'base_rank_id' => $rankId)) . $author;
         }
 
         // If we end up here something must be wrong, just return name sans formatting
@@ -1227,25 +1231,25 @@ class Controller extends BaseClass
 		return sprintf('%05s',$id);
 	}
 
-   private function setHybridMarker($name, $rankId, $isHybrid)
-    {
-        if ($isHybrid == 0)
+	private function setHybridMarker($name, $rankId, $isHybrid)
+	{
+		if ($isHybrid == 0)
 		{
-            return $name;
-        }
-
-        $marker = ($rankId == GRAFT_CHIMAERA_RANK_ID ? $this->_hybridMarker_graftChimaera : $this->_hybridMarkerHtml );
-
-        // intergeneric hybrid
-        if ($isHybrid == 2 || $rankId < SPECIES_RANK_ID)
+			return $name;
+		}
+		
+		$marker = ($rankId == GRAFT_CHIMAERA_RANK_ID ? $this->_hybridMarker_graftChimaera : $this->_hybridMarkerHtml );
+		
+		// intergeneric hybrid
+		if ($isHybrid == 2 || $rankId < SPECIES_RANK_ID)
 		{
-            return $marker . ' ' . $name;
-        }
+			return $marker . ' ' . $name;
+		}
+		
+		// interspecific hybrid; string is already formatted so take second space!!
+		return implode(' ' . $marker . ' ', explode(' ', $name, 3));
 
-        // interspecific hybrid; string is already formatted so take second space!!
-        return implode(' ' . $marker . ' ', explode(' ', $name, 3));
-
-    }
+	}
 
     private function getMainMenu ()
     {
@@ -2725,8 +2729,21 @@ class Controller extends BaseClass
 			 $base_rank_id==NOTHOSUBSPECIES_RANK_ID ||
 			 $base_rank_id==NOTHOVARIETAS_RANK_ID )
 		{
-
 			
+			if ( is_null($parent_id) && !is_null($taxon_id) )
+			{
+				$parent_id=$this->getTaxonById($taxon_id,true)['parent_id'];
+			}
+
+			if ( !is_null($parent_id) )
+			{
+				$parent=$this->getTaxonById($parent_id);
+				if ($parent['rank_id']==NOTHOGENUS_RANK_ID)
+				{
+					return $marker . ( isset($uninomial) ? $uninomial : $name );
+				}
+			}
+	
 			if ( !empty($specific_epithet) )
 			{
 				return $marker . $specific_epithet;
@@ -2852,8 +2869,17 @@ class Controller extends BaseClass
 			if ( !empty($name) && strpos($name,' ')!==false )
 			{
 				$ied=explode( ' ',  $name );
-				$ied[2] = '<span class="no-italics">' . $marker . '</span>' . ' ' . $ied[2];
-				return implode(' ',$ied);
+				if ( isset($ied[2]) )
+				{
+					$ied[2] = '<span class="no-italics">' . $marker . '</span>' . ' ' . $ied[2];
+					return implode(' ',$ied);
+				}
+				else
+				{
+					// not too sure about this one
+					$ied[1] = '<span class="no-italics">' . $marker . '</span>' . ' ' . $ied[1];
+					return implode(' ',$ied);
+				}
 			}
 		}
 		else

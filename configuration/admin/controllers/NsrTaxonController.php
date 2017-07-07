@@ -874,7 +874,7 @@ class NsrTaxonController extends NsrController
         $sort = isset($p['sort']) ? $p['sort'] : null;
         $offset = isset($p['offset']) ? $p['offset'] : null;
 
-		$search=trim($search);
+		$search=trim($this->removeSearchNoise($search));
 
 		if (empty($search) && empty($id) && $haveDeleted!='only')
 		{
@@ -904,11 +904,14 @@ class NsrTaxonController extends NsrController
 			
 			$taxa[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['id'],'parent_id'=>$val['parent_id'] ] );
 
-			//if ($val['nametype']==PREDICATE_VALID_NAME || $val['nametype']==PREDICATE_PREFERRED_NAME ||
-			if ($val['nametype']==PREDICATE_VALID_NAME ||
-			    (isset($val['synonym_base_rank_id']) && !empty($val['synonym_base_rank_id'])))
+			if ($val['nametype']==PREDICATE_VALID_NAME)
 			{
 				$taxa[$key]['label']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['label'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['id'],'parent_id'=>$val['parent_id'] ] );
+			}
+			else
+			if (isset($val['synonym_base_rank_id']) && !empty($val['synonym_base_rank_id']))
+			{
+				$taxa[$key]['label']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['label'],'base_rank_id'=>$val['synonym_base_rank_id'],'taxon_id'=>$val['id'],'parent_id'=>$val['parent_id'] ] );
 			}
 
 			if ($val['base_rank_id']==GENUS_RANK_ID)

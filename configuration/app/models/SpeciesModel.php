@@ -157,7 +157,7 @@ class SpeciesModel extends AbstractModel
 				_m.specific_epithet,
 				_m.infra_specific_epithet,
 				_m.authorship,
-				_f.rank_id,
+				_f.rank_id as base_rank_id,
 				_f.lower_taxon,
 				_g.label as rank,
 				ifnull(_q.label,_x.rank) as rank_label,
@@ -352,6 +352,7 @@ class SpeciesModel extends AbstractModel
             select
 				_a.id,
 				_a.taxon_id,
+				_t.parent_id,
 				_a.name,
 				_a.uninomial,
 				_a.specific_epithet,

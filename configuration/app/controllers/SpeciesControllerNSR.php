@@ -301,7 +301,7 @@ class SpeciesControllerNSR extends SpeciesController
         if ($this->rHasId())
 		{
 			$name=$this->getName(array('nameId'=>$this->rGetId()));
-
+			
 			$name['nametype']=sprintf($this->Rdf->translatePredicate($name['nametype']),$name['language_label']);
 
 			$taxon=$this->getTaxonById($name['taxon_id']);
@@ -330,6 +330,17 @@ class SpeciesControllerNSR extends SpeciesController
 		$this->tmp = array();
 
 		$this->_getTaxonClassification($id);
+		
+		$prevNotho=false;
+		foreach($this->tmp as $key=>$val)
+		{
+			$this->tmp[$key]['previous_is_notho']=$prevNotho;
+			$prevNotho=
+				$val['base_rank_id']==NOTHOSUBSPECIES_RANK_ID ||
+				$val['base_rank_id']==NOTHOVARIETAS_RANK_ID ||
+				$val['base_rank_id']==NOTHOGENUS_RANK_ID ||
+				$val['base_rank_id']==NOTHOSPECIES_RANK_ID;
+		}
 
 		return $this->tmp;
 	}
@@ -1146,10 +1157,11 @@ class SpeciesControllerNSR extends SpeciesController
 
 		if ($taxon)
 		{
-			$taxon['name']=$this->addHybridMarkerAndInfixes( [ 'name'=>$taxon['name'],'base_rank_id'=>$taxon['rank_id'], 'taxon_id' => $taxon['id'], 'parent_id' => $taxon['parent_id'] ] );
-			$taxon['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$taxon['taxon'],'base_rank_id'=>$taxon['rank_id'], 'taxon_id' => $taxon['id'], 'parent_id' => $taxon['parent_id'] ] );
-			$taxon['uninomial']=$this->addHybridMarkerAndInfixes( [ 'uninomial'=>$taxon['uninomial'],'base_rank_id'=>$taxon['rank_id'], 'taxon_id' => $taxon['id'], 'parent_id' => $taxon['parent_id'] ] );
-			$taxon['specific_epithet']=$this->addHybridMarkerAndInfixes( [ 'specific_epithet'=>$taxon['specific_epithet'],'base_rank_id'=>$taxon['rank_id'], 'taxon_id' => $taxon['id'], 'parent_id' => $taxon['parent_id'] ] );
+			$taxon['specific_epithet_no_markers']=$taxon['specific_epithet'];
+			$taxon['name']=$this->addHybridMarkerAndInfixes( [ 'name'=>$taxon['name'],'base_rank_id'=>$taxon['base_rank_id'], 'taxon_id' => $taxon['id'], 'parent_id' => $taxon['parent_id'] ] );
+			$taxon['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$taxon['taxon'],'base_rank_id'=>$taxon['base_rank_id'], 'taxon_id' => $taxon['id'], 'parent_id' => $taxon['parent_id'] ] );
+			$taxon['uninomial']=$this->addHybridMarkerAndInfixes( [ 'uninomial'=>$taxon['uninomial'],'base_rank_id'=>$taxon['base_rank_id'], 'taxon_id' => $taxon['id'], 'parent_id' => $taxon['parent_id'] ] );
+			$taxon['specific_epithet']=$this->addHybridMarkerAndInfixes( [ 'specific_epithet'=>$taxon['specific_epithet_no_markers'],'base_rank_id'=>$taxon['base_rank_id'], 'taxon_id' => $taxon['id'], 'parent_id' => $taxon['parent_id'] ] );
 
 			array_unshift($this->tmp,$taxon);
 
@@ -1250,7 +1262,7 @@ class SpeciesControllerNSR extends SpeciesController
 		foreach((array)$classification as $key=>$val)
 		{
 			if (is_null($prev) || $key==$prev || $val['id']==$current_taxon)
-				$classification[$key]['species_count']=$this->getSpeciesCount(array('id'=>$val['id'],'rank'=>$val['rank_id']));
+				$classification[$key]['species_count']=$this->getSpeciesCount(array('id'=>$val['id'],'rank'=>$val['base_rank_id']));
 		}
 
 		return $classification;
@@ -1275,12 +1287,12 @@ class SpeciesControllerNSR extends SpeciesController
 
 		if ($d['nametype']==PREDICATE_VALID_NAME && $d['language_id']==LANGUAGE_ID_SCIENTIFIC)
 		{
-		    $d['name']=$this->addHybridMarkerAndInfixes([ 'name'=>$d['name'],'base_rank_id'=>$d['base_rank_id'], 'taxon_id' => $taxonId ] );
+		    $d['name']=$this->addHybridMarkerAndInfixes([ 'name'=>$d['name'], 'base_rank_id'=>$d['base_rank_id'], 'taxon_id' => $d['taxon_id'], 'parent_id' => $d['parent_id'] ] );
 		}
 		else
 		if (isset($d['synonym_base_rank_id']) && !empty($d['synonym_base_rank_id']))
 		{
-		    $d['name']=$this->addHybridMarkerAndInfixes([ 'name'=>$d['name'],'base_rank_id'=>$d['synonym_base_rank_id'], 'taxon_id' => $taxonId ] );
+		    $d['name']=$this->addHybridMarkerAndInfixes([ 'name'=>$d['name'], 'base_rank_id'=>$d['synonym_base_rank_id'], 'taxon_id' => $d['taxon_id'], 'parent_id' => $d['parent_id'] ] );
 		}
 
 		$d['addition']=$this->getNameAddition(array('name_id'=>$d['id']));
@@ -1941,9 +1953,6 @@ class SpeciesControllerNSR extends SpeciesController
 		return $data[0];
 	}
 
-
-
-
 	private function getVerspreidingsatlasData($id)
 	{
 
@@ -1994,4 +2003,5 @@ class SpeciesControllerNSR extends SpeciesController
 
 		return $data;
 	}
+
 }

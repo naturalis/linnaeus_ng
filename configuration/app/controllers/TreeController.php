@@ -187,7 +187,6 @@ class TreeController extends Controller
 
 		foreach((array)$taxa as $key=>$val)
 		{
-
 			if ($count=='taxon')
 			{
 				if ( $this->_tree_taxon_count_style=='species_only' || $this->_tree_taxon_count_style=='species_established')
@@ -228,8 +227,8 @@ class TreeController extends Controller
 				$val['child_count']=null;
 			}
 
-			$val['taxon'] = $this->formatTaxon(array_merge($val, ['ranks' => $ranks, 'rankpos' => 'none']));
-			$val['label']=empty($val['name']) ? $val['taxon'] : $val['name'].' ('.$val['taxon'].')';
+			$val['taxon']=$this->formatTaxon(array_merge($val, ['ranks' => $ranks, 'rankpos' => 'none']));
+			$val['label']=(empty($val['name']) ? $val['taxon'] : $val['name'].' ('.$val['taxon'].')');
 
 			unset($val['parent_id']);
 			unset($val['is_hybrid']);
@@ -255,13 +254,14 @@ class TreeController extends Controller
 
 		$x1=$this->_hybridMarkerHtml;
 		$x2=$this->_hybridMarker_graftChimaera;
+		$x3=$this->_hybridMarker;
 
 		usort(
 			$progeny,
-			function($a,$b) use ($x1,$x2)
+			function($a,$b) use ($x1,$x2,$x3)
 			{
-				$aa=strtolower(str_replace([$x1,$x2,' '], '' , strip_tags($a['label'])));
-				$bb=strtolower(str_replace([$x1,$x2,' '], '' , strip_tags($b['label'])));
+				$aa=strtolower(str_replace([$x1,$x2,$x3,' '], '' , strip_tags($a['label'])));
+				$bb=strtolower(str_replace([$x1,$x2,$x3,' '], '' , strip_tags($b['label'])));
 				return ($aa==$bb ? 0 : ($aa>$bb ? 1 : -1));
 			}
 		);

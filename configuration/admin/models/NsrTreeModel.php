@@ -50,7 +50,7 @@ final class NsrTreeModel extends AbstractModel
 					_m.authorship,
 					_r.rank,
 					if(ifnull(_q.label,'')='',_r.rank,_q.label) as rank_label,
-					_p.rank_id as base_rank
+					_p.rank_id as base_rank_id
 
 				from
 					%PRE%taxa _a

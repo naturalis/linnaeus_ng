@@ -83,6 +83,7 @@ final class TreeModel extends AbstractModel
 				_a.parent_id,
 				_a.is_hybrid,
 				_a.rank_id,
+				_p.rank_id as base_rank_id,
 				_a.taxon,
 				ifnull(_k.name,_l.commonname) as name,
 				_m.authorship,
