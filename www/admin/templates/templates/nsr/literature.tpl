@@ -80,10 +80,24 @@ function del_ref( id )
     <h4>{t}referenced literature{/t}</h4>
     <ul id="old_refs">
     {foreach $literature v k}
-    <li>
-    	{if $v.author_name}{$v.author_name} {/if}{if $v.date}{$v.date}. {/if}{$v.label}
-        <a href="#" onclick="del_ref({$v.literature_taxa_id});return false;" style="padding:0 5px 0 5px"> x </a>
-	</li>
+
+        {capture authors}
+            {foreach from=$v.authors a u}
+                {$a.name}{if $v.authors|@count>1 && $u<$v.authors|@count-1}{if $u==$v.authors|@count-2} &{else},{/if}{/if}
+            {/foreach}
+        {/capture}
+
+        <li>
+            {if $v.author}
+            {$v.author}
+            {else}
+            {if ($smarty.capture.authors|@trim|@strlen)>0}
+            {$smarty.capture.authors|@trim}
+            {/if}
+            {/if}
+            {if $v.date} {$v.date}{/if}{if $v.author_name || $v.date}. {/if}{$v.label}
+	        <a href="#" onclick="del_ref({$v.literature_taxa_id});return false;" style="padding:0 5px 0 5px"> x </a>
+        </li>
     {/foreach}
     </ul>
 </p>
