@@ -38,7 +38,11 @@
                 {if $v->label|@trim|@strlen>0}{$v->label|@trim}{if !($v->label|@trim|@substr:-1)|@in_array:array('?','!','.')}. {/if}{/if}
                 {if $v->periodical_id}{$v->periodical_ref->label} {elseif $v->periodical}{$v->periodical} {/if}
                 {if $v->publishedin_id}{$v->publishedin_ref->label} {elseif $v->publishedin}{$v->publishedin} {/if}
-                {if $v->volume}{$v->volume}{/if}{if $v->pages}: {$v->pages}. {/if}
+                {if $v->volume}{$v->volume}{/if}
+                {if ($v->periodical_id && $v->periodical_ref->label || $v->periodical) ||
+                	($v->publishedin_id && $v->publishedin_ref->label || $v->publishedin) ||
+	                ($v->volume)}: {/if}
+                {if $v->pages}{$v->pages}. {/if}
                 {if $v->publisher}{$v->publisher}.{/if}      
                 </a>
 	        {if $external_content->content_json_decoded->result->references|@count>1}</li>{/if}
