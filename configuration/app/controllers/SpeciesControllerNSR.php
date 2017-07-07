@@ -919,7 +919,7 @@ class SpeciesControllerNSR extends SpeciesController
 		{
 			$prevs[]=$key;
 
-			if ($val['nametype']==PREDICATE_SYNONYM)
+			if ($val['nametype']==PREDICATE_SYNONYM || $val['nametype']==PREDICATE_SYNONYM_SL)
 			{
 				if ($synonymStartIndex==-1) $synonymStartIndex=$i;
 				$synonymCount++;

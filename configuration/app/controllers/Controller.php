@@ -1221,7 +1221,7 @@ class Controller extends BaseClass
         return $taxon['taxon'];
     }
 
-    public function formatSynonym ($name)
+    public function formatSynonym($name)
     {
         return '<span class="italics">' . $name . '</span>';
     }
