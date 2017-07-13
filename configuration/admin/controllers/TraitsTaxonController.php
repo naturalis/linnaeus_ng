@@ -398,6 +398,13 @@ class TraitsTaxonController extends TraitsController
 				));
 			}		
 		}
+		
+		
+		$after=$this->getTaxonValues(array('taxon'=>$taxon,'trait'=>$trait));
+		$taxon=$this->getTaxonById( $taxon );
+
+		$this->logChange( [ 'before'=>$existing,'after'=>$after,'note'=> 'updated values for trait ' . $t['sysname'] . ' for ' . $taxon['nomen'] ] );
+
 	}
 
 	private function getReferences( $p )
@@ -437,6 +444,8 @@ class TraitsTaxonController extends TraitsController
 		if ( empty($taxon) || empty($group) )
 			return;
 
+		$before=$this->getReferences( $p );
+
 		$keep=array(-1);
 		$new=array();
 
@@ -466,6 +475,12 @@ class TraitsTaxonController extends TraitsController
 				'reference_id'=>$val
 			));
 		}
+		
+		$after=$this->getReferences( $p );
+		$taxon=$this->getTaxonById( $taxon );
+		$group=$this->getTraitgroup( $group );
+		
+		$this->logChange( [ 'before'=>$before,'after'=>$after,'note'=> 'updated references for trait ' . $group['sysname'] . ' for ' . $taxon['nomen'] ] );
 
 	}
 
@@ -503,6 +518,12 @@ class TraitsTaxonController extends TraitsController
 				}
 			}
 		}
+		
+		$taxon=$this->getTaxonById( $taxon );
+		$group=$this->getTraitgroup( $group );
+		
+		$this->logChange( [ 'before'=>$data,'note'=> 'deleted values for trait group ' . $group['sysname'] . ' for ' . $taxon['nomen'] ] );
+
 	}
 						
 	private function deleteReferences( $p )

@@ -38,6 +38,7 @@ class TraitsController extends Controller
 
 	public function getTraitsSettings()
 	{
+		//REFAC2015: all these should go to central settings
         $s=$this->models->TraitsSettings->_get(
 			array(
 				'id' => array('project_id' => $this->getCurrentProjectId()),

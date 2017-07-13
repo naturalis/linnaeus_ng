@@ -2,6 +2,7 @@
 
 /*
 
+	REFAC2015
 	dude, are you COMPLETELY deleting trait groups!?
 	NO! need to delete traits as well! + texts
 	
@@ -376,6 +377,16 @@ class TraitsTraitsController extends TraitsController
 		$help_link_url=!empty($p['help_link_url']) ? $p['help_link_url'] : 'null';
 
 		if ( is_null($sysname) ) return false;
+		
+		if (!empty($id))
+		{
+			$before=$this->getTraitgroup($id);
+			unset($before['parent']);
+		}
+		else
+		{
+			$before=null;
+		}
 
 		$this->models->TraitsGroups->save(array(
 			'id'=>$id,
@@ -388,6 +399,8 @@ class TraitsTraitsController extends TraitsController
 		));
 
 		if (empty($id)) $id=$this->models->TraitsGroups->getNewId();
+
+		$this->logChange(array('before'=>$before,'after'=>$this->getTraitgroup($id),'note'=> (is_null($before) ? 'created' : 'updated') . ' trait group '.$sysname));
 
 		$textids=$this->storeTranslations(
 			array(
@@ -456,6 +469,8 @@ class TraitsTraitsController extends TraitsController
 			array('parent_id'=>'null'),
 			array('project_id'=>$this->getCurrentProjectId(),'parent_id'=>(int)$id)
 		);
+
+		$this->logChange(array('before'=>$g,'note'=> 'deleted trait group '.$g['sysname']));
 
 		return true;
 	}
@@ -560,6 +575,15 @@ class TraitsTraitsController extends TraitsController
 			);
 
 		if (!empty($id)) $d['id']=$id;
+		
+		if (!empty($id))
+		{
+			$before=$this->getTraitgroupTrait( [ 'trait'=>$id ] );
+		}
+		else
+		{
+			$before=null;
+		}
 
 		$d=$this->models->TraitsTraits->save($d);
 
@@ -567,6 +591,8 @@ class TraitsTraitsController extends TraitsController
 		{
 
 			if (empty($id)) $id=$this->models->TraitsTraits->getNewId();
+			
+			$this->logChange( [ 'before'=>$before,'after'=>$this->getTraitgroupTrait( [ 'trait'=>$id ] ),'note'=> (is_null($before) ? 'created' : 'updated' ) . ' trait '.$sysname ] );
 
 			$trait=$this->models->TraitsTraits->_get(array('id'=>array(
 				'id'=>$id,
@@ -652,14 +678,14 @@ class TraitsTraitsController extends TraitsController
 	
 	private function saveTraitgroupTraitValues($p)
 	{
-		$trait=isset($p['trait']) ? $p['trait'] : null;
+		$trait_id=isset($p['trait']) ? $p['trait'] : null;
 		$values=isset($p['values']) ? $p['values'] : null;
 		$valuelabels=isset($p['valuelabels']) ? $p['valuelabels'] : null;
 		$sortable=isset($p['sortable']) ? $p['sortable'] : null;
 
-		if (empty($trait))
+		if (empty($trait_id))
 		{
-			if (empty($trait)) $this->addError($this->translate('Missing trait ID.'));
+			if (empty($trait_id)) $this->addError($this->translate('Missing trait ID.'));
 			if (empty($values)) $this->addError($this->translate('No values to save.'));
 			$this->addError($this->translate('Values not saved'));
 			return;
@@ -672,10 +698,11 @@ class TraitsTraitsController extends TraitsController
 				'project_id'=>$this->getCurrentProjectId(),
 				'trait_id'=>$trait['id']
 			);
-		
+
+		$before=$this->getTraitgroupTraitValues( [ 'trait' => $trait_id ] );
 
 		// get the current values
-		$current=$this->models->TraitsValues->_get(array('id'=>$base));
+		$current=$this->models->TraitsValues->_get( [ 'id' => $base ] );
 		
 		if ($trait['type_sysname']=='stringlist' || $trait['type_sysname']=='stringlistfree')
 		{
@@ -833,6 +860,10 @@ class TraitsTraitsController extends TraitsController
 
 		}
 
+		$after=$this->getTraitgroupTraitValues( [ 'trait'=>$trait_id ] );
+		
+		$this->logChange( [ 'before'=>$before,'after'=>$after,'note'=> 'updated values for trait '.$trait['sysname'] ] );
+		
 		if ( !is_null($sortable) )
 		{
 			foreach((array)$sortable as $key=>$val)

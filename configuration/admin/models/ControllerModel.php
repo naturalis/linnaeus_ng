@@ -31,6 +31,7 @@ final class ControllerModel extends AbstractModel
         $project_id = isset($params['project_id']) ? $params['project_id'] :  null;
         $taxon_id = isset($params['taxon_id']) ? $params['taxon_id'] : null;
         $name = isset($params['name']) ? $params['name'] : null;
+        $type_id_valid_name = isset($params['type_id_valid_name']) ? $params['type_id_valid_name'] : null;
 
 		if ( is_null($project_id) || ( is_null($taxon_id) && is_null($name) ) ) return;
 
@@ -47,6 +48,7 @@ final class ControllerModel extends AbstractModel
 				_p.rank_id as base_rank,
 				_p.rank_id as base_rank_id,
 				_p.lower_taxon as lower_taxon,
+			" . (!is_null($type_id_valid_name) ? "trim(replace(concat(ifnull(_n.uninomial,''),' ',ifnull(_n.specific_epithet,''),' ',ifnull(_n.infra_specific_epithet,'')),'  ',' ')) as nomen, " : "") ."
 				_r.rank as rank
 
 			from
@@ -58,10 +60,20 @@ final class ControllerModel extends AbstractModel
 
 			left join %PRE%ranks _r
 				on _p.rank_id = _r.id
+				
+			" . (!is_null($type_id_valid_name) ? "
+
+			left join %PRE%names _n
+				on _a.id = _n.taxon_id
+				and _a.project_id = _n.project_id
+				and _n.type_id = " . $type_id_valid_name 
+			: "" ) . "
 
 			where
 				_a.project_id = " . $project_id . "
 				and " . ( is_null($taxon_id) ? "_a.taxon = '" . $this->escapeString($name) ."'" : "_a.id = " . $taxon_id ) . "
+
+			limit 1
 			";
 
 		$d=$this->freeQuery( $query );

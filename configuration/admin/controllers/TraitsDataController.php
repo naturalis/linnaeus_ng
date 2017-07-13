@@ -7,7 +7,7 @@
 		tab as field sep
 		'Species',
 
-
+	//REFAC2015: finish these
 	// check functions
 	v	check_boolean
 	v	check_stringlist
@@ -1079,6 +1079,10 @@ class TraitsDataController extends TraitsController
 			{
 				$saved++;
 				$savedtaxabycolumn[$c]=$val['taxon_id'];
+
+				$after=$this->models->TraitsTaxonValues->_get( [ 'id' => $this->models->TraitsTaxonValues->getNewId() ] );
+				$taxon=$this->getTaxonById($val['taxon_id']);
+				$this->logChange( [ 'after'=>$after,'note'=> 'bulk add taxon trait values for ' . $taxon['nomen'] ] );
 			}
 			else
 			{
@@ -1106,6 +1110,10 @@ class TraitsDataController extends TraitsController
 			{
 				$saved++;
 				$savedtaxabycolumn[$c]=$val['taxon_id'];
+				
+				$after=$this->models->TraitsTaxonFreevalues->_get( [ 'id' => $this->models->TraitsTaxonFreevalues->getNewId() ] );
+				$taxon=$this->getTaxonById($val['taxon_id']);
+				$this->logChange( [ 'after'=>$after,'note'=> 'bulk add taxon trait free values for ' . $taxon['nomen'] ] );
 			}
 			else
 			{
@@ -1122,8 +1130,7 @@ class TraitsDataController extends TraitsController
 				'trait_group_id'=>$data['traitgroup'],
 				'taxon_id'=>$taxon_id
 			));			
-			
-			
+
 			if ( isset($data['references'][$column]['valid']) )
 			{
 				foreach((array)$data['references'][$column]['valid'] as $ref)
@@ -1136,8 +1143,17 @@ class TraitsDataController extends TraitsController
 							'taxon_id'=>$taxon_id,
 							'reference_id'=>$ref['id'],
 						));
+						
 					}
 				}
+
+				$taxon=$this->getTaxonById($taxon_id);
+				$after=$this->models->TraitsTaxonReferences->_get( [ 'id' => [
+					'project_id'=>$this->getCurrentProjectId(),
+					'trait_group_id'=>$data['traitgroup'],
+					'taxon_id'=>$taxon_id
+				] ] );
+				$this->logChange( [ 'after'=>$after,'note'=> 'bulk add taxon trait references for ' . $taxon['nomen'] ] );
 			}
 		}
 		
