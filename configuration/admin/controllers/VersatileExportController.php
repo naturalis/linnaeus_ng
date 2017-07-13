@@ -389,7 +389,9 @@ class VersatileExportController extends Controller
 		{
 			foreach((array)$this->names as $key=>$val)
 			{
-				$this->names[$key]['scientific_name']=preg_replace('/(\s+)/',' ',strip_tags($val['scientific_name']));
+				$this->names[$key]['scientific_name']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['scientific_name'],'base_rank_id'=>$val['_base_rank_id'],'taxon_id'=>$val['_taxon_id'],'parent_id'=>$val['_parent_id'] ] );
+				$this->names[$key]['scientific_name']=html_entity_decode(strip_tags($this->names[$key]['scientific_name']));
+				//$this->names[$key]['scientific_name']=preg_replace('/(\s+)/',' ',strip_tags($val['scientific_name']));
 			}
 		}
 

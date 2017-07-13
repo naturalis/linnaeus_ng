@@ -145,7 +145,6 @@ class SearchControllerNSR extends SearchController
 
     public function searchAction()
     {
-
 		$search=null;
 		
 		if ($this->rHasVal('search'))
@@ -420,6 +419,7 @@ class SearchControllerNSR extends SearchController
 		foreach((array)$data as $key=>$val)
 		{
 			$data[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['taxon_id'],'parent_id'=>$val['parent_id'] ] );
+			$data[$key]['taxon_download']=html_entity_decode(strip_tags($data[$key]['taxon']));
 			$data[$key]['overview_image']=$this->getTaxonOverviewImage($val['taxon_id']);
 		}
 
@@ -517,6 +517,7 @@ class SearchControllerNSR extends SearchController
 		foreach((array)$data as $key=>$val)
 		{
 			$data[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['taxon_id'],'parent_id'=>$val['parent_id'] ] );
+			$data[$key]['taxon_download']=html_entity_decode(strip_tags($data[$key]['taxon']));
 			$data[$key]['overview_image']=$this->getTaxonOverviewImage($val['taxon_id']);
 			if ( $this->_show_all_preferred_names_in_results )
 			{

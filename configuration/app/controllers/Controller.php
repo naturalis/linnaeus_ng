@@ -2781,7 +2781,7 @@ class Controller extends BaseClass
 				*/
 			    $f = strip_tags($name);
 			    $ied=explode(' ', $f, 2);
-				$r = $ied[0]. '  ' . $marker . $ied[1];
+				$r = $ied[0]. ' ' . $marker . $ied[1];
 				return str_replace($f, $r, $name);
 
 			}

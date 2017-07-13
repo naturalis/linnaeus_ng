@@ -132,7 +132,7 @@ function doSubmit()
 	{
 		m.push(_('select a taxon.'));
 	}
-	if ( $( '#selected_ranks li' ).size()<1 )
+	if ( $( '#selected_ranks li' ).length<1 )
 	{
 		m.push(_('select at least one rank.'));
 	}
@@ -243,7 +243,7 @@ function doSubmit()
                     <td style="vertical-align:top;">
                         {t}Display only taxa with the following rank{/t}:<br />
                         <span class=remark>({t}double-click to remove{/t})</span>
-                        <span class=remark><a  href="#"
+                        <span class=remark><a href="#"
                         	onclick="$( '.selected_ranks' ).each(function(index, element) {
                             $(this).remove();checkRanksOp(); });return false;">{t}remove all{/t}</a></span>
                     </td>
