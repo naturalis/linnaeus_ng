@@ -32,7 +32,7 @@ $(document).ready(function()
 var baseurl;
 //var basedata={};
 var results=[];
-var maxresults=5;
+var maxresults={if $external_content->template_params_decoded->max_results}{$external_content->template_params_decoded->max_results}{else}5{/if};
 var totresults=0;
 var urls=[];
 var searchName="";
