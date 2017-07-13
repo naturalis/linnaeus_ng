@@ -1088,7 +1088,6 @@ final class SearchNSRModel extends AbstractModel
 		
 		$query="
 			select
-				distinct 
 				_a.taxon_id as id,
 				concat(_d.taxon,if(_c.name is null,'',concat(' - ',_c.name)),' [',ifnull(_g.label,_r.rank),']') as label,
 				_d.taxon as scientific_name,
@@ -1201,6 +1200,8 @@ final class SearchNSRModel extends AbstractModel
 				" . ( $lower_only ? "and _f.rank_id >= ".SPECIES_RANK_ID : "" )."
 				and " . $clause ."
 				" . ( $restrict_language ? "and (_a.language_id=".$language_id." or _a.language_id=".LANGUAGE_ID_SCIENTIFIC.")" : "" ) . "
+
+			group by _a.taxon_id
 
 			order by " . $order . "
 			" . ( !is_null($limit) ? "limit ".$limit : "" )
