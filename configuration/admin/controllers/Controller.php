@@ -1234,22 +1234,27 @@ class Controller extends BaseClass
 
         // Species
         if ($rankId > GENUS_RANK_ID && count($e) == 2) {
-            $name = '<span class="italics">' . $taxon['taxon'] . '</span>';
+            //$name = '<span class="italics">' . $taxon['taxon'] . '</span>';
+            $name = $taxon['taxon'];
         }
 
         // Regular infraspecies, name consists of three parts
         if (count($e) == 3) {
-            $name = '<span class="italics">' . $e[0] . ' ' . $e[1] . (!empty($abbreviation) && $addInfixes ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[2] . '</span>';
+            //$name = '<span class="italics">' . $e[0] . ' ' . $e[1] . (!empty($abbreviation) && $addInfixes ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[2] . '</span>';
+			// abbreviation handled by addHybridMarkerAndInfixes
+            $name = $e[0] . ' ' . $e[1] . ' ' . $e[2] ;
         }
 
         // Single infraspecies with subgenus
         if (count($e) == 4 && $e[1][0] == '(') {
-            $name = '<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] . (!empty($abbreviation) && $addInfixes ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[3] . '</span>';
+            //$name = '<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] . (!empty($abbreviation) && $addInfixes ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[3] . '</span>';
+			// abbreviation handled by addHybridMarkerAndInfixes
+            $name = $e[0] . ' ' . $e[1] . ' ' . $e[2] . ' '. $e[3];
         }
 
         // Return now if name has been set
         if (isset($name)) {
-            return $this->addHybridMarker(array('name' => $name, 'base_rank_id' => $rankId, 'taxon_id' => $p['id'])) . $author;
+            return '<span class="italics">' . $this->addHybridMarkerAndInfixes( [ 'name' => $name, 'base_rank_id' => $rankId, 'taxon_id' => $p['id'] ] )  . '</span>' . $author;
         }
 
         // Now we're handling more complicated cases. We need the parent before continuing
@@ -2913,7 +2918,7 @@ class Controller extends BaseClass
 			if ( !empty($name) && strpos($name,' ')!==false )
 			{
 				$ied=explode( ' ',  $name );
-				$ied[3] = '<span class="no-italics">' . $marker . '</span>' . ' ' . $ied[3];
+				$ied[2] = '<span class="no-italics">' . $marker . '</span>' . ' ' . $ied[2];
 				return implode(' ',$ied);
 			}
 		}
@@ -2956,7 +2961,8 @@ class Controller extends BaseClass
 		else
 		if ( $base_rank_id==NOTHOSUBSPECIES_RANK_ID )
 		{
-			$marker=$this->getShowAutomaticInfixes() ? 'notho' . $marker : '';
+			// REFAC2015: $this->_nothoInfixPrefix . $marker --> should come from ranks.abbreviation
+			$marker=$this->getShowAutomaticInfixes() ? $this->_nothoInfixPrefix . $marker : '';
 			
 			if ( !empty($infra_specific_epithet) )
 			{
@@ -2966,9 +2972,10 @@ class Controller extends BaseClass
 			if ( !empty($name) && strpos($name,' ')!==false )
 			{
 				$ied=explode( ' ',  $name );
-				if ( isset($ied[3]) )
+
+				if ( isset($ied[2]) )
 				{
-					$ied[3] = '<span class="no-italics">' . $marker . '</span>' . ' ' . $ied[3];
+					$ied[2] = '<span class="no-italics">' . $marker . '</span>' . ' ' . $ied[2];
 					return implode(' ',$ied);
 				}
 				else
