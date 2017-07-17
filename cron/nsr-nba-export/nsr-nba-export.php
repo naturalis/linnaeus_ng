@@ -1,6 +1,6 @@
 <?php
 
-	$outdir = "/var/opt/nba-brondata-nsr/";
+	$outdir = "/var/opt/nba-brondata-nsr/"; // root@various-linnaeusng-027:/var/opt# git clone git@git-brondata-nsr:naturalis/nba-brondata-nsr.git
 	$outfilebasename = "nsr-export";
 	$filelist = "filelist";
 	$compressor = "compress.sh";
