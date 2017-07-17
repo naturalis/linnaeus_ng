@@ -193,7 +193,10 @@ class NsrTreeController extends NsrController
 			}
 			else
 			{
-				$val['has_children']=$childCount>0;
+				$val['has_children']=$this->models->NsrTreeModel->hasChildren(array(
+					"project_id"=>$this->getCurrentProjectId(),
+					"node"=>$val['id']
+				));
 				$progeny[]=$val;
 			}
 

@@ -194,4 +194,35 @@ final class NsrTreeModel extends AbstractModel
 		return $d[0]['total'];
 	}
 
+	public function hasChildren( $params )
+	{
+		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
+		$node = isset($params['node']) ? $params['node'] : null;
+
+		if ( is_null($project_id) || is_null($node) )
+			return;
+
+		$query="
+			select
+				count(*) as total
+			from
+				%PRE%taxa _a
+	
+			left join %PRE%trash_can _trash
+				on _a.project_id = _trash.project_id
+				and _a.id = _trash.lng_id
+				and _trash.item_type='taxon'
+	
+			where 
+				_a.project_id = ".$project_id." 
+				and ifnull(_trash.is_deleted,0)=0
+				and _a.parent_id = ".$node
+		;
+
+		$d=$this->freeQuery( $query );
+		
+		return $d[0]['total']>0;
+	}
+
+
 }
