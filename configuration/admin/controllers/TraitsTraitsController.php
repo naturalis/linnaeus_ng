@@ -400,8 +400,6 @@ class TraitsTraitsController extends TraitsController
 
 		if (empty($id)) $id=$this->models->TraitsGroups->getNewId();
 
-		$this->logChange(array('before'=>$before,'after'=>$this->getTraitgroup($id),'note'=> (is_null($before) ? 'created' : 'updated') . ' trait group '.$sysname));
-
 		$textids=$this->storeTranslations(
 			array(
 				'record'=>$this->getTraitgroup($id),
@@ -413,10 +411,13 @@ class TraitsTraitsController extends TraitsController
 			)
 		);
 		
+		
 		foreach((array)$textids as $col=>$text_id)
 		{
 			$this->models->TraitsGroups->update(array($col=>$text_id),array('id'=>$id));
 		}
+	
+		$this->logChange(array('before'=>$before,'after'=>$this->getTraitgroup($id),'note'=> (is_null($before) ? 'created' : 'updated') . ' trait group '.$sysname));
 
 		return true;
 	}
@@ -592,8 +593,6 @@ class TraitsTraitsController extends TraitsController
 
 			if (empty($id)) $id=$this->models->TraitsTraits->getNewId();
 			
-			$this->logChange( [ 'before'=>$before,'after'=>$this->getTraitgroupTrait( [ 'trait'=>$id ] ),'note'=> (is_null($before) ? 'created' : 'updated' ) . ' trait '.$sysname ] );
-
 			$trait=$this->models->TraitsTraits->_get(array('id'=>array(
 				'id'=>$id,
 				'project_id'=>$this->getCurrentProjectId(),
@@ -614,6 +613,8 @@ class TraitsTraitsController extends TraitsController
 			{
 				$this->models->TraitsTraits->update(array($col=>$text_id),array('id'=>$id));
 			}
+
+			$this->logChange( [ 'before'=>$before,'after'=>$this->getTraitgroupTrait( [ 'trait'=>$id ] ),'note'=> (is_null($before) ? 'created' : 'updated' ) . ' trait '.$sysname ] );
 
 			return true;
 
