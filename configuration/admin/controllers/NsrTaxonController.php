@@ -722,12 +722,12 @@ class NsrTaxonController extends NsrController
 
 			if ($val['language_id']==LANGUAGE_ID_SCIENTIFIC && $val['nametype']==PREDICATE_VALID_NAME)
 			{
-				$names[$key]['name_no_tags']=$this->addHybridMarkerAndInfixes( [ 'name'=>$names[$key]['name_no_tags'],'base_rank_id'=>$base_rank_id,'taxon_id'=>$taxon_id ] );
+				$names[$key]['name_no_tags']=strip_tags($this->addHybridMarkerAndInfixes( [ 'name'=>$names[$key]['name_no_tags'],'base_rank_id'=>$base_rank_id,'taxon_id'=>$taxon_id ] ));
 			}
 			else
 			if ($val['language_id']==LANGUAGE_ID_SCIENTIFIC && $val['nametype']!=PREDICATE_VALID_NAME && isset($val['rank_id']))
 			{
-				$names[$key]['name_no_tags']=$this->addHybridMarkerAndInfixes( [ 'name'=>$names[$key]['name_no_tags'],'base_rank_id'=>$val['rank_id'],'taxon_id'=>$taxon_id ] );
+				$names[$key]['name_no_tags']=strip_tags($this->addHybridMarkerAndInfixes( [ 'name'=>$names[$key]['name_no_tags'],'base_rank_id'=>$val['rank_id'],'taxon_id'=>$taxon_id ] ));
 			}
 
 			$names[$key]['addition']=$this->getNameAddition(array('name_id'=>$val['id']));

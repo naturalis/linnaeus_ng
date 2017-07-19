@@ -2901,7 +2901,7 @@ class Controller extends BaseClass
 			if ( !empty($name) && strpos($name,' ')!==false )
 			{
 				$ied=explode( ' ',  $name );
-				$ied[2] = '<span class="no-italics">' . $marker . '</span>' . ' ' . $ied[2];
+				$ied[2] = '</span><span>' . $marker . '</span>' . ' <span class="italics">' . $ied[2];
 				return implode(' ',$ied);
 			}
 		}
@@ -2918,7 +2918,7 @@ class Controller extends BaseClass
 			if ( !empty($name) && strpos($name,' ')!==false )
 			{
 				$ied=explode( ' ',  $name );
-				$ied[2] = '<span class="no-italics">' . $marker . '</span>' . ' ' . $ied[2];
+				$ied[2] = '</span><span>' . $marker . '</span>' . ' <span class="italics">' . $ied[2];
 				return implode(' ',$ied);
 			}
 		}
@@ -2948,7 +2948,7 @@ class Controller extends BaseClass
 				$ied=explode( ' ',  $name );
 				if ( isset($ied[2]) )
 				{
-					$ied[2] = '<span class="no-italics">' . $marker . '</span>' . ' ' . $ied[2];
+					$ied[2] = '</span><span>' . $marker . '</span>' . ' <span class="italics">' . $ied[2];
 					return implode(' ',$ied);
 				}
 				else
@@ -2975,7 +2975,7 @@ class Controller extends BaseClass
 
 				if ( isset($ied[2]) )
 				{
-					$ied[2] = '<span class="no-italics">' . $marker . '</span>' . ' ' . $ied[2];
+					$ied[2] = '</span><span>' . $marker . '</span>' . ' <span class="italics">' . $ied[2];
 					return implode(' ',$ied);
 				}
 				else
@@ -3009,7 +3009,7 @@ class Controller extends BaseClass
 			if ( !empty($name) && strpos($name,' ')!==false )
 			{
 				$ied=explode( ' ',  $name );
-				$ied[2] = '<span class="no-italics">' . $marker . '</span>' . ' ' . $ied[2];
+				$ied[2] = '</span><span>' . $marker . '</span>' . ' <span class="italics">' . $ied[2];
 				return implode(' ',$ied);
 			}
 		}

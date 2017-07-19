@@ -300,7 +300,7 @@ function doSubmit()
                         $( '.hybrid_options' ).prop( 'disabled' , !$(this).prop( 'checked' ) ).toggle( $(this).prop( 'checked' ) )
                     "/></td>
                     <td><label for=col_sci_name>{t}scientific name{/t}</label>
-                    <div class=hybrid_options style="display:none">
+                    <div class=hybrid_options style="">
                     <label><input class=hybrid_options id=add_hybrid_marker type=checkbox name=add_hybrid_marker checked="checked" /> {t}add × to hybrids & infixes (subsp., f., var.) to infraspecies{/t}</label><br />
                     </div>
                     </td>
@@ -533,7 +533,6 @@ $(document).ready(function()
 	$( '#parent_taxon_id' ).val( {$branch_top.id} );
 	$( '#parent_taxon' ).text( '{$branch_top.label|@escape}' );
 	{/if}
-	$('#col_sci_name').trigger('click').prop('checked',true);
 	setDropListCloseLabel('close');
 });
 </script>
