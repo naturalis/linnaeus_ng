@@ -480,7 +480,7 @@ class TraitsTaxonController extends TraitsController
 		$taxon=$this->getTaxonById( $taxon );
 		$group=$this->getTraitgroup( $group );
 		
-		$this->logChange( [ 'before'=>$before,'after'=>$after,'note'=> 'updated references for trait ' . $group['sysname'] . ' for ' . $taxon['nomen'] ] );
+		$this->logChange( [ 'before'=>$before,'after'=>$after,'note'=> 'updated references for trait group ' . $group['sysname'] . ' for ' . $taxon['nomen'] ] );
 
 	}
 
