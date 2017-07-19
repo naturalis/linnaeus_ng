@@ -34,7 +34,6 @@
                 
                 {foreach $results.data v}
                     <li class="result" sort_name="{$v.taxon|@strip_tags}" sort_relevance="{$i++}" sort_common="{if $v.common_name}{$v.common_name}{else}_{/if}">
-                        <a href="../species/nsr_taxon.php?id={$v.taxon_id}" class="clicklink"></a>		
                         <a href="../species/nsr_taxon.php?id={$v.taxon_id}">
                             {$v.taxon} {if $show_taxon_rank_in_results && $v.common_rank} ({$v.common_rank}){/if}
                         </a>

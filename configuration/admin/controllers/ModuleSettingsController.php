@@ -285,28 +285,30 @@ class ModuleSettingsController extends Controller
 
 	private function saveModuleSetting()
 	{
-		if ( $this->rHasVar('new_setting') && $this->rGetVal('new_setting')!="" )
+		if ( $this->rHasVar('new_setting') && trim($this->rGetVal('new_setting'))!="" )
 		{
-			if ( $this->getModuleSetting( array( "setting"=>$this->rGetVal('new_setting') ) ) !="" )
+			$new_setting=trim($this->rGetVal('new_setting'));
+			
+			if ( $this->getModuleSetting( array( "setting"=>$new_setting ) ) !="" )
 			{
 				$m=$this->getModule();
 				$this->addError( sprintf(
 					$this->translate( '%s: a setting with that name already exists in  %s.' ),
-					$this->rGetVal('new_setting'), $m['module'] )
+					$new_setting, $m['module'] )
 				);
 			}
 			else
 			{
 				$d=[
     				'module_id' => $this->getModuleId(),
-    				'setting' => $this->rGetVal('new_setting'),
+    				'setting' => $new_setting,
     				'info' => $this->rGetVal('new_info'),
     				'default_value' => $this->rGetVal('new_default_value')
 				];
 
 			    $this->models->ModuleSettings->insert($d);
-                $this->addMessage( sprintf( $this->translate( 'new setting %s saved.' ), $this->rGetVal('new_setting') ) );
-				$this->logChange(array('after'=>$d,'note'=>sprintf('New setting "%s"', $this->rGetVal('new_setting'))));
+                $this->addMessage( sprintf( $this->translate( 'new setting %s saved.' ), $new_setting ) );
+				$this->logChange( array( 'after'=>$d, 'note'=>sprintf( 'New setting "%s"', $new_setting ) ) );
 			}
 		}
 	}
