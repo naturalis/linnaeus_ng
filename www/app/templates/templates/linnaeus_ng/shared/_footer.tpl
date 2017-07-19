@@ -77,7 +77,9 @@ $(document).ready(function()
 
 	{if $search}onSearchBoxSelect('');{/if}
 	{foreach from=$requestData key=k item=v}
-	addRequestVar('{$k}','{$v|addslashes}')
+	{if !$v|@is_array}
+	addRequestVar('{$k}','{$v|@addslashes}')
+	{/if}
 	{/foreach}
 	chkPIDInLinks({$session.app.project.id},'{$addedProjectIDParam}');
 	{if $searchResultIndexActive}
