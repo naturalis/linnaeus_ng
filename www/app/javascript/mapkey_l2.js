@@ -328,8 +328,8 @@ function l2DiversityCellClick(ele) {
 
 }
 
-function l2SetCompareSpecies(i,j) {
-
+function l2SetCompareSpecies(i,j)
+{
 	var label = $('[lookupId="'+j+'"]').html();
 
 	if (i==1) {
@@ -341,9 +341,7 @@ function l2SetCompareSpecies(i,j) {
 		$('#speciesNameB').html(label);
 	}
 
-	$('#dialog-close').click();
-	
-
+	$('#dialog-close').click();	
 }
 
 function l2DiversityCellMouseOver(ele) {
@@ -369,4 +367,19 @@ function l2ToggleGrid(caller) {
 	$('td[id^=cell-]').toggleClass('nogrid');
 	$(caller).children().each(function(){$(this).css('display',($(this).css('display')=='block'?'none':'block'));});
 
+}
+
+
+function l2CloseTaxonList()
+{
+	$("#lookup-DialogContent").toggle(false);
+}
+
+
+function l2TaxonSelection(n)
+{
+	$('#lookup-DialogContent').toggle(true);
+	allLookupSetExtraVar( { name: 'l2_must_have_geo', value: 1 } );
+	allLookupNavigateOverrideUrl('javascript:l2SetCompareSpecies('+n+',%s);l2CloseTaxonList()');
+	allLookupShowDialog()
 }

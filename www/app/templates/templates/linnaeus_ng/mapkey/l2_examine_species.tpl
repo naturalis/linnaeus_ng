@@ -12,6 +12,7 @@
 			        	title="{t}Go to this taxon{/t}">
 			        {$taxon.taxon}</a>
 			<div class="map-legend-container">
+
                 <div class="map">
                 	<div id="mapName">
 				        {if $maps|@count>1}
@@ -50,18 +51,19 @@
 					{/if}
 					<div id="coordinates"></div>
                 </div>
+
+
 				<div class="legend-container">
 					<div id="legend">
 						{foreach from=$geoDataTypes key=k item=v name=x}
 						<div class="mapCheckbox">
-							<label class="checkbox-input">
-								<input type="checkbox" checked="checked" value="{$v.id}" onchange="l2ToggleDatatype(this)"/>
-								<span class="mock-checkbox"></span>
-								<span class="opacity"><span class="mapCellLegend" style="background-color:#{$v.colour};">&nbsp;&nbsp;&nbsp;&nbsp;</span></span>
-								
-								{$v.title}
-							</label>
-						</div>
+	                        <input type="checkbox" checked="checked" value="{$v.id}" id="legend-toggle-{$v.id}" onchange="l2ToggleDatatype(this)" />
+                            <span class="clickzone" onclick="$('#legend-toggle-{$v.id}').trigger('click');$('.legend-{$v.id}').toggle();">
+                                <span class="icon legend-{$v.id}" style="color:#{$v.colour};display:none;">&#9744;</span>
+                                <span class="icon legend-{$v.id}" style="color:#{$v.colour};display:inline;">&#9745;</span>
+                                {$v.title}
+                            </span>
+                        </div>
 						{/foreach}
 						<p>
 							<a id="toggleGrid" href="#" onclick="l2ToggleGrid(this);"><span style="display:block">{t}Hide grid{/t}</span><span style="display:none">{t}Show grid{/t}</span></a>
@@ -76,5 +78,6 @@
 <script type="text/javascript" src="{$baseUrl}app/javascript/map.js"></script>
 
 {include file="_mapJquery-start.tpl"}
+allLookupShowDialog('{$taxa}');
 {include file="_mapJquery-end.tpl"}
 {include file="../shared/footer.tpl"}
