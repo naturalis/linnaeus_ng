@@ -1,6 +1,7 @@
 <?php
 
 include_once ('Controller.php');
+include_once ('ModuleSettingsReaderController.php');
 
 class MapKeyController extends Controller
 {
@@ -41,7 +42,6 @@ class MapKeyController extends Controller
 	private $_mapType='lng';
 	private $_allTaxa;
 	
-	private $l2DiversityIndexNumOfClasses=8;
 	private $l2MaxMapWidth=600;
 	private $SRID=4326;
 	private $urlToCheckConnectivity='http://maps.google.com/maps/api/js?sensor=false';
@@ -55,6 +55,8 @@ class MapKeyController extends Controller
 		$this->smarty->assign( 'isOnline', true );
 		$this->smarty->assign('mapType',$this->getSetting('maptype'));
 		$this->initTaxaWithOcc();
+		$this->moduleSettings=new ModuleSettingsReaderController;
+		$this->diversity_index_num_of_classes = $this->moduleSettings->getModuleSetting( array('setting'=>'diversity_index_num_of_classes','subst'=>8) );
     }
 
     public function __destruct ()
@@ -831,14 +833,12 @@ class MapKeyController extends Controller
 
 		$legend = array();
 
-		foreach((array)$ot as $key => $val) {
-
+		foreach((array)$ot as $key => $val)
+		{
 			$ot[$key]['pct'] = round(($val['total'] / $max) * 100);
-			$x = ceil($ot[$key]['pct'] / (100 / $this->controllerSettings['l2DiversityIndexNumOfClasses']));
+			$x = ceil($ot[$key]['pct'] / (100 / $this->diversity_index_num_of_classes ));
 			$ot[$key]['class'] = $x;
 			$legend[$x] = $x;
-
-
 		}
 
 		ksort($legend);
@@ -849,8 +849,8 @@ class MapKeyController extends Controller
 			$thisMax =
 			$max +
 			(
-					($val - $this->l2DiversityIndexNumOfClasses) *
-					($max / $this->l2DiversityIndexNumOfClasses)
+					($val - $this->diversity_index_num_of_classes) *
+					($max / $this->diversity_index_num_of_classes)
 			);
 
 			$legend[$key] =
