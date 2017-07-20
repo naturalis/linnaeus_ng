@@ -1189,7 +1189,7 @@ class Controller extends BaseClass
         // Return now if name has been set
         if (isset($name)) {
             //return $this->addHybridMarker(array('name' => $name, 'base_rank_id' => $rankId, 'taxon_id' => $p['id'])) . $author;
-            return '<span class="italics">' . $this->addHybridMarkerAndInfixes( [ 'name' => $name, 'base_rank_id' => $rankId, 'taxon_id' => $p['id'] ] ) . '</span>' . $author;
+            return '<span class="italics">' . $this->addHybridMarkerAndInfixes( [ 'name' => $name, 'base_rank_id' => $rankId, 'taxon_id' => isset($p['id']) ? $p['id'] : $p['taxon']['id'] ] ) . '</span>' . $author;
         }
 
         // Now we're handling more complicated cases. We need the parent before continuing

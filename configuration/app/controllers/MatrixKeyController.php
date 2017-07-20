@@ -960,7 +960,7 @@ class MatrixKeyController extends Controller
 					'columns' => 'min(lower) as lowest,max(upper) as most_upper'
 				));
 
-			$char['min'] = 1.5;//$cs[0]['lowest'];
+			$char['min'] = $cs[0]['lowest'];
 			$char['max'] = $cs[0]['most_upper'];
 			$char['min_display'] = round($char['min'],(is_float($char['min']) ? 1 : 0));
 			$char['max_display'] = round($char['max'],(is_float($char['max']) ? 1 : 0));
