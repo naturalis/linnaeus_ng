@@ -344,8 +344,8 @@ class MapKeyController extends Controller
 			$selectedDataTypes = $_SESSION['app']['user']['map']['search']['selectedDataTypes'];
 			$mapId = $_SESSION['app']['user']['map']['search']['mapId'];
 			$didSearch = true;
-
-		} else
+		} 
+		else
 		if ($this->rHasVal('selectedCells') && $this->rHasVal('mapId'))
 		{
 			$taxa = $this->l2DoSearchMap(
@@ -353,6 +353,8 @@ class MapKeyController extends Controller
 				$this->requestData['selectedCells'],
 				$this->rHasVal('dataTypes') ? $this->requestData['dataTypes'] : null
 			);
+			
+//			q($this->requestData['selectedCells'],1);
 
 			foreach((array)$this->requestData['selectedCells'] as $val)
 				$selectedCells[$val] = true;

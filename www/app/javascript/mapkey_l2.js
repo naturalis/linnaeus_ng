@@ -2,36 +2,21 @@ var l2MapCoordinates = '';
 var l2MapPxHeight = -1;
 var l2MapPxWidth = -1;
 var l2DataColours = Array();
-
 var eastLabel='E';
 var westLabel='W';
 var northLabel='N';
 var southLabel='S';
 
-$(document).ready(function(){
-	fixOpacity();
-
-	function fixOpacity(){
-		
-		$('td[id^=cell-]').each(function(){
-			str_my_color = $(this).css("background-color");
-			if (str_my_color != "transparent"){
-				str_my_color = str_my_color.replace("rgb","rgba");
-				str_my_color = str_my_color.replace(")",",0.6)");
-				$(this).css("background-color", str_my_color);
-			}
-		});
-	}
-
-	eastLabel=_('E');
-	westLabel=_('W');
-	northLabel=_('N');
-	southLabel=_('S');
-
+$(document).ready(function()
+{
+	eastLabel=_(eastLabel);
+	westLabel=_(westLabel);
+	northLabel=_(northLabel);
+	southLabel=_(southLabel);
 });
 
-function l2SetMap(mapUrl,mapW,mapH,mapCoord,cellW,cellH, resized) {
-
+function l2SetMap(mapUrl,mapW,mapH,mapCoord,cellW,cellH, resized)
+{
 	l2MapPxWidth = mapW;
 	l2MapPxHeight = mapH;
 
@@ -40,13 +25,19 @@ function l2SetMap(mapUrl,mapW,mapH,mapCoord,cellW,cellH, resized) {
 	$('#mapTable').css('width',(mapW)+'px');
 	$('#mapTable').css('height',(mapH)+'px');
 	//l2ScaleCells(cellW,cellH);
-	if (resized==0) {
+	if (resized==0)
+	{
 		$('#mapTable').css('background','url('+mapUrl+')');
-	} else {
-		if (Modernizr.backgroundsize) {
+	} 
+	else
+	{
+		if (Modernizr.backgroundsize) 
+		{
 			$('#mapTable').css('background','url('+mapUrl+')');
 			$('#mapTable').css('background-size','cover');
-		} else {
+		} 
+		else 
+		{
 			$('#mapTable').css({
 		        "filter": "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='"+mapUrl+"', sizingMethod='scale')",
 		        "-ms-filter": "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='"+mapUrl+"', sizingMethod='scale')"
@@ -54,19 +45,21 @@ function l2SetMap(mapUrl,mapW,mapH,mapCoord,cellW,cellH, resized) {
 		}
 	}
 	$('#mapTable').css('visibility','visible');
-	
 }
-function l2ScaleCells(w,h) {
-
-	$('#mapTable').find('tr').eq(0).children().each(function() {
+function l2ScaleCells(w,h)
+{
+	$('#mapTable').find('tr').eq(0).children().each(function()
+	{
 		$(this).css('width',w+'px');
 	});
-	$('#mapTable tr').each(function() {
+	$('#mapTable tr').each(function()
+	{
 		$(this).find('td:first').css('height',h+'px');
 	});
 }
 
-function l2MapMouseOver(x,y) {
+function l2MapMouseOver(x,y)
+{
 	var o = $('#mapTable').offset();
 
 	var widthInDegrees = 
@@ -87,197 +80,183 @@ function l2MapMouseOver(x,y) {
 	var labY = (posY>=0 ? northLabel : southLabel);
 
 	$("#coordinates").html(Math.abs(posY)+'&deg;'+labY+', '+Math.abs(posX)+'&deg;'+labX);
-
 }
 
-function l2ToggleDatatype(ele) {
-
-	if ($(ele).prop('checked')) {
-		
+function l2ToggleDatatype(ele)
+{
+	if ($(ele).prop('checked'))
+	{
 		$('td[datatype='+$(ele).val()+']').css('background-color',l2DataColours[$(ele).val()]);
-
-	} else {
-
+	} 
+	else 
+	{
 		l2DataColours[$(ele).val()] = $('td[datatype='+$(ele).val()+']').css('background-color');
-
 		$('td[datatype='+$(ele).val()+']').css('background-color','transparent');
 	}
 }
 
-function l2DoMapCompare() {
-
-	if($('#idA').val()=='' || $('#idB').val()=='') {
-	
+function l2DoMapCompare()
+{
+	if($('#idA').val()=='' || $('#idB').val()=='')
+	{
 		alert(_('You must select two taxa to compare.'));		
 	
 		if ($('#idA').val()=='')
+		{
 			$('#idA').focus();
+		}
 		else
+		{
 			$('#idB').focus();
-		
-	} else
-	if($('#idA').val()==$('#idB').val()) {
-
+		}
+	} 
+	else
+	if($('#idA').val()==$('#idB').val())
+	{
 		alert(_('You cannot compare a taxon to itself.'));		
 		$('#idA').focus();
-
-	} else {
-
+	} 
+	else 
+	{
 		$('#theForm').submit();
-	
 	}
-
 }
 
-function l2DataTypeToggle() {
-
+function l2DataTypeToggle()
+{
 	if($('#idA').val()!='' && $('#idB').val()!='') l2DoMapCompare();
-
 }
 
-function l2TagMapCell(ele) {
-	
-	if ($(ele).hasClass('mapCellTagged')) {
-		
-		$(ele).removeClass('mapCellTagged');
-		
-	} else {
-
-		$(ele).addClass('mapCellTagged');
-
+function l2TagMapCell(ele)
+{
+	if (!$(ele).length)
+	{
+		ele=$('#'+ele);
 	}
-
-}
-
-function l2DoClearSearch() {
-
-	$('td[id^="cell-"]').each(function(i) {
-
-		if ($(this).hasClass('mapCellTagged')) $(this).removeClass('mapCellTagged');
-
-	});
-
-
-}
-
-function l2DoSearchMap() {
-
-	var squares = false;
 	
-	$('td[id^="cell-"]').each(function(i) {
+	if ($(ele).hasClass('mapCellTagged'))
+	{
+		$(ele).removeClass('mapCellTagged');
+	} 
+	else
+	{
+		$(ele).addClass('mapCellTagged');
+	}
+}
 
-		if ($(this).hasClass('mapCellTagged')) {
-			
+function l2DoClearSearch()
+{
+	$('.mapCellTagged').each(function(i)
+	{
+		$(this).removeClass('mapCellTagged');
+	});
+}
+
+function l2DoSearchMap()
+{
+	var squares;
+	
+	$('td[id^="cell-"]').each(function(i)
+	{
+		if ($(this).hasClass('mapCellTagged'))
+		{
 			squares = true;
-			
 			$('<input type="hidden" name="selectedCells[]">').val($(this).attr('id').replace('cell-','')).appendTo('#theForm');
-			
 		} 
-
 	});
 	
-	if (!squares) {
-		
+	if (!squares)
+	{
 		alert(_('Please select at least one square'));
-		
 		return;
-		
 	} 
 
+	var types=false
 
-	var types = false;
-
-	$('[name^=dataTypes]').each(function() {
+	$('[name^=dataTypes]').each(function()
+	{
 		if ($(this).is(':checked')) types = true;
 	});
 	
-	if (!types) {
-		
+	if (!types)
+	{
 		alert(_('Please select at least one datatype'));
-		
 		return;
-		
 	} 
 
 	$('#theForm').submit();
-
 }
 
-function l2DiversitySetSelectedCell(ele) {
-
-	$('[id^=cell-]').each(function() {
+function l2DiversitySetSelectedCell(ele)
+{
+	$('[id^=cell-]').each(function()
+	{
 		$(this).removeClass('mapCellSelected');
 	});
 
 	$(ele).addClass('mapCellSelected');
 }
 
-function l2DiversityGetSelectedTypes() {
-
+function l2DiversityGetSelectedTypes()
+{
 	var types = [];
 
-	$('[name^=selectedDatatypes]').each(function() {
+	$('[name^=selectedDatatypes]').each(function()
+	{
 		if ($(this).prop('checked')==true) types[types.length] = $(this).val();
 	});
 	
 	return types;
-
 }
 
-function l2DiversityClearAll() {
-
-	$('[id^=cell-]').each(function() {
+function l2DiversityClearAll()
+{
+	$('[id^=cell-]').each(function()
+	{
 		$(this).removeClass();
 		$(this).attr('total','0');
 	});
-
 }
 
-function l2DiversityClearLegend() {
-
+function l2DiversityClearLegend()
+{
 	$('#legend').empty();
-
 }
 
-function l2DiversityGiantOilSpill(data) {
-
+function l2DiversityGiantOilSpill(data)
+{
 	l2DiversityClearAll();
-
-	for(var i=0;i<data.length;i++) {
+	for(var i=0;i<data.length;i++)
+	{
 		$('#cell-'+data[i].id).addClass('mapCellDiversity'+data[i].css);
-		$('#cell-'+data[i].id).attr('total',data[i].total);
-		
+		$('#cell-'+data[i].id).attr('total',data[i].total);	
 	}
-
 }
 
 
-function l2DiversityUpdateLegend(data) {
-
+function l2DiversityUpdateLegend(data)
+{
 	l2DiversityClearLegend();
-
 	var textToAppend = [];
-
-	for(var i=0;i<data.length;i++) {
-
+	for(var i=0;i<data.length;i++)
+	{
 		textToAppend[i] = 
 			'<div class="mapCheckbox"><label>'+
 			'<span class="opacity">'+
 			'<span class="mapCellLegend mapCellDiversity'+data[i].id+'">&nbsp;&nbsp;&nbsp;&nbsp;</span></span>'+
 			data[i].min+'-'+data[i].max+' '+_('records')+
 			'</label></div>';
-
 	}
 
 	$('#legend').append(textToAppend.join(''));
-
 }
 
-function l2DiversityTypeClick() {
-		
+function l2DiversityTypeClick()
+{
 	var types = l2DiversityGetSelectedTypes();
 	
-	if (types.length==0)  {
+	if (types.length==0)
+	{
 		l2DiversityClearAll();
 		l2DiversityClearLegend();
 		return;
@@ -298,15 +277,13 @@ function l2DiversityTypeClick() {
 			if (tmp.legend) l2DiversityUpdateLegend(tmp.legend);
 		}
 	});
-	
 }
 
-function l2DiversityCellClick(ele) {
-
+function l2DiversityCellClick(ele)
+{
 	var types = l2DiversityGetSelectedTypes();
 
 	if ($(ele).attr('total')==0) return;
-
 	if (types.length==0) return;
 
 	allAjaxHandle = $.ajax({
@@ -325,18 +302,20 @@ function l2DiversityCellClick(ele) {
 			l2DiversitySetSelectedCell(ele);			
 		}
 	});
-
 }
 
 function l2SetCompareSpecies(i,j)
 {
 	var label = $('[lookupId="'+j+'"]').html();
 
-	if (i==1) {
+	if (i==1)
+	{
 		$('#idA').val(j);
 		$('#speciesNameA').html(label);
-	} else
-	if (i==2) {
+	} 
+	else
+	if (i==2)
+	{
 		$('#idB').val(j);
 		$('#speciesNameB').html(label);
 	}
@@ -344,37 +323,30 @@ function l2SetCompareSpecies(i,j)
 	$('#dialog-close').click();	
 }
 
-function l2DiversityCellMouseOver(ele) {
-
+function l2DiversityCellMouseOver(ele)
+{
 	var i = $(ele).attr('total');
-
 	$('#species-number').html((i ? i : 0) + _(' species'));
-
 }
 
-function l2MapIEFix() {
-
-
-	if (($.browser.msie && $.browser.version<=9)){
-	
+function l2MapIEFix()
+{
+	if (($.browser.msie && $.browser.version<=9))
+	{
 		$('td[id^=cell-]').removeClass('mapCell').addClass('mapCell-IElt9compat');
-
 	}
-
 }
 
-function l2ToggleGrid(caller) {	
+function l2ToggleGrid(caller)
+{	
 	$('td[id^=cell-]').toggleClass('nogrid');
 	$(caller).children().each(function(){$(this).css('display',($(this).css('display')=='block'?'none':'block'));});
-
 }
-
 
 function l2CloseTaxonList()
 {
 	$("#lookup-DialogContent").toggle(false);
 }
-
 
 function l2TaxonSelection(n)
 {
