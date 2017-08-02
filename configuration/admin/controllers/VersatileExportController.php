@@ -357,7 +357,7 @@ class VersatileExportController extends Controller
 				".$ranks_clause."
 				".$presence_status_clause."
 				and (
-					match(_q.parentage) against ('". $this->generateTaxonParentageId( $this->getBranchTopId() )."' in boolean mode) or
+					match(_q.parentage) against ('". Controller::generateTaxonParentageId( $this->getBranchTopId() )."' in boolean mode) or
 					_q.taxon_id = ".$this->getBranchTopId()."
 				)
 

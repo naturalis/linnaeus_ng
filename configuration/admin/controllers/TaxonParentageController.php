@@ -141,7 +141,7 @@ class TaxonParentageController extends Controller
 			)
 		);
 
-		$family[]=$this->generateTaxonParentageId($parent);
+		$family[]=Controller::generateTaxonParentageId($parent);
 
 		foreach((array)$result as $row)
 		{
