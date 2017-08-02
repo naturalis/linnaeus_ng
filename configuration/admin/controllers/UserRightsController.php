@@ -600,7 +600,7 @@ class UserRights
 					%PRE%taxon_quick_parentage _sq
 				where
 					_sq.project_id = " . $this->projectid . "
-					and MATCH(_sq.parentage) AGAINST ('" . $this->generateTaxonParentageId( $item ) . "' in boolean mode)
+					and MATCH(_sq.parentage) AGAINST ('" . Controller::generateTaxonParentageId( $item ) . "' in boolean mode)
 			");
 
 			foreach((array)$d as $val)
