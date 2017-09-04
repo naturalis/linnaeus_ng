@@ -358,7 +358,11 @@ function doSubmit()
 
                 <tr>
                     <td><input id=col_parent_taxon type=checkbox name=cols[parent_taxon]  /></td>
-                    <td><label for=col_parent_taxon>{t}direct parent{/t}</label></td>
+                    <td><label for=col_parent_taxon>{t}direct parent (name){/t}</label></td>
+                </tr>
+                <tr>
+                    <td><input id=col_parent_taxon_nsr_id type=checkbox name=cols[parent_taxon_nsr_id]  /></td>
+                    <td><label for=col_parent_taxon_nsr_id>{t}direct parent NSR ID{/t}</label></td>
                 </tr>
                 <tr>
                     <td><input id=col_database_id type=checkbox name=cols[database_id]  /></td>
