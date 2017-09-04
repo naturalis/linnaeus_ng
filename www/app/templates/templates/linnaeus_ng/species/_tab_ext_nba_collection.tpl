@@ -203,7 +203,7 @@ function printLogInfo()
 </script>
 
 <p>
-    <h2 id="name-header">{$requested_category.title}</h2>
+    <h2 id="name-header"><b>{$requested_category.title}</b></h2>
 
     {if $content}
     <p>{$content}</p>
