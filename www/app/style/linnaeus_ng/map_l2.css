@@ -187,8 +187,7 @@
   color: #009ee0;
   border-bottom: 1px solid dotted;
   cursor: pointer; }
-  .selectIcon:after {
-    content: " …"; }
+/*  .selectIcon:after { content: " …"; }*/
 
 .map_controls {
   right: 10px;
@@ -199,3 +198,18 @@
 #mapTable td.nogrid {
   border-right: 1px dotted transparent;
   border-bottom: 1px dotted transparent; }
+
+
+#legend {
+	margin-top:38px;
+}
+.mapCheckbox input[type=checkbox] {
+	display:none;
+}
+.mapCheckbox .clickzone {
+	cursor:pointer;
+}
+.mapCheckbox .icon {
+	font-size:1.5em;
+}
+

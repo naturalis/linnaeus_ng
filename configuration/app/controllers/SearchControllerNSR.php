@@ -12,6 +12,7 @@ class SearchControllerNSR extends SearchController
 	private $_resSpeciesPerPage=50;
 	private $_nameTypeIds;
 	private $conceptIdPrefix='tn.nlsr.concept/';
+	private $httpHost;
 
 	private $_operators=array(
 		'=='=>array('label'=>'is gelijk aan','range'=>false),
@@ -98,6 +99,7 @@ class SearchControllerNSR extends SearchController
 
 		$this->_show_presence_in_results = $this->moduleSettings->getModuleSetting( [ 'setting'=>'show_presence_in_results','module'=>'utilities','subst'=>1 ] )==1;
 		$this->_show_all_preferred_names_in_results = $this->moduleSettings->getModuleSetting( [ 'setting'=>'show_all_preferred_names_in_results','module'=>'utilities','subst'=>1 ] )==1;
+		$this->_show_taxon_rank_in_results = $this->moduleSettings->getModuleSetting( [ 'setting'=>'show_taxon_rank_in_results','module'=>'utilities','subst'=>1 ] )==1;
 
 		$this->_search_filter_presence = $this->moduleSettings->getModuleSetting( [ 'setting'=>'search_filter_presence','module'=>'utilities','subst'=>0 ] )==1;
 		$this->_search_filter_multimedia = $this->moduleSettings->getModuleSetting( [ 'setting'=>'search_filter_multimedia','module'=>'utilities','subst'=>0 ] )==1;
@@ -105,6 +107,7 @@ class SearchControllerNSR extends SearchController
 
 		$this->smarty->assign( 'show_presence_in_results',$this->_show_presence_in_results );
 		$this->smarty->assign( 'show_all_preferred_names_in_results',$this->_show_all_preferred_names_in_results );
+		$this->smarty->assign( 'show_taxon_rank_in_results',$this->_show_taxon_rank_in_results );
 		$this->smarty->assign( 'search_filter_presence',$this->_search_filter_presence );
 		$this->smarty->assign( 'search_filter_multimedia',$this->_search_filter_multimedia );
 		$this->smarty->assign( 'search_filter_dna_barcodes',$this->_search_filter_dna_barcodes );
@@ -135,12 +138,13 @@ class SearchControllerNSR extends SearchController
 
 		$this->models->SearchNSRModel->setNameTypeIds($this->_nameTypeIds);
 		$this->setRobotsDirective( ["index","nofollow"] );
+		
+		$this->httpHost = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ?  $_SERVER['HTTP_X_FORWARDED_HOST'] : $_SERVER["HTTP_HOST"];
 
     }
 
     public function searchAction()
     {
-		
 		$search=null;
 		
 		if ($this->rHasVal('search'))
@@ -148,11 +152,11 @@ class SearchControllerNSR extends SearchController
 			$search=$this->rGetAll();
 
 			$search['search_original']=$search['search'];
-			$search['search']=str_replace($this->_hybridMarker,'',$search['search']);
+			$search['search']=$this->removeSearchNoise($search['search']);
 
 			$results=$this->doSearch($search);
 
-			$search['search']=htmlspecialchars($search['search']);
+			$search['search']=htmlspecialchars($search['search_original']);
 
 			$this->smarty->assign('search', $search);
 			$this->smarty->assign('results',$results);
@@ -165,7 +169,7 @@ class SearchControllerNSR extends SearchController
 			$search['limit']=1000;
 			$template='export_search';
 			$this->smarty->assign('csvExportSettings',$this->csvExportSettings);
-			$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/nsr/concept/');
+			$this->smarty->assign('url_taxon_detail',"http://". $this->httpHost.'/nsr/concept/');
 			$this->downloadHeaders(
 				array(
 					'mime'=>'text/csv',
@@ -179,7 +183,7 @@ class SearchControllerNSR extends SearchController
 			$this->smarty->assign('querystring',$this->reconstructQueryString(array('search'=>$search,'ignore'=>array('page'))));
 			$this->smarty->assign('type',$searchType);
 			$this->smarty->assign('searchHR',$this->makeReadableQueryString());
-			$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
+			$this->smarty->assign('url_taxon_detail',"http://". $this->httpHost.'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
 		}
 
         $this->printPage($template);
@@ -194,7 +198,7 @@ class SearchControllerNSR extends SearchController
 			$search['limit']=1000;
 			$template='export_search_extended';
 			$this->smarty->assign('csvExportSettings',$this->csvExportSettings);
-			$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/nsr/concept/');
+			$this->smarty->assign('url_taxon_detail',"http://". $this->httpHost.'/nsr/concept/');
 
 			$this->downloadHeaders(
 				array(
@@ -208,7 +212,7 @@ class SearchControllerNSR extends SearchController
 			$this->smarty->assign('search',$search);
 			$this->smarty->assign('querystring',$this->reconstructQueryString(array('search'=>$search,'ignore'=>array('page'))));
 			$this->smarty->assign('presence_statuses',$this->getPresenceStatuses());
-			$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
+			$this->smarty->assign('url_taxon_detail',"http://". $this->httpHost.'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
 			$template=null;
 		}
 
@@ -237,7 +241,7 @@ class SearchControllerNSR extends SearchController
 				)
 			));
 		}
-
+		
 		$this->smarty->assign('searchHR',$this->makeReadableQueryString());
 		$this->smarty->assign('results',$this->doExtendedSearch($search));
 		$this->smarty->assign('search_presence_help_url',$this->_search_presence_help_url);
@@ -254,7 +258,7 @@ class SearchControllerNSR extends SearchController
 			$search['limit']=1000;
 			$template='export_search_pictures';
 			$this->smarty->assign('csvExportSettings',$this->csvExportSettings);
-			$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/nsr/concept/');
+			$this->smarty->assign('url_taxon_detail',"http://". $this->httpHost.'/nsr/concept/');
 			$this->downloadHeaders(
 				array(
 					'mime'=>'text/csv',
@@ -268,7 +272,7 @@ class SearchControllerNSR extends SearchController
 			$this->smarty->assign('photographers',$this->getPhotographersPictureCount($search));
 			$this->smarty->assign('validators',$this->getValidatorPictureCount($search));
 			$this->smarty->assign('searchHR',$this->makeReadableQueryString());
-			$this->smarty->assign('url_taxon_detail',"http://". $_SERVER['HTTP_HOST'].'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
+			$this->smarty->assign('url_taxon_detail',"http://". $this->httpHost.'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
 			$this->smarty->assign('imageExport',true);
 		}
 
@@ -414,7 +418,8 @@ class SearchControllerNSR extends SearchController
 
 		foreach((array)$data as $key=>$val)
 		{
-			$data[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$data[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['taxon_id'],'parent_id'=>$val['parent_id'] ] );
+			$data[$key]['taxon_download']=html_entity_decode(strip_tags($data[$key]['taxon']));
 			$data[$key]['overview_image']=$this->getTaxonOverviewImage($val['taxon_id']);
 		}
 
@@ -511,7 +516,8 @@ class SearchControllerNSR extends SearchController
 
 		foreach((array)$data as $key=>$val)
 		{
-			$data[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$data[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['taxon_id'],'parent_id'=>$val['parent_id'] ] );
+			$data[$key]['taxon_download']=html_entity_decode(strip_tags($data[$key]['taxon']));
 			$data[$key]['overview_image']=$this->getTaxonOverviewImage($val['taxon_id']);
 			if ( $this->_show_all_preferred_names_in_results )
 			{
@@ -670,84 +676,10 @@ class SearchControllerNSR extends SearchController
 
 		foreach((array)$data as $key=>$val)
 		{
-			$data[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
-			$data[$key]['validName']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['validName'],'base_rank_id'=>$val['base_rank_id'] ) );
-
-			$meta=$this->models->MediaMeta->_get( [
-				"id"=> [
-					"project_id" => $this->getCurrentProjectId(),
-					"media_id" => $val["id"]
-				],
-				"columns" =>
-					"*, trim(concat(
-						trim(substring(meta_data, locate(',',meta_data)+1)),' ',
-						trim(substring(meta_data, 1, locate(',',meta_data)-1))
-					)) as photographer"
-			 ] );
-			 
-			$data[$key]['photographer']="";
-			$data[$key]['meta_datum']="";
-			$data[$key]['meta_short_desc']="";
-			$data[$key]['meta_geografie']="";
-			$data[$key]['meta_copyrights']="";
-			$data[$key]['meta_validator']="";
-			$data[$key]['meta_adres_maker']="";
-			$data[$key]['meta_license']="";
-
-			foreach((array)$meta as $m)
-			{
-				if ($m['sys_label']=='beeldbankFotograaf')
-				{
-					//$data[$key]['photographer']=$m['meta_data'];
-					$data[$key]['photographer']=$m['photographer'];
-				}
-				else
-				if ($m['sys_label']=='beeldbankDatumVervaardiging')
-				{
-					// REFAC2015: well...
-					if (strtoupper(substr(PHP_OS, 0, 3))==='WIN')
-					{
-						setlocale(LC_ALL,'nld_nld'); // windows only
-						$data[$key]['meta_datum']=strftime( '%d %B %Y',strtotime($m['meta_date']));
-					}
-					else
-					{
-						if (!setlocale(LC_ALL,'nl_NL'))
-							setlocale(LC_ALL,'nl_NL.utf8');
-						$data[$key]['meta_datum']=strftime( '%e %B %Y',strtotime($m['meta_date']));
-					}
-				}
-				else
-				if ($m['sys_label']=='beeldbankOmschrijving')
-				{
-					$data[$key]['meta_short_desc']=$m['meta_data'];
-				}
-				else
-				if ($m['sys_label']=='beeldbankLokatie')
-				{
-					$data[$key]['meta_geografie']=$m['meta_data'];
-				}
-				else
-				if ($m['sys_label']=='beeldbankCopyright')
-				{
-					$data[$key]['meta_copyrights']=$m['meta_data'];
-				}
-				else
-				if ($m['sys_label']=='beeldbankValidator')
-				{
-					$data[$key]['meta_validator']=$m['meta_data'];
-				}
-				else
-				if ($m['sys_label']=='beeldbankAdresMaker')
-				{
-					$data[$key]['meta_adres_maker']=$m['meta_data'];
-				}
-				else
-				if ($m['sys_label']=='beeldbankLicentie')
-				{
-					$data[$key]['meta_license']=$m['meta_data'];
-				}
-			}
+			
+			$data[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name' => $val['taxon'], 'base_rank_id' => $val['base_rank_id'], 'taxon_id' => $val['taxon_id'] ] );
+			$data[$key]['validName']=$this->addHybridMarkerAndInfixes( [ 'name' => $val['validName'], 'base_rank_id' => $val['base_rank_id'], 'taxon_id' => $val['taxon_id'] ] );
+			$data[$key][0] = $this->NSRFunctions->formatPictureResults( [$val] );
 
 			$names=$this->models->Names->_get(array("id"=>
 				array(
@@ -770,17 +702,16 @@ class SearchControllerNSR extends SearchController
 					$data[$key]['infra_specific_epithet']=$n['infra_specific_epithet'];
 					$data[$key]['authorship']=$n['authorship'];
 					$data[$key]['nomen']=
-						$this->addHybridMarkerAndInfixes(array('name'=> trim(str_replace($n['authorship'],'',$n['name'])),'base_rank_id'=>$val['base_rank_id']));
+						$this->addHybridMarkerAndInfixes( [ 'name'=> trim(str_replace($n['authorship'],'',$n['name'])),'base_rank_id'=>$val['base_rank_id'],'taxon_id' => $val['taxon_id'] ] );
 					$data[$key]['name']=
-						$this->addHybridMarkerAndInfixes(
-							array( 'name'=>
-										(empty($n['uninomial']) ? '' : $n['uninomial'] . ' ') .
-										(empty($n['specific_epithet']) ? '' : $n['specific_epithet'] . ' ') .
-										(empty($n['infra_specific_epithet']) ? '' : $n['infra_specific_epithet']),
-									'base_rank_id'=>
-										$val['base_rank_id']
-									)
-							);
+						$this->addHybridMarkerAndInfixes( [
+							'name'=>
+								(empty($n['uninomial']) ? '' : $n['uninomial'] . ' ') .
+								(empty($n['specific_epithet']) ? '' : $n['specific_epithet'] . ' ') .
+								(empty($n['infra_specific_epithet']) ? '' : $n['infra_specific_epithet']),
+							'base_rank_id'=> $val['base_rank_id'],
+							'taxon_id' => $val['taxon_id']
+						] );
 				}
 			}
 		}
@@ -839,8 +770,10 @@ class SearchControllerNSR extends SearchController
 
 	private function getSuggestionsName( $p )
 	{
+		$search=$this->removeSearchNoise($p['search']);
+		
 		$data=$this->models->SearchNSRModel->getSuggestionsName(array(
-			"search"=>$p['search'],
+			"search"=>$search,
 			"order"=>isset($p['order']) ? $p['order'] : null,
 			"project_id"=>$this->getCurrentProjectId(),
 			"limit"=>$this->_suggestionListItemMax,
@@ -850,9 +783,9 @@ class SearchControllerNSR extends SearchController
 
 		foreach((array)$data as $key=>$val)
 		{
-			$data[$key]['label']=$this->addHybridMarkerAndInfixes(array('name'=> $val['label'],'base_rank_id'=>$val['base_rank_id']));
-			$data[$key]['scientific_name']=$this->addHybridMarkerAndInfixes(array('name'=> $val['scientific_name'],'base_rank_id'=>$val['base_rank_id']));
-			$data[$key]['nomen']=$this->addHybridMarkerAndInfixes(array('name'=> $val['nomen'],'base_rank_id'=>$val['base_rank_id']));
+			$data[$key]['label']=$this->addHybridMarkerAndInfixes( [ 'name'=> $val['label'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['id'],'parent_id'=>$val['parent_id'] ] );
+			$data[$key]['scientific_name']=$this->addHybridMarkerAndInfixes( [ 'name'=> $val['scientific_name'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['id'],'parent_id'=>$val['parent_id'] ] );
+			$data[$key]['nomen']=$this->addHybridMarkerAndInfixes( [ 'name'=> $val['nomen'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['id'],'parent_id'=>$val['parent_id'] ] );
 		}
 		
 		return $data;

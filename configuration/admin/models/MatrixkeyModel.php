@@ -45,6 +45,7 @@ class MatrixKeyModel extends AbstractModel
 					select
 						_b.id,
 						_b.taxon,
+						_b.parent_id,
 						_c.rank_id as base_rank_id
 			
 					from %PRE%matrices_taxa _a
@@ -65,7 +66,7 @@ class MatrixKeyModel extends AbstractModel
 						_a.project_id = ". $project_id ."
 						and _a.matrix_id = ". $matrix_id."
 						and (
-								MATCH(_sq.parentage) AGAINST ('" . $top . "' in boolean mode)
+								MATCH(_sq.parentage) AGAINST ('" . $this->generateTaxonParentageId( $top ) . "' in boolean mode)
 								or _a.taxon_id=" . $top . " 
 							)		
 					order by
@@ -93,6 +94,7 @@ class MatrixKeyModel extends AbstractModel
 				select
 					_b.id,
 					_b.taxon,
+					_b.parent_id,
 					_c.rank_id as base_rank_id
 		
 				from %PRE%matrices_taxa _a
@@ -139,6 +141,7 @@ class MatrixKeyModel extends AbstractModel
 					
 						_b.id,
 						_b.taxon,
+						_b.parent_id,
 						_c.keypath_endpoint,
 						_c.lower_taxon,
 						_c.rank_id as base_rank_id,
@@ -162,7 +165,7 @@ class MatrixKeyModel extends AbstractModel
 					where 
 						_b.project_id = ". $project_id ."
 						and (
-								MATCH(_sq.parentage) AGAINST ('" . $top . "' in boolean mode)
+								MATCH(_sq.parentage) AGAINST ('" . $this->generateTaxonParentageId( $top ) . "' in boolean mode)
 								or _b.id=" . $top . " 
 							)			
 					order by

@@ -38,6 +38,7 @@ class TraitsController extends Controller
 
 	public function getTraitsSettings()
 	{
+		//REFAC2015: all these should go to central settings
         $s=$this->models->TraitsSettings->_get(
 			array(
 				'id' => array('project_id' => $this->getCurrentProjectId()),
@@ -554,7 +555,7 @@ class TraitsController extends Controller
 		if ( empty($values) )
 			return $values;
 
-		$ra=$this->models->TraitsTaxonValues->_get(
+		$r=$this->models->TraitsTaxonValues->_get(
 			array(
 				'columns'=>'count(distinct taxon_id) as taxon_count,count(taxon_id) as total_count',
 				'id'=>array('project_id'=>$this->getCurrentProjectId()),

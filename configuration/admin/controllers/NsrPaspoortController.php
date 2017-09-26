@@ -262,46 +262,51 @@ class NsrPaspoortController extends NsrController
 						'classification'=>$this->getTaxonClassification($taxon),
 						'taxonlist'=>$this->getTaxonNextLevel($taxon)
 					);
+                $page = 'CTAB_CLASSIFICATION';
                 break;
 
             case CTAB_TAXON_LIST:
                 $content=$this->getTaxonNextLevel($taxon);
+                $page = 'CTAB_TAXON_LIST';
                 break;
 
             case CTAB_LITERATURE:
                 $content=$this->getTaxonLiterature($taxon);
+                $page = 'CTAB_LITERATURE';
                 break;
 
             case CTAB_DNA_BARCODES:
                 $content=$this->getDNABarcodes($taxon);
+                $page = 'CTAB_DNA_BARCODES';
                 break;
 
             default:
 
-                $d = array(
-                    'taxon_id' => $taxon,
-                    'project_id' => $this->getCurrentProjectId(),
-                    'language_id' => $this->getDefaultProjectLanguage(),
-                    'page_id' => $category
-                );
-
-                $ct = $this->models->ContentTaxa->_get(array(
-                    'id' => $d,
-                ));
+                $ct = $this->models->ContentTaxa->_get( [ 'id' => [
+						'taxon_id' => $taxon,
+						'project_id' => $this->getCurrentProjectId(),
+						'language_id' => $this->getDefaultProjectLanguage(),
+						'page_id' => $category,
+					] ] );
 
 				$content = isset($ct) ? $ct[0] : null;
 
+                $page = @$this->models->PagesTaxa->_get( [ 'id' => [ 'project_id' => $this->getCurrentProjectId(), 'id' => $category ] ] )[0]['page'];
         }
 
 		if (isset($content['id']))
+		{
 			$rdf=$this->Rdf->getRdfValues($content['id']);
+		}
 
 		$publish=$content['publish'];
 
 		if (isset($content['content']))
+		{
 			$content=$content['content'];
+		}
 
-		return array('content'=>$content,'rdf'=>$rdf,'publish'=>$publish);
+		return array('content'=>$content,'rdf'=>$rdf,'publish'=>$publish,'page'=>$page);
     }
 
 	private function doDeletePassportMeta($id)
@@ -332,7 +337,7 @@ class NsrPaspoortController extends NsrController
 				'page_id'=>$page
 			));
 
-			$this->logChange(array('before'=>$before,'note'=>'deleted passport tabpage from '.$concept['taxon']));
+			$this->logChange(array('before'=>$before,'note'=>'deleted passport tabpage  '.$before['page'].' of '.$concept['taxon']));
 			return $r;
 
 		}
@@ -361,7 +366,7 @@ class NsrPaspoortController extends NsrController
 
 			$after=$this->getPassport(array('category'=>$page,'taxon'=>$taxon));
 
-			$this->logChange(array('before'=>$before,'after'=>$after,'note'=>($id ? 'updated passport tabpage' : 'new passport tabpage').' from '.$concept['taxon']));
+			$this->logChange(array('before'=>$before,'after'=>$after,'note'=>($id ? 'updated passport tabpage' : 'new passport tabpage').' '.$after['page'].' of '.$concept['taxon']));
 
 			return $r;
 

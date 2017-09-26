@@ -207,6 +207,7 @@ final class Literature2Model extends AbstractModel
         $query = "
 			select
 				_a.taxon_id,
+				_g.parent_id,
 				_p.rank_id as base_rank_id,
 				_a.name,
 				_b.nametype,
@@ -256,6 +257,7 @@ final class Literature2Model extends AbstractModel
 
         $query = "select
 				_a.taxon_id,
+				_g.parent_id,
 				_g.taxon,
 				_p.rank_id as base_rank_id,
 				_a.presence_id,
@@ -295,6 +297,7 @@ final class Literature2Model extends AbstractModel
         $query = "select
 				_a.taxon_id,
 				_b.taxon,
+				_b.parent_id,
 				_p.rank_id as base_rank_id,
 				_a.trait_group_id,
 				_c.sysname
@@ -336,6 +339,7 @@ final class Literature2Model extends AbstractModel
             select
 				_b.taxon_id,
 				_e.taxon,
+				_e.parent_id,
 				_p.rank_id as base_rank_id,
 				_d.title
 			from

@@ -282,19 +282,36 @@ class NsrTaxonController extends NsrController
 			$this->checkAuthorisation();
 
 			$this->setNameId($this->rGetId());
-			
-			$this->updateName();
+		
 
-			if ($this->needParentChange()!=false && $this->canParentChange()!=false)
+			// check whether a concept already exist with the new name *before* updating the valid name (and subsequently the concept)
+			$name=$this->getName(array('id'=>$this->getNameId()));
+			$exist=$this->getTaxonByName($this->rGetVal('name_name')['new']);
+			
+			if (
+				!empty($name['type_id']) && 
+				$name['type_id']==$this->_nameTypeIds[PREDICATE_VALID_NAME]['id'] && 
+				$this->rHasVar('name_name') &&
+				!empty($exist)
+			)
 			{
-				$this->doParentChange();
-				$name=$this->getName(array('id'=>$this->getNameId()));
-				$this->saveTaxonParentage($name['taxon_id']);
+				$this->addError(sprintf($this->translate('Name already exists for') . ' <a target="_new" href="taxon.php?id=%s">' . $this->translate('another taxon concept') . '</a>.',$exist['id']));
 			}
 			else
 			{
-				$this->updateConceptBySciName();
-				$this->doNameIntegrityChecks($this->getName(array('id'=>$this->getNameId())));
+				$this->updateName();
+	
+				if ($this->needParentChange()!=false && $this->canParentChange()!=false)
+				{
+					$this->doParentChange();
+					$name=$this->getName(array('id'=>$this->getNameId()));
+					$this->saveTaxonParentage($name['taxon_id']);
+				}
+				else
+				{
+					$this->updateConceptBySciName();
+					$this->doNameIntegrityChecks($this->getName(array('id'=>$this->getNameId())));
+				}
 			}
 		}
 		else
@@ -424,9 +441,27 @@ class NsrTaxonController extends NsrController
 
 		if ( $this->rHasVal('action','save') && !$this->isFormResubmit())
 		{
+
 			$this->updateName();
 			$this->addMessage($this->translate('Name saved'));
 			$this->resetTree();
+
+			/*
+			see: https://jira.naturalis.nl/browse/LINNA-588
+			
+			// check whether a concept already exist with the new name *before* updating the valid name (and subsequently the concept)
+			$exist=$this->getTaxonByName($this->rGetVal('name_name')['new']);
+			if ( !empty($exist) )
+			{
+				$this->addError(sprintf($this->translate('Name already exists for') . ' <a target="_new" href="taxon.php?id=%s">' . $this->translate('another taxon concept') . '</a>.',$exist['id']));
+			}
+			else
+			{
+				$this->updateName();
+				$this->addMessage($this->translate('Name saved'));
+				$this->resetTree();
+			}
+			*/
 		}
 
 		$this->smarty->assign('concept',$concept);
@@ -528,8 +563,6 @@ class NsrTaxonController extends NsrController
 		$this->smarty->assign('treetop',$this->treeGetTop());
 		$this->printPage();
 	}
-
-
 
     public function ajaxInterfaceAction()
     {
@@ -689,12 +722,12 @@ class NsrTaxonController extends NsrController
 
 			if ($val['language_id']==LANGUAGE_ID_SCIENTIFIC && $val['nametype']==PREDICATE_VALID_NAME)
 			{
-				$names[$key]['name_no_tags']=$this->addHybridMarkerAndInfixes( array( 'name'=>$names[$key]['name_no_tags'],'base_rank_id'=>$base_rank_id ) );
+				$names[$key]['name_no_tags']=strip_tags($this->addHybridMarkerAndInfixes( [ 'name'=>$names[$key]['name_no_tags'],'base_rank_id'=>$base_rank_id,'taxon_id'=>$taxon_id ] ));
 			}
 			else
 			if ($val['language_id']==LANGUAGE_ID_SCIENTIFIC && $val['nametype']!=PREDICATE_VALID_NAME && isset($val['rank_id']))
 			{
-				$names[$key]['name_no_tags']=$this->addHybridMarkerAndInfixes( array( 'name'=>$names[$key]['name_no_tags'],'base_rank_id'=>$val['rank_id'] ) );
+				$names[$key]['name_no_tags']=strip_tags($this->addHybridMarkerAndInfixes( [ 'name'=>$names[$key]['name_no_tags'],'base_rank_id'=>$val['rank_id'],'taxon_id'=>$taxon_id ] ));
 			}
 
 			$names[$key]['addition']=$this->getNameAddition(array('name_id'=>$val['id']));
@@ -760,7 +793,7 @@ class NsrTaxonController extends NsrController
 			only by 'presence82_id', and are therefore also obsolete.
 			these statuses get a index_label of 99, based on the fact that
 			they, and they alone, have no actual index_label, and are
-			subsequently excluded from the list in the wehre-statement.
+			subsequently excluded from the list in the where-statement.
 		*/
 
 		return $this->models->NsrTaxonModel->getStatuses(array(
@@ -806,24 +839,21 @@ class NsrTaxonController extends NsrController
 
 	private function getDeletedSpeciesList()
 	{
-		$taxa=$this->models->NsrTaxonModel->getDeletedSpeciesList(array(
-			"project_id"=>$this->getCurrentProjectId()
-		));
+		$taxa=$this->models->NsrTaxonModel->getDeletedSpeciesList( [ "project_id"=>$this->getCurrentProjectId() ] );
 		foreach((array)$taxa as $key=>$val)
 		{
-			$taxa[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$taxa[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['id'],'parent_id'=>$val['parent_id'] ] );
 		}
 		return $taxa;
 	}
 
 	private function getOrphanedSpeciesList()
 	{
-		$taxa=$this->models->NsrTaxonModel->getOrphanedSpeciesList(array(
-			"project_id"=>$this->getCurrentProjectId()
-		));
+		$taxa=$this->models->NsrTaxonModel->getOrphanedSpeciesList([ "project_id"=>$this->getCurrentProjectId() ] );
+
 		foreach((array)$taxa as $key=>$val)
 		{
-			$taxa[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$taxa[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['taxon_id'],'taxon_id'=>$val['id'],'parent_id'=>$val['parent_id'] ] );
 		}
 
 		return $taxa;
@@ -844,7 +874,7 @@ class NsrTaxonController extends NsrController
         $sort = isset($p['sort']) ? $p['sort'] : null;
         $offset = isset($p['offset']) ? $p['offset'] : null;
 
-		$search=trim($search);
+		$search=trim($this->removeSearchNoise($search));
 
 		if (empty($search) && empty($id) && $haveDeleted!='only')
 		{
@@ -869,13 +899,19 @@ class NsrTaxonController extends NsrController
 			"offset"=>$offset,
 		));
 
-		foreach ((array) $taxa as $key => $val)
+		foreach ((array)$taxa as $key => $val)
 		{
-			$taxa[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+			
+			$taxa[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['id'],'parent_id'=>$val['parent_id'] ] );
 
-			if ($val['nametype']==PREDICATE_VALID_NAME && $val['nametype']==PREDICATE_PREFERRED_NAME ||
-			    isset($val['synonym_base_rank_id']) && !empty($val['synonym_base_rank_id'])) {
-			    $taxa[$key]['label']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['label'],'base_rank_id'=>$val['base_rank_id'] ) );
+			if ($val['nametype']==PREDICATE_VALID_NAME)
+			{
+				$taxa[$key]['label']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['label'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['id'],'parent_id'=>$val['parent_id'] ] );
+			}
+			else
+			if (isset($val['synonym_base_rank_id']) && !empty($val['synonym_base_rank_id']))
+			{
+				$taxa[$key]['label']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['label'],'base_rank_id'=>$val['synonym_base_rank_id'],'taxon_id'=>$val['id'],'parent_id'=>$val['parent_id'] ] );
 			}
 
 			if ($val['base_rank_id']==GENUS_RANK_ID)
@@ -899,7 +935,10 @@ class NsrTaxonController extends NsrController
 
 			if ($val['nametype']!=PREDICATE_VALID_NAME && $val['nametype']!=PREDICATE_PREFERRED_NAME)
 			{
+				$taxa[$key]['label']=
+					$this->addHybridMarkerAndInfixes( [ 'name'=>$val['name'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['id'],'parent_id'=>$val['parent_id'] ] ) . $val['label_suffix'];
 				$taxa[$key]['label']=sprintf($taxa[$key]['label'],'; '.sprintf($this->Rdf->translatePredicate($val['nametype']),$val['language_label']));
+				
 			}
 			else
 			{
@@ -1530,6 +1569,8 @@ class NsrTaxonController extends NsrController
 			'id'=>array('id'=>$this->getConceptId(),'project_id'=>$this->getCurrentProjectId()),
 			'columns'=>'taxon'
 		));
+
+		$this->models->Taxa->resetAffectedRows();
 
 		$result=$this->models->Taxa->update(
 			array('taxon'=>trim($values['new'])),

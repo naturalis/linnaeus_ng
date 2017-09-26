@@ -573,9 +573,6 @@ class ProjectDeleteController extends Controller
         $this->models->Names->delete(array(
             'project_id' => $id
         ));
-        $this->models->NameTypes->delete(array(
-            'project_id' => $id
-        ));
         $this->models->NamesAdditions->delete(array(
             'project_id' => $id
         ));

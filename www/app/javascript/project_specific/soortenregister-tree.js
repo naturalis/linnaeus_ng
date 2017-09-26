@@ -44,6 +44,7 @@ function buildtree(node)
 		}),
 		success : function (data)
 		{
+			//console.log(data);
 			var data=$.parseJSON(data);
 			
 			if ( inititalExpansionLevel!=null && data.node.parentage && data.node.parentage.length < inititalExpansionLevel )

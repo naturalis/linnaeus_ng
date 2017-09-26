@@ -187,7 +187,6 @@ class TreeController extends Controller
 
 		foreach((array)$taxa as $key=>$val)
 		{
-
 			if ($count=='taxon')
 			{
 				if ( $this->_tree_taxon_count_style=='species_only' || $this->_tree_taxon_count_style=='species_established')
@@ -228,29 +227,8 @@ class TreeController extends Controller
 				$val['child_count']=null;
 			}
 
-			/*
-			if ($val['base_rank_id']>=SPECIES_RANK_ID && $val['base_rank_id']!=NOTHOGENUS_RANK_ID )
-			{
-				if ($val['authorship']!='')
-				{
-					$val['taxon']=
-						'<i>'.
-						$this->addHybridMarkerAndInfixes(array('name'=>str_replace($val['authorship'],'',$val['taxon']),'base_rank_id'=>$val['base_rank_id'])).
-						'</i>'.' '.$val['authorship'];
-				}
-				else
-				{
-					$val['taxon']=$this->formatTaxon($val);
-				}
-			}
-			else
-			{
-				$val['taxon']=$this->addHybridMarkerAndInfixes(array('name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id']));
-			}
-			*/
-
-			$val['taxon'] = $this->formatTaxon(array_merge($val, ['ranks' => $ranks, 'rankpos' => 'none']));
-			$val['label']=empty($val['name']) ? $val['taxon'] : $val['name'].' ('.$val['taxon'].')';
+			$val['taxon']=$this->formatTaxon(array_merge($val, ['ranks' => $ranks, 'rankpos' => 'none']));
+			$val['label']=(empty($val['name']) ? $val['taxon'] : $val['name'].' ('.$val['taxon'].')');
 
 			unset($val['parent_id']);
 			unset($val['is_hybrid']);
@@ -274,11 +252,17 @@ class TreeController extends Controller
 			}
 		}
 
+		$x1=$this->_hybridMarkerHtml;
+		$x2=$this->_hybridMarker_graftChimaera;
+		$x3=$this->_hybridMarker;
+
 		usort(
 			$progeny,
-			function($a,$b)
+			function($a,$b) use ($x1,$x2,$x3)
 			{
-				return (strtolower($a['label'])==strtolower($b['label']) ? 0 : (strtolower($a['label'])>strtolower($b['label']) ? 1 : -1));
+				$aa=strtolower(str_replace([$x1,$x2,$x3,' '], '' , strip_tags($a['label'])));
+				$bb=strtolower(str_replace([$x1,$x2,$x3,' '], '' , strip_tags($b['label'])));
+				return ($aa==$bb ? 0 : ($aa>$bb ? 1 : -1));
 			}
 		);
 

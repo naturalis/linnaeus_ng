@@ -20,6 +20,13 @@
 <script>
 $(document).ready(function()
 {
+	//http://fancyapps.com/fancybox/3/docs/#options
+	$('[data-fancybox]').fancybox({
+		arrows : false,
+		infobar : true,
+		animationEffect : false
+	});
+
 	acquireInlineTemplates();
 });
 </script>

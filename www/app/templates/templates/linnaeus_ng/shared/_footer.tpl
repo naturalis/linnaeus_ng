@@ -35,11 +35,14 @@
 	</div>
 </div>
 <script type="text/JavaScript">
-
 $(document).ready(function()
 {
-	// Apply prettyDialog behaviour to items with inline-image class
-	$('.fancy-box').fancybox();
+	//http://fancyapps.com/fancybox/3/docs/#options
+	$('[data-fancybox]').fancybox({
+		arrows : false,
+		infobar : true,
+		animationEffect : false
+	});
 
 	$(".inline-video").each(function()
 	{
@@ -74,7 +77,9 @@ $(document).ready(function()
 
 	{if $search}onSearchBoxSelect('');{/if}
 	{foreach from=$requestData key=k item=v}
-	addRequestVar('{$k}','{$v|addslashes}')
+	{if !$v|@is_array}
+	addRequestVar('{$k}','{$v|@addslashes}')
+	{/if}
 	{/foreach}
 	chkPIDInLinks({$session.app.project.id},'{$addedProjectIDParam}');
 	{if $searchResultIndexActive}
@@ -82,8 +87,6 @@ $(document).ready(function()
 	{/if}
 
 })
-
 </script>
-
 </body>
 </html>

@@ -1,7 +1,5 @@
 {assign var=currentPage value=$session.app.system.path.filename}
 {include file="../shared/header.tpl" title="Distribution" subtitle="Please note, the distribution module is being phased out"}
-
-
 {assign var=map value=$maps[$mapId]}
 
 <div id="page-main">
@@ -12,6 +10,9 @@
             <div>{t _s1=$map.name}The image file for the map "%s" is missing.{/t}</div>
         {else}
         <form method="post" id="theForm" action="">
+            <input type="hidden" name="idA" id="idA" value="{if $taxonA}{$taxonA.id}{/if}" />
+            <input type="hidden" name="idB" id="idB" value="{if $taxonB}{$taxonB.id}{/if}" />
+
             <div class="map-legend-container">
                 <div class="map">
                     <div id="mapName">
@@ -48,54 +49,49 @@
                 </div>
                 <div class="legend-container">
                     <div id="legend">
-                        {foreach from=$geoDataTypes key=k item=v name=x}
-                            <div class="mapPCheckbox">
-                                <label class="checkbox-input">
-                                    <input 
-                                        type="checkbox" 
-                                        name="selectedDataTypes[{$v.id}]" 
-                                        value="{$v.id}" 
-                                        onchange="l2DataTypeToggle();"
-                                        {if $selectedDataTypes=='*' || $selectedDataTypes[$v.id]==$v.id}checked="checked"{/if}/>
-                                    <span class="mock-checkbox"></span>
-                                    {$v.title}
-                                </label>
-                            </div>
-                        {/foreach}
+						{foreach from=$geoDataTypes key=k item=v name=x}
+                        
+                        {$checked = $selectedDataTypes=='*' || $selectedDataTypes[$v.id]==$v.id}
+                        
+						<div class="mapCheckbox">
+	                        <input 
+                            	type="checkbox" 
+								name="selectedDataTypes[{$v.id}]" 
+                                value="{$v.id}" 
+                                id="legend-toggle-{$v.id}" 
+                                onchange="l2ToggleDatatype(this)" 
+                                {if $checked}checked="checked"{/if}/>
+                            <span class="clickzone" onclick="$('#legend-toggle-{$v.id}').trigger('click');$('.legend-{$v.id}').toggle();">
+                                <span class="icon legend-{$v.id}" style="display:{if $checked}none{else}inline{/if};">&#9744;</span>
+                                <span class="icon legend-{$v.id}" style="display:{if $checked}inline{else}none{/if};">&#9745;</span>
+                                {$v.title}
+                            </span>
+                        </div>
+						{/foreach}
+
                         <p>
                             <span class="mapCellA mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                            <span 
-                                id="speciesNameA" 
-                                onclick="
-                                    allLookupSetExtraVar( { name: 'l2_must_have_geo', value: 1 } );
-                                    allLookupNavigateOverrideUrl('javascript:l2SetCompareSpecies(1,%s);');
-                                    allLookupShowDialog()
-                                " 
-                                class="selectIcon{if $taxonA} italics">{$taxonA.taxon}</span>{else}">{t}Select...{/t}{/if}</span>
+                            <span id="speciesNameA" onclick="l2TaxonSelection(1)" class="selectIcon{if $taxonA} italics">{$taxonA.taxon}</span>{else}">{t}Select...{/t}{/if}</span>
                         </p>
                         
                         <p>
                             <span class="mapCellB mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                            <span id="speciesNameB" onclick="
-                                allLookupSetExtraVar( { name: 'l2_must_have_geo', value: 1 } );
-                                allLookupNavigateOverrideUrl('javascript:l2SetCompareSpecies(2,%s);');
-                                allLookupShowDialog()
-                            " 
-                            class="selectIcon{if $taxonB} italics">{$taxonB.taxon}</span>{else}">{t}Select...{/t}{/if}</span>
+                            <span id="speciesNameB" onclick="l2TaxonSelection(2)" class="selectIcon{if $taxonB} italics">{$taxonB.taxon}</span>{else}">{t}Select...{/t}{/if}</span>
                         </p>
                         
-                        <input type="hidden" name="idA" id="idA" value="{if $taxonA}{$taxonA.id}{/if}" />
-                        
-                        <input type="hidden" name="idB" id="idB" value="{if $taxonB}{$taxonB.id}{/if}" />
-                        
-                        <p><span class="mapCellAB mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>{t}Displays overlap between two taxa.{/t}</p>
+                        <p>
+                        	<span class="mapCellAB mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>{t}Displays overlap between two taxa.{/t}
+						</p>
                         
                         <div class="map_controls">
-                            <input id="map_compare_button" type="button" value="{t}Compare{/t}" onclick="l2DoMapCompare()" />
+                            <input id="map_compare_button" type="submit" value="{t}Compare{/t}" />
                         </div>
-                    </div>
 
-                    
+						<p>
+							<a id="toggleGrid" href="#" onclick="l2ToggleGrid(this);"><span style="display:block">{t}Hide grid{/t}</span><span style="display:none">{t}Show grid{/t}</span></a>
+				        </p>
+                        
+                    </div>
                 </div>
             </div>
             

@@ -32,29 +32,30 @@ class MediaController extends Controller
 
     public static $mimeTypes = array(
         'image' => array(
-            'png' => 'image/png',
-            'jpe' => 'image/jpeg',
-            'jpeg' => 'image/jpeg',
-            'jpg' => 'image/jpeg',
-            'gif' => 'image/gif'
+            'image/png' => 'png',
+            'image/jpeg' => 'jpe',
+            'image/jpeg' => 'jpeg',
+            'image/jpeg' => 'jpg',
+            'image/gif' => 'gif',
         ),
         'video' => array(
-            'mp4' => 'video/mp4'
+            'video/mp4' => 'mp4'
         ),
         'audio' => array(
-            'mp3' => 'audio/mpeg'
+            'audio/mpeg' => 'mp3',
+            'audio/mp3' => 'mp3'
         ),
         'pdf' => array(
-            'pdf' => 'application/pdf',
+            'application/pdf' => 'pdf',
         ),
         'text' => array(
-            'doc' => 'application/msword',
-            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'odt' => 'application/vnd.oasis.opendocument.text',
-            'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
-            'rtf' => 'text/rtf',
-            'txt' => 'text/plain',
-            'csv' => 'text/comma-separated-values'
+            'application/msword' => 'doc',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
+            'application/vnd.oasis.opendocument.text' => 'odt',
+            'application/vnd.oasis.opendocument.spreadsheet' => 'ods',
+            'text/rtf' => 'rtf',
+            'text/plain' => 'txt',
+            'text/comma-separated-values' => 'csv',
         )
     );
 
@@ -223,7 +224,7 @@ class MediaController extends Controller
     public function getMediaType ($mime)
     {
         foreach ($this::$mimeTypes as $category => $types) {
-            foreach ($types as $extension => $type) {
+            foreach ($types as $type => $extension) {
                 if ($mime == $type) {
                     return $category;
                 }

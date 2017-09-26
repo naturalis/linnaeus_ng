@@ -53,8 +53,9 @@
 				
             </div>
             <div class="legend-container">
+
 				<div id="legend">
-					<div id="types">
+					<!-- div id="types">
 						{foreach from=$geoDataTypes key=k item=v name=x}
 							<div class="mapPCheckbox">
 								<label class="checkbox-input">
@@ -70,14 +71,17 @@
 							</div>
 						{/foreach}
 						<input type="hidden" name="m" id="mapId" value="{$mapId}" />
-					</div>
+					</div -->
 					{foreach from=$index.legend key=k item=v name=x}
-						<div class="mapCheckbox">
-							<label>
-								<span class="opacity"><span class="mapCellLegend mapCellDiversity{$k}">&nbsp;&nbsp;&nbsp;&nbsp;</span></span>{$v.min}-{$v.max} {t}records{/t}
-							</label>
-						</div>
+                    <div class="mapCheckbox">
+                        <span class="opacity"><span class="mapCellLegend mapCellDiversity{$k}">&nbsp;&nbsp;&nbsp;&nbsp;</span></span>{$v.min}-{$v.max} {t}records{/t}
+                    </div>
 					{/foreach}
+
+                    <p>
+                        <a id="toggleGrid" href="#" onclick="l2ToggleGrid(this);"><span style="display:block">{t}Hide grid{/t}</span><span style="display:none">{t}Show grid{/t}</span></a>
+                    </p>
+                    
 				</div>
             </div>
         </div>

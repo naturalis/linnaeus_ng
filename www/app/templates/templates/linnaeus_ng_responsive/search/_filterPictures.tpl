@@ -28,7 +28,7 @@
 				</label>
 				<div class="filter">
 					<div class="input">
-						<input type="text" class="field" value="{$search.group}" id="group" name="group" autocomplete="off">
+						<input type="text" class="field" value="{$search.group|@strip_tags}" id="group" name="group" autocomplete="off">
 					</div>
 				</div>
 				<div id="group_suggestion" class="suggestion" match="like" class="auto_complete" style="display:none;"></div>

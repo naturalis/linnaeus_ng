@@ -63,27 +63,27 @@ function submitUserEditForm()
 		}
 	}
 
-	if ( $('#username').val().trim().length==0 )
+	if ( $('#username').length!=0 && $('#username').val().trim().length==0 )
 	{
 		msg.push(_('A username is required.'));
 	}
 
-	if ( $('#first_name').val().trim().length==0 )
+	if ( $('#first_name').length!=0 && $('#first_name').val().trim().length==0 )
 	{
 		msg.push(_('First name is required.'));
 	}
 
-	if ( $('#last_name').val().trim().length==0 )
+	if ( $('#last_name').length!=0 && $('#last_name').val().trim().length==0 )
 	{
 		msg.push(_('Last name is required.'));
 	}
 
-	if ( $('#email_address').val().trim().length==0 )
+	if ( $('#email_address').length!=0 && $('#email_address').val().trim().length==0 )
 	{
 		msg.push(_('Email address is required.'));
 	}
 
-	if ( $('#password').val() != $('#password_repeat').val() )
+	if ( $('#password').length!=0 && $('#password').val() != $('#password_repeat').val() )
 	{
 		msg.push(_('Passwords not the same.'));
 	}

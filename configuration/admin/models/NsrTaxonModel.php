@@ -418,6 +418,7 @@ final class NsrTaxonModel extends AbstractModel
 			select
 				_a.id,
 				_a.taxon,
+				_a.parent_id,
 				_q.rank,
 				_q.id as base_rank_id,
 				concat(_user.first_name,' ',_user.last_name) as deleted_by,
@@ -464,6 +465,7 @@ final class NsrTaxonModel extends AbstractModel
 			select
 				_a.id,
 				_a.taxon,
+				_a.parent_id,
 				_q.rank,
 				_q.id as base_rank_id,
 				ifnull(_trash.is_deleted,0) as is_deleted
@@ -520,8 +522,10 @@ final class NsrTaxonModel extends AbstractModel
 			select
 				_a.taxon_id as id,
 				concat(_a.name,' [',ifnull(_q.label,_x.rank),'%s]') as label,
+				concat(' [',ifnull(_q.label,_x.rank),'%s]') as label_suffix,
 				_e.rank_id,
 				_e.taxon,
+				_e.parent_id,
 				_a.name,
 				_common.name as common_name,
 				_f.rank_id as base_rank_id,
@@ -913,7 +917,7 @@ final class NsrTaxonModel extends AbstractModel
 
 			where
 				_a.project_id = ".$project_id."
-				and MATCH(_a.parentage) AGAINST ('".$parent_id."' in boolean mode)
+				and MATCH(_a.parentage) AGAINST ('". $this->generateTaxonParentageId( $parent_id ) ."' in boolean mode)
 		";
 
 		return $this->freeQuery( $query );

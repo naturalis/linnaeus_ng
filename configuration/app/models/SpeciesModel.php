@@ -157,7 +157,7 @@ class SpeciesModel extends AbstractModel
 				_m.specific_epithet,
 				_m.infra_specific_epithet,
 				_m.authorship,
-				_f.rank_id,
+				_f.rank_id as base_rank_id,
 				_f.lower_taxon,
 				_g.label as rank,
 				ifnull(_q.label,_x.rank) as rank_label,
@@ -248,7 +248,7 @@ class SpeciesModel extends AbstractModel
 
 			where
 				_sq.project_id=".$projectId."
-				and MATCH(_sq.parentage) AGAINST ('".$taxonId."' in boolean mode)
+				and MATCH(_sq.parentage) AGAINST ('". $this->generateTaxonParentageId( $taxonId ) ."' in boolean mode)
 				/* and _sp.presence_id is not null */
 				and _f.rank_id".($rankId >= $speciesRankId ? ">=" : "=")." ".$speciesRankId."
 				and ifnull(_trash.is_deleted,0)=0
@@ -276,6 +276,7 @@ class SpeciesModel extends AbstractModel
             select
 				_a.id,
 				_a.taxon,
+				_a.parent_id,
 				if (
 					length(
 						trim(
@@ -351,6 +352,7 @@ class SpeciesModel extends AbstractModel
             select
 				_a.id,
 				_a.taxon_id,
+				_t.parent_id,
 				_a.name,
 				_a.uninomial,
 				_a.specific_epithet,
@@ -866,6 +868,8 @@ class SpeciesModel extends AbstractModel
 				file_name as image,
 				file_name as thumb,
 				_k.taxon,
+				_k.id as taxon_id,
+				_k.parent_id,
 				ifnull(_zz.name,_z.name) as common_name,
 				_j.name,
 				trim(replace(_j.name,ifnull(_j.authorship,''),'')) as nomen,
@@ -1000,13 +1004,11 @@ class SpeciesModel extends AbstractModel
 				on _m.id=_meta6.media_id
 				and _m.project_id=_meta6.project_id
 				and _meta6.sys_label='beeldbankValidator'
-				and _meta6.language_id=".$languageId."
 
 			left join %PRE%media_meta _meta7
 				on _m.id=_meta7.media_id
 				and _m.project_id=_meta7.project_id
 				and _meta7.sys_label='beeldbankAdresMaker'
-				and _meta7.language_id=".$languageId."
 
 			left join %PRE%media_meta _meta8
 				on _m.id=_meta8.media_id
@@ -1198,7 +1200,7 @@ class SpeciesModel extends AbstractModel
 
 			where
 				_q.project_id=".$projectId."
-				and (MATCH(_q.parentage) AGAINST ('".$taxonId."' in boolean mode))
+				and (MATCH(_q.parentage) AGAINST ('". $this->generateTaxonParentageId( $taxonId )."' in boolean mode))
 				and ifnull(_trash.is_deleted,0)=0
 
 			order by taxon
@@ -1253,7 +1255,7 @@ class SpeciesModel extends AbstractModel
 			where
 				_q.project_id=".$projectId."
 				and ifnull(_meta9.meta_data,0)!=1
-				and (MATCH(_q.parentage) AGAINST ('".$taxonId."' in boolean mode))
+				and (MATCH(_q.parentage) AGAINST ('". $this->generateTaxonParentageId( $taxonId ) ."' in boolean mode))
 				and ifnull(_trash.is_deleted,0)=0";
 
         $d = $this->freeQuery($query);

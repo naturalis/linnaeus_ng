@@ -94,7 +94,7 @@ $(document).ready(function()
 			buffer.push(
 				template
 					.replace( /%image%/g, image.image ? image.image : '' )
-					.replace( /%meta_data%/g, image.meta_data ? escape(image.meta_data) : '' )
+					.replace( /%meta_data%/g, image.meta_data ? image.meta_data.replace(/[\n\r]/g) : '' )
 					.replace( /%photographer%/g, image.photographer ? image.photographer : '' )
 					.replace( /%thumb%/g, image.thumb ? image.thumb : '' )
 					.replace( /%id%/g, image.taxon_id ? image.taxon_id : '' )
@@ -154,33 +154,31 @@ $(document).ready(function()
 <span style="display:none" id="template-image-cell">
 <!--
 <div class="imageInGrid3 taxon-page">
-  <div class="thumbContainer">
-    <a class="fancybox" data-fancybox-group="gallery" href="{$taxon_base_url_images_main}%image%" ptitle="<div>%meta_data%</div>">
-    	<div class="imageGradient"></div>
-      <img class="speciesimage" alt="Foto %photographer%" title="Foto %photographer%" src="{$taxon_base_url_images_thumb}%thumb%" />
-      <ul>
-	    <li>{t}Foto{/t}: %photographer%</li>
-	  </ul>
-    </a>
-  </div>
-  
+    <div class="thumbContainer">
+        <a data-fancybox="gallery" href="{$taxon_base_url_images_main}%image%" data-caption='%meta_data%'>
+            <div class="imageGradient"></div>
+	        <img class="speciesimage" alt="Foto %photographer%" title="Foto %photographer%" src="{$taxon_base_url_images_thumb}%thumb%" />
+    	    <ul>
+		        <li>{t}Foto{/t}: %photographer%</li>
+	        </ul>
+        </a>
+    </div>
 </div>
 -->
 </span>
 <span style="display:none" id="template-image-cell-collected">
 <!--
 <div class="imageInGrid3 taxon-page collected">
-  <div class="thumbContainer">
-    <a href="nsr_taxon.php?id=%id%&cat=media">
-    	<div class="imageGradient"></div>
-      <img class="speciesimage" alt="Foto %photographer%" ptitle="Foto %photographer%" src="{$taxon_base_url_images_thumb}%thumb%" />
-      <ul>
-		<li>%name%</li>
-	    <li><i>%taxon%</i></li>
-	  </ul>
-    </a>
-  </div>
-  
+    <div class="thumbContainer">
+        <a href="nsr_taxon.php?id=%id%&cat=media">
+            <div class="imageGradient"></div>
+            <img class="speciesimage" alt="Foto %photographer%" ptitle="{t}Foto{/t} %photographer%" src="{$taxon_base_url_images_thumb}%thumb%" />
+            <ul>
+                <li>%name%</li>
+                <li><i>%taxon%</i></li>
+            </ul>
+        </a>
+    </div>
 </div>
 -->
 </span>

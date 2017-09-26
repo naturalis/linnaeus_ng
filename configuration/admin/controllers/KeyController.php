@@ -906,7 +906,7 @@ class KeyController extends Controller
 		foreach((array)$this->taxaInBranch as $key=>$val)
 		{
 			$this->taxaInBranch[$key]=
-				$this->addHybridMarkerAndInfixes( array( 'name'=>$taxa[$key]["taxon"],'base_rank_id'=>$taxa[$key]["base_rank_id"] ) );
+				$this->addHybridMarkerAndInfixes( [ 'name'=>$taxa[$key]['taxon'],'base_rank_id'=>$taxa[$key]['base_rank_id'],'taxon_id'=>$taxa[$key]['id'],'parent_id'=>$taxa[$key]['parent_id'] ] );
 			unset( $taxa[$key] );
 		}
 
@@ -914,7 +914,7 @@ class KeyController extends Controller
 		foreach((array)$taxa as $key=>$val)
 		{
 			$remaining[$key]=
-				$this->addHybridMarkerAndInfixes( array( 'name'=>$val["taxon"],'base_rank_id'=>$val["base_rank_id"] ) );
+				$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['id'],'parent_id'=>$val['parent_id'] ] );
 		}
 
 		asort( $this->taxaInBranch );
@@ -1005,7 +1005,7 @@ class KeyController extends Controller
 
 		foreach((array)$taxa as $key=>$val)
 		{
-			$taxa[$key]['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'] ) );
+			$taxa[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['id'],'parent_id'=>$val['parent_id'] ] );
 		}
 
 		return $taxa;

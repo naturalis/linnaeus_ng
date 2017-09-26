@@ -686,7 +686,7 @@ class MatrixKeyController extends Controller
 			"matrix_id"=>$this->getCurrentMatrixId(),
 			"preferred_nametype_id"=>$this->getNameTypeId(PREDICATE_PREFERRED_NAME)
         ));
-		
+
 		$taxa=array();
 		$ranks=$this->getProjectRanks() ;
 
@@ -697,9 +697,11 @@ class MatrixKeyController extends Controller
 			$d=$val;
 
 			if (
-				(isset($this->settings->allow_empty_species) && $this->settings->allow_empty_species) ||
-				(!isset($val['is_empty'])) ||
-				(!$this->settings->allow_empty_species && $val['is_empty']==1))
+				!isset($val['is_empty']) ||
+				!isset($this->settings->allow_empty_species) ||
+				(isset($this->settings->allow_empty_species) && $this->settings->allow_empty_species==true) ||
+				(isset($this->settings->allow_empty_species) && $this->settings->allow_empty_species==false && $val['is_empty']==0)
+			)
 			{
 				$d['type']='taxon';
 				if (
@@ -958,7 +960,7 @@ class MatrixKeyController extends Controller
 					'columns' => 'min(lower) as lowest,max(upper) as most_upper'
 				));
 
-			$char['min'] = 1.5;//$cs[0]['lowest'];
+			$char['min'] = $cs[0]['lowest'];
 			$char['max'] = $cs[0]['most_upper'];
 			$char['min_display'] = round($char['min'],(is_float($char['min']) ? 1 : 0));
 			$char['max_display'] = round($char['max'],(is_float($char['max']) ? 1 : 0));

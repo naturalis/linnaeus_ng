@@ -83,6 +83,7 @@ final class TreeModel extends AbstractModel
 				_a.parent_id,
 				_a.is_hybrid,
 				_a.rank_id,
+				_p.rank_id as base_rank_id,
 				_a.taxon,
 				ifnull(_k.name,_l.commonname) as name,
 				_m.authorship,
@@ -171,7 +172,7 @@ final class TreeModel extends AbstractModel
 			where 
 				_sq.project_id = ".$project_id." 
 				and ifnull(_trash.is_deleted,0)=0
-				and MATCH(_sq.parentage) AGAINST ('".$node."' in boolean mode)
+				and MATCH(_sq.parentage) AGAINST ('". $this->generateTaxonParentageId( $node ) ."' in boolean mode)
 			";
 
 		$d=$this->freeQuery($query);
@@ -223,7 +224,7 @@ final class TreeModel extends AbstractModel
 				_sq.project_id=".$project_id."
 				and ifnull(_trash.is_deleted,0)=0
 				and _f.rank_id".($base_rank_id>=SPECIES_RANK_ID ? ">=" : "=")." ".SPECIES_RANK_ID."
-				and MATCH(_sq.parentage) AGAINST ('".$node."' in boolean mode)
+				and MATCH(_sq.parentage) AGAINST ('". $this->generateTaxonParentageId( $node )."' in boolean mode)
 				
 			group by
 				_sr.established

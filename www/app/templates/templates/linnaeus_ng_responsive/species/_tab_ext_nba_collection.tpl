@@ -32,7 +32,7 @@ $(document).ready(function()
 var baseurl;
 //var basedata={};
 var results=[];
-var maxresults=5;
+var maxresults={if $external_content->template_params_decoded->max_results}{$external_content->template_params_decoded->max_results}{else}5{/if};
 var totresults=0;
 var urls=[];
 var searchName="";
@@ -202,26 +202,23 @@ function printLogInfo()
 
 </script>
 
-<p>
-    <h2 id="name-header">{$requested_category.title}</h2>
+<h2 id="name-header">{$requested_category.title}</h2>
 
-    {if $content}
-    <p>{$content}</p>
-    {/if}
-    
-    <div class="nba-data" style="display:none">
-    {t}Geen collectie-exemplaren gevonden in de{/t} <a href="http://bioportal.naturalis.nl/" target="_new">Naturalis Bioportal</a>.
-    </div>
-    
-    <div id="result-header" style="margin-bottom:10px;">
-    </div>
-    <div id="results" class="nba-data" style="margin-bottom:10px;">
-    </div>
-    <br clear="all" />
-    <div id="result-footer" style="margin-bottom:10px;">
-    </div>
+{if $content}
+<p>{$content}</p>
+{/if}
 
-</p>
+<div class="nba-data" style="display:none">
+{t}Geen collectie-exemplaren gevonden in de{/t} <a href="http://bioportal.naturalis.nl/" target="_new">Naturalis Bioportal</a>.
+</div>
+
+<div id="result-header" style="margin-bottom:10px;">
+</div>
+<div id="results" class="nba-data" style="margin-bottom:10px;">
+</div>
+<br clear="all" />
+<div id="result-footer" style="margin-bottom:10px;">
+</div>
 
 <!-- templates -->
 

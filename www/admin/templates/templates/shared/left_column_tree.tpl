@@ -39,7 +39,6 @@ $(document).ready(function()
 	$('#yggdrasil').load( '/linnaeus_ng/admin/views/nsr/tree.php?node=' + {$concept.id}, function() { embedAdminMenu(); } );
 	{/if}
 	
-	
 	function embedAdminMenu()
 	{
 		var top=$( '#admin-menu-top' ).html();

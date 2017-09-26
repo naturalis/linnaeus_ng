@@ -21,6 +21,9 @@
                 </p>
 
                 {if $character.min && $character.max}
+
+	                {if !$character.unit}{$character.unit=""}{/if}
+
                     <p id="state-value-extra">
                         {t _s1=$character.min_display _s2=$character.max_display _s3=$character.unit}Kies een waarde tussen %s en %s%s.{/t}
                     </p>

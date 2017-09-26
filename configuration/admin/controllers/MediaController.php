@@ -87,7 +87,7 @@ class MediaController extends Controller
     public static $metadataFields = array(
         'title',
         'location',
-        'photographer'
+        'creator'//'photographer'
     );
 
     public static $mimeTypes = array(

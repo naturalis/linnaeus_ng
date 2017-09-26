@@ -151,127 +151,74 @@ class NsrTreeController extends NsrController
 				$_SESSION['admin']['user']['species'][$this->getCurrentProjectId()]['tree'] : null;
 	}
 
-	private function getTreeNode($p)
+	private function getTreeNode( $p=null )
 	{
-		$node=isset($p['node']) && $p['node']!==false ? $p['node'] : $this->treeGetTop();
-		$count=isset($p['count']) && in_array($p['count'],array('none','taxon','species')) ? $p['count'] : 'none';
+		
+		$topNode=isset($p['node']) && $p['node']!==false ? $p['node'] : $this->treeGetTop();
 
-		if (is_null($node))
-			return;
+		if (is_null($topNode)) return;
 
-		$nameTypeIdPreferred=!empty($this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']) ? $this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id'] : -1;
-		$nameTypeIdValid=!empty($this->_nameTypeIds[PREDICATE_VALID_NAME]['id']) ? $this->_nameTypeIds[PREDICATE_VALID_NAME]['id'] : -1;
-
-		$taxa=
-			$this->models->NsrTreeModel->getTreeNodeTaxa(array(
-				"language_id"=>$this->getDefaultProjectLanguage(),
-				"type_id_preferred"=>$nameTypeIdPreferred,
-				"type_id_valid"=>$nameTypeIdValid,
-				"project_id"=>$this->getCurrentProjectId(),
-				"node_id"=>$node
-			));
+		$nodeChildren=
+			$this->models->NsrTreeModel->getTreeNodeTaxa( [
+				'language_id' => $this->getDefaultProjectLanguage(),
+				'type_id_preferred' => $this->getNameTypeId(PREDICATE_PREFERRED_NAME),
+				'type_id_valid' => $this->getNameTypeId(PREDICATE_VALID_NAME),
+				'project_id' => $this->getCurrentProjectId(),
+				'node_id' => $topNode
+			] );
 
         $ranks=$this->newGetProjectRanks();
 
 		$taxon=$progeny=array();
 
-		foreach((array)$taxa as $key=>$val)
+		foreach((array)$nodeChildren as $key=>$val)
 		{
+			$childCount=$this->models->NsrTreeModel->getTaxonBranchTaxonCount( [
+				'project_id' => $this->getCurrentProjectId(),
+				'node_id' => $val['id'],
+			] );
+			
+			$val['child_count']=$childCount;
 
-			if ($count=='taxon')
-			{
-				$d=$this->models->NsrTreeModel->getTaxonCount(array(
-					"project_id"=>$this->getCurrentProjectId(),
-					"node_id"=>$val['id']
-				));
+			$val['taxon']=$this->formatTaxon(array_merge($val, ['ranks' => $ranks, 'rankpos' => 'none']));
+			$val['label']=(empty($val['name']) ? $val['taxon'] : $val['name'].' ('.$val['taxon'].')');
 
-				$val['child_count']['taxon']=$d[0]['total'];
-			}
-			else
-			if ($count=='species')
-			{
-				$d=$this->models->NsrTreeModel->getSpeciesCount(array(
-					"project_id"=>$this->getCurrentProjectId(),
-					"base_rank"=>$val['base_rank'],
-					"node_id"=>$val['id']
-				));
-
-				$val['child_count']=
-					array(
-						'total'=>
-							(int)
-								(isset($d['undefined']['total'])?$d['undefined']['total']:0)+
-								(isset($d[0]['total'])?$d[0]['total']:0)+
-								(isset($d[1]['total'])?$d[1]['total']:0),
-						'established'=>
-								(int)(isset($d[1]['total'])?$d[1]['total']:0),
-						'not_established'=>
-								(int)(isset($d[0]['total'])?$d[0]['total']:0)
-					);
-
-			} else
-			{
-				$val['child_count']=null;
-			}
-/*
-			if ($val['base_rank']>=SPECIES_RANK_ID)
-			{
-				if ($val['authorship']!='')
-				{
-					$val['taxon']=
-						'<i>'.
-						str_replace($val['authorship'],'',$val['taxon']).
-						'</i>'.' '.$val['authorship'];
-				}
-				else
-				{
-					$val['taxon']=$this->formatTaxon(array_merge($val, [ 'ranks'=>$ranks ]));
-				}
-			}
-
-			$val['taxon']=$this->addHybridMarkerAndInfixes( array( 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank'] ) );
-*/
-
-			$val['taxon'] = $this->formatTaxon(array_merge($val, ['ranks' => $ranks, 'rankpos' => 'none']));
-			$val['label']=empty($val['name']) ? $val['taxon'] : $val['name'].' ('.$val['taxon'].')';
-
-			//unset($val['parent_id']);
 			unset($val['is_hybrid']);
 			unset($val['rank_id']);
-			unset($val['base_rank']);
+			unset($val['base_rank_id']);
 
-			if ($val['id']==$node)
+			if ($val['id']==$topNode)
 			{
 				$taxon=$val;
 			}
 			else
 			{
-				$d=$this->models->NsrTreeModel->getTaxonChildCount(array(
+				$val['has_children']=$this->models->NsrTreeModel->hasChildren(array(
 					"project_id"=>$this->getCurrentProjectId(),
-					"parent_id"=>$val['id']
+					"node"=>$val['id']
 				));
-
-				$val['has_children']=$d[0]['total']>0;
 				$progeny[]=$val;
 			}
+
 		}
+
+		$x1=$this->_hybridMarkerHtml;
+		$x2=$this->_hybridMarker_graftChimaera;
+		$x3=$this->_hybridMarker;
 
 		usort(
 			$progeny,
-			function($a,$b)
+			function($a,$b) use ($x1,$x2,$x3)
 			{
-				return
-					(strtolower($a['label'])==strtolower($b['label']) ?
-						0 : (strtolower($a['label'])>strtolower($b['label']) ? 1 : -1));
+				$aa=strtolower(str_replace([$x1,$x2,$x3,' '], '' , strip_tags($a['label'])));
+				$bb=strtolower(str_replace([$x1,$x2,$x3,' '], '' , strip_tags($b['label'])));
+				return ($aa==$bb ? 0 : ($aa>$bb ? 1 : -1));
 			}
 		);
 
-		return
-			array(
-				'node'=>$taxon,
-				'progeny'=>$progeny
-			);
+		return [ 'node'=>$taxon, 'progeny'=>$progeny ];
 
 	}
+
 
 }

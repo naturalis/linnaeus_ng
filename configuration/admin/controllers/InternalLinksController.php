@@ -186,7 +186,7 @@ class InternalLinksController extends Controller
 
 				$d[] = array(
 					'id'=> $val['id'],
-					'label' => htmlspecialchars($val['taxon'],ENT_QUOTES).($val['is_hybrid']==1 ? ' &#215;' : '')
+					'label' => htmlspecialchars($val['taxon'],ENT_QUOTES).($val['is_hybrid']==1 ? ' ' . $this->_hybridMarkerHtml : '')
 				);
 
 		}

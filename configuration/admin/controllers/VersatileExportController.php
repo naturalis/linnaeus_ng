@@ -96,6 +96,7 @@ class VersatileExportController extends Controller
 		'concept_url'=>'concept_url',
 		'database_id'=>'database_id',
 		'parent_taxon'=>'parent_taxon',
+		'parent_taxon_nsr_id'=>'parent_taxon_nsr_id',
 		'uninomial'=>'uninomial',
 		'specific_epithet'=>'specific_epithet',
 		'infra_specific_epithet'=>'infra_specific_epithet',
@@ -273,6 +274,7 @@ class VersatileExportController extends Controller
 				".( $this->hasCol( 'concept_url' ) ? " concat('".$this->concept_url."',replace(_b.nsr_id,'tn.nlsr.concept/','')) as " . $this->columnHeaders['concept_url'] . ", " : "" )."
 				".( $this->hasCol( 'database_id' ) ? " _q.taxon_id as " . $this->columnHeaders['database_id'] . ", " : "" )."
 				".( $this->hasCol( 'parent_taxon' ) ? " _pnames.name as " . $this->columnHeaders['parent_taxon'] . ", " : "" )."
+				".( $this->hasCol( 'parent_taxon_nsr_id' ) ? " replace(_pid.nsr_id,'tn.nlsr.concept/','') as " . $this->columnHeaders['parent_taxon_nsr_id'] . ", " : "" )."
 				_q.taxon_id as _taxon_id,
 				_t.parent_id as _parent_id,
 				_r.id as _base_rank_id
@@ -307,7 +309,7 @@ class VersatileExportController extends Controller
 
 			" : "" ).
 
-			( $this->hasCol( 'parent_taxon' ) ? "
+			( $this->hasCol( 'parent_taxon' ) || $this->hasCol( 'parent_taxon_nsr_id' ) ? "
 
 				left join %PRE%taxa _ptaxa
 					on _t.parent_id=_ptaxa.id
@@ -319,6 +321,11 @@ class VersatileExportController extends Controller
 					and _pnames.type_id= ".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
 					and _pnames.language_id=".LANGUAGE_ID_SCIENTIFIC."
 
+				left join %PRE%nsr_ids _pid
+					on _ptaxa.project_id = _pid.project_id
+					and _ptaxa.id = _pid.lng_id
+					and _pid.item_type = 'taxon'
+					
 			" : "" )."
 
 			left join %PRE%projects_ranks _f
@@ -357,7 +364,7 @@ class VersatileExportController extends Controller
 				".$ranks_clause."
 				".$presence_status_clause."
 				and (
-					match(_q.parentage) against ('".$this->getBranchTopId()."' in boolean mode) or
+					match(_q.parentage) against ('". Controller::generateTaxonParentageId( $this->getBranchTopId() )."' in boolean mode) or
 					_q.taxon_id = ".$this->getBranchTopId()."
 				)
 
@@ -380,8 +387,7 @@ class VersatileExportController extends Controller
 		{
 			foreach((array)$this->names as $key=>$val)
 			{
-				$this->names[$key]['scientific_name']=
-					$this->addHybridMarkerAndInfixes( array( 'name'=>$val['scientific_name'],'base_rank_id'=>$val['_base_rank_id'] ) );
+				$this->names[$key]['scientific_name']= $this->addHybridMarkerAndInfixes( [ 'name'=>$val['scientific_name'],'base_rank_id'=>$val['_base_rank_id'], 'taxon_id'=>$val['_taxon_id'],'parent_id'=>$val['_parent_id'] ] );
 			}
 		}
 
@@ -389,7 +395,8 @@ class VersatileExportController extends Controller
 		{
 			foreach((array)$this->names as $key=>$val)
 			{
-				$this->names[$key]['scientific_name']=preg_replace('/(\s+)/',' ',strip_tags($val['scientific_name']));
+				$this->names[$key]['scientific_name']=html_entity_decode(strip_tags($this->names[$key]['scientific_name']));
+				//$this->names[$key]['scientific_name']=preg_replace('/(\s+)/',' ',strip_tags($val['scientific_name']));
 			}
 		}
 

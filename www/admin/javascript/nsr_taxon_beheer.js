@@ -453,6 +453,27 @@ function deletedataform(style)
 
 }
 
+function irrevocablydelete()
+{
+	if (!confirm(_("Are you sure you want to irrevocably delete this taxon and its associated data?"))) return;
+
+	if (dataid)
+	{
+		form = $('<form method=post action="taxon_irrevocably_delete.php"></form>');
+		form.append('<input type="hidden" name="rnd" value="'+$('#rnd').val()+'" />');
+		form.append('<input type="hidden" name="id" value="'+dataid+'" />');
+
+		$(window).unbind('beforeunload');
+		$('body').append(form);
+		form.submit();
+	}
+	else
+	{
+		alert(_("An error occurred: could not locate an ID."));
+	}
+
+}
+
 function deleteform()
 {
 	if (!dataid) return;
@@ -667,7 +688,7 @@ function dropListDialog(ele,title,params)
 		content :
 			'<p><input type="text" class="medium" id="'+id+'" placeholder="' + getInputPlaceHolder() + '" /></p> \
 			 <p> \
-			 <a href="#" onclick="$( \'#dialog-message\' ).dialog( \'close\' );return false;" display-text=" " style="font-size: 0.8em;"> \
+			 <a href="#" onclick="setNsrDropListValue(null,\''+target+'\');$( \'#dialog-message\' ).dialog( \'close\' );return false;" display-text=" " style="font-size: 0.8em;"> \
 				 ' + getDropListCloseLabel() + ' \
 			</a> \
 			<div id="droplist-list-container"></div> \
@@ -746,9 +767,19 @@ function doNsrDropList(p)
 function setNsrDropListValue(ele,variable)
 {
 	// don't change order of lines
-	$('#'+variable.replace(/(_id)$/,'')).html( $(ele).attr('display-text') ? $.trim($(ele).attr('display-text')) : $(ele).text() );
-	$('#'+variable.replace(/(_id)$/,'')).val( $(ele).attr('display-text') ? $.trim($(ele).attr('display-text')) : $(ele).text() );
-	$('#'+variable).val($(ele).attr('value')).trigger('change');
+	if (ele==null)
+	{
+		var lbl='-';
+		var val=null;
+	}
+	else
+	{
+		var lbl=$(ele).attr('display-text') ? $.trim($(ele).attr('display-text')) : $(ele).text()
+		var val=$(ele).attr('value');
+	}
+	$('#'+variable.replace(/(_id)$/,'')).html( lbl );
+	$('#'+variable.replace(/(_id)$/,'')).val( lbl );
+	$('#'+variable).val( val ).trigger('change');
 }
 
 function buildDropList(data,variable)

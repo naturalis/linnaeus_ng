@@ -149,6 +149,7 @@ class KeyModel extends AbstractModel
 					select
 						_a.id,
 						_a.taxon,
+						_a.parent_id,
 						_a.rank_id,
 						_b.res_taxon_id,
 						_d.rank,
@@ -176,7 +177,7 @@ class KeyModel extends AbstractModel
 					where
 						_a.project_id = " . $project_id . "
 						and (
-							MATCH(_sq.parentage) AGAINST ('" . $top . "' in boolean mode)
+							MATCH(_sq.parentage) AGAINST ('" . $this->generateTaxonParentageId( $top ) . "' in boolean mode)
 							or _a.id=" . $top . " 
 						)	
 				");
@@ -268,6 +269,7 @@ class KeyModel extends AbstractModel
 				select
 					_a.id,
 					_a.taxon,
+					_a.parent_id,
 					_c.rank_id as base_rank_id
 				from
 					%PRE%taxa _a

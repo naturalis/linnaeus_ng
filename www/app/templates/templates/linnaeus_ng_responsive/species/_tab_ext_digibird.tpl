@@ -81,28 +81,24 @@ $(document).ready(function()
 });
 </script>
 
+<h2 id="name-header">{$requested_category.title}</h2>
+
+<!-- 
+<a href="{$external_content->full_url}" target="_blank">{$external_content->full_url}</a>
+-->
+
+{if $content}
 <p>
-
-    <h2 id="name-header">{$requested_category.title}</h2>
-
-	<!-- 
-	<a href="{$external_content->full_url}" target="_blank">{$external_content->full_url}</a>
-    -->
-
-    {if $content}
-    <p>
-        {$content}
-    </p>
-    {/if}
-    
-    <div id=results></div>
-    <div>
-        <a href="http://www.xeno-canto.org/species/{$external_content->subst_values['%GENUS%']}-{$external_content->subst_values['%SPECIES%']}" target="_blank">
-        Naar de soortpagina op Xeno-canto.
-        </a>
-    </div>
-
+    {$content}
 </p>
+{/if}
+
+<div id=results></div>
+<div>
+    <a href="http://www.xeno-canto.org/species/{$external_content->subst_values['%GENUS%']}-{$external_content->subst_values['%SPECIES%']}" target="_blank">
+    Naar de soortpagina op Xeno-canto.
+    </a>
+</div>
 
 <div class="inline-templates" id="aSoundTpl">
 <!--

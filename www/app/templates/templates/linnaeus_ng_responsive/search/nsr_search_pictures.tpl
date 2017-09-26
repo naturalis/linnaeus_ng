@@ -38,7 +38,10 @@
 				{foreach from=$results.data item=v}
 					<div class="imageInGrid3">
 						<div class="thumbContainer">
-							<a class="fancybox" data-fancybox-group="gallery" href="{$taxon_base_url_images_main}{$v.image}" pTitle="<div>{$v.meta_data|@escape}</div>">
+							<a 
+                                data-fancybox="gallery"
+                                data-caption="{$v.meta_data|@escape}"
+                                href="{$taxon_base_url_images_main}{$v.image}">
 								<div class="imageGradient"></div>
 								<img class="speciesimage" alt="Foto {$v.photographer}" title="Foto {$v.photographer}" src="{$taxon_base_url_images_thumb}{$v.thumb}" />
 								<ul>
@@ -71,19 +74,17 @@
 $(document).ready(function()
 {
 	$('title').html("{t}Foto's zoeken{/t} - "+$('title').html());
-
-	if(jQuery().prettyPhoto) {
-	 	$("a[rel^='prettyPhoto']").prettyPhoto({
-	 		opacity: 0.70, 
-			animation_speed:50,
-			show_title: false,
-	 		overlay_gallery: false,
-	 		social_tools: false,
-			changepicturecallback:function(){ prettyPhotoCycle() }
-	 	});
-	}
 	bindKeys();
 	acquireInlineTemplates();
+
+	//http://fancyapps.com/fancybox/3/docs/#options
+	$('[data-fancybox]').fancybox({
+		arrows : false,
+		infobar : true,
+		animationEffect : false
+	});
+
+
 });
 </script>
 

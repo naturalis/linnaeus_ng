@@ -132,7 +132,7 @@ function doSubmit()
 	{
 		m.push(_('select a taxon.'));
 	}
-	if ( $( '#selected_ranks li' ).size()<1 )
+	if ( $( '#selected_ranks li' ).length<1 )
 	{
 		m.push(_('select at least one rank.'));
 	}
@@ -243,7 +243,7 @@ function doSubmit()
                     <td style="vertical-align:top;">
                         {t}Display only taxa with the following rank{/t}:<br />
                         <span class=remark>({t}double-click to remove{/t})</span>
-                        <span class=remark><a  href="#"
+                        <span class=remark><a href="#"
                         	onclick="$( '.selected_ranks' ).each(function(index, element) {
                             $(this).remove();checkRanksOp(); });return false;">{t}remove all{/t}</a></span>
                     </td>
@@ -300,7 +300,7 @@ function doSubmit()
                         $( '.hybrid_options' ).prop( 'disabled' , !$(this).prop( 'checked' ) ).toggle( $(this).prop( 'checked' ) )
                     "/></td>
                     <td><label for=col_sci_name>{t}scientific name{/t}</label>
-                    <div class=hybrid_options style="display:none">
+                    <div class=hybrid_options style="">
                     <label><input class=hybrid_options id=add_hybrid_marker type=checkbox name=add_hybrid_marker checked="checked" /> {t}add × to hybrids & infixes (subsp., f., var.) to infraspecies{/t}</label><br />
                     </div>
                     </td>
@@ -358,7 +358,11 @@ function doSubmit()
 
                 <tr>
                     <td><input id=col_parent_taxon type=checkbox name=cols[parent_taxon]  /></td>
-                    <td><label for=col_parent_taxon>{t}direct parent{/t}</label></td>
+                    <td><label for=col_parent_taxon>{t}direct parent (name){/t}</label></td>
+                </tr>
+                <tr>
+                    <td><input id=col_parent_taxon_nsr_id type=checkbox name=cols[parent_taxon_nsr_id]  /></td>
+                    <td><label for=col_parent_taxon_nsr_id>{t}direct parent NSR ID{/t}</label></td>
                 </tr>
                 <tr>
                     <td><input id=col_database_id type=checkbox name=cols[database_id]  /></td>
@@ -507,7 +511,7 @@ function doSubmit()
 
         <span class=remark>
         	{t}The default values generate a CSV file that can be opened in Excel.{/t}<br />
-            {t}Do not open de file directly in Excel, but first save it and ubsequently open it in an empty Excel sheet through 'Data' > 'From text'.{/t}
+            {t}Do not open de file directly in Excel, but first save it and subsequently open it in an empty Excel sheet through 'Data' > 'From text'.{/t}
         </span>
 
 	</fieldset>
@@ -533,7 +537,6 @@ $(document).ready(function()
 	$( '#parent_taxon_id' ).val( {$branch_top.id} );
 	$( '#parent_taxon' ).text( '{$branch_top.label|@escape}' );
 	{/if}
-	$('#col_sci_name').trigger('click').prop('checked',true);
 	setDropListCloseLabel('close');
 });
 </script>

@@ -8,7 +8,7 @@ class TaxonParentageController extends Controller
     );
 
     public $controllerPublicName = 'Quick Taxon Parentage';
-    public $modelNameOverride = 'TreeModel';
+    public $modelNameOverride = 'TaxonParentageModel';
 
     public function __construct ()
     {
@@ -20,33 +20,25 @@ class TaxonParentageController extends Controller
         parent::__destruct();
     }
 
-	public function padId($id)
-	{
-		return sprintf('%05s',$id);
-	}
-
 	private function initialize()
 	{
 		if (!$this->models->TaxonQuickParentage->getTableExists())
 		{
-			// raise error
+			$this->addError('table TaxonQuickParentage does not exist');
 			return;
 		}
+		
+		set_time_limit(600);
 	}
 
     public function getParentageTableRowCount()
     {
-		$d=$this->models->TaxonQuickParentage->_get(array(
-			'id'=>
-				array(
-					'project_id' => $this->getCurrentProjectId()
-
-				),
+		$d=$this->models->TaxonQuickParentage->_get( [
+			'id'=> [ 'project_id' => $this->getCurrentProjectId() ],
 			'columns' => 'count(*) as total'
-			));
+		] );
 
 		return $d[0]['total'];
-
     }
 
 	public function generateParentageAll()
@@ -54,12 +46,11 @@ class TaxonParentageController extends Controller
 		$t = $this->treeGetTop();
 
 		if (empty($t))
-			die('no top!?');
-		/*
-		if (count((array)$t)>1)
-			die('multiple tops!?');
-		*/
-
+		{
+			$this->addError('Didn\'t find a taxon tree top.');
+			return;
+		}
+			
 		$this->tmp=array();
 
 		$this->getProgeny($t,0,array());
@@ -71,14 +62,39 @@ class TaxonParentageController extends Controller
 		$i=0;
 		foreach((array)$this->tmp as $key=>$val)
 		{
-			$this->models->TaxonQuickParentage->save(
-			array(
+			$this->models->TaxonQuickParentage->save( [
 				'id' => null,
 				'project_id' => $this->getCurrentProjectId(),
 				'taxon_id' => $val['id'],
 				'parentage' => implode(' ',$val['parentage'])
+			] );
 
-			));
+			$i++;
+		}
+
+		return $i;
+
+	}
+
+	public function generateParentage( $id )
+	{
+		$this->tmp=[];
+
+		$this->getProgeny($id,0,[]);
+
+		$d=[ 'project_id' => $this->getCurrentProjectId(), 'taxon_id'=>$id ];
+
+		$this->models->TaxonQuickParentage->delete( $d );
+
+		$i=0;
+		foreach((array)$this->tmp as $key=>$val)
+		{
+			$this->models->TaxonQuickParentage->save( [
+				'id' => null,
+				'project_id' => $this->getCurrentProjectId(),
+				'taxon_id' => $val['id'],
+				'parentage' => implode(' ',$val['parentage'])
+			] );
 
 			$i++;
 		}
@@ -94,7 +110,7 @@ class TaxonParentageController extends Controller
 			"_r.id < 10" added as there might be orphans, which are ususally low-level ranks
 		*/
 
-	    $p = $this->models->TreeModel->getTreeTop($this->getCurrentProjectId());
+	    $p = $this->models->TaxonParentageModel->getTreeTop( [ 'project_id'=>$this->getCurrentProjectId() ] );
 
 		if ($p && count((array)$p)==1)
 		{
@@ -125,7 +141,7 @@ class TaxonParentageController extends Controller
 			)
 		);
 
-		$family[]=$this->padId($parent);
+		$family[]=Controller::generateTaxonParentageId($parent);
 
 		foreach((array)$result as $row)
 		{
@@ -134,7 +150,5 @@ class TaxonParentageController extends Controller
 			$this->getProgeny($row['id'],$level+1,$family);
 		}
 	}
-
-
 
 }

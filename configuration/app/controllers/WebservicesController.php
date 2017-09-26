@@ -807,11 +807,13 @@ parameters:
 			*/
 		}
 
+		/*  https://jira.naturalis.nl/browse/LINNA-834
 		$result['statistics']['accepted_names']=
 			array(
 				'count'=>format_number($t['count_name_accepted']),
 				'label'=>$this->translate('Geaccepteerde soortnamen')
 			);
+		*/
 
 		$result['statistics']['dutch_names']=
 			array(

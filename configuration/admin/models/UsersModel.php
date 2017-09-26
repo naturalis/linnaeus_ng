@@ -169,6 +169,7 @@ final class UsersModel extends AbstractModel
 				_b.taxon,
 				_b.rank_id,
 				_b.id as taxon_id,
+				_b.parent_id,
 				_p.rank_id as base_rank_id
 
 			from 

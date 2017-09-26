@@ -164,6 +164,10 @@ class AbstractModel extends BaseClass
 		);
     }
 
+    public function resetAffectedRows()
+    {
+		$this->_affectedRows = 0;
+    }
 
 	/* DEBUG */
     public function q()
@@ -398,5 +402,10 @@ class AbstractModel extends BaseClass
         }
         return false;
     }
+	
+	public function generateTaxonParentageId( $id )
+	{
+		return Controller::generateTaxonParentageId( $id );
+	}
 
 }

@@ -33,7 +33,10 @@
 
 			{section name=taxon loop=$classification start=$start}
 				{math equation="(x-y)*3" x=$smarty.section.taxon.index y=$start assign=buffercount}
-				{if $classification[taxon].parent_id!=null}
+                
+                {assign v $classification[taxon]}
+                
+				{if $v.parent_id!=null}
 				<tr>
 					<td class="buffer-{$buffercount}">
 					{if $buffercount>0}
@@ -42,41 +45,45 @@
 					{/if}
 					<div class="classContainer">
 						<span class="classification-name{if $smarty.section.taxon.index+1<$classification|@count} smaller{else} current{/if}">
-						<a href="nsr_taxon.php?id={$classification[taxon].id}">
-							{if $classification[taxon].lower_taxon==1}
-								{if $classification[taxon].infra_specific_epithet}
-									{$classification[taxon].infra_specific_epithet}
+						<a href="nsr_taxon.php?id={$v.id}">
+							{if $v.lower_taxon==1}
+								{if $v.infra_specific_epithet}
+									{$v.infra_specific_epithet}
 								{else}
-									{$classification[taxon].specific_epithet}
+	                                {if $v.previous_is_notho}
+										{$v.specific_epithet_no_markers}
+                                    {else}
+										{$v.specific_epithet}
+                                    {/if}
 								{/if}
-								{assign var=lastname value="`$classification[taxon].uninomial` `$classification[taxon].specific_epithet`"}
+								{assign var=lastname value="`$v.uninomial` `$v.specific_epithet`"}
 							{else}
-								{$classification[taxon].name}
-								{assign var=lastname value=$classification[taxon].name}
+								{$v.name}
+								{assign var=lastname value=$v.name}
 							{/if}
 						</a>
 						</span>
-						{assign var=rank_id value=$classification[taxon].rank_id}
-						<span class="classification-rank">[{$classification[taxon].rank_label}]</span>
 
-						{if $classification[taxon].species_count.total>0}
+						<span class="classification-rank">[{$v.rank_label}]</span>
+
+						{if $v.species_count.total>0}
 						
                             {if $tree_taxon_count_style!='none'}
                            
                                 {if $smarty.section.taxon.index==$start}
                                     <br /><span class="classification-count">
                                     {if $tree_taxon_count_style=='species_only'}
-                                        ({$classification[taxon].species_count.total} {t}soorten{/t})
+                                        ({$v.species_count.total} {t}soorten{/t})
                                     {else}
-                                        ({$classification[taxon].species_count.total} {t}soorten in totaal{/t} / {$classification[taxon].species_count.established} {t}gevestigd{/t})
+                                        ({$v.species_count.total} {t}soorten in totaal{/t} / {$v.species_count.established} {t}gevestigd{/t})
                                     {/if}
                                     </span>
                                 {else}
                                     <span class="classification-count">
                                     {if $tree_taxon_count_style=='species_only'}
-                                        ({$classification[taxon].species_count.total})
+                                        ({$v.species_count.total})
                                     {else}
-                                        ({$classification[taxon].species_count.total}/{$classification[taxon].species_count.established})
+                                        ({$v.species_count.total}/{$v.species_count.established})
                                     {/if}
                                     </span>
                                 {/if}
@@ -96,7 +103,7 @@
 						<span class="classification-connector"></span>
             <span class="classification-name smaller">
             	<a href="?id={$v.id}">
-								{if $v.rank_id >= $smarty.const.SPECIES_RANK_ID}
+								{if $v.base_rank_id >= $smarty.const.SPECIES_RANK_ID}
 									{if $v.infra_specific_epithet}
 										{$v.infra_specific_epithet}
 									{elseif $v.specific_epithet}
@@ -170,7 +177,10 @@
 
 			{section name=taxon loop=$classification start=$start}
 				{math equation="(x-y)*3" x=$smarty.section.taxon.index y=$start assign=buffercount}
-				{if $classification[taxon].parent_id!=null}
+                
+                {assign v $classification[taxon]}
+                
+				{if $v.parent_id!=null}
 				<tr>
 					<td class="buffer-{$buffercount}">
 					{if $buffercount>0}
@@ -179,40 +189,44 @@
 					{/if}
 					<div class="classContainer">
 						<span class="classification-name{if $smarty.section.taxon.index+1<$classification|@count} smaller{else} current{/if}">
-						<a href="nsr_taxon.php?id={$classification[taxon].id}">
-							{if $classification[taxon].lower_taxon==1}
-								{if $classification[taxon].infra_specific_epithet}
-									{$classification[taxon].infra_specific_epithet}
+						<a href="nsr_taxon.php?id={$v.id}">
+							{if $v.lower_taxon==1}
+								{if $v.infra_specific_epithet}
+									{$v.infra_specific_epithet}
 								{else}
-									{$classification[taxon].specific_epithet}
+	                                {if $v.previous_is_notho}
+										{$v.specific_epithet_no_markers}
+                                    {else}
+										{$v.specific_epithet}
+                                    {/if}
 								{/if}
-								{assign var=lastname value="`$classification[taxon].uninomial` `$classification[taxon].specific_epithet`"}
+								{assign var=lastname value="`$v.uninomial` `$v.specific_epithet`"}
 							{else}
-								{$classification[taxon].name}
-								{assign var=lastname value=$classification[taxon].name}
+								{$v.name}
+								{assign var=lastname value=$v.name}
 							{/if}
 						</a>
 						</span>
-						{assign var=rank_id value=$classification[taxon].rank_id}
-						<span class="classification-rank">[{$classification[taxon].rank_label}]</span>
-						{if $classification[taxon].species_count.total>0}
+
+						<span class="classification-rank">[{$v.rank_label}]</span>
+						{if $v.species_count.total>0}
 						
                         {if $tree_taxon_count_style!='none'}
 
                             {if $smarty.section.taxon.index==$start}
                                 <br /><span class="classification-count">
                                 {if $tree_taxon_count_style=='species_only'}
-                                    ({$classification[taxon].species_count.total} {t}soorten{/t})
+                                    ({$v.species_count.total} {t}soorten{/t})
                                 {else}
-                                    ({$classification[taxon].species_count.total} {t}soorten in totaal{/t} / {$classification[taxon].species_count.established} {t}gevestigd{/t})
+                                    ({$v.species_count.total} {t}soorten in totaal{/t} / {$v.species_count.established} {t}gevestigd{/t})
                                 {/if}
                                 </span>
                             {else}
                                 <span class="classification-count">
                                 {if $tree_taxon_count_style=='species_only'}
-                                    ({$classification[taxon].species_count.total})
+                                    ({$v.species_count.total})
                                 {else}
-                                    ({$classification[taxon].species_count.total}/{$classification[taxon].species_count.established})
+                                    ({$v.species_count.total}/{$v.species_count.established})
                                 {/if}
                                 </span>
                             {/if}
@@ -232,7 +246,7 @@
 						<span class="classification-connector"></span>
             <span class="classification-name smaller">
             	<a href="?id={$v.id}">
-								{if $v.rank_id >= $smarty.const.SPECIES_RANK_ID}
+								{if $v.base_rank_id >= $smarty.const.SPECIES_RANK_ID}
 									{if $v.infra_specific_epithet}
 										{$v.infra_specific_epithet}
 									{elseif $v.specific_epithet}

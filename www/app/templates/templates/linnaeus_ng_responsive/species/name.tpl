@@ -66,9 +66,8 @@ table tr  td:first-child {
 {include file="../shared/footer.tpl"}
 
 <script type="text/JavaScript">
-$(document).ready(function() {
-	
-	$('title').html('{$name.name|@strip_tags|@escape} - '+$('title').html());
-
+$(document).ready(function()
+{
+	$('title').html('{$name.name|@strip_tags} - '+$('title').html());
 });
 </script>

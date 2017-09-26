@@ -11,6 +11,7 @@
 include_once ('Controller.php');
 include_once ('RdfController.php');
 include_once ('ModuleSettingsReaderController.php');
+include_once ('TaxonParentageController.php');
 
 class NsrController extends Controller
 {
@@ -51,6 +52,8 @@ class NsrController extends Controller
     private function initialize()
     {
 		$this->Rdf = new RdfController;
+		$this->TaxonParentageController = new TaxonParentageController;
+		
 		$this->smarty->assign( 'noautoexpand', $this->rHasVal('noautoexpand','1') );
 
 		$this->moduleSettings=new ModuleSettingsReaderController;
@@ -178,6 +181,22 @@ class NsrController extends Controller
 
     }
 
+	// removes interfering noise from search term
+	protected function removeSearchNoise( $search )
+	{
+		$noise = [
+			$this->_hybridMarker,
+			$this->_hybridMarkerHtml,
+			$this->_formaMarker,
+			$this->_hybridMarker_graftChimaera,
+			$this->_varietyMarker,
+			$this->_subspeciesMarker,
+			$this->_nothoInfixPrefix . $this->_varietyMarker,
+			$this->_nothoInfixPrefix . $this->_subspeciesMarker,
+		];
+		 
+		return preg_replace('/(\s+)/',' ',str_replace($noise,' ', $search));
+	}
 
 
 	private function storeParentage($p)
@@ -215,57 +234,16 @@ class NsrController extends Controller
 		}
 	}
 
-	public function saveTaxonParentage($id=null)
+	public function saveTaxonParentage( $id=null )
 	{
-		set_time_limit(600);
-
-		if (!$this->models->TaxonQuickParentage->getTableExists())
+		if ( is_null($id) )
 		{
-			$this->addError('table TaxonQuickParentage does not exist');
-			return;
-		}
-
-		if (empty($id))
-		{
-			$t = $this->treeGetTop();
-
-			if (empty($t))
-				die('no top!?');
-			/*
-			if (count((array)$t)>1)
-				die('multiple tops!?');
-			*/
-
-			//$this->models->TaxonQuickParentage->delete(array('project_id' => $this->getCurrentProjectId())); // ??? crashes
-
-			$this->models->ControllerModel->deleteTaxonParentage(array(
-                'projectId' => $this->getCurrentProjectId()
-            ));
-
-			$this->tmp=0;
-			$this->getProgeny($t,0,array());
-			$i=$this->tmp;
+			return $this->TaxonParentageController->generateParentageAll();
 		}
 		else
 		{
-			$this->tmp=array();
-			$t=$this->getTaxonById($id);
-			$this->getParents($t['parent_id'],0,array());
-			//$this->models->TaxonQuickParentage->delete(array('project_id' => $this->getCurrentProjectId(),'taxon_id'=>$id));
-			$this->models->ControllerModel->deleteTaxonParentage(array(
-                'projectId' => $this->getCurrentProjectId(),
-			    'taxonId' => $id
-            ));
-
-			$qp=array_pop($this->tmp);
-			if (isset($qp['parentage']) && is_array($qp['parentage'])) {
-                $this->storeParentage(array('id'=>$id,'parentage'=>array_reverse($qp['parentage'])));
-			}
-			$i=1;
+			return $this->TaxonParentageController->generateParentage( $id );
 		}
-
-		return $i;
-
 	}
 
 	private function getParents($parent,$level,$family)
@@ -329,12 +307,13 @@ class NsrController extends Controller
 			if ( isset($c['label']) )
 			{
 				$c['label_no_infix']=$c['label'];
-				$c['label']=$this->addHybridMarkerAndInfixes( array( 'name'=>$c['label'],'base_rank_id'=>$c['base_rank'] ) );
+				$c['label']=$this->addHybridMarkerAndInfixes( [ 'name'=>$c['label'],'base_rank_id'=>$c['base_rank'],'taxon_id'=>$c['id'],'parent_id'=>$c['parent_id'] ] );
 			}
 			if ( isset($c['parent']['label']) )
 			{
 				$c['parent']['label_no_infix']=$c['parent']['label'];
-				$c['parent']['label']=$this->addHybridMarkerAndInfixes( array( 'name'=>$c['parent']['label'],'base_rank_id'=>$c['parent']['base_rank'] ) );
+				$c['parent']['label']=
+					$this->addHybridMarkerAndInfixes( [ 'name'=>$c['parent']['label'],'base_rank_id'=>$c['parent']['base_rank'],'taxon_id'=>$c['parent']['id'],'parent_id'=>$c['parent']['parent_id'] ] );
 			}
 		}
 
