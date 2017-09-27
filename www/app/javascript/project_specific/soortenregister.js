@@ -143,7 +143,10 @@ function setSuggestionId(ele)
 	$('#'+cleanSuggestionId(getSuggestionType())+'_id').val($(ele).attr('ident'));
 	$('#'+cleanSuggestionId(getSuggestionType())).val($(ele).html());
 	$('input[type=text][name='+cleanSuggestionId(getSuggestionType())+']').val($(ele).html());
+	$('#formSearchFacetsSpecies').append('<input type=hidden value="'+$('input[type=text][name=group]').val()+'" name=group>');
+	$('#formSearchFacetsSpecies').submit();
 
+	/*
 	if ($('input.zoekknop').length)
 	{
 		// old: user clicks search button
@@ -159,6 +162,7 @@ function setSuggestionId(ele)
 		$('#formSearchFacetsSpecies').append('<input type=hidden value="'+$('input[type=text][name=group]').val()+'" name=group>');
 		$('#formSearchFacetsSpecies').submit();
 	}
+	*/
 }
 
 var lineTpl='<li id="item-%IDX%" ident="%IDENT%" onclick="setSuggestionId(this);" onmouseover="activesuggestion=-1">%LABEL%</li>';
