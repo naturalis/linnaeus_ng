@@ -139,12 +139,13 @@ function showSuggestions()
 function setSuggestionId(ele)
 {
 
-	var searchStr=$(ele).attr("data-sci-name");
+	var searchStr=stripTags($(ele).attr("data-sci-name"));
+	
+	console.log(searchStr);
 
 	$('#'+cleanSuggestionId(getSuggestionType())+'_id').val($(ele).attr('ident'));
 	$('#'+cleanSuggestionId(getSuggestionType())).val(stripTags($(ele).html()));
-	$('input[type=text][name='+cleanSuggestionId(getSuggestionType())+']').val(stripTags(searchStr));
-	
+	$('input[type=text][name='+cleanSuggestionId(getSuggestionType())+']').val(searchStr);
 	
 	if ($('#formSearchFacetsSpecies').length)
 	{
