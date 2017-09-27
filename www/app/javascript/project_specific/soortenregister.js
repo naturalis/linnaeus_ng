@@ -141,8 +141,20 @@ function setSuggestionId(ele)
 	$('#'+cleanSuggestionId(getSuggestionType())+'_id').val($(ele).attr('ident'));
 	$('#'+cleanSuggestionId(getSuggestionType())).val($(ele).html());
 	$('input[type=text][name='+cleanSuggestionId(getSuggestionType())+']').val($(ele).html());
-	$('#formSearchFacetsSpecies').append('<input type=hidden value="'+$('input[type=text][name=group]').val()+'" name=group>');
-	$('#formSearchFacetsSpecies').submit();
+	
+	if ($('#formSearchFacetsSpecies').length)
+	{
+		$('#formSearchFacetsSpecies')
+			.append('<input type=hidden value="'+$('input[type=text][name=group]').val()+'" name=group>')
+			.submit();
+	}
+	if ($('#inlineformsearch').length)
+	{
+		$('#inlineformsearch')
+			.append('<input type=hidden value="'+$('input[type=text][name=group]').val()+'" name=group>')
+			.submit();
+	}
+
 
 	/*
 	if ($('input.zoekknop').length)
