@@ -737,7 +737,9 @@ class MatrixKeyController extends Controller
 
         foreach ( (array)$m as $key=>$val )
 		{
-			$m[$key]['taxon']= $this->getTaxonById( $val['taxon_id'] );
+			$d=$this->getTaxonById( $val['taxon_id'] );
+			$d['label']=$this->formatTaxon($d);
+			$m[$key]['taxon']=$d;
 
 			// Try to fetch common name from `names` table if this is not present
 			// in `common_names` table.

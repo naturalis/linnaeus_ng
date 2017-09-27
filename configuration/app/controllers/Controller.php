@@ -459,18 +459,12 @@ class Controller extends BaseClass
         if (empty($id) || !is_numeric($id) || $id==0)
             return;
 
-		$t = $this->models->ControllerModel->getTaxonById(array(
+		return $this->models->ControllerModel->getTaxonById(array(
             'trashCanExists' => $this->models->TrashCan->getTableExists(),
 		    'projectId' => $this->getCurrentProjectId(),
 		    'languageId'=> $this->getCurrentLanguageId(),
 		    'taxonId' => $id
 		));
-
-		$taxon=$t[0];
-
-		if ($taxon && $formatTaxon) $taxon['label']=$this->formatTaxon($taxon);
-
-        return $taxon;
     }
 
     /* Fetches preferred common name from names table rather than common_names */
@@ -1290,6 +1284,7 @@ class Controller extends BaseClass
 	private function _getTaxonClassification($id)
 	{
 		$taxon = $this->getTaxonById($id);
+		$taxon['label']=$this->formatTaxon($taxon);
 		$taxon['do_display'] = !preg_match('/^\(.*\)$/', $taxon['taxon']);
 
 		array_unshift($this->tmp,$taxon);
@@ -2738,7 +2733,7 @@ class Controller extends BaseClass
 			
 			if ( is_null($parent_id) && !is_null($taxon_id) )
 			{
-				$parent_id=$this->getTaxonById($taxon_id,true)['parent_id'];
+				$parent_id=$this->getTaxonById($taxon_id)['parent_id'];
 			}
 
 			if ( !is_null($parent_id) )

@@ -124,6 +124,7 @@ class SpeciesControllerNSR extends SpeciesController
         $this->setTaxonId($this->rGetId());
 
 		$taxon = $this->getTaxonById($this->getTaxonId());
+		$taxon['label']=$this->formatTaxon($taxon);
 
         if ( !empty($taxon) )
 		{
@@ -305,6 +306,7 @@ class SpeciesControllerNSR extends SpeciesController
 			$name['nametype']=sprintf($this->Rdf->translatePredicate($name['nametype']),$name['language_label']);
 
 			$taxon=$this->getTaxonById($name['taxon_id']);
+			$taxon['label']=$this->formatTaxon($taxon);
 
 			$taxon['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$taxon['taxon'],'base_rank_id'=>$taxon['base_rank_id'],'taxon_id'=>$taxon['id'],'parent_id'=>$taxon['parent_id'] ] );
 

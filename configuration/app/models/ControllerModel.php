@@ -136,8 +136,9 @@ final class ControllerModel extends AbstractModel
 				and _a.project_id=".$projectId."
 				".($trashCanExists ? " and ifnull(_trash.is_deleted,0)=0" : "");
 
-        return $this->freeQuery($query);
-    }
+        $d = $this->freeQuery($query);
+        return isset($d) ? $d[0] : null;
+	}
 
     public function getPreferredName ($params)
     {

@@ -123,6 +123,7 @@ class TreeController extends Controller
 		$node=$this->rHasVal('node') ? $this->rGetVal('node') : $this->getTreeTop();
 		$this->max_rank_id=$this->rHasVal('rank') ? $this->rGetVal('rank') : 36;
 		$top=$this->getTaxonById( $node );
+		$top['label']=$this->formatTaxon($top);
 		$c=array('name'=>$top['taxon']=='Leven' ? 'Life' : $top['taxon'],'children'=>$this->aBranch( $node ));
 		echo json_encode($c);
 	}

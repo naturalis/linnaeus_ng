@@ -439,6 +439,7 @@ parameters:
 		}
 
 		$taxon=$this->getTaxonById($this->getTaxonId());
+		$taxon['label']=$this->formatTaxon($taxon);
 
         $media=$this->models->MediaTaxon->freeQuery("
 			select
@@ -1207,6 +1208,9 @@ parameters:
 
 		$taxon=$this->getTaxonById($this->getTaxonId());
 		$parent=$this->getTaxonById($taxon['parent_id']);
+		
+		$taxon['label']=$this->formatTaxon($taxon);
+		$parent['label']=$this->formatTaxon($parent);
 
 		$data = $this->models->WebservicesModel->getTreeBranch( [
 			'project_id' => $this->getCurrentProjectId(),
