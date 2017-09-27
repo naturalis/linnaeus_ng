@@ -138,28 +138,26 @@ function showSuggestions()
 
 function setSuggestionId(ele)
 {
-
 	var searchStr=stripTags($(ele).attr("data-sci-name"));
-	
-	console.log(searchStr);
+
 
 	$('#'+cleanSuggestionId(getSuggestionType())+'_id').val($(ele).attr('ident'));
 	$('#'+cleanSuggestionId(getSuggestionType())).val(stripTags($(ele).html()));
 	$('input[type=text][name='+cleanSuggestionId(getSuggestionType())+']').val(searchStr);
-	
+
 	if ($('#formSearchFacetsSpecies').length)
 	{
-		$('#formSearchFacetsSpecies')
-			.append('<input type=hidden value="'+$('input[type=text][name=group]').val()+'" name=group>')
-			.submit();
+			$('#formSearchFacetsSpecies')
+					.append('<input type=hidden value="'+$('input[type=text][name=group]').val()+'" name=group>')
+					.submit();
 	}
 	if ($('#inlineformsearch').length)
 	{
-		$('#inlineformsearch')
-			.append('<input type=hidden value="'+searchStr+'" name=group>')
-			.submit();
+			$('#name').val(searchStr);
+			$('#inlineformsearch')
+					.append('<input type=hidden value="'+searchStr+'" name=group>')
+					.submit();
 	}
-
 
 	/*
 	if ($('input.zoekknop').length)
