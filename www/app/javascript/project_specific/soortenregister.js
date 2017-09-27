@@ -138,9 +138,13 @@ function showSuggestions()
 
 function setSuggestionId(ele)
 {
+	
+	var searchStr=stripTags($(ele).html());
+	
 	$('#'+cleanSuggestionId(getSuggestionType())+'_id').val($(ele).attr('ident'));
-	$('#'+cleanSuggestionId(getSuggestionType())).val($(ele).html());
-	$('input[type=text][name='+cleanSuggestionId(getSuggestionType())+']').val($(ele).html());
+	$('#'+cleanSuggestionId(getSuggestionType())).val(searchStr);
+	$('input[type=text][name='+cleanSuggestionId(getSuggestionType())+']').val(searchStr);
+	
 	
 	if ($('#formSearchFacetsSpecies').length)
 	{
@@ -151,7 +155,7 @@ function setSuggestionId(ele)
 	if ($('#inlineformsearch').length)
 	{
 		$('#inlineformsearch')
-			.append('<input type=hidden value="'+$('input[type=text][name=group]').val()+'" name=group>')
+			.append('<input type=hidden value="'+searchStr.replace(/(\[([^>]+)\])/ig,"")+'" name=group>')
 			.submit();
 	}
 
