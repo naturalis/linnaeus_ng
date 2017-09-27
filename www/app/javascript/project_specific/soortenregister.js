@@ -138,12 +138,12 @@ function showSuggestions()
 
 function setSuggestionId(ele)
 {
-	
-	var searchStr=stripTags($(ele).html()).replace(/(\[([^\]]+)\])/ig,"");
-	
+
+	var searchStr=$(ele).attr("data-sci-name");
+
 	$('#'+cleanSuggestionId(getSuggestionType())+'_id').val($(ele).attr('ident'));
-	$('#'+cleanSuggestionId(getSuggestionType())).val(searchStr);
-	$('input[type=text][name='+cleanSuggestionId(getSuggestionType())+']').val(searchStr);
+	$('#'+cleanSuggestionId(getSuggestionType())).val(stripTags($(ele).html()));
+	$('input[type=text][name='+cleanSuggestionId(getSuggestionType())+']').val(stripTags(searchStr));
 	
 	
 	if ($('#formSearchFacetsSpecies').length)
@@ -179,7 +179,7 @@ function setSuggestionId(ele)
 	*/
 }
 
-var lineTpl='<li id="item-%IDX%" ident="%IDENT%" onclick="setSuggestionId(this);" onmouseover="activesuggestion=-1">%LABEL%</li>';
+var lineTpl='<li id="item-%IDX%" ident="%IDENT%" onclick="setSuggestionId(this);" onmouseover="activesuggestion=-1" data-sci-name="%SCIENTIFIC_NAME%">%LABEL%</li>';
 
 function buildSuggestions()
 {
@@ -201,9 +201,9 @@ function buildSuggestions()
 			thisTpl
 				.replace('%IDX%',i)
 				.replace(/%IDENT%/g,( l.id ? l.id : '' ))
-				.replace('%LABEL%',l.label)
-				.replace('%SCIENTIFIC_NAME%',l.scientific_name ? l.scientific_name : '' )
-				.replace('%COMMON_NAME%',l.common_name ? l.common_name : ( l.nomen ? l.nomen : l.scientific_name ) )
+				.replace(/%LABEL%/g,l.label)
+				.replace(/%SCIENTIFIC_NAME%/g,l.scientific_name ? l.scientific_name : '' )
+				.replace(/%COMMON_NAME%/g,l.common_name ? l.common_name : ( l.nomen ? l.nomen : l.scientific_name ) )
 		);
 	}
 
