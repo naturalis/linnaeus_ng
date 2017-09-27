@@ -139,7 +139,7 @@ function showSuggestions()
 function setSuggestionId(ele)
 {
 	
-	var searchStr=stripTags($(ele).html());
+	var searchStr=stripTags($(ele).html()).replace(/(\[([^\]]+)\])/ig,"");
 	
 	$('#'+cleanSuggestionId(getSuggestionType())+'_id').val($(ele).attr('ident'));
 	$('#'+cleanSuggestionId(getSuggestionType())).val(searchStr);
@@ -155,7 +155,7 @@ function setSuggestionId(ele)
 	if ($('#inlineformsearch').length)
 	{
 		$('#inlineformsearch')
-			.append('<input type=hidden value="'+searchStr.replace(/(\[([^>]+)\])/ig,"")+'" name=group>')
+			.append('<input type=hidden value="'+searchStr+'" name=group>')
 			.submit();
 	}
 
