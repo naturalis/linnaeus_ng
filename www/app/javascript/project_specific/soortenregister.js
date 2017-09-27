@@ -20,8 +20,6 @@ function nbcPrettyPhotoInit() {
 		infobar : true,
 		animationEffect : false
 	});
-		
-	console.log('fuck');
 
 }
 

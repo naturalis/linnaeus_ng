@@ -51,6 +51,7 @@ function getSpecimens()
 			//basedata=data;
 			processBaseData( data );
 			checkForExtraUrls();
+			nbcPrettyPhotoInit();
 		},
 		complete : function( jqXHR, textStatus )
 		{
@@ -123,6 +124,13 @@ function printBaseData()
 		if (i>=maxresults) break;
 
 		var r=results[i];
+	
+		var imageMetaData = fetchTemplate( 'imageMetaDataTpl' )
+				.replace(/%UNIT-ID%/g,r.specimen.unitID)
+				.replace('%COLLECTION%',r.specimen.sourceSystem.name)
+				.replace('%RECORD-BASIS%',r.specimen.recordBasis)
+				.replace('%KIND_UNIT%',r.specimen.kindOfUnit ? ": " + r.specimen.kindOfUnit : "" );
+		
 		buffer.push(
 			rowTpl
 				.replace('%PURL%',r.specimen.PURL)
@@ -133,6 +141,7 @@ function printBaseData()
 				.replace(/%IMG-SRC%/g,r.image.imgUrl)
 				.replace(/%THUMB-SRC%/g,r.image.imgUrl.replace('large','medium'))
 				.replace('%REL%','prettyPhoto[gallery]')
+				.replace('%meta_data%',imageMetaData.replace('"','\"'))
 		);
 	}
 
@@ -251,18 +260,28 @@ function printLogInfo()
 <!--
 <div style="margin-bottom:20px;margin-right:2px;float:left;padding:2px;">
 	<div class="thumbContainer" style="margin-bottom:2px;">
-		<a class="fancybox" ptitle="<div></div>" href="%IMG-SRC%/%UNIT-ID%.jpg" data-fancybox-group="gallery">
+		<a class="fancybox" data-caption="%meta_data%" href="%IMG-SRC%/%UNIT-ID%.jpg" data-fancybox="gallery">
 			<img class="speciesimage" src="%THUMB-SRC%" title="%UNIT-ID%" alt="%UNIT-ID%" style="max-width:400px;max-height:200px;">
 		</a>
 	</div>
-    <b><a href="%PURL%" target="_blank">%UNIT-ID%</a></b><br>
-    <span style="font-size:0.9em">
-    %COLLECTION%<br />
-    %RECORD-BASIS%%KIND_UNIT%
-    </span>
+	<b><a href="%PURL%" target="_blank">%UNIT-ID%</a></b><br>
+	<span style="font-size:0.9em">
+	%COLLECTION%<br />
+	%RECORD-BASIS%%KIND_UNIT%
+	</div>
 </div>
 -->
 </div>
+
+<div class="inline-templates" id="imageMetaDataTpl">
+<!--
+	<b>%UNIT-ID%</b><br>
+	%COLLECTION%<br />
+	%RECORD-BASIS%%KIND_UNIT%
+</div>
+-->
+</div>
+
 
 <div class="inline-templates" id="errorOccurredTpl">
 <!--
