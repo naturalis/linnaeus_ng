@@ -171,7 +171,7 @@ function growbranches(data)
 				)+
 				*/
 				(data.node.child_count && data.node.child_count>0 && !activeNode ?
-					'<span class="child-count">'+data.node.child_count+' '+_('species')+'</span>' :
+					'<span class="child-count">'+data.node.child_count+' '+_('taxa')+'</span>' :
 					'' 
 				)+
 				(data.node.child_count && data.node.child_count>0 && activeNode ?
