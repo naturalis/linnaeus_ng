@@ -178,7 +178,7 @@ function setSuggestionId(ele)
 	*/
 }
 
-var lineTpl='<li id="item-%IDX%" ident="%IDENT%" onclick="setSuggestionId(this);" onmouseover="activesuggestion=-1" data-sci-name="%SCIENTIFIC_NAME%">%LABEL%</li>';
+var lineTpl='<li id="item-%IDX%" ident="%IDENT%" onclick="setSuggestionId(this);" onmouseover="activesuggestion=-1" data-sci-name="%SCIENTIFIC_NAME_DATA%">%LABEL%</li>';
 
 function buildSuggestions()
 {
@@ -202,7 +202,9 @@ function buildSuggestions()
 				.replace(/%IDENT%/g,( l.id ? l.id : '' ))
 				.replace(/%LABEL%/g,l.label)
 				.replace(/%SCIENTIFIC_NAME%/g,l.scientific_name ? l.scientific_name : '' )
+				.replace(/%SCIENTIFIC_NAME_DATA%/g,l.scientific_name ? l.scientific_name : '' )
 				.replace(/%COMMON_NAME%/g,l.common_name ? l.common_name : ( l.nomen ? l.nomen : l.scientific_name ) )
+			
 		);
 	}
 
