@@ -5,8 +5,8 @@
 	{foreach from=$photographers item=v name=foo}
 		{if $smarty.foreach.foo.index < 5}
 		<li>
-			<a href="nsr_search_pictures.php?photographer={$v.photographer}">{$v.photographer} 
-				<div class="count">({$v.total} / {$v.taxon_count})</div>
+			<a href="nsr_search_pictures.php?photographer={$v.name}">{$v.name} 
+				<div class="count">({$v.picture_count} / {$v.taxon_count})</div>
 			</a>
 		</li>
 		{/if}

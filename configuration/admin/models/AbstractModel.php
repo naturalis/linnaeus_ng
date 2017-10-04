@@ -22,9 +22,9 @@ class AbstractModel extends BaseClass
 	protected $_currentWhereArray=null;
     protected $tableExists=true;
 
-    protected $_retainQuery = true;
     protected $_dataBeforeQuery=true;
     protected $_dataAfterQuery=true;
+	protected $error;
 
     public function __construct ($tableBaseName = false)
     {
@@ -73,11 +73,6 @@ class AbstractModel extends BaseClass
 		if (is_bool($state)) $this->noKeyViolationLogging = $state;
 	}
 
-    public function setRetainQuery ($state)
-    {
-        if (is_bool($state)) $this->_retainQuery = $state;
-    }
-
     public function freeQuery($params)
     {
         if (is_array($params))
@@ -90,6 +85,7 @@ class AbstractModel extends BaseClass
             $query = isset($params) ? $params : null;
             $fieldAsIndex = false;
         }
+
         if (empty($query))
 		{
             $this->log('Called freeQuery with an empty query',1);
@@ -101,11 +97,17 @@ class AbstractModel extends BaseClass
 
         $set = mysqli_query($this->databaseConnection, $query);
 
+		if (mysqli_error($this->databaseConnection))
+		{
+   			$this->setError( mysqli_error($this->databaseConnection) );
+		}
+		
         $this->logQueryResult($set,$query,'freeQuery');
         $this->setLastQuery($query);
 		$this->setAffectedRows();
 
-		unset($this->data);
+        unset($this->data);
+
         while($row=@mysqli_fetch_assoc($set))
 		{
             if($fieldAsIndex!==false && isset($row[$fieldAsIndex]))
@@ -228,8 +230,8 @@ class AbstractModel extends BaseClass
 		$config = new configuration;
 		$settings = $config->getDatabaseSettings();
 
-        Db::createInstance('lngAdmin', $settings);
-        $this->databaseConnection = Db::getInstance('lngAdmin');
+        Db::createInstance('lngApp', $settings);
+        $this->databaseConnection = Db::getInstance('lngApp');
 
         if (!$this->databaseConnection) {
             die('Error ' . mysqli_connect_errno() . ': failed to connect to database ' .
@@ -240,8 +242,7 @@ class AbstractModel extends BaseClass
 
     protected function disconnectFromDatabase ()
     {
-		//sometimes causes errors
-		//@mysqli_close($this->databaseConnection);
+        @mysqli_close($this->databaseConnection);
     }
 
 	protected function reEngineerQuery($query)
@@ -270,10 +271,6 @@ class AbstractModel extends BaseClass
 
     protected function retainDataBeforeQuery($query)
     {
-        if (!$this->_retainQuery) {
-            return;
-        }
-
         unset($this->_dataBeforeQuery);
 
 		if (empty($query))
@@ -293,10 +290,6 @@ class AbstractModel extends BaseClass
 
     protected function retainDataAfterQuery($query,$failed=false)
     {
-        if (!$this->_retainQuery) {
-            return;
-        }
-
         unset($this->_dataAfterQuery);
 
 		if ($failed)
@@ -369,8 +362,7 @@ class AbstractModel extends BaseClass
 		    return false;
 		}
 
-        $this->freeQuery("SET lc_time_names = '".
-            mysqli_real_escape_string($this->databaseConnection, $locale)."'");
+        $this->freeQuery("SET lc_time_names = '". mysqli_real_escape_string($this->databaseConnection, $locale)."'");
     }
 
     public function getLanguagesUsed ($projectId = null)
@@ -406,6 +398,16 @@ class AbstractModel extends BaseClass
 	public function generateTaxonParentageId( $id )
 	{
 		return Controller::generateTaxonParentageId( $id );
+	}
+
+	public function setError( $error )
+	{
+		$this->error=$error;
+	}
+
+	public function getError()
+	{
+		return $this->error;
 	}
 
 }

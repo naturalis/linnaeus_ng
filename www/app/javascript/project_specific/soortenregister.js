@@ -138,6 +138,7 @@ function showSuggestions()
 
 function setSuggestionId(ele)
 {
+
 	var searchStr=stripTags($(ele).attr("data-sci-name"));
 
 
@@ -151,6 +152,7 @@ function setSuggestionId(ele)
 					.append('<input type=hidden value="'+$('input[type=text][name=group]').val()+'" name=group>')
 					.submit();
 	}
+	else
 	if ($('#inlineformsearch').length)
 	{
 			$('#name').val(searchStr);
@@ -158,24 +160,6 @@ function setSuggestionId(ele)
 					.append('<input type=hidden value="'+searchStr+'" name=group>')
 					.submit();
 	}
-
-	/*
-	if ($('input.zoekknop').length)
-	{
-		// old: user clicks search button
-		// trigger an Enter keyup in the receiving input, so we can hook a submit
-		var e = $.Event('keyup');
-		e.which = 13;
-		$('#'+getSuggestionType()).trigger(e);
-		hideSuggestions();	
-	}
-	else
-	{
-		// new: no search button
-		$('#formSearchFacetsSpecies').append('<input type=hidden value="'+$('input[type=text][name=group]').val()+'" name=group>');
-		$('#formSearchFacetsSpecies').submit();
-	}
-	*/
 }
 
 var lineTpl='<li id="item-%IDX%" ident="%IDENT%" onclick="setSuggestionId(this);" onmouseover="activesuggestion=-1" data-sci-name="%SCIENTIFIC_NAME_DATA%">%LABEL%</li>';

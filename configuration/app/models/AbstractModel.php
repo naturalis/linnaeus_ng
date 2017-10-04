@@ -24,6 +24,7 @@ class AbstractModel extends BaseClass
 
     protected $_dataBeforeQuery=true;
     protected $_dataAfterQuery=true;
+	protected $error;
 
     public function __construct ($tableBaseName = false)
     {
@@ -96,6 +97,11 @@ class AbstractModel extends BaseClass
 
         $set = mysqli_query($this->databaseConnection, $query);
 
+		if (mysqli_error($this->databaseConnection))
+		{
+   			$this->setError( mysqli_error($this->databaseConnection) );
+		}
+		
         $this->logQueryResult($set,$query,'freeQuery');
         $this->setLastQuery($query);
 		$this->setAffectedRows();
@@ -392,6 +398,16 @@ class AbstractModel extends BaseClass
 	public function generateTaxonParentageId( $id )
 	{
 		return Controller::generateTaxonParentageId( $id );
+	}
+
+	public function setError( $error )
+	{
+		$this->error=$error;
+	}
+
+	public function getError()
+	{
+		return $this->error;
 	}
 
 }

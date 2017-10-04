@@ -402,7 +402,6 @@ class SearchControllerNSR extends SearchController
 		$data=$d['data'];
 		$count=$d['count'];
 
-
 		if ( $this->_show_all_preferred_names_in_results )
 		{
 			foreach((array)$data as $key=>$val)
@@ -541,33 +540,11 @@ class SearchControllerNSR extends SearchController
 
 	private function getPhotographersPictureCount($p=null)
 	{
-		$tCount=$this->models->SearchNSRModel->getPhotographersPictureCount(array(
+		$limit=!isset($p['limit']) ? 5 : ($p['limit']=='*' ? null : $p['limit']);
+
+		$photographers=$this->models->SearchNSRModel->getPhotographersPictureCount(array(
 			"project_id"=>$this->getCurrentProjectId()
 		));
-
-		$photographers=$this->models->MediaMeta->_get(
-			array(
-				'id'=>array(
-					'project_id'=>$this->getCurrentProjectId(),
-					'sys_label' => 'beeldbankFotograaf'
-				),
-				'columns'=>"count(*) as total, meta_data,
-					trim(concat(
-						trim(substring(meta_data, locate(',',meta_data)+1)),' ',
-						trim(substring(meta_data, 1, locate(',',meta_data)-1))
-					)) as photographer",
-				'group'=>'meta_data, photographer',
-				'order'=>'count(*) desc, meta_data desc',
-				'fieldAsIndex'=>'meta_data'
-			)
-		);
-
-		foreach((array)$photographers as $key=>$val)
-		{
-			$photographers[$key]['taxon_count']=isset($tCount[$val['meta_data']]) ? $tCount[$val['meta_data']]['taxon_count'] : 0;
-		}
-
-		$limit=!isset($p['limit']) ? 5 : ($p['limit']=='*' ? null : $p['limit']);
 
 		if (!empty($limit) && $limit<count((array)$photographers))
 		{
@@ -575,47 +552,22 @@ class SearchControllerNSR extends SearchController
 		}
 
 		return $photographers;
-
 	}
 
-	private function getValidatorPictureCount($p=null)
+	private function getValidatorPictureCount($p=null)		
 	{
-		$tCount= $this->models->SearchNSRModel->getValidatorPictureCount(array(
+		$limit=!isset($p['limit']) ? 5 : ($p['limit']=='*' ? null : $p['limit']);
+		
+		$validators= $this->models->SearchNSRModel->getValidatorPictureCount(array(
 			"project_id"=>$this->getCurrentProjectId()
 		));
-
-		$validators=$this->models->MediaMeta->_get(
-			array(
-				'id'=>array(
-					'project_id'=>$this->getCurrentProjectId(),
-					'sys_label' => 'beeldbankValidator'
-				),
-				'columns'=>"count(*) as total, meta_data,
-					trim(concat(
-						trim(substring(meta_data, locate(',',meta_data)+1)),' ',
-						trim(substring(meta_data, 1, locate(',',meta_data)-1))
-					)) as validator",
-				'group'=>'meta_data, validator',
-				'order'=>'count(*) desc, meta_data desc',
-				'fieldAsIndex'=>'meta_data'
-			)
-		);
-
-		foreach((array)$validators as $key=>$val)
-		{
-			$validators[$key]['taxon_count']=isset($tCount[$val['meta_data']]) ? $tCount[$val['meta_data']]['taxon_count'] : 0;
-		}
-
-
-		$limit=!isset($p['limit']) ? 5 : ($p['limit']=='*' ? null : $p['limit']);
-
+		
 		if (!empty($limit) && $limit<count((array)$validators))
 		{
 			$validators=array_slice($validators,0,$limit);
 		}
 
 		return $validators;
-
 	}
 
 	private function doPictureSearch( $p )

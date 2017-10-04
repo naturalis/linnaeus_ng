@@ -294,7 +294,31 @@ final class SearchNSRModel extends AbstractModel
 				)
 				and ifnull(_trash.is_deleted,0)=0
 		
-			group by _a.taxon_id
+			group by
+				_a.taxon_id,
+				_a.name,
+				_a.uninomial,
+				_a.specific_epithet,
+				_a.infra_specific_epithet,
+				_a.name_author,
+				_a.authorship_year,
+				_a.authorship,
+				_a.reference,
+				_a.reference_id,
+				_a.expert,
+				_a.expert_id,
+				_a.organisation,
+				_a.organisation_id,
+				_ids.nsr_id,
+				_b.nametype,
+				_e.taxon,
+				_e.rank_id,
+				_e.parent_id,
+				_f.lower_taxon,
+				_k.name,
+				_q.label,
+				_h.information_title,
+				_h.index_label
 
 			order by 
 				match_percentage desc, _e.taxon asc, _f.rank_id asc, ".
@@ -306,6 +330,7 @@ final class SearchNSRModel extends AbstractModel
 		$data=$this->freeQuery( $query );
 		//SQL_CALC_FOUND_ROWS
 		$count=$this->freeQuery( "select found_rows() as total" );
+		
 		return array('data'=>$data,'count'=>$count[0]['total']);
 
 	}
@@ -538,8 +563,9 @@ final class SearchNSRModel extends AbstractModel
 
 		$query="
 			select 
+				count(distinct _b.media_id) as picture_count,
 				count(distinct _a.taxon_id) as taxon_count,
-				_b.meta_data
+				_b.meta_data as name
 			from 
 				%PRE%media_taxon _a
 	
@@ -550,10 +576,13 @@ final class SearchNSRModel extends AbstractModel
 			
 			where
 				_a.project_id=".$project_id."
-			group by _b.meta_data"
-			;
+			group by
+				_b.meta_data
+			order by
+				picture_count desc
+			";
 
-		return $this->freeQuery( array( "query"=>$query, "fieldAsIndex"=>"meta_data") );
+		return $this->freeQuery( [ "query"=>$query, "fieldAsIndex"=>"name" ] );
 	}
 
 	public function getValidatorPictureCount( $params )
@@ -565,8 +594,9 @@ final class SearchNSRModel extends AbstractModel
 
 		$query="
 			select 
+				count(distinct _b.media_id) as picture_count,
 				count(distinct _a.taxon_id) as taxon_count,
-				_b.meta_data
+				_b.meta_data as name
 			from 
 				%PRE%media_taxon _a
 	
@@ -578,10 +608,12 @@ final class SearchNSRModel extends AbstractModel
 			where
 				_a.project_id=".$project_id."
 			group by
-				_b.meta_data"
-			;
+				_b.meta_data
+			order by
+				picture_count desc
+			";
 
-		return $this->freeQuery( array( "query"=>$query, "fieldAsIndex"=>"meta_data") );
+		return $this->freeQuery( [ "query"=>$query, "fieldAsIndex"=>"name" ] );
 	}
 
 	public function doPictureSearch( $params )
@@ -815,7 +847,7 @@ final class SearchNSRModel extends AbstractModel
 			".(isset($limit) ? "limit ".$limit : "")."
 			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
 		;
-
+		
 		$data=$this->freeQuery( $query );
 		//SQL_CALC_FOUND_ROWS
 		$count=$this->freeQuery( "select found_rows() as total" );

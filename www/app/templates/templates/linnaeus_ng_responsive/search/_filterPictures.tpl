@@ -54,7 +54,7 @@
                     {foreach $photographers v foo}
                         {if $smarty.foreach.foo.index < 5}
                         <li>
-                            <a href="nsr_search_pictures.php?photographer={$v.photographer}">{$v.photographer} ({$v.total}/{$v.taxon_count})</a>
+                            <a href="nsr_search_pictures.php?photographer={$v.name}">{$v.name} ({$v.picture_count}/{$v.taxon_count})</a>
                         </li>
                         {/if}
                     {/foreach}
@@ -85,7 +85,7 @@
                     {foreach $validators v foo}
                         {if $smarty.foreach.foo.index < 5}
                         <li>
-                            <a href="nsr_search_pictures.php?validator={$v.validator}">{$v.validator} ({$v.total}/{$v.taxon_count})</a>
+                            <a href="nsr_search_pictures.php?validator={$v.name}">{$v.name} ({$v.picture_count}/{$v.taxon_count})</a>
                         </li>
                         {/if}
                     {/foreach}
