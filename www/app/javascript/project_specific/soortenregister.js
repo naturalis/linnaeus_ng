@@ -186,7 +186,7 @@ function buildSuggestions()
 				.replace(/%IDENT%/g,( l.id ? l.id : '' ))
 				.replace(/%LABEL%/g,l.label)
 				.replace(/%SCIENTIFIC_NAME%/g,l.scientific_name ? l.scientific_name : '' )
-				.replace(/%SCIENTIFIC_NAME_DATA%/g,stripTags(l.scientific_name ? l.scientific_name : '' ))
+				.replace(/%SCIENTIFIC_NAME_DATA%/g,stripTags(l.scientific_name ? l.scientific_name : l.label ))
 				.replace(/%COMMON_NAME%/g,l.common_name ? l.common_name : ( l.nomen ? l.nomen : l.scientific_name ) )
 			
 		);
