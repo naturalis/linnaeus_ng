@@ -76,7 +76,7 @@ $(document).ready(function()
 	{
 		$('#more-images-button').toggle($('.thumbContainer').length<total);
 	}
-	
+ 
 	function setImageBatch(images)
 	{
 		if (!images) return;
@@ -94,7 +94,7 @@ $(document).ready(function()
 			buffer.push(
 				template
 					.replace( /%image%/g, image.image ? image.image : '' )
-					.replace( /%meta_data%/g, image.meta_data ? image.meta_data.replace(/[\n\r]/g) : '' )
+					.replace( /%meta_data%/g, image.meta_data ? image.meta_data.replace(/[\n\r]/g).htmlEntities() : '' )
 					.replace( /%photographer%/g, image.photographer ? image.photographer : '' )
 					.replace( /%thumb%/g, image.thumb ? image.thumb : '' )
 					.replace( /%id%/g, image.taxon_id ? image.taxon_id : '' )

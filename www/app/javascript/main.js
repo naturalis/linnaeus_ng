@@ -1,5 +1,13 @@
 var projectId=null;
 
+String.prototype.trim = function () {
+    return this.replace(/^\s+|\s+$/g, "");
+};
+
+String.prototype.htmlEntities = function () {
+	return this.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+};
+
 (function($)
 {
     $.fn.removeClassRegEx = function(regex)
