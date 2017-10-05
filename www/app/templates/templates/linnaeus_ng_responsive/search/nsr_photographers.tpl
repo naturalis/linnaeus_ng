@@ -35,8 +35,8 @@ table.photographersList tr:nth-child(1) td
 				</tr>
 			{foreach $photographers v}
 				<tr>
-					<td><a href="nsr_search_pictures.php?photographer={$v.photographer}">{$v.photographer}</a></td>
-					<td>{$v.total} / {$v.taxon_count}</td>
+					<td><a href="nsr_search_pictures.php?photographer={$v.photographer}">{$v.name}</a></td>
+					<td>{$v.picture_count} / {$v.taxon_count}</td>
 				</tr>
 			{/foreach}
 			</table>

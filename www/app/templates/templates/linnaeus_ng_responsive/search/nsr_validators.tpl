@@ -36,8 +36,8 @@ table.validatorList tr:nth-child(1) td
 				</tr>
 			{foreach $validators v}
 				<tr>
-					<td><a href="nsr_search_pictures.php?validator={$v.validator}">{$v.validator}</a></td>
-					<td>{$v.total} / {$v.taxon_count}</td>
+					<td><a href="nsr_search_pictures.php?validator={$v.validator}">{$v.name}</a></td>
+					<td>{$v.picture_count} / {$v.taxon_count}</td>
 				</tr>
 			{/foreach}
 			</table>
