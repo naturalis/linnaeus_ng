@@ -295,30 +295,7 @@ final class SearchNSRModel extends AbstractModel
 				and ifnull(_trash.is_deleted,0)=0
 		
 			group by
-				_a.taxon_id,
-				_a.name,
-				_a.uninomial,
-				_a.specific_epithet,
-				_a.infra_specific_epithet,
-				_a.name_author,
-				_a.authorship_year,
-				_a.authorship,
-				_a.reference,
-				_a.reference_id,
-				_a.expert,
-				_a.expert_id,
-				_a.organisation,
-				_a.organisation_id,
-				_ids.nsr_id,
-				_b.nametype,
-				_e.taxon,
-				_e.rank_id,
-				_e.parent_id,
-				_f.lower_taxon,
-				_k.name,
-				_q.label,
-				_h.information_title,
-				_h.index_label
+				_a.taxon_id
 
 			order by 
 				match_percentage desc, _e.taxon asc, _f.rank_id asc, ".
