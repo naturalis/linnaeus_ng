@@ -444,6 +444,7 @@ class MatrixKeyController extends Controller
 			"state_id"=>$id,
 			"characteristic_id"=>$char
 		));
+		
 
         // getCharacterStates may return array of records or single record...
         if (isset($states[0]))
