@@ -199,7 +199,7 @@ class MatrixKeyController extends Controller
         $this->smarty->assign( 'matrices', $this->getAllMatrices() );
 		$this->smarty->assign( 'master_matrix', $this->getMasterMatrix() );
 		$this->smarty->assign( 'facetmenu', $this->getFacetMenu() );
-		$this->smarty->assign( 'states', $this->getCharacterStates( array("id"=>"*") ) );
+		$this->smarty->assign( 'states', json_encode( $this->getCharacterStates() ) );
 
         $this->printPage();
     }
@@ -318,7 +318,7 @@ class MatrixKeyController extends Controller
 					'statecount'=>$this->setRemainingStateCount()
 				)));
 		}
-
+			
 		$this->printPage();
 	}
 
@@ -430,13 +430,13 @@ class MatrixKeyController extends Controller
 		return ( isset($id) && $id!='*' && isset($m[$id]) ? $m[$id] : ( isset($m) ? $m  : null ) ) ;
 	}
 
-    private function getCharacterStates( $p )
+    private function getCharacterStates( $p=null )
     {
 		$id=isset($p['id']) ? $p['id'] : null;
 		$char=isset($p['char']) ? $p['char'] : null;
 
-		if (is_null($id) && is_null($char))
-			return;
+		//if (is_null($id) && is_null($char))
+		//  return;
 
         $states = $this->models->MatrixkeyModel->getCharacterStates(array(
 			"language_id"=>$this->getCurrentLanguageId(),
@@ -444,6 +444,7 @@ class MatrixKeyController extends Controller
 			"state_id"=>$id,
 			"characteristic_id"=>$char
 		));
+		
 
         // getCharacterStates may return array of records or single record...
         if (isset($states[0]))
@@ -1670,8 +1671,5 @@ class MatrixKeyController extends Controller
 	{
 		return $this->_incUnknowns;
 	}
-
-
-
 
 }

@@ -15,6 +15,8 @@ function __(text)
 
 /*
 	hooks:
+	hook_preInit();
+	hook_postInit();
 	hook_prePrintResults();
 	hook_postPrintResults();
 	hook_prePrintMenu();
@@ -59,7 +61,7 @@ var matrixsettings={
 };
 
 var data={
-	menu: Array(), // full menu
+	menu: Array(), // menu (without characters)
 	dataset: Array(), // full dataset
 	resultset: Array(), // result subset
 	states: {}, // user-selected states
@@ -67,7 +69,8 @@ var data={
 	statecount: {}, // remaining taxa per state
 	scores: {}, // match scores based on selection
 	related: {}, // related species
-	found: {} // search results
+	found: {}, // search results
+	characterStates: [] // charcater states 
 }
 
 /*
@@ -1728,6 +1731,8 @@ function bindSecretlyClickable()
 
 function matrixInit()
 {
+	if (typeof hook_preInit == 'function') { hook_preInit(); }
+
 	matrixsettings.defaultSpeciesImage=matrixsettings.defaultSpeciesImages[matrixsettings.imageOrientation];
 	
 	acquireInlineTemplates();
@@ -1745,4 +1750,6 @@ function matrixInit()
 	printResults();
 	setCursor();
 	bindSecretlyClickable();
+	
+	if (typeof hook_postInit == 'function') { hook_postInit(); }
 }

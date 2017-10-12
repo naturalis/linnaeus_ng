@@ -27,7 +27,6 @@ final class MatrixKeyModel extends AbstractModel
         parent::__destruct();
     }
 
-
     public function getMatrix( $params )
     {
 		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
@@ -100,7 +99,7 @@ final class MatrixKeyModel extends AbstractModel
 
 			where
 				_a.project_id=".$project_id."
-				".( empty($state_id) || $state_id=='*' ? "" : "and _a.id=" . $state_id )."
+				".( empty($state_id) ? "" : "and _a.id=" . $state_id )."
 				".( empty($characteristic_id) ? "" : "and _a.characteristic_id=" . $characteristic_id )."
 
 			order by
@@ -1092,4 +1091,3 @@ final class MatrixKeyModel extends AbstractModel
 	}
 
 }
-

@@ -2661,20 +2661,20 @@ class Controller extends BaseClass
 	{
 		$base_rank_id=isset($p['base_rank_id']) ? $p['base_rank_id'] : null;
 
-		if ( $base_rank_id==NOTHOVARIETAS_RANK_ID )
+		if ( defined('NOTHOVARIETAS_RANK_ID') && $base_rank_id==NOTHOVARIETAS_RANK_ID )
 		{
 			$p['name']=$this->addHybridMarker( $p );
 			return $this->addVarietasInfix( $p );
 		}
 		else
-		if ( $base_rank_id==NOTHOSUBSPECIES_RANK_ID )
+		if ( defined('NOTHOSUBSPECIES_RANK_ID') && $base_rank_id==NOTHOSUBSPECIES_RANK_ID )
 		{
 			$p['name']=$this->addHybridMarker( $p );
 			return $this->addSubspeciesInfix( $p );
 		}
 		else
-		if ( $base_rank_id==NOTHOGENUS_RANK_ID ||
-			 $base_rank_id==NOTHOSPECIES_RANK_ID )
+		if ( defined('NOTHOGENUS_RANK_ID') && defined('NOTHOSPECIES_RANK_ID') && ($base_rank_id==NOTHOGENUS_RANK_ID ||
+			 $base_rank_id==NOTHOSPECIES_RANK_ID ))
 		{
 			return $this->addHybridMarker( $p );
 		}

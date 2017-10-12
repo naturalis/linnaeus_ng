@@ -174,15 +174,12 @@ function drnzkr_open_dier_link()
 		}
 	
 		drnzkr_toon_dier( { id:n.id, type:n.type } );
-
 	}	
-
 }
 
 
 function drnzkr_update_choices_made()
 {
-
 	$('#gemaakte-keuzes').html( "" );
 
 	var d=Array();
@@ -216,12 +213,22 @@ function drnzkr_update_choices_made()
 			characterinfo=characterinfo[0];
 		}
 		
+		for(var k=0;k<data.characterStates.length;k++)
+		{
+			if (data.characterStates[k].id==state.id)
+			{
+				state.file_name=data.characterStates[k].file_name;
+				break;
+			}
+		}
+		
 		d.push(
-			drzkr_selectedFacetHtmlTemplate
+			fetchTemplate( 'drzkr_selectedFacetHtmlTemplate' )
 				.replace('%CHARACTER-LABEL%',characterinfo)
 				.replace('%STATE-VAL%',state.val)
 				.replace('%STATE-LABEL%',state.label)
-				.replace('%ICON%',matrixsettings.imageRootProject+state.file_name)
+				.replace('%ICON%',state.file_name)
+				//.replace('%ICON%',matrixsettings.imageRootProject+state.file_name)
 				.replace('%IMG-ROOT-SKIN%',matrixsettings.imageRootSkin)
 		);
 
@@ -261,5 +268,3 @@ function drnzkr_update_states()
 		if (d[i]>0) $('#state-'+i).removeClass('ui-disabled').on('click',function(){ charClick(this);});
 	}
 }
-
-//196170 
