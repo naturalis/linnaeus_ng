@@ -1868,47 +1868,23 @@ class Controller extends BaseClass
 
     private function setSkinName ()
     {
-
-		if ($this->controllerBaseName=='webservices') {
-
+		if ($this->controllerBaseName=='webservices')
+		{
 			$_SESSION['app']['system']['skinName'] = $this->generalSettings['app']['skinNameWebservices'];
+		} 
+		else
+		{
+			$skin=$this->getSetting('skin');
 
-		} else {
-
-			$force = $this->getSetting('force_skin_mobile')==1;
-
-			if ($force || isset($this->helpers->UserAgent)) {
-
-				if ($force || $this->helpers->UserAgent->isMobileDevice()) {
-
-					$d=$this->getSetting('skin_gsm');
-
-					if ($force || $this->helpers->UserAgent->isGSM() && isset($d))
-					{
-						$skin = $d;
-					}
-					else
-					{
-						$skin = $this->getSetting('skin_mobile');
-					}
-
-					if (isset($skin))
-						$skin = $this->doesSkinExist($skin) ? $skin : null;
-
-				}
-
-			}
-
-			$skin = empty($skin) ? $this->getSetting('skin') : $skin;
-
-			if (isset($skin) && $this->doesSkinExist($skin)) {
+			if (isset($skin) && $this->doesSkinExist($skin))
+			{
 				$_SESSION['app']['system']['skinName'] = $skin;
-			} else {
+			} 
+			else
+			{
 				$_SESSION['app']['system']['skinName'] = $this->generalSettings['app']['skinName'];
 			}
-
 		}
-
     }
 
     private function doesSkinExist ($skin)
