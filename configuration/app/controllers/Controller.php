@@ -172,7 +172,6 @@ class Controller extends BaseClass
 		'session_module_settings',
         'logging_helper',
         'debug_tools',
-		'user_agent',
 		'functions',
 		'custom_array_sort',
 		'paginator',
