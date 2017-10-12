@@ -3,7 +3,6 @@
 {"\n"|implode:$array_merged} 
 {else}
 {include file="../shared/admin-header.tpl"}
-
 <style>
 .dropzone {
 	width:550px;
@@ -16,7 +15,9 @@ td {
 
 <script src="../../javascript/dropzone/dropzone.js"></script>
 <link rel="stylesheet" href="../../javascript/dropzone/dropzone.css">
-
+<script>
+	Dropzone.autoDiscover = false;
+</script>
 <div id="page-main">
 
 	<table><tr><td>
@@ -58,13 +59,15 @@ td {
 {include file="../shared/admin-footer.tpl"}
 
 <script>
+
 $(document).ready(function()
 {
-	Dropzone.options.groundzero =
+	$("#groundzero").dropzone(
 	{
 		url: "upload.php",
 		paramName: "file", // The name that will be used to transfer the file
 		maxFilesize: 10, // MB
+		maxFiles: 2000,
 		createImageThumbnails: false,
 		sending: function(file, xhr, formData)
 		{
@@ -83,7 +86,8 @@ $(document).ready(function()
 			//console.dir(file);
 			$("#list").append('<li>' + file.name +': ' + (response?response:"could\'t upload") + '</li>');
 		}
-	};
+	});
+
 });
 </script>
 

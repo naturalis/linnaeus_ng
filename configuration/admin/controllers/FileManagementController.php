@@ -1,5 +1,11 @@
 <?php
 
+/*
+	required settings (in 'General settings'):
+	enable_file_management	1
+	allowed_file_management_extensions	["jpg","png"]
+*/
+			
 include_once ('Controller.php');
 include_once ('ModuleSettingsReaderController.php');
 
