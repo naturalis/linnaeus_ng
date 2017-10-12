@@ -199,7 +199,7 @@ class MatrixKeyController extends Controller
         $this->smarty->assign( 'matrices', $this->getAllMatrices() );
 		$this->smarty->assign( 'master_matrix', $this->getMasterMatrix() );
 		$this->smarty->assign( 'facetmenu', $this->getFacetMenu() );
-		$this->smarty->assign( 'states', json_encode( $this->getCharacterStates() ) );
+		$this->smarty->assign( 'states', $this->getCharacterStates() );
 
         $this->printPage();
     }

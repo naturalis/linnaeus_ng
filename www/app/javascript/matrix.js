@@ -561,7 +561,7 @@ function formatResult( data )
 		var states = Array();
 
 		for(var i in data.states)
-		{
+		{0
 			var state=data.states[i];
 			
 			if (state.characteristic==undefined)
@@ -688,6 +688,8 @@ function formatResult( data )
 				.replace('%PHOTO-CREDIT%',photoCredit)
 			;
 	}
+	
+	console.log( imageHtml , ":" );
 
 	var resultHtml=
 		fetchTemplate( 'resultHtmlTpl' )
@@ -748,6 +750,9 @@ function formatResult( data )
 	{
 		resultHtml=resultHtml.replace('%PHOTOGRAPHER%', "");
 	}
+	
+	console.log( resultHtml );
+	
 	return resultHtml;
 }
 

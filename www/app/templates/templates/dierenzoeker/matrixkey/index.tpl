@@ -209,6 +209,7 @@ $(document).ready(function()
 		imageRootSkin: '{$image_root_skin}',
 		imageRootProject: '{$projectUrls.projectMedia}',
 		useEmergingCharacters: {$settings->use_emerging_characters},
+		suppressImageEnlarge: {if $settings->suppress_image_enlarge}{$settings->suppress_image_enlarge}{else}0{/if},
 		defaultSpeciesImages: { portrait: '{$image_root_skin}noimage.gif', landscape: '{$image_root_skin}noimage-lndscp.gif' } ,
 		imageOrientation: '{$settings->image_orientation}',
 		browseStyle: '{$settings->browse_style}',
@@ -228,7 +229,7 @@ $(document).ready(function()
 	setCharacters($.parseJSON('{$session_characters|@addslashes}'));
 	setDataSet($.parseJSON('{$full_dataset|@addslashes}'));
 	 
-	data.characterStates=$.parseJSON('{$states|@addslashes}');
+	data.characterStates=$.parseJSON('{$states|@json_encode|@addslashes}');
 			
 	matrixInit();
 
