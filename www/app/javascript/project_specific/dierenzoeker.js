@@ -104,7 +104,6 @@ function drnzkr_toon_dier( p )
 		{
 			if (data)
 			{
-
 				if ( p.name )
 				{
 					try {

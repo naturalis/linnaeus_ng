@@ -689,8 +689,6 @@ function formatResult( data )
 			;
 	}
 	
-	console.log( imageHtml , ":" );
-
 	var resultHtml=
 		fetchTemplate( 'resultHtmlTpl' )
 			.replace('%CLASS-HIGHLIGHT%',(data.h ? ' result-highlight' : ''))
@@ -750,8 +748,6 @@ function formatResult( data )
 	{
 		resultHtml=resultHtml.replace('%PHOTOGRAPHER%', "");
 	}
-	
-	console.log( resultHtml );
 	
 	return resultHtml;
 }

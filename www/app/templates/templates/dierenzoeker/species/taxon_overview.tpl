@@ -25,15 +25,15 @@ div.pp_default .pp_description {
 </div>
 {/if}
 <p>
-    <span class="label">{$categoryList[855]}:</span>
+    <span class="label">Uiterlijk:</span>
     {$content[855].content}
 </p>
 <p>
-    <span class="label">{$categoryList[856]}:</span>
+    <span class="label">Gedrag:</span>
     {$content[856].content}
 </p>
 <p>
-    <span class="label">{$categoryList[857]}:</span>
+    <span class="label">Waar en wanneer:</span>
     {$content[857].content}
 </p>
 <p>
@@ -46,19 +46,19 @@ div.pp_default .pp_description {
 </script>
 
 <p>
-    <span class="label">{$categoryList[860]|replace:'%s':($taxon.commonname|lower)}</span>
+    <span class="label">{'Wat zijn %s?'|replace:'%s':($taxon.commonname|lower)}</span>
     {$content[860].content}
 </p>
 <p>
-    <span class="label">{$categoryList[861]|replace:'%s':($taxon.commonname|lower)}</span>
+    <span class="label">{'Waar zitten %s?'|replace:'%s':($taxon.commonname|lower)}</span>
     {$content[861].content}
 </p>
 <p>
-    <span class="label">{$categoryList[862]|replace:'%s':($taxon.commonname|lower)}</span>
+    <span class="label">{'Wat doen %s?'|replace:'%s':($taxon.commonname|lower)}</span>
     {$content[862].content}
 </p>
 <p>
-    <span class="label">{$categoryList[863]|replace:'%s':($taxon.commonname|lower)}</span>
+    <span class="label">{'Hoeveel %s zijn er in Nederland?'|replace:'%s':($taxon.commonname|lower)}</span>
     {$content[863].content}
 </p>
 
