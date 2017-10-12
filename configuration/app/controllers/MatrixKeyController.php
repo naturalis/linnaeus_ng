@@ -451,7 +451,8 @@ class MatrixKeyController extends Controller
 		{
             foreach ($states as $i => $state)
 			{
-				if (!filter_var($state['file_name'], FILTER_VALIDATE_URL) === false)
+				//if (!filter_var($state['file_name'], FILTER_VALIDATE_URL) === false)
+				if (!empty($state['file_name']))
 					continue;
 
                 $this->_mc->setItemId($state['id']);
@@ -472,6 +473,9 @@ class MatrixKeyController extends Controller
         } else
 		if (isset($states['id']))
 		{
+			if (!empty($states['file_name']))
+				continue;
+
 			if (!filter_var($states['file_name'], FILTER_VALIDATE_URL))
 			{
 				$this->_mc->setItemId($states['id']);

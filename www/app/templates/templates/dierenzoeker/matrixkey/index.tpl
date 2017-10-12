@@ -130,7 +130,7 @@
 	                                    onclick="charClick(this)"
                                         id="state-{$state.id}">
                                         <div class="grid-iconbox">
-                                            <img alt="" class="grid-icon" src="{if !$state.file_name_is_full_url}{$projectUrls.projectMedia}{/if}{$state.file_name}">
+                                            <img alt="" class="grid-icon" src="{$state.file_name}">
                                         </div>
                                         <div class="grid-labelbox ">
                                             {$state.label}
@@ -170,7 +170,7 @@
                                     onclick="charClick(this)"
                                     id="state-{$state.id}">
                                 <div class="grid-iconbox">
-                                    <img alt="" class="grid-icon" src="{if !$state.file_name_is_full_url}{$projectUrls.projectMedia}{/if}{$state.file_name}">
+                                    <img alt="" class="grid-icon" src="{$state.file_name}">
                                 </div>
                                 <div class="grid-labelbox ">
                                     {$state.label}
