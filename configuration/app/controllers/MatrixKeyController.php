@@ -473,10 +473,8 @@ class MatrixKeyController extends Controller
         } else
 		if (isset($states['id']))
 		{
-			if (!empty($states['file_name']))
-				continue;
-
-			if (!filter_var($states['file_name'], FILTER_VALIDATE_URL))
+			//if (!filter_var($states['file_name'], FILTER_VALIDATE_URL))
+			if (empty($states['file_name']))
 			{
 				$this->_mc->setItemId($states['id']);
 				$media = $this->_mc->getItemMediaFiles();
