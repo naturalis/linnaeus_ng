@@ -353,7 +353,7 @@ class SpeciesController extends Controller
 		// hardcoding....
 		if (isset($nbc["url_image"])) $nbc["url_image_large"]=str_replace('280x190','original',$nbc["url_image"]);
 
-		$media=$this->getTaxonMedia(array('taxon'=>$this->rGetVal('id')));
+		$media=$this->getTaxonMedia(array('taxon'=>$this->rGetVal('id'),'forceOld'=>true));
 
 		$contentparent = $this->models->ContentTaxa->_get(array(
 			'id' =>  array(
@@ -844,18 +844,29 @@ class SpeciesController extends Controller
 	{
 		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
 		$id = isset($p['id']) ? $p['id'] : null;
+		$forceOld = isset($p['forceOld']) ? $p['forceOld'] : false;
+
 		$inclOverviewImage = isset($p['inclOverviewImage']) ? $p['inclOverviewImage'] : false;
 
-        if ($mt = $this->getlastVisitedCategory($taxon, CTAB_MEDIA))
+		if (!$forceOld)
 		{
-            return $mt;
-        }
+			if ($mt = $this->getlastVisitedCategory($taxon, CTAB_MEDIA))
+			{
+				return $mt;
+			}
 
-	    $this->_mc->setItemId(isset($taxon) ? $taxon : $id);
-	    $mt = $this->_mc->getItemMediaFiles();
-		$this->_mc->reformatOutput($mt, $inclOverviewImage);
-		
-		$this->setlastVisitedCategory($taxon, CTAB_MEDIA, $mt);
+			$this->_mc->setItemId(isset($taxon) ? $taxon : $id);
+			$mt = $this->_mc->getItemMediaFiles();
+			$this->_mc->reformatOutput($mt, $inclOverviewImage);
+
+			$this->setlastVisitedCategory($taxon, CTAB_MEDIA, $mt);
+		}
+		else
+		{
+			
+			$mt = $this->models->MediaTaxon->_get( [ 'id' => [ 'project_id' => $this->getCurrentProjectId(), 'taxon_id' => $taxon ] ] );
+
+		}
 
 		return $mt;
 	}
