@@ -9,7 +9,6 @@
 	<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />	<link rel="image_src" href="{$projectUrls.systemMedia}dierenzoeker-logo.png" />
 	<link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}basics.css" />
 	<link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}jquery-ui-1.10.0.custom.min.css" />
-    <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}prettyPhoto/prettyPhoto.css" />
 	<link href="{$projectUrls.systemMedia}favicon.ico" type="image/x-icon" rel="icon" />
     <link href="{$projectUrls.systemMedia}favicon.ico" type="image/x-icon" rel="shortcut icon" />        
 	<link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/inline_templates.css" />
@@ -31,6 +30,7 @@
 {/foreach}
 {/if}
 
-<script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/jquery.prettyPhoto.custom.js"></script>
+	<link rel="stylesheet" type="text/css" href="{$baseUrl}app/javascript/fancybox-3/jquery.fancybox.min.css">
+    <script type="text/javascript" src="{$baseUrl}app/javascript/fancybox-3/jquery.fancybox.min.js"></script>
 
 </head>

@@ -71,7 +71,7 @@ div.pp_default .pp_description {
 	
 	{foreach $media v}
     	<li>
-        	<a rel="prettyPhoto[gallery]" href="{$v.file_name}" title="{$v.description}" id="img-{$v.id}">
+        	<a data-fancybox="gallery" data-caption="{$v.description}" href="{$v.file_name}" title="{$v.description}" id="img-{$v.id}">
             	<img style="width:130px" title="{$v.description}" src="{$v.file_name|@replace:'w800':'160x100'}" alt="">
            	</a>
 		</li>
