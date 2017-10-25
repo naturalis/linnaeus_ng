@@ -55,13 +55,14 @@
 	echo "adding\n";
 	echo shell_exec( "cd " . $outdir ."; git add -A" );
 
-	echo "tagging ".$tag."\n";
-	echo shell_exec( "cd " . $outdir ."; git tag " . $tag );
-
 	echo "committing\n";
 	echo shell_exec( "cd " . $outdir ."; git commit -m \"new dataset " . $tag ."\"" );
 //	echo shell_exec( "cd " . $outdir ."; ssh-agent bash -c 'ssh-add /root/.ssh/githubkey_nba_data; git push git@github.com:naturalis/nba-brondata-nsr.git'" );
 //	echo shell_exec( "cd " . $outdir ."; ssh-agent bash -c 'ssh-add /root/.ssh/githubkey_nba_data; git push origin " . $tag . " git@github.com:naturalis/nba-brondata-nsr.git'" );
 	echo shell_exec( "cd " . $outdir ."; git push git@git-brondata-nsr:naturalis/nba-brondata-nsr.git" );
+
+	echo "tagging ".$tag."\n";
+	echo shell_exec( "cd " . $outdir ."; git tag " . $tag );
 	echo shell_exec( "cd " . $outdir ."; git push --tags git@git-brondata-nsr:naturalis/nba-brondata-nsr.git" );
 	echo "committing\n";
+
