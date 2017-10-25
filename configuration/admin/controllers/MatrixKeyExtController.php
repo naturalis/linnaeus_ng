@@ -45,17 +45,11 @@ class MatrixKeyExtController extends Controller
 		$this->checkAuthorisation();
 		if ( !$this->rHasId() ) $this->redirect( "ext_overview.php");
 		$this->setCurrentMatrixId( $this->rGetId() );
-
-		if ( $this->rHasVar('action','saveSortOrder') )
-		{
-			$this->saveSortOrders( $this->rGetVal('newOrder') );
-			$this->addMessage( $this->translate( "saved new order") );
-		}
-
-
+		$this->matrixActionFormActions();
 		$this->setPageName($this->translate('Edit matrix'));
-		$this->smarty->assign( 'matrix', $this->getMatrix(  $this->getCurrentMatrixId() ));
-		$this->smarty->assign( 'groupsCharactersStates', $this->getGroupsCharactersStates(  $this->getCurrentMatrixId() ));
+		$this->smarty->assign( 'matrix', $this->getMatrix() );
+		$this->smarty->assign( 'groupsCharactersStates', $this->getGroupsCharactersStates() );
+		$this->smarty->assign( 'languages', $this->getProjectLanguages() );
 		$this->printPage( 'ext_matrix' );
 	}	
 
@@ -64,11 +58,17 @@ class MatrixKeyExtController extends Controller
     {
         if ( !$this->rHasVal('action') ) return;
 
+  		if ( $this->rGetVal('action')=='get_group')
+  		{
+  			if ( is_null($this->rGetVal('id')) ) return;
+  			$this->smarty->assign( 'returnText', json_encode($this->getGroup($this->rGetVal('id'))) );
+  		}      
+  		else
   		if ( $this->rGetVal('action')=='get_taxa_for_state')
   		{
   			if ( is_null($this->rGetVal('id')) ) return;
   			$this->smarty->assign( 'returnText', json_encode($this->getTaxaForState($this->rGetVal('id'))) );
-  		}      
+  		}
 
         $this->printPage( 'ext_ajax_interface' );
     }
@@ -91,38 +91,47 @@ class MatrixKeyExtController extends Controller
     	] );
     }
 
-    private function getMatrix( $id )
+    private function getMatrix()
     {
-        if ( !isset($id) ) return;
-
     	return $this->models->MatrixKeyExtModel->getMatrix( [
     		"project_id" => $this->getCurrentProjectId(),
-    		"matrix_id" => $id,
+    		"matrix_id" => $this->getCurrentMatrixId(),
     		"default_project_language" => $this->getDefaultProjectLanguage()
     	] );
     }
 	
-	private function getGroups( $id )
+	private function getGroups()
 	{
 		return
 			$this->models->MatrixKeyExtModel->getGroups( [
 				'project_id' => $this->getCurrentProjectId(),
-				'matrix_id' => $id,
+				'matrix_id' =>  $this->getCurrentMatrixId(),
 				'default_project_language' => $this->getDefaultProjectLanguage()
 		] );
 	}		
 	
-	private function getCharacters( $id )
+	private function getGroup( $id )
+	{
+		return
+			$this->models->MatrixKeyExtModel->getGroup( [
+				'project_id' => $this->getCurrentProjectId(),
+				'matrix_id' => $this->getCurrentMatrixId(),
+				'group_id' => $id,
+				'default_project_language' => $this->getDefaultProjectLanguage()
+		] );
+	}		
+	
+	private function getCharacters()
 	{
 		return
 			$this->models->MatrixKeyExtModel->getCharacters( [
 				'project_id' => $this->getCurrentProjectId(),
-				'matrix_id' => $id,
+				'matrix_id' =>  $this->getCurrentMatrixId(),
 				'default_project_language' => $this->getDefaultProjectLanguage()
 		] );
 	}	
 	
-	private function getStates( $id )
+	private function getStates()
 	{
 		return
 			$this->models->MatrixKeyExtModel->getStates( [
@@ -131,21 +140,21 @@ class MatrixKeyExtController extends Controller
 		] );
 	}		
 	
-	private function getGuiOrder( $id )
+	private function getGuiOrder()
 	{
 		return
 			$this->models->MatrixKeyExtModel->getGuiOrder( [
 				'project_id' => $this->getCurrentProjectId(),
-				'matrix_id' => $id
+				'matrix_id' =>  $this->getCurrentMatrixId()
 		] );
 	}		
 	
-	private function getGroupsCharactersStates( $id )
+	private function getGroupsCharactersStates()
 	{
-		$groups=$this->getGroups( $id );
-		$characters=$this->getCharacters( $id );
-		$states=$this->getStates(  $id );
-		$order=$this->getGuiOrder(  $id );
+		$groups=$this->getGroups();
+		$characters=$this->getCharacters();
+		$states=$this->getStates();
+		$order=$this->getGuiOrder();
 
 		// add states to their character
 		foreach ($characters as $key => $value)
@@ -163,15 +172,18 @@ class MatrixKeyExtController extends Controller
 		// adding characters to groups
 		foreach ($groups as $key => $value)
 		{
-			foreach ($value['characters'] as $cKey=>$cValue)
+			if ($value['characters'])
 			{
-				$hKey=array_search($cValue['characteristic_id'],array_column($characters, 'id'));
-				if ($hKey!==false)
+				foreach ($value['characters'] as $cKey=>$cValue)
 				{
-					$groups[$key]['characters'][$cKey]=$characters[$hKey];
-					array_splice($characters, $hKey, 1);
+					$hKey=array_search($cValue['characteristic_id'],array_column($characters, 'id'));
+					if ($hKey!==false)
+					{
+						$groups[$key]['characters'][$cKey]=$characters[$hKey];
+						array_splice($characters, $hKey, 1);
+					}
 				}
-			}
+			}		
 		}
 
 		// re-ordening groups and ungrouped characters
@@ -180,7 +192,8 @@ class MatrixKeyExtController extends Controller
 			if ( $value['ref_type']=='char' )
 			{
 				$hKey=array_search($value['ref_id'],array_column($characters, 'id'));
-				if ($hKey)
+
+				if ($hKey!==false)
 				{
 					$order[$key]['item']=$characters[$hKey];
 					array_splice($characters, $hKey, 1);
@@ -190,7 +203,7 @@ class MatrixKeyExtController extends Controller
 			if ( $value['ref_type']=='group' )
 			{
 				$hKey=array_search($value['ref_id'],array_column($groups, 'id'));
-				if ($hKey)
+				if ($hKey!==false)
 				{
 					$order[$key]['item']=$groups[$hKey];
 					array_splice($groups, $hKey, 1);
@@ -198,8 +211,9 @@ class MatrixKeyExtController extends Controller
 			}
 		}
 
+
 		// see if there's anything left (which was not in the order table)
-		$i=0;
+		$i=count($order);
 		foreach ($groups as $key => $value)
 		{
 			$order[$i]['item']=$value;
@@ -234,7 +248,40 @@ class MatrixKeyExtController extends Controller
 				'language_id' => $this->getDefaultProjectLanguage(),
 				'name_type_id' => $this->getNameTypeId(PREDICATE_PREFERRED_NAME)
 		] );
-	}		
+	}
+
+	private function matrixActionFormActions()
+	{
+		if ( $this->rHasVal('action','saveSortOrder') )
+		{
+			$this->saveSortOrders( $this->rGetVal('newOrder') );
+			$this->addMessage( $this->translate( "saved new order") );
+		} 
+		else
+		if ( $this->rHasVal('action','saveGroup') )
+		{
+			if ( $this->saveGroup( $this->rGetAll() ) )
+			{
+				$this->addMessage( $this->translate( "saved group") );
+			}
+			else
+			{
+				$this->addError( $this->translate( "could not save group") );
+			}
+		}
+		else
+		if ( $this->rHasVal('action','deleteGroup') )
+		{
+			if ( !$this->rHasVal('groupId') ) return;
+			if ( $this->deleteGroup( $this->rGetVal('groupId') ) )
+			{
+				$this->addMessage( $this->translate( "deleted group") );
+			}
+		}
+		
+
+	}
+
 	
 	private function saveSortOrders( $order )
 	{
@@ -245,7 +292,7 @@ class MatrixKeyExtController extends Controller
 			"matrix_id" => $this->getCurrentMatrixId()
 		]);
 
-		$i=0;
+		$i=1;
 		foreach((array)$order as $val)
 		{
 			$val=json_decode($val,true);
@@ -262,9 +309,8 @@ class MatrixKeyExtController extends Controller
 			}
 		}
 
-
 		// saving order of states
-		$i=0;
+		$i=1;
 		foreach((array)$order as $val)
 		{
 			$val=json_decode($val,true);
@@ -282,13 +328,105 @@ class MatrixKeyExtController extends Controller
 		}
 	}
 
+	private function saveGroup( $data )
+	{
+		if (isset($data['groupId']))
+		{
+			$groupId=$data['groupId'];
+		}
+		else
+		{
+			$groupId=null;
+		}
 
+		$names=[];
+		foreach ($data['newNames'] as $key => $val)
+		{
+			$val=json_decode($val,true);
+			if ($val['id']=='sys_name' && !empty($val['value']))
+			{
+				$this->models->Chargroups->save([
+					"id" => $groupId,
+					"project_id" => $this->getCurrentProjectId(),
+					"matrix_id" => $this->getCurrentMatrixId(),
+					"label" => $val['value'],
+					"show_order" => 99
+				]);
+
+				$groupId=!is_null($groupId) ? $groupId : $this->models->Chargroups->getNewId();
+			}
+			else
+			if (!empty($val['value']))
+			{
+				$names[$val['id']]=$val['value'];
+			}
+		}
+
+		if ( isset($groupId) )
+		{
+			$this->models->ChargroupsLabels->delete([
+				"project_id" => $this->getCurrentProjectId(),
+				"chargroup_id" => $groupId
+			]);
+
+			foreach ($names as $key => $value)
+			{
+				$this->models->ChargroupsLabels->save([
+					"project_id" => $this->getCurrentProjectId(),
+					"chargroup_id" => $groupId,
+					"language_id" => $key,
+					"label" => $value,
+				]);
+			}
+			return true;
+		}
+		else
+		{
+			return true;
+		}
+
+	}
+
+	private function deleteGroup( $id )
+	{
+		// remove from GUI
+		$this->models->GuiMenuOrder->delete([
+			"project_id" => $this->getCurrentProjectId(),
+			"matrix_id" => $this->getCurrentMatrixId(),
+			"ref_id" => $id,
+			"ref_type" => 'group'
+		]);
+
+		// orphan characters
+		$this->models->CharacteristicsChargroups->delete([
+			"project_id" => $this->getCurrentProjectId(),
+			"chargroup_id" => $id
+		]);
+
+		// delete labels
+		$this->models->ChargroupsLabels->delete([
+			"project_id" => $this->getCurrentProjectId(),
+			"chargroup_id" => $id
+		]);
+
+		// delete group
+		$this->models->Chargroups->delete([
+			"project_id" => $this->getCurrentProjectId(),
+			"matrix_id" => $this->getCurrentMatrixId(),
+			"id" => $id
+		]);
+
+		return true;
+	}
+
+			
 
 /*
-	add group
+
 	remove grouop
 		remove chars
 		orphan chars
+	edit group
 	remove chars
 	add char
 	move char to group

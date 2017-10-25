@@ -2,9 +2,113 @@
 
 <script>
 
+var currentId=null;
 var parentLabel=null;
 var parentId=null;
 var taxa=[];
+var projectLanguages=[];
+
+function dialogAddGroup( data )
+{
+	var id=+ new Date();
+	var buffer=[];
+	buffer.push(
+		fetchTemplate( 'labelInputTpl' )
+			.replace( /%LABEL%/g, _('internal') )
+			.replace( '%NAME%', 'sys_name' )
+			.replace( '%VALUE%', data ? data.sys_name : "" )
+			.replace( '%CLASS%', "" )
+			.replace( '%ID%', "lead-" + id )
+	);
+	for(var i=0;i<projectLanguages.length;i++)
+	{
+		var value="";
+		if (data && data.labels)
+		{
+			for(var j=0;j<data.labels.length;j++)
+			{
+				if (data.labels[j].language_id==projectLanguages[i].id)
+				{
+					value=data.labels[j].label;
+				}
+			}
+		}
+
+		buffer.push(
+			fetchTemplate( 'labelInputTpl' )
+				.replace( /%LABEL%/g, projectLanguages[i].label )
+				.replace( '%NAME%', projectLanguages[i].id )
+				.replace( '%VALUE%', value )
+				.replace( '%CLASS%', "follow-" + id  )
+				.replace( '%ID%', "" )
+		);
+	}
+
+	if (data)
+	{
+		var cCount=data.characters ? data.characters.length : 0;
+		buffer.push(
+			fetchTemplate( 'groupCharacterCountTpl' )
+				.replace( '%COUNT%', cCount )
+		);
+	}
+
+	var content=
+		fetchTemplate( 'editGroupTpl' )
+			.replace( '%FORM%', buffer.join("\n").replace(/%SAVE_GROUP%/g,id))
+			.replace('%HEADER%',data ? fetchTemplate( 'editGroupHeaderTpl' ) :  fetchTemplate( 'newGroupHeaderTpl' ) );
+
+	var extraData={ savegroup: id };
+	if (data)
+	{
+		extraData.id = data.id;
+	}
+
+	var msg = _("Are you sure?" + (cCount>0 ? "\n" + _("(grouped characters will not be deleted)") : "" ));
+
+	saveDialog({
+		title: data ? sprintf(_('Edit group: %s'),data.sys_name) : _('Add group'), 
+		content: content, 
+		callback: saveGroup, 
+		data: extraData,
+		buttons: data ?
+			{ Delete : function()
+				{
+					if( confirm(msg) )
+					{
+						deleteGroup(data.id);
+					}
+					$( this ).dialog( "close" ); } 
+			} : null
+	});
+
+	$('#lead-' + id).on('blur',function()
+	{
+		$('.follow-' + id).each(function()
+		{
+			$(this).val( $(this).val().length==0 ? $('#lead-' + id).val() : $(this).val() );
+		})
+	})
+}
+
+function dialogEditGroup()
+{
+	if (currentId==null) return;
+
+	$.ajax({
+		url : 'ext_ajax_interface.php',
+		data : ({
+			'action' : 'get_group',
+			'id' : currentId ,
+			'time' : allGetTimestamp()
+		}),
+		success : function( data )
+		{
+			data=$.parseJSON( data );
+			dialogAddGroup( data );
+		}
+	})
+}
 
 function dialogAddCharacter()
 {
@@ -24,17 +128,11 @@ function dialogTaxaForState()
 
 function saveDialog( p )
 {
-	$( "#dialog-confirm" ).dialog({
-		title: p.title,
-		resizable: false,
-		height: "auto",
-		width: 400,
-		modal: true,
-		position: { my: "middle", at: "middle", of: $('#character-tree') },
-		buttons: {
-			"Save": function() {
+
+	var buttons = {
+			Save: function() {
 				if (p.callback) {
-					if (p.callback()) {
+					if (p.callback(p.data ? p.data : p.data)) {
 						$( this ).dialog( "close" );
 					}
 				}
@@ -45,29 +143,43 @@ function saveDialog( p )
 			Cancel: function() {
 				$( this ).dialog( "close" );
 			}
-		}
+		};
+
+	if ( p.buttons )
+	{
+		$.extend( buttons, p.buttons);
+	}
+
+	$( "#dialog-confirm" ).dialog({
+		title: p.title,
+		resizable: false,
+		height: "auto",
+		width: 400,
+		modal: true,
+		position: { my: "middle", at: "middle", of: $('#character-tree') },
+		buttons: buttons
 	}).find(".content").html( p.content );
 }
 
 function saveCharacter()
 {
-	return false;
 	parentLabel=null;
 	parentId=null;
+	return false;
 }
 
 function saveState()
 {
-	return false;
 	parentLabel=null;
 	parentId=null;
+	return false;
 }
 
 function saveTaxa()
 {
-	return false;
 	parentLabel=null;
 	parentId=null;
+	return false;
 }
 
 function getTaxaForState()
@@ -124,17 +236,31 @@ function shouldWarnUnsavedValues()
 	return orderChanged;
 }
 
+function makeForm( p )
+{
+	var form=$('<form action="" method="post"></form>').appendTo('body');	
+	if ( p.vars && p.vars.action )
+	{
+		form.append('<input type="hidden" name="action" value="'+p.vars.action+'">');
+	}
+	return form;
+}
+
+function submitForm( form )
+{
+	$( window ).off( 'beforeunload')
+	form.submit();
+}
 
 function saveSortOrder()
 {
-	if (! orderChanged)
+	if ( !orderChanged )
 	{
 		$('#saveMessage').html('nothing to save').fadeOut(3000, function(){ $('#saveMessage').html('').show(); });
 		return;
 	}
 
-	var form=$('<form action="" method="post"></form>').appendTo('body');	
-	form.append('<input type="hidden" name="action" value="saveSortOrder">');
+	var form=makeForm( { vars: { action: 'saveSortOrder' } } );
 
 	$('#character-tree li').each(function()
 	{
@@ -157,8 +283,63 @@ function saveSortOrder()
 		form.append("<input type='hidden' name='newOrder[]' value='"+JSON.stringify({ type: type, id: $(this).attr('data-id') })+"''>");
 	})
 
-	$( window ).off( 'beforeunload')
-	form.submit();	
+	submitForm( form );
+}
+
+function saveGroup( data )
+{
+	var errors=[];
+	var form=makeForm( { vars: { action: 'saveGroup' } } );
+	var newSysName="";
+
+	if ( data.savegroup )
+	{
+		$('[data-savegroup='+data.savegroup+']').each(function()
+		{
+			if ($(this).val().length==0)
+			{
+				errors.push(sprintf(_("Missing value: %s"),$(this).attr("placeholder")));
+			}
+			else
+			{
+				form.append("<input type='hidden' name='newNames[]' value='"+JSON.stringify({ id:$(this).attr("name"),value:$(this).val()})+"''>");
+				if ( $(this).attr("name")=="sys_name")
+				{
+					newSysName=$(this).val();
+				}
+			}
+		})
+	}
+
+	if (newSysName.length>0)
+	{
+		$('li.group').each(function()
+		{
+			if ($(this).attr("data-sys_name")==newSysName && (!data || (data && data.id != $(this).attr("data-id"))))
+			{
+				errors.push( sprintf( _("Group name already exists: %s"), newSysName ));
+			}
+		});
+	}
+
+	if (errors.length!=0)
+	{
+		errors.unshift( _("Errors occurred!") );
+		alert( errors.join("\n") );
+		return false;
+	}
+
+	if (data && data.id) form.append("<input type='hidden' name='groupId' value='"+data.id+"''>");
+
+	submitForm( form );
+}
+
+function deleteGroup( id )
+{
+	var errors=[];
+	var form=makeForm( { vars: { action: 'deleteGroup' } } );
+	form.append("<input type='hidden' name='groupId' value='"+id+"''>");
+	submitForm( form );
 }
 
 </script>
@@ -255,9 +436,15 @@ li.state {
 .character-tree li.state {
 }
 
+form {
+	line-height: 30px;
+}
+
 input[type=button] {
 	height:25px;
 }
+
+
 
 </style>
 
@@ -276,7 +463,7 @@ input[type=button] {
 			<div class="symbol grip"></div>
 			<span class="label">{if $s.default_label}{$s.default_label}{else}{$s.sys_name}{/if}</span>
 			<span class="symbol edit state"></span>
-			<span class="symbol taxa"></span>
+			<span class="symbol taxa state"></span>
 		</li>
 		{/foreach}
 	</ul>
@@ -284,7 +471,7 @@ input[type=button] {
 {/function}
 
 {function printGroup}
-<li class="group" data-id="{$data.id}">
+<li class="group" data-id="{$data.id}" data-sys_name="{$data.sys_name}">
 	<div class="symbol grip"></div>
 	<span class="label">{if $data.default_label}{$data.default_label}{else}{$data.sys_name}{/if}</span>
 	<div class="controls" data-group-id="characters-{$data.id}" data-id="{$data.id}">
@@ -328,8 +515,8 @@ input[type=button] {
 	</p>
 
 	<div class="controls">
-		<span class="symbol add"> add a group</span><br />
-		<span class="symbol add"> add a character</span><br />
+		<span class="symbol group add"> add a group</span><br />
+		<span class="symbol character add"> add a character</span><br />
 	</div>
 
 </div>
@@ -364,40 +551,54 @@ $(document).ready(function()
 		$('.controls span.display-toggle.master').toggle();
 	});
 
-	$('.controls .add.character').on('click',function()
+	$('.controls > .group.add').on('click',function()
+	{
+		dialogAddGroup();
+	})
+
+	$('.edit.group').on('click',function()
+	{
+		currentId=$(this).parent().attr('data-id');
+		dialogEditGroup();
+	})
+
+	$('.add.character').on('click',function()
 	{
 		parentLabel=$(this).parent().prev(".label").html();
 		parentId=$(this).parent().attr('data-id');
 		dialogAddCharacter();
 	})
 
-	$('.controls .add.state').on('click',function()
+	$('.edit.character').on('click',function()
+	{
+		dialogEditCharacter();
+	})
+
+	$('.add.state').on('click',function()
 	{
 		parentLabel=$(this).parent().prev(".label").html();
 		parentId=$(this).parent().attr('data-id');
 		dialogAddState();
 	})
 
-	$('.controls .edit.character').on('click',function()
+	$('.edit.state').on('click',function()
 	{
 		parentLabel=$(this).parent().prev(".label").html();
 		parentId=$(this).parent().attr('data-id');
-		dialogAddCharacter();
+		dialogEditState();
 	})
 
-	$('.controls .edit.state').on('click',function()
-	{
-		parentLabel=$(this).parent().prev(".label").html();
-		parentId=$(this).parent().attr('data-id');
-		dialogAddState();
-	})
-
-	$('.symbol.taxa').on('click',function()
+	$('.taxa.state').on('click',function()
 	{
 		parentLabel=$(this).prev(".label").html();
 		parentId=$(this).parent().attr('data-id');
 		dialogTaxaForState();
 	})
+
+
+
+
+
 
 	$('.controls span.display-toggle.up').attr('title','hide nodes');
 	$('.controls span.display-toggle.down').attr('title','show nodes');
@@ -414,7 +615,8 @@ $(document).ready(function()
 		}
 	})
 
-    $( ".sortable" ).sortable({
+    $( ".sortable" ).sortable(
+    {
 		 handle: ".grip",
 		 stop: function( event, ui )
 		 {
@@ -429,7 +631,10 @@ $(document).ready(function()
 		if (shouldWarnUnsavedValues()) return true;
 	});
 
-    acquireInlineTemplates();
+	{foreach $languages v}
+	projectLanguages.push( { id: {$v.language_id}, label: '{$v.language}', default: {$v.def_language==1}} )
+	{/foreach}
+
     setInitialSortOrderHash();
 
 });
@@ -450,6 +655,44 @@ $(document).ready(function()
 	<li>%NAME%</li>
 -->
 </div>
+
+<div id="editGroupTpl" class="inline-templates">
+<!--
+	<form>
+	%HEADER%
+	<table>
+	%FORM%
+	</table>
+	</form>
+-->
+</div>
+
+<div id="newGroupHeaderTpl" class="inline-templates">
+<!--
+	{t}Enter the new group's names:{/t}
+-->
+</div>
+
+<div id="editGroupHeaderTpl" class="inline-templates">
+<!--
+	{t}Edit group names:{/t}
+-->
+</div>
+
+<div id="labelInputTpl" class="inline-templates">
+<!--
+	<tr><td>%LABEL%:</td><td><input type="text" name="%NAME%" placeholder="%LABEL% {t}name{/t}" id="%ID%" value="%VALUE%" class="%CLASS%" data-savegroup="%SAVE_GROUP%" /></td></tr>
+-->
+</div>
+
+
+<div id="groupCharacterCountTpl" class="inline-templates">
+<!--
+	<tr><td>{t}Grouped characters:{/t}</td><td>%COUNT%</td></tr>
+-->
+</div>
+
+
 
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}

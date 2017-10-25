@@ -359,11 +359,14 @@ class MatrixKeyExtModel extends AbstractModel
 
                 $d[$key]['labels']=$this->freeQuery( [ "query"=>$query ] );
 
-                $dKey=array_search($default_project_language,array_column($d[$key]['labels'],'language_id'));
-
-                if ($dKey!==false)
+                if ($d[$key]['labels'])
                 {
-                     $d[$key]['default_label']=$d[$key]['labels'][$dKey]['label'];
+                    $dKey=array_search($default_project_language,array_column($d[$key]['labels'],'language_id'));
+
+                    if ($dKey!==false)
+                    {
+                         $d[$key]['default_label']=$d[$key]['labels'][$dKey]['label'];
+                    }
                 }
 
                 $query ="
@@ -383,6 +386,82 @@ class MatrixKeyExtModel extends AbstractModel
 
                 $d[$key]['characters']=$this->freeQuery( [ "query"=>$query ] );
             }
+        }
+
+        return $d;
+    }
+
+    public function getGroup( $p )
+    {
+        $project_id=isset($p['project_id']) ? $p['project_id'] : null;
+        $matrix_id=isset($p['matrix_id']) ? $p['matrix_id'] : null;
+        $group_id=isset($p['group_id']) ? $p['group_id'] : null;
+        $default_project_language=isset($p['default_project_language']) ? $p['default_project_language'] : null;
+
+        if ( is_null($project_id) ) return;
+        if ( is_null($matrix_id) ) return;
+        if ( is_null($group_id) ) return;
+        if ( is_null($default_project_language) ) return;
+
+        $query="
+            select
+                id,
+                label as sys_name
+            from
+                %PRE%chargroups
+            where
+                project_id = " .$project_id. "
+                and matrix_id = " .$matrix_id. "
+                and id = " .$group_id. "
+            ";
+        
+        $d=$this->freeQuery([ 'query'=>$query ] );
+
+        if ($d)
+        {
+            $d=$d[0];
+
+            $query ="
+                select
+                    label,
+                    language_id
+
+                from
+                    %PRE%chargroups_labels
+
+                where
+                    project_id = ". $project_id ."
+                    and chargroup_id = ". $d['id'] ."
+                ";
+
+            $d['labels']=$this->freeQuery( [ "query"=>$query ] );
+
+            if ($d['labels'])
+            {
+                $dKey=array_search($default_project_language,array_column($d['labels'],'language_id'));
+
+                if ($dKey!==false)
+                {
+                     $d['default_label']=$d['labels'][$dKey]['label'];
+                }
+            }
+
+            $query ="
+                select
+                    characteristic_id
+
+                from
+                    %PRE%characteristics_chargroups
+
+                where
+                    project_id = ". $project_id ."
+                    and chargroup_id = ". $d['id'] ."
+
+                order by
+                    show_order
+                ";
+
+            $d['characters']=$this->freeQuery( [ "query"=>$query ] );
         }
 
         return $d;
