@@ -288,12 +288,12 @@ class NsrController extends Controller
 
 	public function getConcept($id)
 	{
-		$c=$this->getTaxonById($id);
+		$c=$this->getTaxonById($id,true);
 
 		if ( !empty($c) )
 		{
 			$c['nsr_id']=$this->getNsrId(array('id'=>$c['id'],'item_type'=>'taxon'));
-			$c['parent']=$this->getTaxonById($c['parent_id']);
+			$c['parent']=$this->getTaxonById($c['parent_id'],true);
 
 			$d=$this->models->TrashCan->_get(array('id'=>
 			array(
