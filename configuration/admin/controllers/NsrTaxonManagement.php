@@ -77,7 +77,8 @@ class NsrTaxonManagement extends NsrController
 			['field'=>'name:infra_specific_epithet','label'=>'infra specific epithet (valid name 3rd part)'],
 			['field'=>'id','label'=>'taxon ID'],
 			['field'=>'project_id','label'=>'project ID'],
-			['field'=>'language_id','label'=>'language ID'],
+            ['field'=>'language_id','label'=>'language ID'],
+            ['field'=>'[synonyms]','label'=>'all synonyms (array)'],
 		];
 
 	private $linkEmbedTypes=

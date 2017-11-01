@@ -426,6 +426,7 @@ class SpeciesControllerNSR extends SpeciesController
 		['field'=>'id','label'=>'taxon ID'],
 		['field'=>'project_id','label'=>'project ID'],
 		['field'=>'language_id','label'=>'language ID'],
+		['field'=>'[synonyms]','label'=>'all synonyms (array)'],
 		['field'=>'nsr_id','label'=>'NSR ID']
 		+
 		trait:...
@@ -441,6 +442,20 @@ class SpeciesControllerNSR extends SpeciesController
 		if ( $val=='language_id' )
 		{
 			$sval=$this->getCurrentLanguageId();
+		}
+		else
+		if ( $val=='[synonyms]' )
+		{
+			$sval=[];
+			$names=$this->getNames( ['id' => $taxon['id'] ] );
+			foreach( $names['list'] as $key=>$val)
+			{
+				if( $val['nametype']=='isSynonymOf' )
+				{
+					$sval[]= $val;
+				}
+			}
+			$sval=json_encode($sval);
 		}
 		else
 		if( strpos($val,'name:')===0 )
