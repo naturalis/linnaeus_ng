@@ -43,64 +43,38 @@ class TaxonParentageController extends Controller
 
 	public function generateParentageAll()
 	{
-		$t = $this->treeGetTop();
+		$id = $this->treeGetTop();
 
-		if (empty($t))
+		if (empty($id))
 		{
-			$this->addError('Didn\'t find a taxon tree top.');
+			$this->addError("Didn't find a taxon tree top.");
 			return;
 		}
-			
-		$this->tmp=array();
 
-		$this->getProgeny($t,0,array());
+		$this->tmp=0;
+		// circumventing unexplained errors (mysqli spontaneously getting lost)
+		//$this->models->TaxonQuickParentage->delete(['project_id' => $this->getCurrentProjectId()]);
+		mysqli_query(
+			$this->models->TaxonQuickParentage->databaseConnection,
+			"delete from ".$this->models->TaxonQuickParentage->tableName." where project_id = " . $this->getCurrentProjectId()
+		);
 
-		$d=array('project_id' => $this->getCurrentProjectId());
-
-		$this->models->TaxonQuickParentage->delete($d);
-
-		$i=0;
-		foreach((array)$this->tmp as $key=>$val)
-		{
-			$this->models->TaxonQuickParentage->save( [
-				'id' => null,
-				'project_id' => $this->getCurrentProjectId(),
-				'taxon_id' => $val['id'],
-				'parentage' => implode(' ',$val['parentage'])
-			] );
-
-			$i++;
-		}
-
-		return $i;
-
+		$this->getProgeny($id,0,array());
+		return $this->tmp;
 	}
 
 	public function generateParentage( $id )
 	{
-		$this->tmp=[];
-
-		$this->getProgeny($id,0,[]);
-
-		$d=[ 'project_id' => $this->getCurrentProjectId(), 'taxon_id'=>$id ];
-
-		$this->models->TaxonQuickParentage->delete( $d );
-
-		$i=0;
-		foreach((array)$this->tmp as $key=>$val)
-		{
-			$this->models->TaxonQuickParentage->save( [
-				'id' => null,
-				'project_id' => $this->getCurrentProjectId(),
-				'taxon_id' => $val['id'],
-				'parentage' => implode(' ',$val['parentage'])
-			] );
-
-			$i++;
-		}
-
-		return $i;
-
+		$this->tmp=0;
+		// circumventing unexplained errors (mysqli spontaneously getting lost)
+		//$this->models->TaxonQuickParentage->delete( [ 'project_id' => $this->getCurrentProjectId(), 'taxon_id'=>$id ] );
+		mysqli_query(
+			$this->models->TaxonQuickParentage->databaseConnection,
+			"delete from " . $this->models->TaxonQuickParentage->tableName. "
+				where project_id = " . $this->getCurrentProjectId() . " and taxon_id = " .$id
+		);
+		$this->getProgeny($id,0,array());
+		return $this->tmp;
 	}
 
 	private function treeGetTop()
@@ -131,22 +105,29 @@ class TaxonParentageController extends Controller
 
 	private function getProgeny($parent,$level,$family)
 	{
-		$result = $this->models->Taxa->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'parent_id' => $parent
-				),
-				'columns' => 'id,parent_id,taxon,'.$level.' as level'
-			)
-		);
-
 		$family[]=Controller::generateTaxonParentageId($parent);
+
+		$result = $this->models->Taxa->_get( [
+			'id' => [
+				'project_id' => $this->getCurrentProjectId(),
+				'parent_id' => $parent
+			],
+			'columns' => 'id,parent_id,taxon,'.$level.' as level'
+		] );
 
 		foreach((array)$result as $row)
 		{
 			$row['parentage']=$family;
-			$this->tmp[]=$row;
+
+			$this->models->TaxonQuickParentage->save( [
+				'id' => null,
+				'project_id' => $this->getCurrentProjectId(),
+				'taxon_id' => $row['id'],
+				'parentage' => implode(' ',$row['parentage'])
+			] );
+
+			$this->tmp++;
+
 			$this->getProgeny($row['id'],$level+1,$family);
 		}
 	}
