@@ -1,56 +1,89 @@
-{*
-
-	make a tab with the external URL:
-    http://api.biodiversitydata.nl/v0/multimedia/search/?scientificName=%SCI-NAME%
-    http://api.biodiversitydata.nl/v0/multimedia/search/?scientificName=%NOMEN%
-
-    add the substitute:
-    %NOMEN% --> nomen
-    %SCI-NAME% --> scientific name
-    
-    choose "link or embed"-option
-    embed parametrized URL only (no content, better performance)
-    
-    and as template:
-    _tab_ext_nba_collection.tpl
-    (this file)
-
-*}
-
 <script>
+
+var rawInputs=[];
+var baseurl;
+var results=[];
+var maxresults={if $external_content->template_params_decoded->max_results}{$external_content->template_params_decoded->max_results}{else}5{/if};
+var totresults=0;
+var sciName="";
+var nomen="";
+var synonyms=Array()
+var query="";
 
 $(document).ready(function()
 {
 	{foreach item=v from="\n"|explode:$external_content->full_url}
-	urls.push('{$v|@trim}');
+	rawInputs.push('{$v|@trim}');
     {/foreach} 
-	
-	baseurl = urls.shift();
+
+    processRawInputs();
+    buildQuery();
 	getSpecimens();
+	printBioPortalSearchTerm();
 });
 
-var baseurl;
-//var basedata={};
-var results=[];
-var maxresults={if $external_content->template_params_decoded->max_results}{$external_content->template_params_decoded->max_results}{else}5{/if};
-var totresults=0;
-var urls=[];
-var searchName="";
+
+function processRawInputs()
+{
+	for(var i=0;i<rawInputs.length;i++)
+	{
+		if (rawInputs[i].indexOf('sciName=')!=-1)
+		{
+			sciName=decodeURIComponent(rawInputs[i].replace('sciName=','')).replace(/\+/g,' ');
+		}
+		else
+		if (rawInputs[i].indexOf('nomen=')!=-1)
+		{
+			nomen=decodeURIComponent(rawInputs[i].replace('nomen=','')).replace(/\+/g,' ');
+		}
+		else
+		if (rawInputs[i].indexOf('synonyms=')!=-1)
+		{
+			synonyms=$.parseJSON(decodeURIComponent(rawInputs[i].replace('synonyms=','').replace(/\+/g,' ')));
+			for(var j=0;j<synonyms.length;j++)
+			{
+				synonyms[j]['nomen']=synonyms[j]['name'].replace(synonyms[j]['authorship'],'').trim();
+			}
+			//console.log( synonyms );
+		}
+		else
+		if (rawInputs[i].length>0)
+		{
+		    baseurl=rawInputs[i];
+		}
+	}
+}
+
+function buildQuery()
+{
+	var s=[];
+
+	for(var j=0;j<synonyms.length;j++)
+	{
+		s.push(fetchTemplate( 'nbaSubQueryTpl' ).replace(/%SCI_NAME%/g,synonyms[j].nomen));
+	}
+
+	query=fetchTemplate( 'nbaQueryTpl')
+		.replace('%SCI_NAME%',nomen)
+		.replace('%SUB_QUERIES%',s.join(","));
+}
 
 function getSpecimens()
 {
+	//console.log(baseurl + encodeURIComponent( query ) );
 	$.ajax({
 		url : "../../../shared/tools/remote_service.php",
 		type: "POST",
 		data: ({
-			url : encodeURIComponent(baseurl),
+			url : encodeURIComponent( baseurl + encodeURIComponent( query ) ),
 			original_headers : 1
 		}),
 		success : function(data)
 		{
-			//basedata=data;
-			processBaseData( data );
-			checkForExtraUrls();
+			//console.log(data);
+			basedata=data;
+			processBaseData( );
+			printBaseData();
 			nbcPrettyPhotoInit();
 		},
 		complete : function( jqXHR, textStatus )
@@ -65,43 +98,30 @@ function getSpecimens()
 	});
 }
 
-var searches=[];
-
-function processBaseData( data )
+function processBaseData()
 {
-	//console.log(baseurl);
-	//console.dir(data);
-	
-	searches.push( { url:baseurl, search:data.queryParameters.scientificName[0], size:0 } );
-	
-	if (!data.searchResults) return;
-	
+	var data=basedata;
+	if (!data.resultSet) return;
+
 	totresults+=data.totalSize;
 	
-	searches[searches.length-1].size=data.totalSize;
-	
-	for(var i=0; i<data.searchResults.length; i++)
+	for(var i=0; i<data.resultSet.length; i++)
 	{
-		var r=data.searchResults[i].result;
+		var r=data.resultSet[i].item;
 
-		if (!r.associatedSpecimen || r.associatedSpecimen.unitID.length==0) continue;
+		if (!r.associatedMultiMediaUris || r.associatedMultiMediaUris.length==0) continue;
 
-		if (!searches[searches.length-1].name)
-		{
-			searches[searches.length-1].name=r.associatedSpecimen.identifications[0].scientificName.fullScientificName;
-		}
-	
 		results.push({
 			specimen: {
-				unitID: r.associatedSpecimen.unitID,
-				PURL: r.associatedSpecimen.unitGUID,
-				sourceSystem: r.associatedSpecimen.sourceSystem, 
-				recordBasis: r.associatedSpecimen.recordBasis, 
-				kindOfUnit: r.associatedSpecimen.kindOfUnit, 
+				unitID: r.unitID,
+				PURL: r.unitGUID,
+				sourceSystem: r.sourceSystem, 
+				recordBasis: r.recordBasis, 
+				kindOfUnit: r.kindOfUnit, 
 			},
 			image: {
-				title: r.title,
-				imgUrl: r.serviceAccessPoints.MEDIUM_QUALITY.accessUri
+				title: r.associatedMultiMediaUris[0].variant,
+				imgUrl: r.associatedMultiMediaUris[0].accessUri
 			}
 		});
 	}
@@ -167,32 +187,10 @@ function printBaseData()
 
 }
 
-function checkForExtraUrls()
-{
-	if (baseurl = urls.shift())
-	{
-		getSpecimens();
-	}
-	else
-	{
-		printBaseData();
-		printBioPortalSearchTerm();
-		printLogInfo();
-	}
-}
-
 function printBioPortalSearchTerm()
 {
-	var s=0;
-	for(var i=0;i<searches.length;i++)
-	{
-		if (searches[i].size>s)
-		{
-			searchName=searches[i].search;
-			s=searches[i].size;
-		}
-	}
-	$('.searchName').val(searchName);
+	$('#theForm').attr('action',$('#theForm').attr('action').replace(/%SEARCH%/g,encodeURIComponent(nomen)))
+	$('#theForm2').attr('action',$('#theForm2').attr('action').replace(/%SEARCH%/g,encodeURIComponent(nomen)))
 }
 
 function printLogInfo()
@@ -246,6 +244,8 @@ function printLogInfo()
 <div class="inline-templates" id="moreResultsTpl">
 <!--
 	<a href="#" onclick="$('#theForm').submit();return false;">{t}Bekijk meer resultaten in de Naturalis Bioportal{/t}</a>
+	<BR/>
+	<a href="#" onclick="$('#theForm2').submit();return false;">{t}Bekijk meer resultaten in de Naturalis Bioportal{/t} (simple)</a>
 -->
 </div>
 
@@ -299,10 +299,35 @@ linked bioportal search:
 -->
 </div>
 
+<div class="inline-templates" id="nbaQueryTpl">
+<!--
+{
+  "conditions" : [
+    { "field" : "identifications.scientificName.scientificNameGroup", "operator" : "EQUALS_IC", "value" : "%SCI_NAME%", "or" : [
+    	%SUB_QUERIES%
+    ] },
+    { "field" : "associatedMultiMediaUris.variant", "operator" : "NOT_EQUALS" }
+  ],
+  "logicalOperator" : "AND",
+  "from" : 0,
+  "size" : 10
+}	
+-->
+</div>
 
-<form id="theForm" method="post" target="_blank" action="http://bioportal.naturalis.nl/nba/result">
-<input type="hidden" name="form_id" value="ndabio_advanced_taxonomysearch" />
-<input type="hidden" name="m_scientificName" class="searchName" id="searchName" value="{$names.nomen_no_formatting}" />
+<div class="inline-templates" id="nbaSubQueryTpl">
+<!--
+{ "field" : "identifications.scientificName.scientificNameGroup", "operator" : "EQUALS_IC", "value" : "%SCI_NAME%" },
+{ "field" : "identifications.taxonomicEnrichments.synonyms.fullScientificName", "operator" : "EQUALS_IC", "value" : "%SCI_NAME%" }
+-->
+</div>
+
+
+<!-- form id="theForm" method="post" target="_blank" action="http://bioportal.naturalis.nl/nba/result" -->
+<form id="theForm" method="post" target="_blank" action="http://145.136.242.149/result?s_andOr=0&s_scientificName=%SEARCH%&s_vernacularName=&s_family=&s_genusOrMonomial=&s_specificEpithet=&s_unitID=&s_sourceSystem=&s_collectionType=&s_typeStatus=&s_localityText=&s_phaseOrStage=&s_sex=&s_gatheringAgent=&s_collectorsFieldNumber=&s_kingdom=&s_phylum=&s_className=&s_order=&s_infraspecificEpithet=&t_andOr=0&t_scientificName=&t_vernacularName=&t_family=&t_genusOrMonomial=&t_specificEpithet=&t_sourceSystem=&t_kingdom=&t_phylum=&t_className=&t_order=&t_subgenus=&t_infraspecificEpithet=&m_andOr=0&m_scientificName=%SEARCH%&m_vernacularName=&m_family=&m_genusOrMonomial=&m_specificEpithet=&m_sourceSystem=&m_collectionType=&m_kingdom=&m_phylum=&m_className=&m_order=&m_infraspecificEpithet=&op=Zoeken&form_build_id=form-A-fK1lNDxawbh_4WwuXhY84RMbj4NDqR4uChHe0iJ8k&form_id=ndabio_advanced_taxonomysearch">
+</form>
+
+<form id="theForm2" method="post" target="_blank" action="http://145.136.242.149/result?term=%SEARCH%&op=Zoeken&s_andOr=0&s_scientificName=&s_vernacularName=&s_family=&s_genusOrMonomial=&s_specificEpithet=&s_unitID=&s_sourceSystem=&s_collectionType=&s_typeStatus=&s_localityText=&s_phaseOrStage=&s_sex=&s_gatheringAgent=&s_collectorsFieldNumber=&s_kingdom=&s_phylum=&s_className=&s_order=&s_infraspecificEpithet=&t_andOr=0&t_scientificName=&t_vernacularName=&t_family=&t_genusOrMonomial=&t_specificEpithet=&t_sourceSystem=&t_kingdom=&t_phylum=&t_className=&t_order=&t_subgenus=&t_infraspecificEpithet=&m_andOr=0&m_scientificName=&m_vernacularName=&m_family=&m_genusOrMonomial=&m_specificEpithet=&m_sourceSystem=&m_collectionType=&m_kingdom=&m_phylum=&m_className=&m_order=&m_infraspecificEpithet=&form_build_id=form-0_5PI5xWiA1RkxFtgwC2XSAQzP8EQjSPAFuumjPVRLE&form_id=ndabio_advanced_taxonomysearch">
 </form>
 
 <span id="page-log" style="display:none;">
