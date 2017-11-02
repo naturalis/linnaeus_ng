@@ -423,6 +423,7 @@ class SpeciesControllerNSR extends SpeciesController
 		['field'=>'name:uninomial','label'=>'uninomial (valid name 1st part)'],
 		['field'=>'name:specific_epithet','label'=>'specific epithet (valid name 2nd part)'],
 		['field'=>'name:infra_specific_epithet','label'=>'infra specific epithet (valid name 3rd part)'],
+		['field'=>'[name]','label'=>'scientific name in parts'],
 		['field'=>'id','label'=>'taxon ID'],
 		['field'=>'project_id','label'=>'project ID'],
 		['field'=>'language_id','label'=>'language ID'],
@@ -442,6 +443,21 @@ class SpeciesControllerNSR extends SpeciesController
 		if ( $val=='language_id' )
 		{
 			$sval=$this->getCurrentLanguageId();
+		}
+		else
+		if ( $val=='[name]' )
+		{
+			$sval=[];
+			$names=$this->getNames( ['id' => $taxon['id'] ] );
+
+			foreach( $names['list'] as $key=>$val)
+			{
+				if( $val['nametype']=='isValidNameOf' )
+				{
+					$sval=$val;
+				}
+			}
+			$sval=json_encode($sval);
 		}
 		else
 		if ( $val=='[synonyms]' )
