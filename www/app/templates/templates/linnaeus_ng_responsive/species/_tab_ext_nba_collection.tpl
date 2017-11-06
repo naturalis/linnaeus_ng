@@ -23,6 +23,25 @@ $(document).ready(function()
 	printBioPortalSearchTerm();
 });
 
+function localPrettyPhotoInit() {
+	/*
+ 	$("a[rel^='prettyPhoto']").prettyPhoto({
+		allow_resize:true,
+		animation_speed:50,
+ 		opacity: 0.70, 
+		show_title: false,
+ 		overlay_gallery: false,
+ 		social_tools: false
+ 	});
+	*/
+
+	$('[data-fancybox]').fancybox({
+		arrows : false,
+		infobar : true,
+		animationEffect : false
+	});
+
+}
 
 function processRawInputs()
 {
@@ -91,7 +110,7 @@ function getSpecimens()
 			basedata=data;
 			processBaseData( );
 			printBaseData();
-			nbcPrettyPhotoInit();
+			localPrettyPhotoInit();
 		},
 		complete : function( jqXHR, textStatus )
 		{
@@ -190,10 +209,7 @@ function printBaseData()
 
 	$('#results').html( buffer.join( "\n" ) );
 	$('#result-header').html( header );
-
-	{if !isset($external_content->template_params_decoded->show_bioportal_link) || $external_content->template_params_decoded->show_bioportal_link==1}
 	$('#result-footer').html( fetchTemplate( 'moreResultsTpl' ) );
-	{/if}
 
 }
 
@@ -257,7 +273,6 @@ function printLogInfo()
 
 <div class="inline-templates" id="moreResultsTpl">
 <!--
-	<a href="#" onclick="$('#theForm').submit();return false;">{t}Bekijk meer resultaten in de Naturalis Bioportal{/t}</a>
 -->
 </div>
 
