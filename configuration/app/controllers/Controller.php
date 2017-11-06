@@ -172,6 +172,7 @@ class Controller extends BaseClass
 		'session_module_settings',
         'logging_helper',
         'debug_tools',
+		'user_agent',
 		'functions',
 		'custom_array_sort',
 		'paginator',
@@ -1867,23 +1868,47 @@ class Controller extends BaseClass
 
     private function setSkinName ()
     {
-		if ($this->controllerBaseName=='webservices')
-		{
-			$_SESSION['app']['system']['skinName'] = $this->generalSettings['app']['skinNameWebservices'];
-		} 
-		else
-		{
-			$skin=$this->getSetting('skin');
 
-			if (isset($skin) && $this->doesSkinExist($skin))
-			{
+		if ($this->controllerBaseName=='webservices') {
+
+			$_SESSION['app']['system']['skinName'] = $this->generalSettings['app']['skinNameWebservices'];
+
+		} else {
+
+			$force = $this->getSetting('force_skin_mobile')==1;
+
+			if ($force || isset($this->helpers->UserAgent)) {
+
+				if ($force || $this->helpers->UserAgent->isMobileDevice()) {
+
+					$d=$this->getSetting('skin_gsm');
+
+					if ($force || $this->helpers->UserAgent->isGSM() && isset($d))
+					{
+						$skin = $d;
+					}
+					else
+					{
+						$skin = $this->getSetting('skin_mobile');
+					}
+
+					if (isset($skin))
+						$skin = $this->doesSkinExist($skin) ? $skin : null;
+
+				}
+
+			}
+
+			$skin = empty($skin) ? $this->getSetting('skin') : $skin;
+
+			if (isset($skin) && $this->doesSkinExist($skin)) {
 				$_SESSION['app']['system']['skinName'] = $skin;
-			} 
-			else
-			{
+			} else {
 				$_SESSION['app']['system']['skinName'] = $this->generalSettings['app']['skinName'];
 			}
+
 		}
+
     }
 
     private function doesSkinExist ($skin)
@@ -2648,23 +2673,23 @@ class Controller extends BaseClass
 			return $this->addSubspeciesInfix( $p );
 		}
 		else
-		if ( (defined('NOTHOGENUS_RANK_ID') && $base_rank_id==NOTHOGENUS_RANK_ID) ||
-			 (defined('NOTHOSPECIES_RANK_ID') && $base_rank_id==NOTHOSPECIES_RANK_ID) )
+		if ( defined('NOTHOGENUS_RANK_ID') && defined('NOTHOSPECIES_RANK_ID') && ($base_rank_id==NOTHOGENUS_RANK_ID ||
+			 $base_rank_id==NOTHOSPECIES_RANK_ID) )
 		{
 			return $this->addHybridMarker( $p );
 		}
 		else
-		if ( defined('VARIETAS_RANK_ID') && $base_rank_id==VARIETAS_RANK_ID  )
+		if ( $base_rank_id==VARIETAS_RANK_ID  )
 		{
 			return $this->addVarietasInfix( $p );
 		}
 		else
-		if ( defined('SUBSPECIES_RANK_ID') && $base_rank_id==SUBSPECIES_RANK_ID  )
+		if ( $base_rank_id==SUBSPECIES_RANK_ID  )
 		{
 			return $this->addSubspeciesInfix( $p );
 		}
 		else
-		if ( defined('FORMA_RANK_ID') && $base_rank_id==FORMA_RANK_ID )
+		if ( $base_rank_id==FORMA_RANK_ID )
 		{
 			return $this->addFormaInfix( $p );
 		}
