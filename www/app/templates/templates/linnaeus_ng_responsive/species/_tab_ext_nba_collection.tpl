@@ -190,10 +190,7 @@ function printBaseData()
 
 	$('#results').html( buffer.join( "\n" ) );
 	$('#result-header').html( header );
-
-	{if !isset($external_content->template_params_decoded->show_bioportal_link) || $external_content->template_params_decoded->show_bioportal_link==1}
 	$('#result-footer').html( fetchTemplate( 'moreResultsTpl' ) );
-	{/if}
 
 }
 

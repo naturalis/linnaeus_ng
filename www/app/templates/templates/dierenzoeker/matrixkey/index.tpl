@@ -6,13 +6,13 @@
             <div class="header">
                 <div class="header-inner">
                 
-		            {include file="../shared/top-banners.tpl"}
+                    {include file="../shared/top-banners.tpl"}
 
                     <div class="clearer"></div>
                     
                     <ul class="wat-weet-je-list">      
                         <li class="wat-weet-je-arrow no-text">Wat weet je van het dier?</li>
-
+  
                         {foreach $facetmenu group groupkey}
                         
                             {assign var=foo value="|"|explode:$group.label} 
@@ -34,7 +34,7 @@
                 </div>
             </div>
 
-			<div class="sub-header-wrapper" style="display:none" >
+            <div class="sub-header-wrapper" style="display:none" >
                 <div class="sub-header">
                     <div class="sub-header-inner">
                         <a href="#" class="no-text alles-wissen" onClick="resetMatrix();return false;">Alles wissen</a>
@@ -55,14 +55,14 @@
                     <div class="result-list-header">
                         <ul>
                             <li id="prev-button-container-top" style="visibility:hidden">
-								<a href="#" class="first-btn" onClick="drnzkr_navigeren('eerste');return false;"></a>
-								<a href="#" class="prev-btn" onClick="drnzkr_navigeren('vorige');return false;"></a>
-							</li>
+                                <a href="#" class="first-btn" onClick="drnzkr_navigeren('eerste');return false;"></a>
+                                <a href="#" class="prev-btn" onClick="drnzkr_navigeren('vorige');return false;"></a>
+                            </li>
                             <li class="num-found" style="margin-top:-2px;"><span class="num" id="result-count-container">0</span> dieren gevonden</li>
                             <li id="next-button-container-top" style="position:relative;left:84px;visibility:visible;">
-								<a href="#" class="next-btn last-child" onClick="drnzkr_navigeren('volgende');return false;"></a>
-								<a href="#" class="last-btn last-child" onClick="drnzkr_navigeren('laatste');return false;"></a>
-							</li>
+                                <a href="#" class="next-btn last-child" onClick="drnzkr_navigeren('volgende');return false;"></a>
+                                <a href="#" class="last-btn last-child" onClick="drnzkr_navigeren('laatste');return false;"></a>
+                            </li>
                         </ul>
                         <div class="clearer"></div>
                     </div>
@@ -74,14 +74,14 @@
                     <div class="result-list-footer">
                          <ul>
                             <li id="prev-button-container-bottom" style="visibility:hidden">
-								<a href="#" class="first-btn" onClick="drnzkr_navigeren('eerste');return false;" style="margin-left:5px"></a>
-								<a href="#" class="prev-btn" onClick="drnzkr_navigeren('vorige');return false;" style="margin-left:1px"></a>
-							</li>
+                                <a href="#" class="first-btn" onClick="drnzkr_navigeren('eerste');return false;" style="margin-left:5px"></a>
+                                <a href="#" class="prev-btn" onClick="drnzkr_navigeren('vorige');return false;" style="margin-left:1px"></a>
+                            </li>
                             <li style="width:184px;">&nbsp;</li>
                             <li id="next-button-container-bottom" style="position:relative;left:84px;visibility:visible;">
-								<a href="#" class="next-btn last-child" onClick="drnzkr_navigeren('volgende');return false;"></a>
-								<a href="#" class="last-btn last-child" onClick="drnzkr_navigeren('laatste');return false;"></a>
-							</li>
+                                <a href="#" class="next-btn last-child" onClick="drnzkr_navigeren('volgende');return false;"></a>
+                                <a href="#" class="last-btn last-child" onClick="drnzkr_navigeren('laatste');return false;"></a>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -103,74 +103,74 @@
 
         </div>
 
-		<div class="facetgrouppage-wrapper"> 
+        <div class="facetgrouppage-wrapper"> 
                
         {foreach $facetmenu group groupkey}
 
             <div class="facetgrouppage" id="facetgrouppage{$groupkey}">
-				<img class="facetpage-puntje" alt="" src="{$session.app.system.urls.systemMedia}facet-puntje.png">
-				<a class="no-text facetgrouppage-close-btn" href="#">Sluiten</a>
+                <img class="facetpage-puntje" alt="" src="{$session.app.system.urls.systemMedia}facet-puntje.png">
+                <a class="no-text facetgrouppage-close-btn" href="#">Sluiten</a>
 
                 {if $group.chars}
                 {foreach $group.chars character characterkey}
 
-				<div class="facetgrouppage-inner">
-					<h4 class="tagline left-tagline ie-rounded keuze-tagline">{$character.info}</h4>
-					<div class="facetgrouppage-icons">
-						<div class="helper-div">
-							<div class="ui-grid-c">
+                <div class="facetgrouppage-inner">
+                    <h4 class="tagline left-tagline ie-rounded keuze-tagline">{$character.info}</h4>
+                    <div class="facetgrouppage-icons">
+                        <div class="helper-div">
+                            <div class="ui-grid-c">
 
-								{foreach $states state statekey}
+                                {foreach $states state statekey}
                                 {if $state.characteristic_id==$character.id && $state.file_name}
 
-								<div class="facet-btn ui-block-{if $statekey+1%4==0}d{elseif $statekey+1%3==0}c{elseif $statekey+1%2==0}b{else}a{/if}">
-									<a 
-                                    	href="#" 
+                                <div class="facet-btn ui-block-{if $statekey+1%4==0}d{elseif $statekey+1%3==0}c{elseif $statekey+1%2==0}b{else}a{/if}">
+                                    <a 
+                                        href="#" 
                                         data-value='{$character.prefix}:{$character.id}:{$state.id}'
-	                                    onclick="charClick(this)"
+                                        onclick="charClick(this)"
                                         id="state-{$state.id}">
                                         <div class="grid-iconbox">
-                                            <img alt="" class="grid-icon" src="{if !$state.file_name_is_full_url}{$projectUrls.projectMedia}{/if}{$state.file_name}">
+                                            <img alt="" class="grid-icon" src="{$state.file_name}">
                                         </div>
                                         <div class="grid-labelbox ">
                                             {$state.label}
                                         </div>
-									</a>
-								</div>
+                                    </a>
+                                </div>
 
-								{/if}
-								{/foreach}
-	
-							</div>
-						</div>
-						<div class="clearer"></div>
-						<div class="facetgrouppage-bottom-shade"></div>
+                                {/if}
+                                {/foreach}
+    
+                            </div>
+                        </div>
+                        <div class="clearer"></div>
+                        <div class="facetgrouppage-bottom-shade"></div>
 
-					</div>
+                    </div>
 
-				</div>
+                </div>
                 
                 {/foreach}
 
-				{else}
+                {else}
 
-				{assign var=foo value="|"|explode:$group.label} 
+                {assign var=foo value="|"|explode:$group.label} 
 
-				<div class="facetgrouppage-inner">
-					<h4 class="tagline left-tagline ie-rounded keuze-tagline">{$foo[1]}</h4>
-					<div class="facetgrouppage-icons">
-						<div class="helper-div">
-							<div class="ui-grid-c">
+                <div class="facetgrouppage-inner">
+                    <h4 class="tagline left-tagline ie-rounded keuze-tagline">{$foo[1]}</h4>
+                    <div class="facetgrouppage-icons">
+                        <div class="helper-div">
+                            <div class="ui-grid-c">
                             {foreach $states state statekey}
                             {if $state.characteristic_id==$group.id && $state.file_name}
                             <div class="facet-btn ui-block-{if $statekey+1%4==0}d{elseif $statekey+1%3==0}c{elseif $statekey+1%2==0}b{else}a{/if}">
                                 <a
-                                	href="#" 
+                                    href="#" 
                                     data-value='{$group.prefix}:{$group.id}:{$state.id}'
                                     onclick="charClick(this)"
                                     id="state-{$state.id}">
                                 <div class="grid-iconbox">
-                                    <img alt="" class="grid-icon" src="{if !$state.file_name_is_full_url}{$projectUrls.projectMedia}{/if}{$state.file_name}">
+                                    <img alt="" class="grid-icon" src="{$state.file_name}">
                                 </div>
                                 <div class="grid-labelbox ">
                                     {$state.label}
@@ -180,76 +180,79 @@
                             {/if}
                             {/foreach}
 
-						</div>
-						</div>
-						<div class="clearer"></div>
-						<div class="facetgrouppage-bottom-shade"></div>
+                        </div>
+                        </div>
+                        <div class="clearer"></div>
+                        <div class="facetgrouppage-bottom-shade"></div>
 
-					</div>  
-				</div>
+                    </div>  
+                </div>
                 
-             	{/if}
+                {/if}
                 
-			</div>    
-		{/foreach}
+            </div>    
+        {/foreach}
 
-		</div>
+        </div>
 
 
 <script type="text/JavaScript">
 $(document).ready(function()
 {
-	{if $requestData.dier}
-	drnzkr_startDier='{$requestData.dier|@escape}';
-	{/if}
+    {if $requestData.dier}
+    drnzkr_startDier='{$requestData.dier|@escape}';
+    {/if}
 
-	setSetting({
-		matrixId: {$matrix.id},
-		projectId: {$session.app.project.id},
-		imageRootSkin: '{$image_root_skin}',
-		imageRootProject: '{$projectUrls.projectMedia}',
-		useEmergingCharacters: {$settings->use_emerging_characters},
-		defaultSpeciesImages: { portrait: '{$image_root_skin}noimage.gif', landscape: '{$image_root_skin}noimage-lndscp.gif' } ,
-		imageOrientation: '{$settings->image_orientation}',
-		browseStyle: '{$settings->browse_style}',
-		scoreThreshold: {$settings->score_threshold},
-		alwaysShowDetails: {$settings->always_show_details},
-		perPage: {$settings->items_per_page},
-		perLine: {$settings->items_per_line},
-		generalSpeciesInfoUrl: '{$settings->species_info_url}',
-		initialSortColumn: '{$settings->initial_sort_column}',
-		alwaysSortByInitial: {$settings->always_sort_by_initial},
-		similarSpeciesShowDistinctDetailsOnly: {if $settings->similar_species_show_distinct_details_only}{$settings->similar_species_show_distinct_details_only}{else}0{/if},
-	});
+    setSetting({
+        matrixId: {$matrix.id},
+        projectId: {$session.app.project.id},
+        imageRootSkin: '{$image_root_skin}',
+        imageRootProject: '{$projectUrls.projectMedia}',
+        useEmergingCharacters: {$settings->use_emerging_characters},
+        suppressImageEnlarge: {if $settings->suppress_image_enlarge}{$settings->suppress_image_enlarge}{else}0{/if},
+        defaultSpeciesImages: { portrait: '{$image_root_skin}noimage.gif', landscape: '{$image_root_skin}noimage-lndscp.gif' } ,
+        imageOrientation: '{$settings->image_orientation}',
+        browseStyle: '{$settings->browse_style}',
+        scoreThreshold: {$settings->score_threshold},
+        alwaysShowDetails: {$settings->always_show_details},
+        perPage: {$settings->items_per_page},
+        perLine: {$settings->items_per_line},
+        generalSpeciesInfoUrl: '{$settings->species_info_url}',
+        initialSortColumn: '{$settings->initial_sort_column}',
+        alwaysSortByInitial: {$settings->always_sort_by_initial},
+        similarSpeciesShowDistinctDetailsOnly: {if $settings->similar_species_show_distinct_details_only}{$settings->similar_species_show_distinct_details_only}{else}0{/if},
+    });
 
-	setScores($.parseJSON('{$session_scores|@addslashes}'));
-	setStates($.parseJSON('{$session_states|@addslashes}'));
-	setStateCount($.parseJSON('{$session_statecount|@addslashes}'));
-	setCharacters($.parseJSON('{$session_characters|@addslashes}'));
-	setDataSet($.parseJSON('{$full_dataset|@addslashes}'));
-			
-	matrixInit();
+    setScores($.parseJSON('{$session_scores|@addslashes}'));
+    setStates($.parseJSON('{$session_states|@addslashes}'));
+    setStateCount($.parseJSON('{$session_statecount|@addslashes}'));
+    setCharacters($.parseJSON('{$session_characters|@addslashes}'));
+    setDataSet($.parseJSON('{$full_dataset|@addslashes}'));
+     
+    data.characterStates=$.parseJSON('{$states|@json_encode|@addslashes}');
+            
+    matrixInit();
 
-	$('[data-facetgrouppageid^="facetgrouppage"]').click(function(e)
-	{
-		e.preventDefault();
-		drnzkr_update_states();
-		var currentstate=$("#"+$(this).attr('data-facetgrouppageid')).css("display");
-		// Close all facet group pages (cleanup):
-		$(".facetgrouppage").css("display", "none");
-		// Show facet group page:
-		$("#"+$(this).attr('data-facetgrouppageid')).css("display", currentstate=="none"?"block":"none");
-		return false;           
-	});
-	
-	$('.facetgrouppage-close-btn').click(function(e){
-		e.preventDefault();
-		// Hide all facet group pages:
-		$(".facetgrouppage").css("display", "none");
-		return false;           
-	});
+    $('[data-facetgrouppageid^="facetgrouppage"]').click(function(e)
+    {
+        e.preventDefault();
+        drnzkr_update_states();
+        var currentstate=$("#"+$(this).attr('data-facetgrouppageid')).css("display");
+        // Close all facet group pages (cleanup):
+        $(".facetgrouppage").css("display", "none");
+        // Show facet group page:
+        $("#"+$(this).attr('data-facetgrouppageid')).css("display", currentstate=="none"?"block":"none");
+        return false;           
+    });
+    
+    $('.facetgrouppage-close-btn').click(function(e){
+        e.preventDefault();
+        // Hide all facet group pages:
+        $(".facetgrouppage").css("display", "none");
+        return false;           
+    });
 
-	$.backstretch("../../media/system/skins/dierenzoeker/background.jpg");
+    $.backstretch("../../media/system/skins/dierenzoeker/background.jpg");
 
 });
 </script>
@@ -416,13 +419,13 @@ function udm_(e){var t="comScore=",n=document,r=n.cookie,i="",s="indexOf",o="sub
 
 <div class="inline-templates" id="menuLoneCharDisabledHtmlTpl">
 <!--
-<li class="inner ungrouped %CLASS% disabled" title="%TITLE%" ondblclick="showStates(%ID%);">%LABEL%%VALUE%	%SELECTED% </li>
+<li class="inner ungrouped %CLASS% disabled" title="%TITLE%" ondblclick="showStates(%ID%);">%LABEL%%VALUE%  %SELECTED% </li>
 -->
 </div>
 
 <div class="inline-templates" id="menuCharDisabledHtmlTpl">
 <!--
-<li class="inner %CLASS% disabled" title="%TITLE%" ondblclick="showStates(%ID%);">%LABEL%%VALUE%	%SELECTED% </li>
+<li class="inner %CLASS% disabled" title="%TITLE%" ondblclick="showStates(%ID%);">%LABEL%%VALUE%    %SELECTED% </li>
 -->
 </div>
 
@@ -498,12 +501,12 @@ function udm_(e){var t="comScore=",n=document,r=n.cookie,i="",s="indexOf",o="sub
 <!--
 <li class="facetgroup-btn" title="%HINT%">
 <div class="facet-btn ui-block-d">
-	<a data-facetgrouppageid="facetgrouppage%INDEX%" href="#" data-role="button" data-corners="false" data-shadow="false" class="" onClick="" characters="{$smarty.capture.chars|@trim}">
-		<div class="grid-iconbox" >
-			<img src="%ICON%" class="grid-icon" alt="" />
-		</div>
-		<div class="grid-labelbox ">%LABEL%</div>
-	</a>
+    <a data-facetgrouppageid="facetgrouppage%INDEX%" href="#" data-role="button" data-corners="false" data-shadow="false" class="" onClick="" characters="{$smarty.capture.chars|@trim}">
+        <div class="grid-iconbox" >
+            <img src="%ICON%" class="grid-icon" alt="" />
+        </div>
+        <div class="grid-labelbox ">%LABEL%</div>
+    </a>
 </div>
 </li>
 -->
