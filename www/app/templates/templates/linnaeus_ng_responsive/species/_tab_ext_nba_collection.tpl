@@ -23,26 +23,6 @@ $(document).ready(function()
 	printBioPortalSearchTerm();
 });
 
-function localPrettyPhotoInit() {
-	/*
- 	$("a[rel^='prettyPhoto']").prettyPhoto({
-		allow_resize:true,
-		animation_speed:50,
- 		opacity: 0.70, 
-		show_title: false,
- 		overlay_gallery: false,
- 		social_tools: false
- 	});
-	*/
-
-	$('[data-fancybox]').fancybox({
-		arrows : false,
-		infobar : true,
-		animationEffect : false
-	});
-
-}
-
 function processRawInputs()
 {
 	for(var i=0;i<rawInputs.length;i++)
@@ -110,7 +90,7 @@ function getSpecimens()
 			basedata=data;
 			processBaseData( );
 			printBaseData();
-			localPrettyPhotoInit();
+			nbcPrettyPhotoInit();
 		},
 		complete : function( jqXHR, textStatus )
 		{
