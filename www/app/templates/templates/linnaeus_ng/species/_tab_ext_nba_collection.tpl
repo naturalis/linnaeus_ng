@@ -89,8 +89,8 @@ function buildQuery()
 	}
 
 	query=fetchTemplate( 'nbaQueryTpl')
-		.replace('%UNINOMIAL%',nameParts.uninomial)
-		.replace('%SPECIFIC_EPITHET%',nameParts.specific_epithet)
+		.replace(/%UNINOMIAL%/g,nameParts.uninomial)
+		.replace(/%SPECIFIC_EPITHET%/g,nameParts.specific_epithet)
 		.replace('%INFRA_SPECIFIC_EPITHET_CLAUSE%',s);
 }
 
