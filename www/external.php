@@ -15,6 +15,8 @@
 		- setDatabaseSettings(): receives dB host, user, pass etc in the same
 		  format as te output of Configuration::getDatabaseSettings()
 		- setParameters(): receives all REQUEST-parameters
+		- httpHeaders(): for outputting extra headers (like 
+		  header('Content-Type: application/json');)
 		- main(): main program
 		- getOutput(): delievered output of the service, to be printed "as is" 
 
@@ -60,6 +62,9 @@
 
 	if ( method_exists($e,'main') ) 
 		$e->main();
+
+	if ( method_exists($e,'httpHeaders') ) 
+		$e->httpHeaders();
 
 	if ( method_exists($e,'getOutput') ) 
 		echo $e->getOutput();
