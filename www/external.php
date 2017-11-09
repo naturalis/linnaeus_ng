@@ -1,6 +1,5 @@
 <?php
 
-
 	/*
 		generic endpoint for LNG-data delivered outside of the LNG-codebase
 		call this file with paremeter 'set=name':
@@ -34,7 +33,7 @@
 
 	$set=isset($_REQUEST['set']) ? $_REQUEST['set'] : null;
 
-	if (is_null($set)) exit;
+	if (is_null($set)) pageNotFound();
 
 	$set=strtolower(preg_replace('/\W/','', $set));
 
@@ -46,11 +45,11 @@
 
 	$file=$s['lngFileRoot'] . '/external/'.$set.'.php';
 
-	if (!file_exists($file)) exit;
+	if (!file_exists($file)) pageNotFound();
 
 	include_once($file);
 
-	if (!class_exists('ExternalService')) exit;
+	if (!class_exists('ExternalService')) pageNotFound();
 
 	$e=new ExternalService;
 
@@ -68,4 +67,9 @@
 
 	if ( method_exists($e,'getOutput') ) 
 		echo $e->getOutput();
-	
+
+	function pageNotFound()
+	{
+		header('HTTP/1.0 404 Not Found', true, 404);
+		die();
+	}
