@@ -1,14 +1,7 @@
 {include file="../shared/admin-header.tpl"}
 
 <script>
-
-var currentId=null;
-var parentLabel=null;
-var parentId=null;
-var taxa=[];
-var projectLanguages=[];
-
-function dialogAddGroup( data )
+function dialogAddCharacter( data )
 {
 	var id=+ new Date();
 	var buffer=[];
@@ -20,6 +13,7 @@ function dialogAddGroup( data )
 			.replace( '%CLASS%', "" )
 			.replace( '%ID%', "lead-" + id )
 	);
+
 	for(var i=0;i<projectLanguages.length;i++)
 	{
 		var value="";
@@ -44,39 +38,56 @@ function dialogAddGroup( data )
 		);
 	}
 
+
+	var s=[]
+	for(var i=0;i<characterTypes.length;i++)
+	{
+		s.push(
+			fetchTemplate( 'characterTypeTpl' )
+				.replace( /%LABEL%/g, characterTypes[i].id )
+				.replace( '%VALUE%', characterTypes[i].id )
+				.replace( '%DESCRIPTION%', characterTypes[i].description )
+				.replace( '%SELECTED%', '' )
+		);
+	}
+
+
+		
+
+
 	if (data)
 	{
-		var cCount=data.characters ? data.characters.length : 0;
+		var sCount=data.states ? data.states.length : 0;
 		buffer.push(
-			fetchTemplate( 'groupCharacterCountTpl' )
+			fetchTemplate( 'characterStateCountTpl' )
 				.replace( '%COUNT%', cCount )
 		);
 	}
 
 	var content=
-		fetchTemplate( 'editGroupTpl' )
-			.replace( '%FORM%', buffer.join("\n").replace(/%SAVE_GROUP%/g,id))
-			.replace('%HEADER%',data ? fetchTemplate( 'editGroupHeaderTpl' ) :  fetchTemplate( 'newGroupHeaderTpl' ) );
+		fetchTemplate( 'editCharacterTpl' )
+			.replace( '%FORM%', buffer.join("\n").replace(/%SAVE_GROUP%/g,id) + fetchTemplate( 'characterTypesTpl' ).replace( '%OPTIONS%', s.join("\n") ))
+			.replace('%HEADER%',data ? fetchTemplate( 'editCharacterHeaderTpl' ) :  fetchTemplate( 'newCharacterHeaderTpl' ) );
 
-	var extraData={ savegroup: id };
-	if (data)
+	var extraData;
+	if ( parentId )
 	{
-		extraData.id = data.id;
+		extraData={ parentId: parentId };
 	}
 
-	var msg = _("Are you sure?" + (cCount>0 ? "\n" + _("(grouped characters will not be deleted)") : "" ));
+	var msg = _("Are you sure?" + (sCount>0 ? "\n" + _("states will also be deleted") : "" ));
 
 	saveDialog({
-		title: data ? sprintf(_('Edit group: %s'),data.sys_name) : _('Add group'), 
+		title: data ? sprintf(_('Edit character: %s'),data.sys_name) : _('Add character' + (parentId ? ' to "' + parentLabel + '"' : '' )), 
 		content: content, 
-		callback: saveGroup, 
+		callback: saveCharacter, 
 		data: extraData,
 		buttons: data ?
 			{ Delete : function()
 				{
 					if( confirm(msg) )
 					{
-						deleteGroup(data.id);
+						deleteCharacter(data.id);
 					}
 					$( this ).dialog( "close" ); } 
 			} : null
@@ -89,30 +100,7 @@ function dialogAddGroup( data )
 			$(this).val( $(this).val().length==0 ? $('#lead-' + id).val() : $(this).val() );
 		})
 	})
-}
 
-function dialogEditGroup()
-{
-	if (currentId==null) return;
-
-	$.ajax({
-		url : 'ext_ajax_interface.php',
-		data : ({
-			'action' : 'get_group',
-			'id' : currentId ,
-			'time' : allGetTimestamp()
-		}),
-		success : function( data )
-		{
-			data=$.parseJSON( data );
-			dialogAddGroup( data );
-		}
-	})
-}
-
-function dialogAddCharacter()
-{
-	saveDialog( { title : 'add character to "' + parentLabel + '"', callback:saveCharacter} );
 }
 
 function dialogAddState()
@@ -128,7 +116,6 @@ function dialogTaxaForState()
 
 function saveDialog( p )
 {
-
 	var buttons = {
 			Save: function() {
 				if (p.callback) {
@@ -515,8 +502,8 @@ input[type=button] {
 	</p>
 
 	<div class="controls">
-		<span class="symbol group add"> add a group</span><br />
-		<span class="symbol character add"> add a character</span><br />
+		<span class="symbol group add">add a group</span><br />
+		<span class="symbol character add">add a character</span><br />
 	</div>
 
 </div>
@@ -635,64 +622,15 @@ $(document).ready(function()
 	projectLanguages.push( { id: {$v.language_id}, label: '{$v.language}', default: {$v.def_language==1}} )
 	{/foreach}
 
+	{foreach $characterTypes v}
+	characterTypes.push( { id: '{$v.label}', description: '{$v.description}' } )
+	{/foreach}
+
     setInitialSortOrderHash();
 
 });
 </script>
 
-<div id="dialog-confirm" title="action" style="display: none;">
-	<p class="content"></p>
-</div>
-
-<div id="taxonListTpl" class="inline-templates">
-<!--
-	<ul>%ITEMS%</ul>
--->
-</div>
-
-<div id="taxonListItemTpl" class="inline-templates">
-<!--
-	<li>%NAME%</li>
--->
-</div>
-
-<div id="editGroupTpl" class="inline-templates">
-<!--
-	<form>
-	%HEADER%
-	<table>
-	%FORM%
-	</table>
-	</form>
--->
-</div>
-
-<div id="newGroupHeaderTpl" class="inline-templates">
-<!--
-	{t}Enter the new group's names:{/t}
--->
-</div>
-
-<div id="editGroupHeaderTpl" class="inline-templates">
-<!--
-	{t}Edit group names:{/t}
--->
-</div>
-
-<div id="labelInputTpl" class="inline-templates">
-<!--
-	<tr><td>%LABEL%:</td><td><input type="text" name="%NAME%" placeholder="%LABEL% {t}name{/t}" id="%ID%" value="%VALUE%" class="%CLASS%" data-savegroup="%SAVE_GROUP%" /></td></tr>
--->
-</div>
-
-
-<div id="groupCharacterCountTpl" class="inline-templates">
-<!--
-	<tr><td>{t}Grouped characters:{/t}</td><td>%COUNT%</td></tr>
--->
-</div>
-
-
-
+{include file="_ext_matrix_tpl.tpl"}
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}

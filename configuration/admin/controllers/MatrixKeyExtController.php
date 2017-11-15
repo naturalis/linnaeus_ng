@@ -6,8 +6,6 @@ include_once ('ModuleSettingsReaderController.php');
 
 class MatrixKeyExtController extends Controller
 {
-
-
     public $usedModels = [
 	    'matrices',
 	    'matrices_names',
@@ -25,11 +23,25 @@ class MatrixKeyExtController extends Controller
 		'gui_menu_order'
 	];
 
+	public $jsToLoad = [
+		'all' => [
+			'matrix_ext.js',
+		]
+	];
+
     public $modelNameOverride='MatrixKeyExtModel';
+
+    private $characterTypes=[
+		[ 'label'=>'text', 'description'=>'textual descriptions' ],
+		[ 'label'=>'media', 'description'=>'images, videos or soundfiles' ],
+		[ 'label'=>'range', 'description'=>'value ranges, defined by a lowest and a highest value' ],
+		[ 'label'=>'distribution', 'description'=>'value distributions, defined by a mean and values for one and two standard deviations' ]
+	];
 
 	public function __construct()
 	{
 		parent::__construct();
+		$this->initialize();
 	}
 
 	public function overviewAction()
@@ -50,6 +62,8 @@ class MatrixKeyExtController extends Controller
 		$this->smarty->assign( 'matrix', $this->getMatrix() );
 		$this->smarty->assign( 'groupsCharactersStates', $this->getGroupsCharactersStates() );
 		$this->smarty->assign( 'languages', $this->getProjectLanguages() );
+		$this->smarty->assign( 'characterTypes', $this->characterTypes );
+
 		$this->printPage( 'ext_matrix' );
 	}	
 
@@ -72,6 +86,11 @@ class MatrixKeyExtController extends Controller
 
         $this->printPage( 'ext_ajax_interface' );
     }
+
+    private function initialize()
+    {
+    	array_walk($this->characterTypes,function(&$a) { $a['description']=$this->translate($a['description']); });
+	}
 
 	private function setCurrentMatrixId( $id )
 	{
@@ -157,7 +176,7 @@ class MatrixKeyExtController extends Controller
 		$order=$this->getGuiOrder();
 
 		// add states to their character
-		foreach ($characters as $key => $value)
+		foreach ((array)$characters as $key => $value)
 		{
 			$characters[$key]['states']=[];
 			foreach ($states as $sKey => $sValue)
@@ -170,7 +189,7 @@ class MatrixKeyExtController extends Controller
 		}
 
 		// adding characters to groups
-		foreach ($groups as $key => $value)
+		foreach ((array)$groups as $key => $value)
 		{
 			if ($value['characters'])
 			{
@@ -214,20 +233,20 @@ class MatrixKeyExtController extends Controller
 
 		// see if there's anything left (which was not in the order table)
 		$i=count($order);
-		foreach ($groups as $key => $value)
+		foreach ((array)$groups as $key => $value)
 		{
 			$order[$i]['item']=$value;
 			$order[$i++]['ref_type']='group';
 		}
 
-		foreach ($characters as $key => $value)
+		foreach ((array)$characters as $key => $value)
 		{
 			$order[$i]['item']=$value;
 			$order[$i++]['ref_type']='char';
 		}
 
 		// eliminating left-over empty items in the order list
-		foreach ($order as $key => $value)
+		foreach ((array)$order as $key => $value)
 		{
 			if ( !isset($value['item']) )
 			{

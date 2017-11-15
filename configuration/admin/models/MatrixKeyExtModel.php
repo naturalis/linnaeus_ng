@@ -231,16 +231,6 @@ class MatrixKeyExtModel extends AbstractModel
 
             return $d;
         }
-
-
-
-
-        return
-            $this->models->MatrixkeyModel->getCharacters( [
-                'project_id' => $this->getCurrentProjectId(),
-                'matrix_id' => $id,
-                'language_id' => $this->getDefaultProjectLanguage()
-        ] );
     }   
     
     public function getStates( $p )
