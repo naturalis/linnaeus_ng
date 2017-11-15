@@ -459,9 +459,11 @@ final class SearchNSRModel extends AbstractModel
 					and _j.project_id=_a.project_id" :  "" 
 				)."
 
-			right join %PRE%taxon_quick_parentage _q
-				on _a.id=_q.taxon_id
-				and _a.project_id=_q.project_id
+			".(isset($ancestor_id) ? "
+				right join %PRE%taxon_quick_parentage _q
+					on _a.id=_q.taxon_id
+					and _a.project_id=_q.project_id" : ""
+			)."
 
 			left join %PRE%projects_ranks _f
 				on _a.rank_id=_f.id
