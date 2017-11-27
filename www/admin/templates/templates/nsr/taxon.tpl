@@ -266,7 +266,7 @@ $(document).ready(function()
 
 	{if $concept}
 	dataid={$concept.id};
-	taxonrank={$concept.base_rank};
+	{if $concept.base_rank}taxonrank={$concept.base_rank};{/if}
 	$('#presence_reference_id').trigger('change');
 	{/if}
 	$('#data :input[type!=button]').each(function(key,value)
