@@ -128,6 +128,7 @@ function matrixGetStates(id)
 		async: allAjaxAsynchMode,
 		success : function (data)
 		{
+			//console.log(data);
 			obj = $.parseJSON(data);
 			if (obj) matrixSetStates(obj);
 		}
@@ -233,7 +234,10 @@ function matrixSetTaxa(obj)
 	{
 		for(var i=0;i<obj.taxa.length;i++)
 		{
-			$('#taxa').append('<option ondblclick="matrixDeleteTaxon()" value="'+obj.taxa[i].id+'">'+obj.taxa[i].taxon+'</option>').val(obj.taxa[i].id);
+			$('#taxa').append('<option ondblclick="matrixDeleteTaxon()" value="'+obj.taxa[i].id+'">'+
+				obj.taxa[i].taxon+
+				(obj.taxa[i].name.length>0 ? " ("+obj.taxa[i].name + ")" : "" )+
+				'</option>').val(obj.taxa[i].id);
 		}
 	}
 
@@ -340,7 +344,7 @@ function matrixGetLinks()
 		async: allAjaxAsynchMode,
 		success : function (data)
 		{
-			console.log(data);
+			//console.log(data);
 			matrixSetLinks($.parseJSON(data));
 		}
 	});

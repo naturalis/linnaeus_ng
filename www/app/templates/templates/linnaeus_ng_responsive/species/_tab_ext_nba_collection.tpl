@@ -253,6 +253,7 @@ function printLogInfo()
 
 <div class="inline-templates" id="moreResultsTpl">
 <!--
+	<a href="#" onclick="$('#theForm').submit();return false;">Bekijk meer resultaten in de Naturalis Bioportal</a>
 -->
 </div>
 

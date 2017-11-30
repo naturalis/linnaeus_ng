@@ -30,6 +30,8 @@ class MatrixKeyModel extends AbstractModel
 		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
 		$matrix_id = isset($params['matrix_id']) ? $params['matrix_id'] : null;
 		$branch_tops=isset($params['branch_tops']) ? $params['branch_tops'] : null;
+		$language_id=isset($params['language_id']) ? $params['language_id'] : null;
+		$type_id_preferred=isset($params['type_id_preferred']) ? $params['type_id_preferred'] : null;
 
 		if ( is_null($project_id) || is_null($matrix_id) )
 			return;
@@ -46,21 +48,33 @@ class MatrixKeyModel extends AbstractModel
 						_b.id,
 						_b.taxon,
 						_b.parent_id,
-						_c.rank_id as base_rank_id
+						_c.rank_id as base_rank_id,
+						_names.name
 			
-					from %PRE%matrices_taxa _a
+					from
+						%PRE%matrices_taxa _a
 			
-					left join %PRE%taxa _b
-						on _a.project_id=_b.project_id
-						and _a.taxon_id = _b.id
+					left join
+						%PRE%taxa _b
+							on _a.project_id=_b.project_id
+							and _a.taxon_id = _b.id
 
-					left join %PRE%projects_ranks _c
-						on _b.project_id=_c.project_id
-						and _b.rank_id = _c.id
+					left join
+						%PRE%names _names
+							on _b.id = _names.taxon_id
+							and _b.project_id = _names.project_id
+							and _names.type_id = ".$type_id_preferred."
+							and _names.language_id=".$language_id."
 
-					right join %PRE%taxon_quick_parentage _sq
-						on _a.taxon_id = _sq.taxon_id
-						and _sq.project_id = " . $project_id . " 
+					left join
+						%PRE%projects_ranks _c
+							on _b.project_id=_c.project_id
+							and _b.rank_id = _c.id
+
+					right join
+						%PRE%taxon_quick_parentage _sq
+							on _a.taxon_id = _sq.taxon_id
+							and _sq.project_id = " . $project_id . " 
 			
 					where 
 						_a.project_id = ". $project_id ."
@@ -69,6 +83,7 @@ class MatrixKeyModel extends AbstractModel
 								MATCH(_sq.parentage) AGAINST ('" . $this->generateTaxonParentageId( $top ) . "' in boolean mode)
 								or _a.taxon_id=" . $top . " 
 							)		
+
 					order by
 						_b.taxon
 					");
@@ -95,17 +110,28 @@ class MatrixKeyModel extends AbstractModel
 					_b.id,
 					_b.taxon,
 					_b.parent_id,
-					_c.rank_id as base_rank_id
+					_c.rank_id as base_rank_id,
+					_names.name
 		
-				from %PRE%matrices_taxa _a
+				from
+					%PRE%matrices_taxa _a
 		
-				left join %PRE%taxa _b
-					on _a.project_id=_b.project_id
-					and _a.taxon_id = _b.id
+				left join
+					%PRE%taxa _b
+						on _a.project_id=_b.project_id
+						and _a.taxon_id = _b.id
 
-				left join %PRE%projects_ranks _c
-					on _b.project_id=_c.project_id
-					and _b.rank_id = _c.id		
+				left join
+					%PRE%names _names
+						on _b.id = _names.taxon_id
+						and _b.project_id = _names.project_id
+						and _names.type_id = ".$type_id_preferred."
+						and _names.language_id=".$language_id."
+
+				left join
+					%PRE%projects_ranks _c
+						on _b.project_id=_c.project_id
+						and _b.rank_id = _c.id		
 
 				where 
 					_a.project_id = ". $project_id ."
@@ -125,6 +151,8 @@ class MatrixKeyModel extends AbstractModel
 		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
 		$matrix_id = isset($params['matrix_id']) ? $params['matrix_id'] : null;
 		$branch_tops=isset($params['branch_tops']) ? $params['branch_tops'] : null;
+		$language_id=isset($params['language_id']) ? $params['language_id'] : null;
+		$type_id_preferred=isset($params['type_id_preferred']) ? $params['type_id_preferred'] : null;
 
 		if ( is_null($project_id) || is_null($matrix_id) )
 			return;
@@ -138,29 +166,40 @@ class MatrixKeyModel extends AbstractModel
 
 				$taxa+=$this->freeQuery( "
 					select
-					
 						_b.id,
 						_b.taxon,
 						_b.parent_id,
 						_c.keypath_endpoint,
 						_c.lower_taxon,
 						_c.rank_id as base_rank_id,
-						if(ifnull(_a.id,0)=0,0,1) as already_in_matrix
+						if(ifnull(_a.id,0)=0,0,1) as already_in_matrix,
+						_names.name
 			
-					from %PRE%taxa _b
+					from
+						%PRE%taxa _b
 		
-					left join %PRE%matrices_taxa _a
-						on _a.project_id=_b.project_id
-						and _a.taxon_id = _b.id
-						and _a.matrix_id = ". $matrix_id."
+					left join
+						%PRE%matrices_taxa _a
+							on _a.project_id=_b.project_id
+							and _a.taxon_id = _b.id
+							and _a.matrix_id = ". $matrix_id."
 		
-					left join %PRE%projects_ranks _c
-						on _b.project_id=_c.project_id
-						and _b.rank_id = _c.id
+					left join
+						%PRE%names _names
+							on _b.id = _names.taxon_id
+							and _b.project_id = _names.project_id
+							and _names.type_id = ".$type_id_preferred."
+							and _names.language_id=".$language_id."
 
-					right join %PRE%taxon_quick_parentage _sq
-						on _b.id = _sq.taxon_id
-						and _sq.project_id = " . $project_id . " 
+					left join
+						%PRE%projects_ranks _c
+							on _b.project_id=_c.project_id
+							and _b.rank_id = _c.id
+
+					right join
+						%PRE%taxon_quick_parentage _sq
+							on _b.id = _sq.taxon_id
+							and _sq.project_id = " . $project_id . " 
 
 					where 
 						_b.project_id = ". $project_id ."
@@ -189,12 +228,22 @@ class MatrixKeyModel extends AbstractModel
 				
 					_b.id,
 					_b.taxon,
+					_b.parent_id,
 					_c.lower_taxon,
 					_c.keypath_endpoint,
 					_c.rank_id as base_rank_id,
-					if(ifnull(_a.id,0)=0,0,1) as already_in_matrix
+					if(ifnull(_a.id,0)=0,0,1) as already_in_matrix,
+					_names.name
 		
 				from %PRE%taxa _b
+
+				left join
+					%PRE%names _names
+						on _b.id = _names.taxon_id
+						and _b.project_id = _names.project_id
+						and _names.type_id = ".$type_id_preferred."
+						and _names.language_id=".$language_id."
+
 	
 				left join %PRE%matrices_taxa _a
 					on _a.project_id=_b.project_id
@@ -264,7 +313,7 @@ class MatrixKeyModel extends AbstractModel
 			{
 				if (strpos($val['label'],'|')!==false)
 				{
-					$d = explode('|',$label);
+					$d = explode('|',$val['label']);
 					$d[$key]['short_label']=$d[0];
 				}
 				else
@@ -445,17 +494,20 @@ class MatrixKeyModel extends AbstractModel
 
 		$query ="
 			select
+
 				_b.id,
 				_b.type,
 				_b.sys_name,
 				ifnull(_c.label,_b.sys_name) as label
 
-			from %PRE%characteristics _b
+			from
+				%PRE%characteristics _b
 
-			left join %PRE%characteristics_labels _c
-				on _b.project_id=_c.project_id
-				and _b.id=_c.characteristic_id
-				and _c.language_id=" . $language_id . "
+			left join
+				%PRE%characteristics_labels _c
+					on _b.project_id=_c.project_id
+					and _b.id=_c.characteristic_id
+					and _c.language_id=" . $language_id . "
 
 			where 
 				_b.project_id = ". $project_id ."

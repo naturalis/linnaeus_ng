@@ -75,6 +75,7 @@ class MatrixKeyController extends Controller
         $this->smarty->assign('activeLanguage', $this->getDefaultProjectLanguage());
 
 		$this->use_media=$this->moduleSettings->getModuleSetting( [ 'setting'=>'no_media','subst'=>0 ] )!=1;
+		$this->character_name_split_char=$this->moduleSettings->getModuleSetting( [ 'setting'=>'character_name_split_char','subst'=>'|' ] );
 
 		if ( $this->use_media )
 		{
@@ -582,7 +583,9 @@ class MatrixKeyController extends Controller
 
 		$d=array(
 			'project_id' => $this->getCurrentProjectId(),
-			'matrix_id' => $this->getCurrentMatrixId()
+			'matrix_id' => $this->getCurrentMatrixId(),
+			'language_id' => $this->getDefaultProjectLanguage(),
+			'type_id_preferred' => $this->getNameTypeId(PREDICATE_PREFERRED_NAME)
 		);
 
 		$this->UserRights->setUserItems();
@@ -870,6 +873,7 @@ class MatrixKeyController extends Controller
 
         $this->smarty->assign( 'matrix', $this->getMatrix( $this->getCurrentMatrixId() ) );
 		$this->smarty->assign( 'taxa', $this->getTaxa() );
+
         if ( isset($links) ) $this->smarty->assign('links', $links);
         if ($this->rHasVal('taxon'))  $this->smarty->assign('taxon', $this->rGetVal('taxon'));
 
@@ -1598,7 +1602,9 @@ class MatrixKeyController extends Controller
     {
 		$d=array(
 			'project_id' => $this->getCurrentProjectId(),
-			'matrix_id' => $this->getCurrentMatrixId()
+			'matrix_id' => $this->getCurrentMatrixId(),
+			'language_id' => $this->getDefaultProjectLanguage(),
+			'type_id_preferred' => $this->getNameTypeId(PREDICATE_PREFERRED_NAME)
 		);
 
 		$this->UserRights->setUserItems();
@@ -1758,8 +1764,9 @@ class MatrixKeyController extends Controller
 				'language_id'=>$this->getDefaultProjectLanguage()
 			]);
 
-            $mts[$key]['state'] = $a['sys_name'];
-            $mts[$key]['characteristic'] = $b['sys_name'];
+            $mts[$key]['state'] = $a['label'];
+            $mts[$key]['characteristic'] = $b['label'];
+            $mts[$key]['characteristic_split'] = $this->splitCharacterLabel( $b['label'] );
         }
 
         return $mts;
@@ -2318,6 +2325,18 @@ class MatrixKeyController extends Controller
         $this->_mc->setModuleId($this->getCurrentModuleId());
         $this->_mc->setItemId($this->rGetId());
         $this->_mc->setLanguageId($this->getDefaultProjectLanguage());
+	}
+
+
+	private function splitCharacterLabel( $s )
+	{
+		if (strpos($s, $this->character_name_split_char)!==false)
+		{
+			$d=explode($this->character_name_split_char,$s);
+			return [ 'label' => $d[0],  'description' => $d[1] ];
+		}
+		
+		return [ 'label' => $s,  'description' => null ];
 	}
 
 
