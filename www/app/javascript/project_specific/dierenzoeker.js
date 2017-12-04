@@ -2,6 +2,21 @@ var drnzkr_startDier=null;
 
 function hook_prePrintResults()
 {
+	for(var i=0;i<data.dataset.length;i++)
+	{
+		if (data.dataset[i].images)
+		{
+			for(var j=0;j<data.dataset[i].images.length;j++)
+			{
+				if (data.dataset[i].images[j].overview_image && data.dataset[i].images[j].overview_image==1)
+				{
+					data.dataset[i].info.url_image=data.dataset[i].images[j].file_name;
+					data.dataset[i].info.url_thumbnail=data.dataset[i].images[j].thumb_name;
+				}
+			}
+		}
+	}
+
 	drnzk_verberg_dier();
 }
 

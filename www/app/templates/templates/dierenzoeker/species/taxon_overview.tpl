@@ -11,34 +11,58 @@ div.pp_default .pp_description {
 <h1>{$taxon.commonname}</h1>
 <h2>{$taxon.taxon}</h2> 
 
+{foreach $categories.categories v}
+{if $v.page=='Appearance'}{assign catUiterlijk $v.id}{/if}
+{if $v.page=='Behaviour'}{assign catGedrag $v.id}{/if}
+{if $v.page=='Where and when'}{assign catWaar $v.id}{/if}
+{if $v.page=='DescriptionTitle'}{assign catDescriptionTitle $v.id}{/if}
+{if $v.page=='Description'}{assign catDescription $v.id}{/if}
+
+{if $v.page=='_howMany'}{assign catHowMany $v.id}{/if}
+{if $v.page=='_whatAre'}{assign catWhatAre $v.id}{/if}
+{if $v.page=='_whatDo'}{assign catWhatDo $v.id}{/if}
+{if $v.page=='_whereAre'}{assign catWhereAre $v.id}{/if}
+{/foreach}
+
+
 {if $taxon.base_rank_id >= $smarty.const.SPECIES_RANK_ID}
 <script>
 	$("#dier-header").html('Dier');
 </script>
-{if $nbc.url_image}
+
+{foreach $media v}
+{if $v.overview_image==1}
+{assign overview_image $v}
+{/if}
+{/foreach}
+
+{if $overview_image}
 <div class="illustratie-wrapper">
     <div class="illustratie">
-       	<a rel="prettyPhoto[gallery]" href="{$nbc.url_image_large}" title="{$v.description}" id="overview-picture">
-            <img style="width:280px" title="" src="{$nbc.url_image}" alt="">
+       	<a rel="prettyPhoto[gallery]" href="{$base_url_images_main}{$overview_image.file_name}" title="{$overview_image.description}" id="overview-picture">
+            <img style="width:280px" title="" src="{$base_url_images_main}{$overview_image.file_name}" alt="">
 		</a>
     </div>
 </div>
 {/if}
+
 <p>
     <span class="label">Uiterlijk:</span>
-    {$content[855].content}
+    {$content[$catUiterlijk].content}
 </p>
+
 <p>
     <span class="label">Gedrag:</span>
-    {$content[856].content}
+    {$content[$catGedrag].content}
 </p>
+
 <p>
     <span class="label">Waar en wanneer:</span>
-    {$content[857].content}
+    {$content[$catWaar].content}
 </p>
 <p>
-    <span class="label">{$content[858].content}</span>
-    {$content[848].content}
+    <span class="label">{$content[$catDescriptionTitle].content}</span>
+    {$content[$catDescription].content}
 </p>
 {else}
 <script>
@@ -47,19 +71,19 @@ div.pp_default .pp_description {
 
 <p>
     <span class="label">{'Wat zijn %s?'|replace:'%s':($taxon.commonname|lower)}</span>
-    {$content[860].content}
+    {$content[$catWhatAre].content}
 </p>
 <p>
     <span class="label">{'Waar zitten %s?'|replace:'%s':($taxon.commonname|lower)}</span>
-    {$content[861].content}
+    {$content[$catWhereAre].content}
 </p>
 <p>
     <span class="label">{'Wat doen %s?'|replace:'%s':($taxon.commonname|lower)}</span>
-    {$content[862].content}
+    {$content[$catWhatDo].content}
 </p>
 <p>
     <span class="label">{'Hoeveel %s zijn er in Nederland?'|replace:'%s':($taxon.commonname|lower)}</span>
-    {$content[863].content}
+    {$content[$catHowMany].content}
 </p>
 
 {/if}
@@ -86,6 +110,7 @@ div.pp_default .pp_description {
 {if $parent.commonname && $parent.id && $parent.hasContent}
 <a class="grouplink group-container" href="#" onclick="drnzkr_toon_dier( { id: {$parent.id}, back: {$taxon.id} } );return false;" style="">{$parent.commonname}</a>
 {/if}
+
 {if $related}
 <div class="related">
         <span style="font-weight:bold;padding-left:40px;font-size:14px;position:relative;top:10px;">Lijkt op</span>

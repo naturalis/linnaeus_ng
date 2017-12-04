@@ -320,20 +320,40 @@ class SpeciesController extends Controller
 		foreach((array)$related as $key => $val)
 		{
 			$d = $this->getCommonname($val['relation_id']);
-			$related[$key]['label'] = $d;
-			$related[$key]['url_image'] = $this->getNbcExtras(array('id'=>$val['relation_id'],'name' => 'url_image'));
-			$related[$key]['url_thumbnail'] = $this->getNbcExtras(array('id'=>$val['relation_id'],'name' => 'url_thumbnail'));
+            $related[$key]['label'] = $d;
+
+            $media=$this->getTaxonMedia( [ 'taxon'=>$val['relation_id'],'forceOld'=>true ] );
+
+            foreach((array)$media as $val)
+            {
+                if ($val['overview_image']==1)
+                {
+                    $related[$key]['url_image'] = $val['file_name'];
+                    $related[$key]['url_thumbnail'] = $val['thumb_name'];
+                }
+            }
 		}
+
 		$children=$this->models->Taxa->_get(array('id'=>array('project_id' => $this->getCurrentProjectId(),'parent_id' => $this->rGetVal('id'))));
 		foreach((array)$children as $key => $val)
 		{
 			$d = $this->getCommonname($val['id']);
 			$children[$key]['label'] = $d;
-			$children[$key]['url_image'] = $this->getNbcExtras(array('id'=>$val['id'],'name' => 'url_image'));
-			$children[$key]['url_thumbnail'] = $this->getNbcExtras(array('id'=>$val['id'],'name' => 'url_thumbnail'));
+            
+            $media=$this->getTaxonMedia( [ 'taxon'=>$val['id'],'forceOld'=>true ] );
+
+            foreach((array)$media as $val)
+            {
+                if ($val['overview_image']==1)
+                {
+                    $children[$key]['url_image'] = $val['file_name'];
+                    $children[$key]['url_thumbnail'] = $val['thumb_name'];
+                }
+            }
+
 		}
-		if ($children)
-			usort($children,function($a,$b) {return ($a['label']>$b['label']?1:-1);});
+
+		if ($children) usort($children,function($a,$b) {return ($a['label']>$b['label']?1:-1);});
 
 		$taxon = $this->getTaxonById($this->rGetVal('id'));
 		$taxon['label']=$this->formatTaxon($taxon);
@@ -363,17 +383,17 @@ class SpeciesController extends Controller
 			'columns'=>'count(*) as total'
 			)
 		);
+
 		$parent['hasContent']=$contentparent[0]['total']>0;
 
 		$this->smarty->assign('taxon',$taxon);
 		$this->smarty->assign('parent',$parent);
-		$this->smarty->assign('categoryList', $categories['categoryList']);
+		$this->smarty->assign('categories', $categories);
 		$this->smarty->assign('content',$content);
 		$this->smarty->assign('children', $children);
 		$this->smarty->assign('related', $related);
 		$this->smarty->assign('media', $media);
 		$this->smarty->assign('back',$this->rGetVal('back'));
-
         $this->smarty->assign('base_url_images_main',$this->_base_url_images_main);
 
 		$this->printPage();
@@ -562,13 +582,11 @@ class SpeciesController extends Controller
 			'id' => array(
 				'project_id' => $this->getCurrentProjectId()
 			),
-			'order' => 'show_order',
 			'fieldAsIndex' => 'id'
 		));
 
 		foreach ((array) $tp as $key => $val)
 		{
-
 		    if (is_null($this->moduleSession->getModuleSetting('defaultCategory'))) {
                 $this->moduleSession->setModuleSetting(array(
                     'setting' => 'defaultCategory',
@@ -840,11 +858,16 @@ class SpeciesController extends Controller
 		return array('content'=>$content);
     }
 
+
 	protected function getTaxonMedia ($p)
 	{
 		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
 		$id = isset($p['id']) ? $p['id'] : null;
 		$forceOld = isset($p['forceOld']) ? $p['forceOld'] : false;
+
+        /*
+            forceOld should be replaced with a "use/don't use RS"-setting
+        */
 
 		$inclOverviewImage = isset($p['inclOverviewImage']) ? $p['inclOverviewImage'] : false;
 

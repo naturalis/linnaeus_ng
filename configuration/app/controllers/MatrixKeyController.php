@@ -622,24 +622,21 @@ class MatrixKeyController extends Controller
 		{
 			foreach((array)$taxa as $key=>$val)
 			{
-				/*
-				 $d=$this->models->MediaTaxon->_get(array("id"=>
-					array(
-						"taxon_id"=>$val['id'],
-						"project_id" => $this->getCurrentProjectId(),
-						"overview_image"=>"1"
-				)));
-
-				if ( $d )
-				{
-					$taxa[$key]['info']['url_image']=$d[0]['file_name'];
-				}
-				*/
-
 			    $this->_smc->setItemId($val['id']);
 			    $taxa[$key]['info']['url_image'] = $this->_smc->getOverview();
 
 			}
+		}
+
+		foreach((array)$taxa as $key=>$val)
+		{
+			$taxa[$key]['images']=
+				$this->models->MediaTaxon->_get( [ "id"=> [
+					"taxon_id"=>$val['id'],
+					"project_id" => $this->getCurrentProjectId()
+				 ],
+				 "columns" => "file_name,thumb_name,overview_image" 
+			] );
 		}
 
 		$all=array_merge((array)$taxa,(array)$variations);

@@ -561,7 +561,7 @@ function formatResult( data )
 		var states = Array();
 
 		for(var i in data.states)
-		{0
+		{
 			var state=data.states[i];
 			
 			if (state.characteristic==undefined)
@@ -638,7 +638,7 @@ function formatResult( data )
 			thumb=image;
 		}
 	}
-	
+
 	var id = data.type+'-'+data.id;
 	var showStates = states && states.length > 0;
 
