@@ -367,6 +367,8 @@ class NsrTaxonImagesController extends NsrController
 			"order"=>"sys_label"
 		));
 
+		$d=[];
+
 		foreach((array)$fields as $val)
 		{
 			$d[]=$val['sys_label'];
