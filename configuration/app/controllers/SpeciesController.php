@@ -94,6 +94,9 @@ class SpeciesController extends Controller
         $this->_includeOverviewImageInMedia=$this->moduleSettings->getModuleSetting( array( 'setting'=>'include_overview_in_media','subst'=>true) );
 		$this->_defaultSpeciesTab=$this->moduleSettings->getModuleSetting( array( 'setting'=>'species_default_tab','subst'=>CTAB_CLASSIFICATION) );
 		$this->_inclHigherTaxaRankPrefix=$this->moduleSettings->getModuleSetting( array( 'setting'=>'higher_taxa_rank_prefix','subst'=>0) )==1;
+        $this->_base_url_images_main=$this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_main','module'=>'species') );
+        $this->_base_url_images_thumb=$this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_thumb','module'=>'species') );
+
 		
 		$this->smarty->assign('inclHigherTaxaRankPrefix',$this->_inclHigherTaxaRankPrefix);
     }
@@ -348,12 +351,8 @@ class SpeciesController extends Controller
 			'fieldAsIndex'=>'page_id'
 			)
 		);
-		$nbc=$this->getNbcExtras(array('id'=>$this->rGetVal('id')));
-
-		// hardcoding....
-		if (isset($nbc["url_image"])) $nbc["url_image_large"]=str_replace('280x190','original',$nbc["url_image"]);
-
-		$media=$this->getTaxonMedia(array('taxon'=>$this->rGetVal('id'),'forceOld'=>true));
+		
+		$media=$this->getTaxonMedia( [ 'taxon'=>$this->rGetVal('id'),'forceOld'=>true ] );
 
 		$contentparent = $this->models->ContentTaxa->_get(array(
 			'id' =>  array(
@@ -370,11 +369,12 @@ class SpeciesController extends Controller
 		$this->smarty->assign('parent',$parent);
 		$this->smarty->assign('categoryList', $categories['categoryList']);
 		$this->smarty->assign('content',$content);
-		$this->smarty->assign('nbc',$nbc);
 		$this->smarty->assign('children', $children);
 		$this->smarty->assign('related', $related);
 		$this->smarty->assign('media', $media);
 		$this->smarty->assign('back',$this->rGetVal('back'));
+
+        $this->smarty->assign('base_url_images_main',$this->_base_url_images_main);
 
 		$this->printPage();
     }

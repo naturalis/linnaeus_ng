@@ -67,14 +67,16 @@ div.pp_default .pp_description {
 <div>
 
 <div class="fotos">
+
 	<ul>
-	
 	{foreach $media v}
+    {if $v.overview_image!=1}
     	<li>
-        	<a data-fancybox="gallery" data-caption="{$v.description}" href="{$v.file_name}" title="{$v.description}" id="img-{$v.id}">
-            	<img style="width:130px" title="{$v.description}" src="{$v.file_name|@replace:'w800':'160x100'}" alt="">
+        	<a data-fancybox="gallery" data-caption="{$v.description}" href="{$base_url_images_main}{$v.file_name}" title="{$v.description}" id="img-{$v.id}">
+            	<img style="width:130px" title="{$v.description}" src="{$base_url_images_main|@replace:'w800':'160x100'}{$v.file_name}" alt="">
            	</a>
 		</li>
+    {/if}
 	{/foreach}
 	</ul>
 
@@ -120,37 +122,13 @@ div.pp_default .pp_description {
 
 
 <script type="text/JavaScript">
-$(document).ready(function() {
-function getremotemetadata(p)
+$(document).ready(function()
 {
-	$.ajax({
-		url : '../../static/dierenzoeker/getremotemetadata.php',
-		type: 'GET',
-		data : ({
-			image_id :p.name
-		}),
-		success : function (data)
-		{
-			if (data)
-			{
-				var data=$.parseJSON(data);
-				$('#'+p.id).attr('title',
-					(data.description? '"'+data.description+'" ' : '')+(data.copyright ? '&copy; '+data.copyright : '') +
-					(data.copyright && data.maker ? ' - ' : '') +(data.maker ? 'Maker: '+data.maker : '')
-				);
-			}
-		}
-	});	
-}
-
-{if $nbc.url_image}
-	var url = '{$nbc.url_image}';
-	getremotemetadata( { id: 'overview-picture' , name: url.substring(url.lastIndexOf('/')+1).replace('.jpg','') } );
-{/if}
-{foreach $media v}
-	var url = '{$v.file_name}';
-	getremotemetadata( { id: 'img-'+ {$v.id} , name: url.substring(url.lastIndexOf('/')+1).replace('.jpg','') } );
-{/foreach}
+    $('[data-fancybox]').fancybox({
+        arrows : false,
+        infobar : true,
+        animationEffect : false
+        });
 
 });
 </script>
