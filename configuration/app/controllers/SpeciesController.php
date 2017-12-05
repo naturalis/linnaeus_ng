@@ -357,7 +357,8 @@ class SpeciesController extends Controller
 
 		$taxon = $this->getTaxonById($this->rGetVal('id'));
 		$taxon['label']=$this->formatTaxon($taxon);
-		$taxon['taxon']=trim(str_replace('%VAR%','',$taxon['taxon']));
+		//$taxon['taxon']=trim(str_replace('%VAR%','',$taxon['taxon']));
+        $taxon['taxon']=preg_replace('/\%VAR(\d)*\%/','',trim($taxon['taxon']));
 		$parent = $this->getTaxonById($taxon['parent_id']);
 		$parent['label']=$this->formatTaxon($parent);
 		$categories = $this->getCategories(array('taxon' => $this->requestData['id']));
