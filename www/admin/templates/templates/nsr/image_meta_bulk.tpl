@@ -36,9 +36,13 @@ th {
 	background-color:#FF6;
 	text-decoration:line-through;
 }
+.taxon-image-already-in-db {
+    color:#444;
+    border-bottom:1px dashed #AAF;
+}
 .maps-to-cell {
-	font-style:italic;
-	border-bottom:1px dotted #666;
+    font-style:italic;
+    border-bottom:1px dotted #666;
 }
 
 </style>
@@ -146,12 +150,13 @@ th {
         matches (<a href="#" onclick="$('.legend').toggle();">legend</a>):
         </p>
         <p class="legend" style="display:none">
-        <span class="nsr-id-ok">NSR ID resolved successfully</span><br />
-        <span class="nsr-id-not-ok">NSR ID not resolved successfully</span><br />
-        <span class="image-warning">image does not exist at {$taxon_main_image_base_url}, but will be saved nonetheless</span><br />
-        <span class="meta-data-unassigned">unassigned column, will be ignored</span><br />
-        <span class="row-wont-save">row that won't be saved due to unresolved NSR ID</span><br />
-        <span class="meta-data-format-error">metadata that will not be saved due to format errors</span><br />
+            <span class="nsr-id-ok">NSR ID resolved successfully</span><br />
+            <span class="nsr-id-not-ok">NSR ID not resolved successfully</span><br />
+            <span class="image-warning">image does not exist at {$taxon_main_image_base_url}, but will be saved nonetheless</span><br />
+            <span class="taxon-image-already-in-db">image already in database for this taxon, metadata will be saved nonetheless, overwriting existing</span><br />
+            <span class="meta-data-unassigned">unassigned column, will be ignored</span><br />
+            <span class="row-wont-save">row that won't be saved due to unresolved NSR ID</span><br />
+            <span class="meta-data-format-error">metadata that will not be saved due to format errors</span><br />
         </p>
 
 		<table class="image-meta-data">
@@ -206,7 +211,14 @@ th {
 					{assign var=class value="$class meta-data-format-error"}
                     {assign var=message value="format error; field will not be saved"}
                 {/if }
-                
+
+
+                {if $matches.files[$lsk].exists_in_db==1}
+                    {assign var=class value="$class taxon-image-already-in-db"}
+                {/if }
+
+
+
             	<td class="{$class}" title="{$message|@sprintf:$matches.files[$lsk].url}">
                 	{$l}
 				</td>
