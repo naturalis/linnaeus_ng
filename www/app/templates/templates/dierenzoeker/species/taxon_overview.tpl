@@ -39,8 +39,8 @@ div.pp_default .pp_description {
 {if $overview_image}
 <div class="illustratie-wrapper">
     <div class="illustratie">
-       	<a rel="prettyPhoto[gallery]" href="{$base_url_images_main}{$overview_image.file_name}" title="{$overview_image.description}" id="overview-picture">
-            <img style="width:280px" title="" src="{$base_url_images_main}{$overview_image.file_name}" alt="">
+       	<a data-fancybox="gallery" data-caption="{$overview_image.description}" href="{$base_url_images_main}{$overview_image.file_name}" title="{$overview_image.description}" id="overview-picture">
+            <img style="width:280px" title="{$overview_image.description}" src="{$base_url_images_main}{$overview_image.file_name}" alt="">
 		</a>
     </div>
 </div>

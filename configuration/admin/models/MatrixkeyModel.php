@@ -32,6 +32,7 @@ class MatrixKeyModel extends AbstractModel
 		$branch_tops=isset($params['branch_tops']) ? $params['branch_tops'] : null;
 		$language_id=isset($params['language_id']) ? $params['language_id'] : null;
 		$type_id_preferred=isset($params['type_id_preferred']) ? $params['type_id_preferred'] : null;
+		$order_by=isset($params['order_by']) ? $params['order_by'] : '_b.taxon';
 
 		if ( is_null($project_id) || is_null($matrix_id) )
 			return;
@@ -49,7 +50,9 @@ class MatrixKeyModel extends AbstractModel
 						_b.taxon,
 						_b.parent_id,
 						_c.rank_id as base_rank_id,
-						_names.name
+						_names.name,
+						_parent.taxon as parent_taxon,
+						_names_parent.name as parent_name
 			
 					from
 						%PRE%matrices_taxa _a
@@ -75,6 +78,18 @@ class MatrixKeyModel extends AbstractModel
 						%PRE%taxon_quick_parentage _sq
 							on _a.taxon_id = _sq.taxon_id
 							and _sq.project_id = " . $project_id . " 
+
+					left join
+						%PRE%taxa _parent
+							on _b.project_id=_parent.project_id
+							and _b.parent_id = _parent.id
+
+					left join
+						%PRE%names _names_parent
+							on _parent.id = _names_parent.taxon_id
+							and _b.project_id = _names_parent.project_id
+							and _names_parent.type_id = ".$type_id_preferred."
+							and _names_parent.language_id=".$language_id."
 			
 					where 
 						_a.project_id = ". $project_id ."
@@ -85,8 +100,8 @@ class MatrixKeyModel extends AbstractModel
 							)		
 
 					order by
-						_b.taxon
-					");
+						".$order_by
+					);
 
 					if ($d) $taxa=array_merge($taxa,$d);
 
@@ -104,14 +119,15 @@ class MatrixKeyModel extends AbstractModel
 		}
 		else
 		{
-
 			$taxa=$this->freeQuery( "
 				select
 					_b.id,
 					_b.taxon,
 					_b.parent_id,
 					_c.rank_id as base_rank_id,
-					_names.name
+					_names.name,
+					_parent.taxon as parent_taxon,
+					_names_parent.name as parent_name
 		
 				from
 					%PRE%matrices_taxa _a
@@ -133,13 +149,25 @@ class MatrixKeyModel extends AbstractModel
 						on _b.project_id=_c.project_id
 						and _b.rank_id = _c.id		
 
+				left join
+					%PRE%taxa _parent
+						on _b.project_id=_parent.project_id
+						and _b.parent_id = _parent.id
+
+				left join
+					%PRE%names _names_parent
+						on _parent.id = _names_parent.taxon_id
+						and _b.project_id = _names_parent.project_id
+						and _names_parent.type_id = ".$type_id_preferred."
+						and _names_parent.language_id=".$language_id."
+
 				where 
 					_a.project_id = ". $project_id ."
 					and _a.matrix_id = ". $matrix_id."
 	
 				order by
-					_b.taxon
-				");
+					".$order_by
+				);
 
 		}
 
@@ -546,6 +574,69 @@ class MatrixKeyModel extends AbstractModel
 			
 			return  !is_null($id) ? $d[0] : $d;
 		}
+    }
+
+
+    public function getTaxaRelations( $params )
+    {
+		$project_id=isset($params['project_id']) ? $params['project_id'] : null;
+		$matrix_id=isset($params['matrix_id']) ? $params['matrix_id'] : null;
+		$language_id=isset($params['language_id']) ? $params['language_id'] : null;
+		$type_id_preferred=isset($params['type_id_preferred']) ? $params['type_id_preferred'] : null;
+		$taxon_id=isset($params['taxon_id']) ? $params['taxon_id'] : null;
+
+		if ( is_null($project_id) || is_null($matrix_id) || is_null($language_id) || is_null($type_id_preferred) || is_null($taxon_id) )
+			return;
+
+		$taxa=$this->freeQuery( "
+			select
+			
+				_b.id,
+				_b.taxon,
+				_b.parent_id,
+				_c.lower_taxon,
+				_c.keypath_endpoint,
+				_c.rank_id as base_rank_id,
+				if(ifnull(_a.id,0)=0,0,1) as already_in_matrix,
+				_names.name
+	
+			from %PRE%taxa _b
+
+			left join
+				%PRE%names _names
+					on _b.id = _names.taxon_id
+					and _b.project_id = _names.project_id
+					and _names.type_id = ".$type_id_preferred."
+					and _names.language_id=".$language_id."
+
+			left join
+				%PRE%matrices_taxa _a
+					on _a.project_id=_b.project_id
+					and _a.taxon_id = _b.id
+					and _a.matrix_id = ". $matrix_id."
+
+			left join
+				%PRE%projects_ranks _c
+					on _b.project_id=_c.project_id
+					and _b.rank_id = _c.id
+
+			right join
+				%PRE%taxa_relations _r
+					on _b.project_id=_r.project_id
+					and _b.id = _r.relation_id
+					and _r.ref_type = 'taxon'
+
+			where 
+				_b.project_id = ". $project_id ."
+				and _r.taxon_id = " . $taxon_id . "
+
+			order by
+				_c.rank_id asc, _b.taxon asc
+				");
+
+			return $taxa;
+
+		
     }
 
 }

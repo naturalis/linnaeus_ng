@@ -8,6 +8,9 @@
         <!-- li><a href="sdd_import_1.php">{t}Import SDD file{/t}</a></li -->
     </ul>
     <ul class="admin-list">
+        <li><a href="relations.php">{t}Taxon relations{/t}</a></li>
+    </ul>
+    <ul class="admin-list">
         <li><a href="rank.php">{t}Define ranks that can appear in key{/t}</a></li>
     </ul>
 </div>

@@ -23,7 +23,8 @@ class MatrixKeyController extends Controller
         'chargroups',
         'characteristics_chargroups',
         'matrices_variations',
-		'gui_menu_order'
+		'gui_menu_order',
+		'taxa_relations'
     );
 
     public $usedHelpers = array(
@@ -526,7 +527,6 @@ class MatrixKeyController extends Controller
 
         $this->printPage();
 
-
     }
 
     public function taxaAction()
@@ -880,6 +880,70 @@ class MatrixKeyController extends Controller
         $this->printPage();
     }
 
+    public function rankAction()
+    {
+		$this->checkAuthorisation();
+
+        $this->setPageName( $this->translate('Taxon ranks in key') );
+
+        $pr = $this->getProjectRanks(array(
+            'lowerTaxonOnly' => false
+        ));
+
+        if ($this->rHasVal('keyRankBorder') && isset($pr) && !$this->isFormResubmit())
+		{
+			$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
+			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+			$this->checkAuthorisation();
+
+            $endPoint = false;
+
+            foreach ((array) $pr as $key => $val)
+			{
+
+                if ($val['rank_id'] == $this->rGetVal('keyRankBorder'))
+                    $endPoint = true;
+
+                $this->models->ProjectsRanks->save(array(
+                    'id' => $val['id'],
+                    'keypath_endpoint' => $endPoint ? 1 : 0
+                ));
+            }
+
+            $this->addMessage($this->translate('Saved.'));
+
+            $pr = $this->getProjectRanks(array(
+                'lowerTaxonOnly' => false,
+                'forceLookup' => true
+            ));
+        }
+
+        $this->smarty->assign('projectRanks', $pr);
+
+        $this->printPage();
+    }
+
+	public function relationsAction()
+	{
+		$this->checkAuthorisation();
+
+        $this->setPageName( $this->translate('Taxon relations') );
+
+		$d=array(
+			'project_id' => $this->getCurrentProjectId(),
+			'matrix_id' => $this->getCurrentMatrixId(),
+			'language_id' => $this->getDefaultProjectLanguage(),
+			'type_id_preferred' => $this->getNameTypeId(PREDICATE_PREFERRED_NAME)
+		);
+
+        $taxa=$this->getTaxa( $d );
+
+        $this->smarty->assign( 'taxon', $this->rGetVal( 'taxon' ) );
+        $this->smarty->assign( 'taxa', $taxa );
+
+        $this->printPage();
+    }
+
     public function ajaxInterfaceAction()
     {
         if (!$this->rHasVal('action'))
@@ -941,53 +1005,21 @@ class MatrixKeyController extends Controller
                 'taxon_id' => $this->rGetVal('taxon')
             ))));
         }
-
-        $this->printPage();
-    }
-
-    public function rankAction()
-    {
-		$this->checkAuthorisation();
-
-        $this->setPageName( $this->translate('Taxon ranks in key') );
-
-        $pr = $this->getProjectRanks(array(
-            'lowerTaxonOnly' => false
-        ));
-
-        if ($this->rHasVal('keyRankBorder') && isset($pr) && !$this->isFormResubmit())
+        else
+		if ($this->rGetVal('action') == 'add_taxon_relation')
 		{
-			$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
-			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
-			$this->checkAuthorisation();
-
-            $endPoint = false;
-
-            foreach ((array) $pr as $key => $val)
-			{
-
-                if ($val['rank_id'] == $this->rGetVal('keyRankBorder'))
-                    $endPoint = true;
-
-                $this->models->ProjectsRanks->save(array(
-                    'id' => $val['id'],
-                    'keypath_endpoint' => $endPoint ? 1 : 0
-                ));
-            }
-
-            $this->addMessage($this->translate('Saved.'));
-
-            $pr = $this->getProjectRanks(array(
-                'lowerTaxonOnly' => false,
-                'forceLookup' => true
-            ));
+            $r=$this->addTaxonRelation( [ 'taxon' => $this->rGetVal('taxon'), 'relation' => $this->rGetVal('relation') ] );
+            $this->smarty->assign('returnText',$r);
+        }
+        else
+		if ($this->rGetVal('action') == 'remove_taxon_relation')
+		{
+            $r=$this->removeTaxonRelation( [ 'taxon' => $this->rGetVal('taxon'), 'relation' => $this->rGetVal('relation') ] );
+            $this->smarty->assign('returnText',$r);
         }
 
-        $this->smarty->assign('projectRanks', $pr);
-
         $this->printPage();
     }
-
 
     private function createNewMatrix( $sys_name )
     {
@@ -1619,7 +1651,10 @@ class MatrixKeyController extends Controller
 
 		foreach((array)$taxa as $key=>$val)
 		{
-			$taxa[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['id'],'parent_id'=>$val['parent_id'] ] );
+			$taxa[$key]['taxon']=
+				$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['id'],'parent_id'=>$val['parent_id'] ] );
+
+			$taxa[$key]['relations']=$this->models->MatrixkeyModel->getTaxaRelations( array_merge( $d,["taxon_id"=>$val['id']]) );
 		}
 
         return isset($taxa) ? $taxa : null;
@@ -2210,7 +2245,6 @@ class MatrixKeyController extends Controller
 
 	private function effectuateGUIMenuOrder($p=null)
 	{
-
 		$g = isset($p['groups']) ? $p['groups'] : null;
 		$c = isset($p['characters']) ? $p['characters'] : null;
 		$m = isset($p['menu']) ? $p['menu'] : null;
@@ -2259,7 +2293,8 @@ class MatrixKeyController extends Controller
     {
         $media = $this->_mc->getItemMediaFiles();
 
-        if (!empty($media)) {
+        if (!empty($media))
+        {
             return array(
                 'file_name' => $media[0]['rs_original'],
                 'file_dimensions' => $media[0]['width'] . ':' . $media[0]['height']
@@ -2339,5 +2374,43 @@ class MatrixKeyController extends Controller
 		return [ 'label' => $s,  'description' => null ];
 	}
 
+	private function addTaxonRelation( $params )
+	{
+		$taxon = isset($params['taxon']) ? $params['taxon'] : null;
+		$relation = isset($params['relation']) ? $params['relation'] : null;
+
+		if ( is_null($taxon) || is_null($relation) )
+			return;
+
+		if ( $taxon==$relation )
+			return;
+
+		$r=$this->models->TaxaRelations->save( [
+			'project_id' => $this->getCurrentProjectId(),
+			'taxon_id' => $taxon,
+			'relation_id' => $relation,
+			'ref_type' => 'taxon'
+		] );
+
+		return $r;
+	}
+
+	private function removeTaxonRelation( $params )
+	{
+		$taxon = isset($params['taxon']) ? $params['taxon'] : null;
+		$relation = isset($params['relation']) ? $params['relation'] : null;
+
+		if ( is_null($taxon) || is_null($relation) )
+			return;
+
+		$r=$this->models->TaxaRelations->delete( [
+			'project_id' => $this->getCurrentProjectId(),
+			'taxon_id' => $taxon,
+			'relation_id' => $relation,
+			'ref_type' => 'taxon'
+		] );
+
+		return $r;
+	}
 
 }
