@@ -38,7 +38,7 @@ div.pp_default .pp_description {
 
 
 {function tidy_string}
-    {$data|regex_replace:"/(^<p>|<\/p>$)/":"X"}
+    {$data|regex_replace:"/(^<p>|<\/p>$)/":""}
 {/function}
 
 
