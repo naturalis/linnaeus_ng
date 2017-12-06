@@ -265,8 +265,8 @@ class SpeciesModel extends AbstractModel
     public function getTaxonChildrenNsr($params)
     {
 		$projectId = isset($params['projectId']) ? $params['projectId'] : null;
-		$predicateValidNameId =
-            isset($params['predicateValidNameId']) ? $params['predicateValidNameId'] : null;
+		$predicateValidNameId = isset($params['predicateValidNameId']) ? $params['predicateValidNameId'] : null;
+		$predicatePreferredNameId = isset($params['predicatePreferredNameId']) ? $params['predicatePreferredNameId'] : null;
 		$languageId = isset($params['languageId']) ? $params['languageId'] : null;
 		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : null;
 
@@ -299,6 +299,7 @@ class SpeciesModel extends AbstractModel
 				_f.rank_id,
 				_f.lower_taxon,
 				ifnull(_g.label,_r.rank) as rank_label,
+				".( !is_null($predicatePreferredNameId) && !is_null($languageId) ? "_kpref.name as commonname,"	: "" ) . "
 				_k.uninomial,
 				_k.specific_epithet,
 				_k.infra_specific_epithet,
@@ -311,6 +312,15 @@ class SpeciesModel extends AbstractModel
 				and _a.project_id=_k.project_id
 				and _k.type_id=".$predicateValidNameId."
 				and _k.language_id=".LANGUAGE_ID_SCIENTIFIC."
+			" . 
+
+			( !is_null($predicatePreferredNameId) && !is_null($languageId) ? "
+				left join %PRE%names _kpref
+					on _a.id=_kpref.taxon_id
+					and _a.project_id=_kpref.project_id
+					and _kpref.type_id=".$predicatePreferredNameId."
+					and _kpref.language_id=".$languageId
+				: "" ) . "
 
 			left join %PRE%projects_ranks _f
 				on _a.rank_id=_f.id
@@ -585,7 +595,6 @@ class SpeciesModel extends AbstractModel
 				and _a.taxon_id =".$taxonId;
 
         return $this->freeQuery($query);
-
     }
 
     public function getTrendDataByYear($params)
@@ -612,7 +621,6 @@ class SpeciesModel extends AbstractModel
 			order by _a.trend_year";
 
         return $this->freeQuery($query);
-
     }
 
     public function getTrendDataByTrend($params)
@@ -640,7 +648,6 @@ class SpeciesModel extends AbstractModel
 			order by _a.trend_label";
 
         return $this->freeQuery($query);
-
     }
 
     public function getReferenceAuthorsNsr($params)
@@ -666,7 +673,6 @@ class SpeciesModel extends AbstractModel
 			order by _a.sort_order,_b.name";
 
         return $this->freeQuery($query);
-
     }
 
     public function getReferenceNsr($params)
@@ -698,7 +704,6 @@ class SpeciesModel extends AbstractModel
 
         $l = $this->freeQuery($query);
         return isset($l[0]) ? $l[0] : null;
-
     }
 
     public function doesLanguageHavePreferredNameNsr($params)
@@ -728,7 +733,6 @@ class SpeciesModel extends AbstractModel
         $d = $this->freeQuery($query);
 
 		return $d[0]['total'] > 0;
-
     }
 
     public function getFirstTaxonIdNsr($params)
@@ -836,7 +840,6 @@ class SpeciesModel extends AbstractModel
 
     public function getTaxonMediaNsr($params)
     {
-
 		$projectId = isset($params['projectId']) ? $params['projectId'] : null;
 		$languageId = isset($params['languageId']) ? $params['languageId'] : null;
 		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : null;
@@ -1261,7 +1264,6 @@ class SpeciesModel extends AbstractModel
         $d = $this->freeQuery($query);
 
 		return isset($d[0]) ? $d[0]['total'] : null;
-
     }
 
     public function runCheckQuery( $query )
@@ -1303,7 +1305,6 @@ class SpeciesModel extends AbstractModel
 				and lower(_a.name) = '" .  $this->escapeString( $organisation ) ."'";
 
         return $this->freeQuery($query);
-
     }
 
     public function getExternalOrgNsr($params)
@@ -1325,7 +1326,6 @@ class SpeciesModel extends AbstractModel
 				and lower(name) = '". $this->escapeString( $organisation ) ."'";
 
         return $this->freeQuery($query);
-
     }
 
     public function getTaxonTraitValue( $params )
@@ -1376,7 +1376,6 @@ class SpeciesModel extends AbstractModel
         $d=$this->freeQuery($query);
 
 		return $d ? $d[0]['value'] : null;
-
 	}
 
     public function getTaxonReferences( $params )
@@ -1534,8 +1533,6 @@ class SpeciesModel extends AbstractModel
 				_a.project_id=".$project_id;
 
 		return $this->freeQuery($query);
-
     }
-
 
 }

@@ -145,7 +145,7 @@ div.pp_default .pp_description {
             <li class="">
                 <a href="#" onclick="drnzkr_toon_dier( { id: {$v.id},type:'{if $v.ref_type=='variation'}v{else}t{/if}' } );return false;" class="resultlink">
                 <img src="{$v.url_thumbnail}">
-                {$v.label}
+                {$v.commonname}
                 </a>
             </li>
 		{/foreach}

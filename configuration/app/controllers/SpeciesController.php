@@ -334,12 +334,20 @@ class SpeciesController extends Controller
             }
 		}
 
-		$children=$this->models->Taxa->_get(array('id'=>array('project_id' => $this->getCurrentProjectId(),'parent_id' => $this->rGetVal('id'))));
+    	$children=$this->models->Taxa->_get(array('id'=>array('project_id' => $this->getCurrentProjectId(),'parent_id' => $this->rGetVal('id'))));
+
+
+        $children=$this->models->SpeciesModel->getTaxonChildrenNsr( [
+            'projectId' => $this->getCurrentProjectId(),
+            'taxonId' => $this->rGetVal('id'),
+            'languageId' => $this->getCurrentLanguageId(),
+            'predicateValidNameId' => $this->getNameTypeId(PREDICATE_VALID_NAME),
+            'predicatePreferredNameId' => $this->getNameTypeId(PREDICATE_PREFERRED_NAME)
+        ]);
+
 		foreach((array)$children as $key => $val)
 		{
-			$d = $this->getCommonname($val['id']);
-			$children[$key]['label'] = $d;
-            
+
             $media=$this->getTaxonMedia( [ 'taxon'=>$val['id'],'forceOld'=>true ] );
 
             foreach((array)$media as $val)
@@ -353,7 +361,7 @@ class SpeciesController extends Controller
 
 		}
 
-		if ($children) usort($children,function($a,$b) {return ($a['label']>$b['label']?1:-1);});
+		if ($children) usort($children,function($a,$b) {return ($a['commonname']>$b['commonname']?1:-1);});
 
 		$taxon = $this->getTaxonById($this->rGetVal('id'));
 		$taxon['label']=$this->formatTaxon($taxon);
