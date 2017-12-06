@@ -306,11 +306,11 @@ class MatrixKeyModel extends AbstractModel
 
 		$query="
 			select
-				_a.characteristic_id, 
-				_a.show_order, 
-				_d.id as characteristic_chargroup_id ,
+				_b.id, 
+				_b.type,
 				_b.sys_name,
-				ifnull(_c.label,_b.sys_name) as label
+				ifnull(_c.label,_b.sys_name) as label,
+				_a.show_order
 
 			from %PRE%characteristics_matrices _a
 
@@ -333,25 +333,25 @@ class MatrixKeyModel extends AbstractModel
 				and _d.id is null
 		";
 		
-		$d=$this->freeQuery(array('query'=>$query,'fieldAsIndex' => 'characteristic_id'));
-		
+		$d=$this->freeQuery($query);
+
 		if ($d)
 		{
 			foreach((array)$d as $key=>$val)
 			{
 				if (strpos($val['label'],'|')!==false)
 				{
-					$d = explode('|',$val['label']);
-					$d[$key]['short_label']=$d[0];
+					$t=explode('|',$val['label']);
+					$d[$key]['short_label']=$t[0];
 				}
 				else
 				{
 					$d[$key]['short_label']=$val['label'];
 				}
 			}
-			
-			return $d;
-		}		
+		}	
+
+		return $d;	
 		
 	}
 

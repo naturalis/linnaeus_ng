@@ -18,7 +18,7 @@
     </ul>
     {/foreach}
 
-	<div style="clear:both;"></div>
+    <div style="clear:both;"></div>
 
     <ul id="sortable0" class="sortable-drag-list connectedSortable">
         <li id="group-0" class="ui-state-disabled">{t}Not in any group{/t}</li>

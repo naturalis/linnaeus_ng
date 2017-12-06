@@ -36,6 +36,15 @@ div.pp_default .pp_description {
 {/if}
 {/foreach}
 
+
+{function tidy_string}
+    {$data|regex_replace:"/(^<p>|<\/p>$)/":"X"}
+{/function}
+
+
+
+
+
 {if $overview_image}
 <div class="illustratie-wrapper">
     <div class="illustratie">
@@ -48,21 +57,21 @@ div.pp_default .pp_description {
 
 <p>
     <span class="label">Uiterlijk:</span>
-    {$content[$catUiterlijk].content}
+    {tidy_string data=$content[$catUiterlijk].content}
 </p>
 
 <p>
     <span class="label">Gedrag:</span>
-    {$content[$catGedrag].content}
+    {tidy_string data=$content[$catGedrag].content}
 </p>
 
 <p>
     <span class="label">Waar en wanneer:</span>
-    {$content[$catWaar].content}
+    {tidy_string data=$content[$catWaar].content}
 </p>
 <p>
-    <span class="label">{$content[$catDescriptionTitle].content}</span>
-    {$content[$catDescription].content}
+    <span class="label">{tidy_string data=$content[$catDescriptionTitle].content}</span>
+    {tidy_string data=$content[$catDescription].content}
 </p>
 {else}
 <script>
@@ -71,19 +80,19 @@ div.pp_default .pp_description {
 
 <p>
     <span class="label">{'Wat zijn %s?'|replace:'%s':($taxon.commonname|lower)}</span>
-    {$content[$catWhatAre].content}
+    {tidy_string data=$content[$catWhatAre].content}
 </p>
 <p>
     <span class="label">{'Waar zitten %s?'|replace:'%s':($taxon.commonname|lower)}</span>
-    {$content[$catWhereAre].content}
+    {tidy_string data=$content[$catWhereAre].content}
 </p>
 <p>
     <span class="label">{'Wat doen %s?'|replace:'%s':($taxon.commonname|lower)}</span>
-    {$content[$catWhatDo].content}
+    {tidy_string data=$content[$catWhatDo].content}
 </p>
 <p>
     <span class="label">{'Hoeveel %s zijn er in Nederland?'|replace:'%s':($taxon.commonname|lower)}</span>
-    {$content[$catHowMany].content}
+    {tidy_string data=$content[$catHowMany].content}
 </p>
 
 {/if}
