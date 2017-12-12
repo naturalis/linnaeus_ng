@@ -105,8 +105,8 @@ div.pp_default .pp_description {
 	{foreach $media v}
     {if $v.overview_image!=1}
         {capture caption}
-        {if $v.meta_data.beeldbankOmschrijving.meta_data}{$v.meta_data.beeldbankOmschrijving.meta_data}<br />{/if}
-        fotograaf: {$v.meta_data.beeldbankFotograaf.meta_data}
+        {if $v.meta_data.beeldbankOmschrijving.meta_data}<b>{$v.meta_data.beeldbankOmschrijving.meta_data}</b><br />{/if}
+        {if $v.meta_data.beeldbankFotograaf.meta_data}fotograaf: {$v.meta_data.beeldbankFotograaf.meta_data}{/if}
         {/capture}
     	<li>
         	<a data-fancybox="gallery" data-caption="{$smarty.capture.caption}" href="{$base_url_images_main}{$v.file_name}" title="{$v.meta_data.beeldbankOmschrijving.meta_data}" id="img-{$v.id}">
