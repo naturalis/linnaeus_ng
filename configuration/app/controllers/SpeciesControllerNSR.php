@@ -338,10 +338,10 @@ class SpeciesControllerNSR extends SpeciesController
 		{
 			$this->tmp[$key]['previous_is_notho']=$prevNotho;
 			$prevNotho=
-				$val['base_rank_id']==NOTHOSUBSPECIES_RANK_ID ||
-				$val['base_rank_id']==NOTHOVARIETAS_RANK_ID ||
-				$val['base_rank_id']==NOTHOGENUS_RANK_ID ||
-				$val['base_rank_id']==NOTHOSPECIES_RANK_ID;
+				defined('NOTHOSUBSPECIES_RANK_ID') ? $val['base_rank_id']==NOTHOSUBSPECIES_RANK_ID : false ||
+				defined('NOTHOVARIETAS_RANK_ID') ? $val['base_rank_id']==NOTHOVARIETAS_RANK_ID : false ||
+				defined('NOTHOGENUS_RANK_ID') ? $val['base_rank_id']==NOTHOGENUS_RANK_ID : false ||
+				defined('NOTHOSPECIES_RANK_ID') ? $val['base_rank_id']==NOTHOSPECIES_RANK_ID : false;
 		}
 
 		return $this->tmp;
