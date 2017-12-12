@@ -23,6 +23,7 @@ class SpeciesController extends Controller
         'literature_taxa',
         'media_descriptions_taxon',
         'media_taxon',
+        'media_meta',
         'pages_taxa',
         'pages_taxa_titles',
         'synonyms',
@@ -898,7 +899,21 @@ class SpeciesController extends Controller
 			
 			$mt = $this->models->MediaTaxon->_get( [ 'id' => [ 'project_id' => $this->getCurrentProjectId(), 'taxon_id' => $taxon ] ] );
 
+            foreach ($mt as $key => $value)
+            {
+                $mt[$key]['meta_data']=$this->models->MediaMeta->_get( [
+                    "id"=>[
+                            "project_id"=>$this->getCurrentProjectId(),
+                            "language_id"=>$this->getCurrentLanguageId(),
+                            'media_id'=>$value["id"]
+                    ],
+                    "columns"=>"sys_label, meta_data, meta_date, meta_number",
+                    "fieldAsIndex"=>"sys_label"
+                ] );
+            }
 		}
+
+
 
 		return $mt;
 	}

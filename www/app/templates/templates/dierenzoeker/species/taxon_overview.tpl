@@ -104,9 +104,13 @@ div.pp_default .pp_description {
 	<ul>
 	{foreach $media v}
     {if $v.overview_image!=1}
+        {capture caption}
+        {if $v.meta_data.beeldbankOmschrijving.meta_data}{$v.meta_data.beeldbankOmschrijving.meta_data}<br />{/if}
+        fotograaf: {$v.meta_data.beeldbankFotograaf.meta_data}
+        {/capture}
     	<li>
-        	<a data-fancybox="gallery" data-caption="{$v.description}" href="{$base_url_images_main}{$v.file_name}" title="{$v.description}" id="img-{$v.id}">
-            	<img style="width:130px" title="{$v.description}" src="{$base_url_images_main|@replace:'w800':'160x100'}{$v.file_name}" alt="">
+        	<a data-fancybox="gallery" data-caption="{$smarty.capture.caption}" href="{$base_url_images_main}{$v.file_name}" title="{$v.meta_data.beeldbankOmschrijving.meta_data}" id="img-{$v.id}">
+            	<img style="width:130px" title="{$v.meta_data.beeldbankOmschrijving.meta_data}" src="{$base_url_images_main|@replace:'w800':'160x100'}{$v.file_name}" alt="">
            	</a>
 		</li>
     {/if}
@@ -153,7 +157,6 @@ div.pp_default .pp_description {
         <div class="clearer"></div>
 </div>    
 {/if}
-
 
 <script type="text/JavaScript">
 $(document).ready(function()
