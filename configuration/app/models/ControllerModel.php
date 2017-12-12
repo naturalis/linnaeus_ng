@@ -79,6 +79,8 @@ final class ControllerModel extends AbstractModel
 		$projectId = isset($params['projectId']) ? $params['projectId'] : false;
 		$languageId = isset($params['languageId']) ? $params['languageId'] : false;
 		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : false;
+		$predicateValidNameId = isset($params['predicateValidNameId']) ? $params['predicateValidNameId'] : null;
+		$predicatePreferredNameId = isset($params['predicatePreferredNameId']) ? $params['predicatePreferredNameId'] : null;
 
         $query = "
 			select
@@ -92,7 +94,7 @@ final class ControllerModel extends AbstractModel
 				_a.list_level,
 				_a.is_empty,
 				_f.lower_taxon,
-				_c.commonname,
+				ifnull(_kpref.name, _c.commonname) as commonname,
 				_f.rank_id as base_rank_id,
 				_r.rank,
 				ifnull(_q.label,_r.rank) as rank_label
@@ -131,6 +133,13 @@ final class ControllerModel extends AbstractModel
 						and language_id = ". $languageId . "
 						limit 1
 					)
+
+			left join %PRE%names _kpref
+				on _a.id=_kpref.taxon_id
+				and _a.project_id=_kpref.project_id
+				and _kpref.type_id=".$predicatePreferredNameId."
+				and _kpref.language_id=".$languageId."
+
 			where
 				_a.id=". $taxonId ."
 				and _a.project_id=".$projectId."

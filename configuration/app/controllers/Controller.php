@@ -463,7 +463,9 @@ class Controller extends BaseClass
             'trashCanExists' => $this->models->TrashCan->getTableExists(),
 		    'projectId' => $this->getCurrentProjectId(),
 		    'languageId'=> $this->getCurrentLanguageId(),
-		    'taxonId' => $id
+		    'taxonId' => $id,
+            'predicateValidNameId' => $this->getNameTypeId(PREDICATE_VALID_NAME),
+            'predicatePreferredNameId' => $this->getNameTypeId(PREDICATE_PREFERRED_NAME)		    
 		));
     }
 
