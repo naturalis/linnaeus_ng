@@ -320,8 +320,8 @@ class SpeciesController extends Controller
 		$related=$this->getRelatedEntities(array('tId' => $this->rGetVal('id')));
 		foreach((array)$related as $key => $val)
 		{
-			$d = $this->getCommonname($val['relation_id']);
-            $related[$key]['label'] = $d;
+			$d = $this->getTaxonById($val['relation_id']);
+            $related[$key]['label'] = $d['commonname'];
 
             $media=$this->getTaxonMedia( [ 'taxon'=>$val['relation_id'],'forceOld'=>true ] );
 
@@ -336,7 +336,6 @@ class SpeciesController extends Controller
 		}
 
     	$children=$this->models->Taxa->_get(array('id'=>array('project_id' => $this->getCurrentProjectId(),'parent_id' => $this->rGetVal('id'))));
-
 
         $children=$this->models->SpeciesModel->getTaxonChildrenNsr( [
             'projectId' => $this->getCurrentProjectId(),
@@ -899,7 +898,7 @@ class SpeciesController extends Controller
 			
 			$mt = $this->models->MediaTaxon->_get( [ 'id' => [ 'project_id' => $this->getCurrentProjectId(), 'taxon_id' => $taxon ] ] );
 
-            foreach ($mt as $key => $value)
+            foreach ((array)$mt as $key => $value)
             {
                 $mt[$key]['meta_data']=$this->models->MediaMeta->_get( [
                     "id"=>[
