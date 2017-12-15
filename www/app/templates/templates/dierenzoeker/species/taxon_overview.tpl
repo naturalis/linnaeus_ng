@@ -114,7 +114,7 @@ div.pp_default .pp_description {
         {/capture}
     	<li>
         	<a data-fancybox="gallery" data-caption="{$smarty.capture.caption}" href="{$base_url_images_main}{$v.file_name}" title="{$v.meta_data.beeldbankOmschrijving.meta_data}" id="img-{$v.id}">
-            	<img style="width:130px" title="{$v.meta_data.beeldbankOmschrijving.meta_data}" src="{$base_url_images_main|@replace:'w800':'160x100'}{$v.file_name}" alt="">
+            	<img style="width:130px" title="{$v.meta_data.beeldbankOmschrijving.meta_data}" src="{$base_url_images_overview}{$v.file_name}" alt="">
            	</a>
 		</li>
     {/if}
