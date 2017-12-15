@@ -47,7 +47,7 @@ div.pp_default .pp_description {
 
 {capture caption}
 {if $overview_image.meta_data.beeldbankOmschrijving.meta_data}<b>{$overview_image.meta_data.beeldbankOmschrijving.meta_data}</b><br />{/if}
-{if $overview_image.meta_data.beeldbankFotograaf.meta_data}fotograaf: {$overview_image.meta_data.beeldbankFotograaf.meta_data}{/if}
+{if $overview_image.meta_data.beeldbankFotograaf.meta_data}Gemaakt door: {$overview_image.meta_data.beeldbankFotograaf.meta_data}{/if}
 {/capture}
 
 <div class="illustratie-wrapper">
@@ -110,7 +110,7 @@ div.pp_default .pp_description {
     {if $v.overview_image!=1}
         {capture caption}
         {if $v.meta_data.beeldbankOmschrijving.meta_data}<b>{$v.meta_data.beeldbankOmschrijving.meta_data}</b><br />{/if}
-        {if $v.meta_data.beeldbankFotograaf.meta_data}fotograaf: {$v.meta_data.beeldbankFotograaf.meta_data}{/if}
+        {if $v.meta_data.beeldbankFotograaf.meta_data}Gemaakt door: {$v.meta_data.beeldbankFotograaf.meta_data}{/if}
         {/capture}
     	<li>
         	<a data-fancybox="gallery" data-caption="{$smarty.capture.caption}" href="{$base_url_images_main}{$v.file_name}" title="{$v.meta_data.beeldbankOmschrijving.meta_data}" id="img-{$v.id}">

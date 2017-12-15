@@ -1660,14 +1660,14 @@ class MatrixKeyController extends Controller
         }
         else
 		{
-			$taxon=$this->getTaxonById( $id, true);
+			$t=$this->getTaxonById( $id, true );
             $this->deleteLinks([ 'taxon_id' => $id ]);
             $this->models->MatricesTaxa->delete([
                 'project_id' => $this->getCurrentProjectId(),
                 'matrix_id' => $this->getCurrentMatrixId(),
                 'taxon_id' => $id
             ]);
-            $this->logChange($this->models->MatricesTaxa->getDataDelta() + [ 'note'=>sprintf('removed taxon %s from matrix',$taxon['taxon']) ]);
+            $this->logChange($this->models->MatricesTaxa->getDataDelta() + [ 'note'=>sprintf('removed taxon %s from matrix',$t['taxon']) ]);
         }
     }
 
@@ -1706,7 +1706,24 @@ class MatrixKeyController extends Controller
 			'state_id' => $stateId
         ]);
 
-        $this->logChange($this->models->MatricesTaxaStates->getDataDelta() + [ 'note'=>'added taxa-state link' ]);
+
+        if (isset($taxonId))
+        {
+        	$t=$this->getTaxonById( $taxonId, true );
+        	$type='taxon';
+        	$name=$t['taxon'];
+        }
+        else
+        if (isset($variationId))
+        {
+        	$t=$this->getVariation( $variationId );
+        	$type='variation';
+        	$name=$t['label'];
+        }
+        
+        $s=$this->getState( $stateId );
+
+        $this->logChange($this->models->MatricesTaxaStates->getDataDelta() + [ 'note'=>sprintf('added state %s to %s %s',$s['label'],$type,$name) ]);
     }
 
     private function deleteLinks( $params )
@@ -1729,8 +1746,26 @@ class MatrixKeyController extends Controller
 
         $d['project_id'] = $this->getCurrentProjectId();
 
+		$before=$this->models->MatricesTaxaStates->_get(["id"=>$d]);
         $this->models->MatricesTaxaStates->delete($d);
-        $this->logChange($this->models->MatricesTaxaStates->getDataDelta() + [ 'note'=>'deleted taxa-state links' ]);
+
+        if (!is_null($before[0]['taxon_id']))
+        {
+        	$t=$this->getTaxonById( $before[0]['taxon_id'], true );
+        	$type='taxon';
+        	$name=$t['taxon'];
+        }
+        else
+        if (!is_null($before[0]['variation_id']))
+        {
+        	$t=$this->getVariation( $before[0]['variation_id'] );
+        	$type='variation';
+        	$name=$t['label'];
+        }
+
+        $s=$this->getState( $before[0]['state_id'] );
+
+        $this->logChange($this->models->MatricesTaxaStates->getDataDelta() + [ 'note'=>sprintf('deleted state %s from %s %s',$s['label'],$type,$name) ]);
     }
 
     private function getLinks( $params )
@@ -2318,7 +2353,7 @@ class MatrixKeyController extends Controller
 
 		$r=$this->models->TaxaRelations->save( $d );
 		$after=$this->models->TaxaRelations->_get( [ "id" => $d ] );
-		$t=$this->getTaxonById( $taxon );
+		$t=$this->getTaxonById( $taxon, true );
 
 		if ($r) $this->logChange( $this->models->TaxaRelations->getDataDelta() + [ 'note'=>sprintf('added taxon relation to %s',$t['taxon'])  ] );
 
@@ -2342,7 +2377,7 @@ class MatrixKeyController extends Controller
 
 		$before=$this->models->TaxaRelations->_get( [ "id" => $d ] );
 		$r=$this->models->TaxaRelations->delete( $d );
-		$t=$this->getTaxonById( $taxon );
+		$t=$this->getTaxonById( $taxon, true );
 
 		if ($r) $this->logChange($this->models->TaxaRelations->getDataDelta() + [ 'note'=> sprintf('removed taxon relation from %s',$t['taxon']) ]);
 		return $r;
