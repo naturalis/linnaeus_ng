@@ -26,13 +26,14 @@ div.pp_default .pp_description {
 
 
 {if $taxon.base_rank_id >= $smarty.const.SPECIES_RANK_ID}
+
 <script>
 	$("#dier-header").html('Dier');
 </script>
 
 {foreach $media v}
 {if $v.overview_image==1}
-{assign overview_image $v}
+    {assign overview_image $v}
 {/if}
 {/foreach}
 
@@ -42,13 +43,16 @@ div.pp_default .pp_description {
 {/function}
 
 
-
-
-
 {if $overview_image}
+
+{capture caption}
+{if $overview_image.meta_data.beeldbankOmschrijving.meta_data}<b>{$overview_image.meta_data.beeldbankOmschrijving.meta_data}</b><br />{/if}
+{if $overview_image.meta_data.beeldbankFotograaf.meta_data}fotograaf: {$overview_image.meta_data.beeldbankFotograaf.meta_data}{/if}
+{/capture}
+
 <div class="illustratie-wrapper">
     <div class="illustratie">
-       	<a data-fancybox="gallery" data-caption="{$overview_image.description}" href="{$base_url_images_main}{$overview_image.file_name}" title="{$overview_image.description}" id="overview-picture">
+       	<a data-fancybox="gallery" data-caption="{$smarty.capture.caption}" href="{$base_url_images_main}{$overview_image.file_name}" title="{$v.meta_data.beeldbankOmschrijving.meta_data}" id="overview-picture">
             <img style="width:280px" title="{$overview_image.description}" src="{$base_url_images_main}{$overview_image.file_name}" alt="">
 		</a>
     </div>
@@ -120,24 +124,25 @@ div.pp_default .pp_description {
 	<div class="clearer"></div>
 
 </div>
+
 {if $parent.commonname && $parent.id && $parent.hasContent}
 <a class="grouplink group-container" href="#" onclick="drnzkr_toon_dier( { id: {$parent.id}, back: {$taxon.id} } );return false;" style="">{$parent.commonname}</a>
 {/if}
 
 {if $related}
 <div class="related">
-        <span style="font-weight:bold;padding-left:40px;font-size:14px;position:relative;top:10px;">Lijkt op</span>
-        <ul>
-        {foreach $related v}
-            <li class="">
-                <a href="#" onclick="drnzkr_toon_dier( { id: {$v.relation_id},type:'{if $v.ref_type=='variation'}v{else}t{/if}' } );return false;" class="resultlink">
-                <img src="{$v.url_thumbnail}">
-                {$v.label}                    
-                </a>
-            </li>
-		{/foreach}
-        </ul>
-        <div class="clearer"></div>
+    <span style="font-weight:bold;padding-left:40px;font-size:14px;position:relative;top:10px;">Lijkt op</span>
+    <ul>
+    {foreach $related v}
+        <li class="">
+            <a href="#" onclick="drnzkr_toon_dier( { id: {$v.relation_id},type:'{if $v.ref_type=='variation'}v{else}t{/if}' } );return false;" class="resultlink">
+            <img src="{$projectUrls.uploadedMedia}{$v.url_image|@replace:'.jpg':'_thumb.jpg'}">
+            {$v.label}                    
+            </a>
+        </li>
+    {/foreach}
+    </ul>
+    <div class="clearer"></div>
 </div>    
 {/if}
 
@@ -148,7 +153,7 @@ div.pp_default .pp_description {
         {foreach $children v}
             <li class="">
                 <a href="#" onclick="drnzkr_toon_dier( { id: {$v.id},type:'{if $v.ref_type=='variation'}v{else}t{/if}' } );return false;" class="resultlink">
-                <img src="{$v.url_thumbnail}">
+                <img src="{$projectUrls.uploadedMedia}{$v.url_image|@replace:'.jpg':'_thumb.jpg'}">
                 {$v.commonname}
                 </a>
             </li>
@@ -165,7 +170,6 @@ $(document).ready(function()
         arrows : false,
         infobar : true,
         animationEffect : false
-        });
-
+    });
 });
 </script>

@@ -97,7 +97,6 @@ class SpeciesController extends Controller
 		$this->_inclHigherTaxaRankPrefix=$this->moduleSettings->getModuleSetting( array( 'setting'=>'higher_taxa_rank_prefix','subst'=>0) )==1;
         $this->_base_url_images_main=$this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_main','module'=>'species') );
         $this->_base_url_images_thumb=$this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_thumb','module'=>'species') );
-
 		
 		$this->smarty->assign('inclHigherTaxaRankPrefix',$this->_inclHigherTaxaRankPrefix);
     }
@@ -403,8 +402,8 @@ class SpeciesController extends Controller
 		$this->smarty->assign('related', $related);
 		$this->smarty->assign('media', $media);
 		$this->smarty->assign('back',$this->rGetVal('back'));
+        $this->smarty->assign('_base_url_images_thumb',$this->_base_url_images_thumb);
         $this->smarty->assign('base_url_images_main',$this->_base_url_images_main);
-
 		$this->printPage();
     }
 

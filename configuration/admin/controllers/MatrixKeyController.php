@@ -2317,10 +2317,10 @@ class MatrixKeyController extends Controller
 		];
 
 		$r=$this->models->TaxaRelations->save( $d );
-
 		$after=$this->models->TaxaRelations->_get( [ "id" => $d ] );
+		$t=$this->getTaxonById( $taxon );
 
-		if ($r) $this->logChange( $this->models->TaxaRelations->getDataDelta() + [ 'note'=>'added taxon relation' ] );
+		if ($r) $this->logChange( $this->models->TaxaRelations->getDataDelta() + [ 'note'=>sprintf('added taxon relation to %s',$t['taxon'])  ] );
 
 		return $r;
 	}
@@ -2341,10 +2341,10 @@ class MatrixKeyController extends Controller
 		];
 
 		$before=$this->models->TaxaRelations->_get( [ "id" => $d ] );
-
 		$r=$this->models->TaxaRelations->delete( $d );
+		$t=$this->getTaxonById( $taxon );
 
-		if ($r) $this->logChange($this->models->TaxaRelations->getDataDelta() + [ 'note'=>'removed taxon relation' ]);
+		if ($r) $this->logChange($this->models->TaxaRelations->getDataDelta() + [ 'note'=> sprintf('removed taxon relation from %s',$t['taxon']) ]);
 		return $r;
 	}
 
