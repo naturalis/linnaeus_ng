@@ -58,7 +58,7 @@
 }
 
 .mobile a.small {
-	font-size: 0.7em;
+	font-size: 0.8em;
 }
 
 </style>
@@ -72,7 +72,7 @@
 		<a href="https://play.google.com/store/apps/details?id=nl.naturalis.dierenzoeker">
 		{/if}
 		Download de Dierenzoeker app voor je {if $deviceInfo.isTablet}tablet{else}telefoon{/if}</a><br />
-		<a class="small" onclick="$('.mobile.outer').toggle(false);">sluit deze melding</a>
+		<a class="small" onclick="$('.mobile.outer').toggle(false);">deze melding sluiten</a>
 	</div>
 </div>
 {/if}
