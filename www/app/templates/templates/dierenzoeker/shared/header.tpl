@@ -40,7 +40,7 @@
 <style>
 .mobile.outer {
 	background-color:#fff;
-	height:175px;
+	height:180px;
 	width:100%;
 }
 
@@ -50,13 +50,17 @@
 	color:white;
 	text-align:center;
 	padding-top:35px;
-	padding-top:40px;
 	font-size: 2.1em;
 	line-height: 1.2em;
 }
 .mobile a {
 	color: #fff;
 }
+
+.mobile a.small {
+	font-size: 0.7em;
+}
+
 </style>
 
 <div class="mobile outer">
@@ -67,7 +71,8 @@
 		{else}
 		<a href="https://play.google.com/store/apps/details?id=nl.naturalis.dierenzoeker">
 		{/if}
-		Download de Dierenzoeker app voor je {if $deviceInfo.isTablet}tablet{else}telefoon{/if}</a>
+		Download de Dierenzoeker app voor je {if $deviceInfo.isTablet}tablet{else}telefoon{/if}</a><br />
+		<a class="small" onclick="$('.mobile.outer').toggle(false);">sluit deze melding</a>
 	</div>
 </div>
 {/if}
