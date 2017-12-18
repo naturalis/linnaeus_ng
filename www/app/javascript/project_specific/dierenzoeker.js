@@ -92,7 +92,7 @@ function drnzkr_update_navigatie()
 		$('#prev-button-container-top,#prev-button-container-bottom').css('visibility','visible');
 	}
 
-	if (matrixsettings.start+matrixsettings.perPage>data.resultset.length)
+	if ((matrixsettings.start+matrixsettings.perPage)>=data.resultset.length)
 	{
 		$('#next-button-container-top,#next-button-container-bottom').css('visibility','hidden');
 	}
