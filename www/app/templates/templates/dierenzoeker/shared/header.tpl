@@ -34,3 +34,37 @@
     <script type="text/javascript" src="{$baseUrl}app/javascript/fancybox-3/jquery.fancybox.min.js"></script>
 
 </head>
+
+
+{if $deviceInfo.isMobile}
+<style>
+.mobile.outer {
+	background-color:#fff;
+	height:65px;
+	width:100%;
+}
+
+.mobile .inner {
+	background-color:#25aad5;
+	height:100%;
+	color:white;
+	text-align:center;
+	padding-top:10px;
+}
+.mobile a {
+	color: #fff;
+}
+</style>
+
+<div class="mobile outer">
+	<div class="inner">
+		<b>Hallo mobiele gebruiker!</b><br />
+		{if $deviceInfo.isiOS}
+		<a href="https://itunes.apple.com/nl/app/dierenzoeker/id699543364">
+		{else}
+		<a href="https://play.google.com/store/apps/details?id=nl.naturalis.dierenzoeker">
+		{/if}
+		Download de Dierenzoeker app voor je {if $deviceInfo.isTablet}tablet{else}telefoon{/if}</a>
+	</div>
+</div>
+{/if}

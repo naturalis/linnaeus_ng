@@ -124,9 +124,5 @@ $(document).ready(function(e)
 
 });
 
-
-
-
-
 </script>
 </html>
