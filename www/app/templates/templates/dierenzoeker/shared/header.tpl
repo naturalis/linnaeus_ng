@@ -40,7 +40,7 @@
 <style>
 .mobile.outer {
 	background-color:#fff;
-	height:65px;
+	height:175px;
 	width:100%;
 }
 
@@ -49,7 +49,10 @@
 	height:100%;
 	color:white;
 	text-align:center;
-	padding-top:10px;
+	padding-top:35px;
+	padding-top:40px;
+	font-size: 2.1em;
+	line-height: 1.2em;
 }
 .mobile a {
 	color: #fff;
