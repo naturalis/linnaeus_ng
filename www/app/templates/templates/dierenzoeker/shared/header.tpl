@@ -97,7 +97,7 @@
 		Download de Dierenzoeker app voor je {if $deviceInfo.isTablet}tablet{else}telefoon{/if}</a>
 	</div>
 	<div class="support">
-		<a class="close" title="mededeling sluiten" onclick="$('.mobile.outer').toggle(false);">&#10006;</a>
+		<span class="close" title="mededeling sluiten" onclick="$('.mobile.outer').toggle(false);">&#10006;</span>
 	</div>
 </div>
 {/if}
