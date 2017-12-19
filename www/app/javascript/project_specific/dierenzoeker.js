@@ -11,8 +11,9 @@ function hook_prePrintResults()
 				if (data.dataset[i].images[j].overview_image && data.dataset[i].images[j].overview_image==1)
 				{
 					data.dataset[i].info.url_image=data.dataset[i].images[j].file_name;
-					//data.dataset[i].info.url_thumbnail=data.dataset[i].images[j].thumb_name;
-					data.dataset[i].info.url_thumbnail=data.dataset[i].images[j].file_name.replace(".jpg","_thumb.jpg");
+					var url= data.dataset[i].info.url_thumbnail=data.dataset[i].images[j].file_name;
+					var filename = url.substring(url.lastIndexOf('/')+1);
+					data.dataset[i].info.url_thumbnail=filename.replace(".jpg","_thumb.jpg");
 				}
 			}
 		}

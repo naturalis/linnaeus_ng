@@ -35,23 +35,24 @@
 
 </head>
 
-
 {if $deviceInfo.isMobile}
 <style>
 .mobile.outer {
-	background-color:#fff;
+	background-color:#25aad5;
 	height:180px;
 	width:100%;
 }
 
 .mobile .inner {
-	background-color:#25aad5;
+	display: inline-block;;
+	background-color:#25aad5;	
 	height:100%;
 	color:white;
 	text-align:center;
 	padding-top:35px;
 	font-size: 2.1em;
 	line-height: 1.2em;
+	width:76%;
 }
 .mobile a {
 	color: #fff;
@@ -61,9 +62,30 @@
 	font-size: 0.8em;
 }
 
+.support {
+	background-color:#25aad5;
+	width:10%;
+	display: inline-block;
+	text-align: center;
+}
+
+.close {
+	display: inline-block;
+	background-color:#25aad5;
+	font-size: 2em;
+	font-weight: bold;
+    border-radius: 15px;
+    padding: 2px 5px 7px 5px; 
+    width: 40px;
+    height: 40px;
+    border: 1px solid #ddd;
+    cursor: pointer;
+}
+
 </style>
 
 <div class="mobile outer">
+	<div class="support"></div>
 	<div class="inner">
 		<b>Hallo mobiele gebruiker!</b><br />
 		{if $deviceInfo.isiOS}
@@ -71,8 +93,12 @@
 		{else}
 		<a href="https://play.google.com/store/apps/details?id=nl.naturalis.dierenzoeker">
 		{/if}
-		Download de Dierenzoeker app voor je {if $deviceInfo.isTablet}tablet{else}telefoon{/if}</a><br />
-		<a class="small" onclick="$('.mobile.outer').toggle(false);">deze melding sluiten</a>
+		Download de Dierenzoeker app voor je {if $deviceInfo.isTablet}tablet{else}telefoon{/if}</a>
+	</div>
+	<div class="support">
+		<a class="close" title="mededeling sluiten" onclick="$('.mobile.outer').toggle(false);">&#10006;</a>
 	</div>
 </div>
 {/if}
+
+
