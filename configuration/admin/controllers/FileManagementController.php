@@ -71,6 +71,11 @@ class FileManagementController extends Controller
 	        $this->setSelectedFiles( $this->rGetVal('delete') );
 	        $this->downloadFiles();
 			die();
+		} else
+		if ( $this->rHasVal( 'file_search' ) && !empty($this->rGetVal('file_search') ) )
+		{
+			$needle=$this->rGetVal('file_search');
+			$this->_files = array_filter($this->_files,function($a) use($needle) { return stripos($a['fileName'], $needle)!==false; } );
 		}
 		
 		$paginated=$this->getPaginationWithPager( $this->_files, 25 );
@@ -78,6 +83,7 @@ class FileManagementController extends Controller
         //$this->smarty->assign( 'files',  $this->_files );
         $this->smarty->assign( 'paginated',  $paginated );
         $this->smarty->assign( 'basePath',  $this->_basePath );
+        $this->smarty->assign( 'file_search',  $this->rGetVal('file_search') );
         $this->printPage();
 	}
 
@@ -193,26 +199,13 @@ class FileManagementController extends Controller
 	{
 		$this->_files=null;
 
-		foreach (glob("$this->_fileDir/*") as $name)
+		foreach (glob("$this->_fileDir*") as $name)
 		{
 			if( !is_dir($name) )
 			{
-				$this->_files[md5($name)]= [ 'pathName'=>$name, 'fileName'=>basename($name) ];
+				$this->_files[md5($name)]=[ 'pathName'=>$name, 'fileName'=>basename($name) ];
 			}
 		}
-		
-		/*
-		$this->_files=null;
-		$path=$this->_fileDir;
-		$objects=new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
-		foreach($objects as $name=>$object)
-		{
-			if( !is_dir($name) )
-			{
-				$this->_files[md5($object->getPathName())]= [ 'pathName'=>$object->getPathName(), 'fileName'=>$object->getFileName() ];
-			}
-		}
-		*/
 	}
 
 	private function downloadFiles()
@@ -222,7 +215,7 @@ class FileManagementController extends Controller
 		foreach((array)$this->_selectedfiles as $key)
 		{
 			
-			if ( isset($this->_files[$key])  && file_exists($this->_files[$key]['pathName']) )
+			if ( isset($this->_files[$key]) && file_exists($this->_files[$key]['pathName']) )
 			{
 				$this->helpers->ZipFile->addFile( realpath($this->_files[$key]['pathName']), $this->_files[$key]['fileName'] );
 			}

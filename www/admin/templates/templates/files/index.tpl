@@ -29,6 +29,11 @@ input[type=text]  {
 </style>
 
 <div id="page-main">
+
+	<form id="searchForm" method="post">
+	<input type="text" id="file_search" name="file_search" value="{$file_search}" placeholder="{t}search for files{/t}"><input type="submit" value="{t}search{/t}">
+	<a href="javascript:$('#file_search').val('');$('#searchForm').submit();" title="{t}clear search{/t}">&#10006;</a>
+	</form>
 	
     <form id="theForm" method="post">
     <input type="hidden" name="rnd" value="{$rnd}" />
