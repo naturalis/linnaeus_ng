@@ -105,7 +105,10 @@ div.pp_default .pp_description {
 
 <div class="fotos">
 
-	<ul>
+    
+    
+
+	<!-- ul>
 	{foreach $media v}
     {if $v.overview_image!=1}
         {capture caption}
@@ -119,11 +122,34 @@ div.pp_default .pp_description {
 		</li>
     {/if}
 	{/foreach}
-	</ul>
+	</ul -->
 
 	<div class="clearer"></div>
 
 </div>
+
+<style type="text/css">
+.group-header-no-text {
+    display: block;
+    text-decoration: none;
+    background-color: black;
+    background-image: url(../../media/system/skins/dierenzoeker/diergroep-header-no-text.png);
+    background-repeat: no-repeat;
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    width: 348px;
+    height: 26px;
+    padding-left: 37px;
+    padding-top: 16px;
+}    
+</style>
+
+
+{if !$children}
+<a class="group-header-no-text" href="http://www.nederlandsesoorten.nl/linnaeus_ng/app/views/species/nsr_taxon.php?id=139390&cat=CTAB_MEDIA" target="_new">Foto's bekijken op het Nederlands Soortenregister</a>
+{/if}
+
 
 {if $parent.commonname && $parent.id && $parent.hasContent}
 <a class="grouplink group-container" href="#" onclick="drnzkr_toon_dier( { id: {$parent.id}, back: {$taxon.id} } );return false;" style="">{$parent.commonname}</a>
