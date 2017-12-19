@@ -79,6 +79,7 @@
     width: 40px;
     height: 40px;
     border: 1px solid #ddd;
+    color: #fff;
     cursor: pointer;
 }
 
