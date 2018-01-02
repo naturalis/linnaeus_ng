@@ -11,6 +11,7 @@ div.pp_default .pp_description {
 <h1>{$taxon.commonname}</h1>
 <h2>{$taxon.taxon}</h2> 
 
+
 {foreach $categories.categories v}
 {if $v.page=='Appearance'}{assign catUiterlijk $v.id}{/if}
 {if $v.page=='Behaviour'}{assign catGedrag $v.id}{/if}
@@ -152,7 +153,7 @@ div.pp_default .pp_description {
 
 
 {if !$children}
-<a class="group-header-no-text" href="http://www.nederlandsesoorten.nl/linnaeus_ng/app/views/species/nsr_taxon.php?id=139390&cat=CTAB_MEDIA" target="_new">Foto's bekijken op het Nederlands Soortenregister</a>
+<a class="group-header-no-text nsr-image-link" style="display:none" href="" target="_new">Foto's bekijken op het Nederlands Soortenregister</a>
 {/if}
 
 
@@ -197,6 +198,25 @@ div.pp_default .pp_description {
 <script type="text/JavaScript">
 $(document).ready(function()
 {
+    $.ajax({
+        url : "/linnaeus_ng/external.php",
+        type: 'GET',
+        cache: false,
+        data: {
+            set: 'dierenzoeker_nsr_image_link',
+            taxon_id: {$taxon.id},
+        },
+        success: function (data)
+        {
+            if (data.length>0)
+            {
+                $('.nsr-image-link')
+                    .attr('href', 'http://www.nederlandsesoorten.nl/linnaeus_ng/rewrite.php?p=1&u=nsr/concept/'+data+'/images')
+                    .toggle(true);
+            }
+        }
+    })
+
     $('[data-fancybox]').fancybox({
         arrows : false,
         infobar : true,
