@@ -42,6 +42,11 @@ div.pp_default .pp_description {
     {$data|regex_replace:"/(^<p>|<\/p>$)/":""}
 {/function}
 
+{function make_thumb}
+    {assign var=foo value="/"|explode:$data} 
+    {assign var=foo value=$foo[count($foo)-1]} 
+    {$projectUrls.uploadedMedia}{$foo|@replace:'.jpg':'_thumb.jpg'}
+{/function}
 
 {if $overview_image}
 
@@ -162,7 +167,7 @@ div.pp_default .pp_description {
     {foreach $related v}
         <li class="">
             <a href="#" onclick="drnzkr_toon_dier( { id: {$v.relation_id},type:'{if $v.ref_type=='variation'}v{else}t{/if}' } );return false;" class="resultlink">
-            <img src="{$projectUrls.uploadedMedia}{$v.url_image|@replace:'.jpg':'_thumb.jpg'}">
+            <img src="{make_thumb data=$v.url_image}">
             {$v.label}                    
             </a>
         </li>
@@ -179,7 +184,7 @@ div.pp_default .pp_description {
         {foreach $children v}
             <li class="">
                 <a href="#" onclick="drnzkr_toon_dier( { id: {$v.id},type:'{if $v.ref_type=='variation'}v{else}t{/if}' } );return false;" class="resultlink">
-                <img src="{$projectUrls.uploadedMedia}{$v.url_image|@replace:'.jpg':'_thumb.jpg'}">
+                <img src="{make_thumb data=$v.url_image}">
                 {$v.commonname}
                 </a>
             </li>
