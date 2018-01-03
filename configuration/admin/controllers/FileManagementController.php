@@ -38,12 +38,14 @@ class FileManagementController extends Controller
     private function initialize()
     {
 		$this->moduleSettings=new ModuleSettingsReaderController;
+
 		if ( !$this->moduleSettings->getGeneralSetting( [ 'setting'=>'enable_file_management', 'subst'=>false ] ) )
 		{
 			$this->redirect('../projects/overview.php');	
 		}
 
 		$this->allowed_extensions=json_decode($this->moduleSettings->getGeneralSetting( [ 'setting'=>'allowed_file_management_extensions' ]));
+
 		if (!empty($this->allowed_extensions))
 		{
 			array_walk($this->allowed_extensions,function(&$a) { $a=strtolower(trim($a,'. ') ); } );
@@ -52,11 +54,13 @@ class FileManagementController extends Controller
 		$this->setFileDir();
 		$this->setBasePath();
 		$this->scanMediaDir();
+
+    	$this->UserRights->setNoModule( true );
+		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
 	}
 
     public function indexAction()
     {
-		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
         $this->checkAuthorisation();
         $this->setPageName($this->translate('Browse'));
 		
@@ -89,7 +93,6 @@ class FileManagementController extends Controller
 
     public function uploadAction()
     {
-		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
         $this->checkAuthorisation();
         $this->setPageName($this->translate('Upload'));
 
