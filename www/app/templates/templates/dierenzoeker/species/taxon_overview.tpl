@@ -25,7 +25,6 @@ div.pp_default .pp_description {
 {if $v.page=='_whereAre'}{assign catWhereAre $v.id}{/if}
 {/foreach}
 
-
 {if $taxon.base_rank_id >= $smarty.const.SPECIES_RANK_ID}
 
 <script>
@@ -135,25 +134,29 @@ div.pp_default .pp_description {
 </div>
 
 <style type="text/css">
-.group-header-no-text {
+.nsr-image-link {
     display: block;
     text-decoration: none;
     background-color: black;
-    background-image: url(../../media/system/skins/dierenzoeker/diergroep-header-no-text.png);
+    background-image: url(../../media/system/skins/dierenzoeker/diergroep-ext-link.png);
     background-repeat: no-repeat;
     color: #fff;
     font-size: 12px;
     font-weight: bold;
     width: 348px;
-    height: 26px;
+    height: 39px;
     padding-left: 37px;
-    padding-top: 16px;
+    padding-top: 9px;
 }    
 </style>
 
 
 {if !$children}
-<a class="group-header-no-text nsr-image-link" style="display:none" href="" target="_new">Foto's bekijken op het Nederlands Soortenregister</a>
+<!-- a class="group-header-no-text nsr-image-link" style="display:none" href="" target="_new">Foto's bekijken op het Nederlands Soortenregister</a -->
+<a class="group-header-no-text nsr-image-link" style="display:none" href="" target="_new">
+    Nederlands Soortenregister<br />
+    <span style="font-size: 18px;display: block;padding-top:1px;">Bekijk foto's</span>
+</a>
 {/if}
 
 
