@@ -80,6 +80,7 @@ function drnzkr_navigeren( target )
 
 	printResults();
 	drnzkr_update_navigatie();
+	drnzkr_result_style_update();
 }
 
 function drnzkr_update_navigatie()
@@ -283,4 +284,18 @@ function drnzkr_update_states()
 	{
 		if (d[i]>0) $('#state-'+i).removeClass('ui-disabled').on('click',function(){ charClick(this);});
 	}
+}
+
+function drnzkr_result_style_update()
+{
+    $('.result0').hover(
+        function()
+        {
+            $(this).children('a').children('table').children('tbody').children('tr').children('td').css('color','#25AAD5');
+        },
+        function()
+        {
+            $(this).children('a').children('table').children('tbody').children('tr').children('td').css('color','#000000');
+        }
+    );
 }

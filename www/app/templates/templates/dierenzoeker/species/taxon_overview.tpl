@@ -151,16 +151,15 @@ div.pp_default .pp_description {
 </style>
 
 
+{if $parent.commonname && $parent.id && $parent.hasContent}
+<a class="grouplink group-container" href="#" onclick="drnzkr_toon_dier( { id: {$parent.id}, back: {$taxon.id} } );return false;" style="">{$parent.commonname}</a>
+{/if}
+
 {if !$children}
 <a class="group-header-no-text nsr-image-link" style="display:none" href="" target="_new">
     Nederlands Soortenregister<br />
     <span style="font-size: 18px;display: block;padding-top:1px;">Bekijk foto's</span>
 </a>
-{/if}
-
-
-{if $parent.commonname && $parent.id && $parent.hasContent}
-<a class="grouplink group-container" href="#" onclick="drnzkr_toon_dier( { id: {$parent.id}, back: {$taxon.id} } );return false;" style="">{$parent.commonname}</a>
 {/if}
 
 {if $related}

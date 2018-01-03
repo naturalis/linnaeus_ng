@@ -50,7 +50,7 @@
         
 
         <div class="content">
-            
+
             <div class="result-list-wrapper">
                 <div class="result-list-header">
                     <ul>
@@ -253,6 +253,8 @@ $(document).ready(function()
 	});
 
 	$.backstretch("../../media/system/skins/dierenzoeker/background.jpg");
+
+    drnzkr_result_style_update();
 
 });
 </script>
