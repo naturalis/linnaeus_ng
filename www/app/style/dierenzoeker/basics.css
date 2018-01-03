@@ -133,8 +133,17 @@ a img {
 	background: url("../../media/system/skins/dierenzoeker/home-over.png") top left no-repeat;
 }
 
+#app-btn {
+	width:54px;
+	height:27px;
+	background: url("../../media/system/skins/dierenzoeker/app.png") top left no-repeat;	
+}
+#app-btn:hover {	
+	background: url("../../media/system/skins/dierenzoeker/app-over.png") top left no-repeat;	
+}
+
 #tv-btn {
-	width: 161px;
+	width: 75px;
 	height: 22px;
 	background: url("../../media/system/skins/dierenzoeker/op-tv.png") top left no-repeat;	
 }
