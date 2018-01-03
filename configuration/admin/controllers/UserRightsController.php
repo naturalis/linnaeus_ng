@@ -119,6 +119,8 @@ class UserRights
 		$this->setModuleId();
 		$this->setUserModuleAccess();
 		$this->setNoModule( false );
+		$this->setUserItems();
+		//$this->setUserSubjacentItems(); // moved to canManageItem() for performance reasons
     }
 
     public function canAccessModule()
@@ -204,8 +206,6 @@ class UserRights
 		}
 		else
 		{
-			$this->setUserItems( true );
-
 			if ( count((array)$this->useritems)==0 )
 			{
 				$this->setManageItemState( true );
@@ -213,10 +213,10 @@ class UserRights
 			}
 			else
 			{
-				$this->setUserSubjacentItems();
-				$d=$this->isCurrentItemInUserOrSubjacentItems();
-				$this->setManageItemState( $d );
-				$this->setStatus( sprintf('%s to item for user', ( $d ? 'access' : 'no access' ) ) );
+				$this->setUserSubjacentItems(); // this here (and not in init) for performance reasons
+				$state=$this->isCurrentItemInUserOrSubjacentItems();
+				$this->setManageItemState( $state );
+				$this->setStatus( sprintf('%s to item for user', ( $state ? 'access' : 'no access' ) ) );
 			}
 		}
 
@@ -261,7 +261,6 @@ class UserRights
 
 		return $this->getLevelState();
     }
-
 
     public function setUserItems()
 	{
@@ -593,19 +592,37 @@ class UserRights
 
 		foreach((array)$this->useritems as $item)
 		{
-			$d=$this->model->freeQuery( "
-				select
-					taxon_id
-				from
-					%PRE%taxon_quick_parentage _sq
-				where
-					_sq.project_id = " . $this->projectid . "
-					and MATCH(_sq.parentage) AGAINST ('" . Controller::generateTaxonParentageId( $item ) . "' in boolean mode)
-			");
+			/*
+				fun issue: the original single query w/o limit and offset occasionally crashed the mysqli-object, presumably
+				because it returned 'too much' results (it works fine with a limit). what that actually means is unclear.
+				the query returns only a list of ID's, so the actual size in bytes rarely grows beyond a few hundred KB's.
+				yet comparing the result of memory_get_usage() before and after the query suggests the entire thing takes
+				up approx 15MB when executed for an ID that returns ca. 35.000 rows, which breaks down to aroundd 470K *per
+				row*. which seems _somewhat_ excessive for rows that contain only one value, an int(11) that in reality is
+				never larger larger than 6 digits.
+			*/
 
-			foreach((array)$d as $val)
+			$batchSize=1000;
+			$i=0;
+			$d=true;
+
+			while (!is_null($d))
 			{
-				array_push( $this->subjacentitems, $val['taxon_id'] );
+				$d=$this->model->freeQuery( "
+					select
+						taxon_id
+					from
+						%PRE%taxon_quick_parentage
+					where
+						project_id = " . $this->projectid . "
+						and MATCH(parentage) AGAINST ('" . Controller::generateTaxonParentageId( $item ) . "' in boolean mode)
+					limit " . $batchSize . " offset " . ($batchSize * $i++) ."
+				" );
+
+				foreach((array)$d as $val)
+				{
+					array_push( $this->subjacentitems, $val['taxon_id'] );
+				}
 			}
 		}
 	}
