@@ -1,7 +1,7 @@
             <div class="footer">
                 <div class="footer-inner">
                     <ul>
-                        <li><a href="../introduction/topic.php?id=Op%20je%20mobiel" class="no-text" id="mobiel-btn">Op je mobiel</a></li>
+                        <!-- li><a href="../introduction/topic.php?id=Op%20je%20mobiel" class="no-text" id="mobiel-btn">Op je mobiel</a></li -->
                         <li><a href="../introduction/topic.php?id=Veelgestelde%20vragen" class="no-text" id="faq-btn" >Veel gestelde vragen</a></li>
                         <li><a href="../introduction/topic.php?id=Colofon" class="no-text" id="colofon-btn">Colofon</a></li>
                     </ul>
