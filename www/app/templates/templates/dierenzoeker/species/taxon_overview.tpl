@@ -152,7 +152,6 @@ div.pp_default .pp_description {
 
 
 {if !$children}
-<!-- a class="group-header-no-text nsr-image-link" style="display:none" href="" target="_new">Foto's bekijken op het Nederlands Soortenregister</a -->
 <a class="group-header-no-text nsr-image-link" style="display:none" href="" target="_new">
     Nederlands Soortenregister<br />
     <span style="font-size: 18px;display: block;padding-top:1px;">Bekijk foto's</span>
