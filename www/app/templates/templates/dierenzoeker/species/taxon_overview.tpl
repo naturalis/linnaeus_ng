@@ -110,25 +110,6 @@ div.pp_default .pp_description {
 
 <div class="fotos">
 
-    
-    
-
-	<!-- ul>
-	{foreach $media v}
-    {if $v.overview_image!=1}
-        {capture caption}
-        {if $v.meta_data.beeldbankOmschrijving.meta_data}<b>{$v.meta_data.beeldbankOmschrijving.meta_data}</b><br />{/if}
-        {if $v.meta_data.beeldbankFotograaf.meta_data}Gemaakt door: {$v.meta_data.beeldbankFotograaf.meta_data}{/if}
-        {/capture}
-    	<li>
-        	<a data-fancybox="gallery" data-caption="{$smarty.capture.caption}" href="{$base_url_images_main}{$v.file_name}" title="{$v.meta_data.beeldbankOmschrijving.meta_data}" id="img-{$v.id}">
-            	<img style="width:130px" title="{$v.meta_data.beeldbankOmschrijving.meta_data}" src="{$base_url_images_overview}{$v.file_name}" alt="">
-           	</a>
-		</li>
-    {/if}
-	{/foreach}
-	</ul -->
-
 	<div class="clearer"></div>
 
 </div>
@@ -146,7 +127,7 @@ div.pp_default .pp_description {
     width: 348px;
     height: 39px;
     padding-left: 37px;
-    padding-top: 9px;
+    padding-top: 7px;
 }    
 </style>
 
@@ -155,12 +136,10 @@ div.pp_default .pp_description {
 <a class="grouplink group-container" href="#" onclick="drnzkr_toon_dier( { id: {$parent.id}, back: {$taxon.id} } );return false;" style="">{$parent.commonname}</a>
 {/if}
 
-{if !$children}
 <a class="group-header-no-text nsr-image-link" style="display:none" href="" target="_new">
     Nederlands Soortenregister<br />
     <span style="font-size: 18px;display: block;padding-top:1px;">Bekijk foto's</span>
 </a>
-{/if}
 
 {if $related}
 <div class="related">
