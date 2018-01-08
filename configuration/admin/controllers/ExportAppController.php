@@ -60,7 +60,9 @@ class ExportAppController extends Controller
 		'taxongroups_labels',
 		'taxongroups_taxa',
 		'users_taxa',
-		'variation_relations'
+		'variation_relations',
+		'traits_taxon_freevalues',
+		'names'
     );
 
     public $controllerPublicName = 'Export';
@@ -86,7 +88,9 @@ class ExportAppController extends Controller
 	private $_exportDump;
 
 	private $_projectVersion='1.0';
+	private $_matrixStandAloneExportVersion='3.0';
 
+	const NSR_ID_TRAIT_ID = 1;
 
     /**
      * Constructor, calls parent's constructor
@@ -237,67 +241,70 @@ class ExportAppController extends Controller
 
 		$this->_exportDump->Characteristics = $this->models->Characteristics->_get(array('id' => $where));
 		$this->_exportDump->CharacteristicsLabels = $this->models->CharacteristicsLabels->_get(array('id' => $where));
+
 		$this->_exportDump->CharacteristicsStates = $this->models->CharacteristicsStates->_get(array('id' => $where));
+		foreach ($this->_exportDump->CharacteristicsStates as $key => $value)
+		{
+			$this->_exportDump->CharacteristicsStates[$key]['file_name']=basename($value['file_name']);
+		}
+
 		$this->_exportDump->CharacteristicsLabelsStates = $this->models->CharacteristicsLabelsStates->_get(array('id' => $where));
 		$this->_exportDump->Chargroups = $this->models->Chargroups->_get(array('id' => $where));
 		$this->_exportDump->ChargroupsLabels = $this->models->ChargroupsLabels->_get(array('id' => $where));
 		$this->_exportDump->CharacteristicsChargroups = $this->models->CharacteristicsChargroups->_get(array('id' => $where));
-
 		$this->_exportDump->MatricesTaxa = $this->models->MatricesTaxa->_get(array('id' => $where));
-		$this->_exportDump->Taxa = $this->models->Taxa->_get(array('id' => $where));
-		$this->_exportDump->Commonnames = $this->models->Commonnames->_get(array('id' => $where));
-		$this->_exportDump->TaxaRelations = $this->models->TaxaRelations->_get(array('id' => $where));
-		$this->_exportDump->ContentTaxa = $this->models->ContentTaxa->_get(array('id' => $where));
-		$this->_exportDump->MediaTaxon = $this->models->MediaTaxon->_get(array('id' => $where));
-
-		$this->_exportDump->MatricesVariations = $this->models->MatricesVariations->_get(array('id' => $where));
-		$this->_exportDump->TaxaVariations = $this->models->TaxaVariations->_get(array('id' => $where));
-		$this->_exportDump->VariationRelations = $this->models->VariationRelations->_get(array('id' => $where));
-		$this->_exportDump->VariationsLabels = $this->models->VariationsLabels->_get(array('id' => $where));
-
 		$this->_exportDump->MatricesTaxaStates = $this->models->MatricesTaxaStates->_get(array('id' => $where));
 
-		$this->_exportDump->NbcExtras = array_merge(
-			(array)$this->models->NbcExtras->_get(array('id' => array_merge($where,array('ref_type'=>'taxon')))),
-			(array)$this->models->NbcExtras->_get(array('id' => array_merge($where,array('ref_type'=>'variation'))))
-		);
-
-		if ($this->_reduceURLs)
+		$this->_exportDump->Taxa = $this->models->Taxa->_get(array('id' => $where));
+		foreach((array)$this->_exportDump->Taxa as $key=>$val)
 		{
-			foreach((array)$this->_exportDump->NbcExtras as $key => $val)
-			{
-				if (
-					($val['name']=='url_image' || $val['name']=='url_thumbnail') &&
-					(stripos($val['value'],'http://')!==false || stripos($val['value'],'https://')!==false)
-				)
-				{
-					$d=pathinfo($val['value']);
-					$this->_exportDump->NbcExtras[$key]['value']=$d['basename'];
-				}
-			}
+			$trait=$this->models->TraitsTaxonFreevalues->_get( [
+				'id' => $where + ['taxon_id'=>$val['id'], 'trait_id' => $this::NSR_ID_TRAIT_ID ],
+				'limit' => 1
+			] );
 
-			foreach((array)$this->_exportDump->MediaTaxon as $key => $val)
-			{
-				if (stripos($val['file_name'],'http://')!==false || stripos($val['file_name'],'https://')!==false)
-				{
-					$d=pathinfo($val['file_name']);
-					$this->_exportDump->MediaTaxon[$key]['file_name']=$d['basename'];
-				}
-				if (stripos($val['thumb_name'],'http://')!==false || stripos($val['thumb_name'],'https://')!==false)
-				{
-					$d=pathinfo($val['thumb_name']);
-					$this->_exportDump->MediaTaxon[$key]['thumb_name']=$d['basename'];
-				}
-			}
+			/* 
+				WARNING: blatant abuse of the taxa.author column to store the NSR ID. not feeling like
+				adding to the datamodel for a single field. shoot me.
+			*/
+			$this->_exportDump->Taxa[$key]['author'] = $trait[0]['string_value'];
 		}
+
+		$this->_exportDump->Names = $this->models->Names->_get(array('id' =>
+			$where+['type_id'=>$this->getNameTypeId(PREDICATE_PREFERRED_NAME),'language_id'=>LANGUAGE_ID_DUTCH]
+		));
+
+		$this->_exportDump->TaxaRelations = $this->models->TaxaRelations->_get(array('id' => $where));
+		$this->_exportDump->ContentTaxa = $this->models->ContentTaxa->_get(array('id' => $where));
+		foreach((array)$this->_exportDump->ContentTaxa as $key=>$val)
+		{
+			$this->_exportDump->ContentTaxa[$key]['content']=trim(preg_replace('/<([^>]*)>/i', ' ', $val['content']));
+		}
+
+		$this->_exportDump->MediaTaxon = $this->models->MediaTaxon->_get(array('id' => $where + ['overview_image' => 1 ]));
+		foreach((array)$this->_exportDump->MediaTaxon as $key=>$val)
+		{
+			$baseName=basename($val['file_name']);
+			if ($this->_reduceURLs) $this->_exportDump->MediaTaxon[$key]['file_name']=$baseName;
+			if ($this->_reduceURLs) $this->_exportDump->MediaTaxon[$key]['thumb_name']=$baseName;
+
+			if ( !empty($baseName) )
+			{
+				$this->_exportDump->MediaTaxon[$key]['thumb_name']=pathinfo($baseName)['filename'].'_thumb.'.pathinfo($baseName)['extension'];
+			}
+			$this->_exportDump->MediaTaxon[$key]['original_name']='';
+		}
+
+		// no variations in dierenzoeker (and we're not going to use this code for anything else any longer)
+		//$this->_exportDump->MatricesVariations = $this->models->MatricesVariations->_get(array('id' => $where));
+		//$this->_exportDump->TaxaVariations = $this->models->TaxaVariations->_get(array('id' => $where));
+		//$this->_exportDump->VariationRelations = $this->models->VariationRelations->_get(array('id' => $where));
+		//$this->_exportDump->VariationsLabels = $this->models->VariationsLabels->_get(array('id' => $where));
 
 		$this->_exportDump->GuiMenuOrder = $this->models->GuiMenuOrder->_get(array('id' => $where));
 		$this->_exportDump->PagesTaxa = $this->models->PagesTaxa->_get(array('id' => $where));
 		$this->_exportDump->PagesTaxaTitles = $this->models->PagesTaxaTitles->_get(array('id' => $where));
-
 	}
-
-
 
 
 	/* version 2 (eti apps) */
@@ -460,13 +467,6 @@ echo '<pre>';
 
 	}
 
-
-
-
-
-
-
-
 	private function makeFileName($projectName,$ext='xml')
 	{
 		return strtolower(preg_replace('/\W/','_',$projectName)).(is_null($ext) ? null : '.'.$ext);
@@ -481,6 +481,22 @@ echo '<pre>';
 				unset($d[$key]);
 		}
 		return implode(chr(10),$d);
+	}
+
+	private function removeUnwantedColumnsFromKeys($k)
+	{
+		$b=[];
+		foreach ($k as $key => $val)
+		{
+			$pass=true;
+			foreach ($this->_appExpSkipCols as $col)
+			{
+				if ($pass) $pass=!preg_match('/\(([^)]*)`'.$col.'`([^)]*)\)/',$val);
+			}
+			if ($pass) $b[]=$val;
+		}
+		
+		return $b;
 	}
 
 	private function fixTablePrefix($s,$table=null)
@@ -887,7 +903,10 @@ echo '<pre>';
 			$this->_sqliteQueriesDDL[] = $this->helpers->Mysql2Sqlite->getSqlDropTable();
 			$this->_sqliteQueriesDDL = array_merge($this->_sqliteQueriesDDL,$this->helpers->Mysql2Sqlite->getSqlDropKeys());
 			$this->_sqliteQueriesDDL[] = $this->helpers->Mysql2Sqlite->getSqlTable();
-			$this->_sqliteQueriesDDL = array_merge($this->_sqliteQueriesDDL,$this->helpers->Mysql2Sqlite->getSqlKeys());
+
+			$keys=$this->helpers->Mysql2Sqlite->getSqlKeys();
+			$keys=$this->removeUnwantedColumnsFromKeys($keys);
+			$this->_sqliteQueriesDDL = array_merge($this->_sqliteQueriesDDL,$keys);
 
 			if ($this->_separateDrop)
 			{
@@ -1160,7 +1179,7 @@ var installConfig = {
 "
   queryCountDDL:".count((array)$this->_sqliteQueriesDDL).",
   queryCountDML:".count((array)$this->_sqliteQueriesDML).",
-  exportVersion:'1.0 (".date("Y-m-d H:i:s").")',
+  exportVersion:'".$this->_matrixStandAloneExportVersion." (".date("Y-m-d H:i:s").")',
   exportID:'".$exportId."',
   encodedDataDDL:'".$bufferDDL."',
   encodedDataDML:'".$bufferDML."'".($this->_separateDrop ? ",\n  encodedDropQueries:'".$drop."'": '')."
