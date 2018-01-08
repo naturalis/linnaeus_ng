@@ -65,17 +65,17 @@ div.pp_default .pp_description {
 {/if}
 
 <p>
-    <span class="label">Uiterlijk:</span>
+    <span class="label">Uiterlijk</span>
     {tidy_string data=$content[$catUiterlijk].content}
 </p>
 
 <p>
-    <span class="label">Gedrag:</span>
+    <span class="label">Gedrag</span>
     {tidy_string data=$content[$catGedrag].content}
 </p>
 
 <p>
-    <span class="label">Waar en wanneer:</span>
+    <span class="label">Waar en wanneer</span>
     {tidy_string data=$content[$catWaar].content}
 </p>
 <p>
