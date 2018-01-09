@@ -2,6 +2,23 @@ var drnzkr_startDier=null;
 
 function hook_prePrintResults()
 {
+	for(var i=0;i<data.dataset.length;i++)
+	{
+		if (data.dataset[i].images)
+		{
+			for(var j=0;j<data.dataset[i].images.length;j++)
+			{
+				if (data.dataset[i].images[j].overview_image && data.dataset[i].images[j].overview_image==1)
+				{
+					data.dataset[i].info.url_image=data.dataset[i].images[j].file_name;
+					var url= data.dataset[i].info.url_thumbnail=data.dataset[i].images[j].file_name;
+					var filename = url.substring(url.lastIndexOf('/')+1);
+					data.dataset[i].info.url_thumbnail=filename.replace(".jpg","_thumb.jpg");
+				}
+			}
+		}
+	}
+
 	drnzk_verberg_dier();
 }
 
@@ -63,6 +80,7 @@ function drnzkr_navigeren( target )
 
 	printResults();
 	drnzkr_update_navigatie();
+	drnzkr_result_style_update();
 }
 
 function drnzkr_update_navigatie()
@@ -76,7 +94,7 @@ function drnzkr_update_navigatie()
 		$('#prev-button-container-top,#prev-button-container-bottom').css('visibility','visible');
 	}
 
-	if (matrixsettings.start+matrixsettings.perPage>data.resultset.length)
+	if ((matrixsettings.start+matrixsettings.perPage)>=data.resultset.length)
 	{
 		$('#next-button-container-top,#next-button-container-bottom').css('visibility','hidden');
 	}
@@ -104,7 +122,6 @@ function drnzkr_toon_dier( p )
 		{
 			if (data)
 			{
-
 				if ( p.name )
 				{
 					try {
@@ -174,15 +191,12 @@ function drnzkr_open_dier_link()
 		}
 	
 		drnzkr_toon_dier( { id:n.id, type:n.type } );
-
 	}	
-
 }
 
 
 function drnzkr_update_choices_made()
 {
-
 	$('#gemaakte-keuzes').html( "" );
 
 	var d=Array();
@@ -216,12 +230,22 @@ function drnzkr_update_choices_made()
 			characterinfo=characterinfo[0];
 		}
 		
+		for(var k=0;k<data.characterStates.length;k++)
+		{
+			if (data.characterStates[k].id==state.id)
+			{
+				state.file_name=data.characterStates[k].file_name;
+				break;
+			}
+		}
+		
 		d.push(
-			drzkr_selectedFacetHtmlTemplate
+			fetchTemplate( 'drzkr_selectedFacetHtmlTemplate' )
 				.replace('%CHARACTER-LABEL%',characterinfo)
 				.replace('%STATE-VAL%',state.val)
 				.replace('%STATE-LABEL%',state.label)
-				.replace('%ICON%',matrixsettings.imageRootProject+state.file_name)
+				.replace('%ICON%',state.file_name)
+				//.replace('%ICON%',matrixsettings.imageRootProject+state.file_name)
 				.replace('%IMG-ROOT-SKIN%',matrixsettings.imageRootSkin)
 		);
 
@@ -262,4 +286,16 @@ function drnzkr_update_states()
 	}
 }
 
-//196170 
+function drnzkr_result_style_update()
+{
+    $('.result0').hover(
+        function()
+        {
+            $(this).children('a').children('table').children('tbody').children('tr').children('td').css('color','#25AAD5');
+        },
+        function()
+        {
+            $(this).children('a').children('table').children('tbody').children('tr').children('td').css('color','#000000');
+        }
+    );
+}

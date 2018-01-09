@@ -253,7 +253,6 @@ class NsrTaxonImagesController extends NsrController
 				$checks=$this->fieldFormatChecks(array('lines'=>$lines,'fields'=>$fields,'ignorefirst'=>$ignorefirst));
 				$this->setSessionVar('checks',$checks);
 			}
-
 		}
 
 		$this->smarty->assign('col_NSR_ID',$this->getSessionVar( $this->sys_label_NSR_ID ));
@@ -366,6 +365,8 @@ class NsrTaxonImagesController extends NsrController
 			"columns"=>"distinct sys_label",
 			"order"=>"sys_label"
 		));
+
+		$d=[];
 
 		foreach((array)$fields as $val)
 		{
@@ -672,7 +673,7 @@ class NsrTaxonImagesController extends NsrController
 		if (is_null($lines) || is_null($col_nsr_id) || is_null($col_file_name)) return null;
 
 		$taxa=[];
-		$file_exists=[];
+		$files=[];
 
 		// go through all lines
 		foreach((array)$lines as $key=>$line)
@@ -690,28 +691,46 @@ class NsrTaxonImagesController extends NsrController
 				else
 				if($c==$col_file_name)
 				{
+
 					$src=$this->taxon_main_image_base_url . trim($cell);
 					
-					$file_exists[$key]=array('url'=>$src);
+					$files[$key]=array('file_name'=>trim($cell),'url'=>$src);
 					
 					if ($no_image_exist_check===false)
 					{
 						if (@getimagesize($src))
 						{
-							$file_exists[$key]['exists']=true;
+							$files[$key]['exists']=true;
 						}
 						else
 						{
-							$file_exists[$key]['exists']=false;
+							$files[$key]['exists']=false;
 						}
 					}
+				}
+			}
+
+			$files[$key]['exists_in_db']=false;
+
+			if ( isset($taxa[$key]['taxon_id']) && isset($files[$key]['file_name']) )
+			{
+				$exist=$this->models->MediaTaxon->_get([ 'id' => [
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon_id' => $taxa[$key]['taxon_id'],
+					'file_name' => $files[$key]['file_name']
+				], 'columns' => 'id', 'limit' => 1 ]);
+
+				if ($exist)
+				{
+					$files[$key]['exists_in_db']=true;
+					$files[$key]['db_id']=$exist[0]['id'];
 				}
 			}
 		}
 
 		return array(
 			'taxa'=>$taxa,
-			'files'=>$file_exists
+			'files'=>$files
 		);
 
 	}
@@ -745,6 +764,22 @@ class NsrTaxonImagesController extends NsrController
 
 	private function doSaveImageMetaBulk()
 	{
+
+	/*
+	   [files] => Array
+	        (
+	            [0] => Array
+	                (
+	                    [file_name] => 64805.jpg
+	                    [url] => http://images.naturalis.nl/w800/64805.jpg
+	                    [exists] => 1
+	                    [exists_in_db] => 1
+	                )
+
+		implement [exists_in_db] => 1
+		image exists, save/replace metadata
+
+	*/		
 		$ignorefirst=$this->getSessionVar( 'ignorefirst' );
 		$lines=$this->getSessionVar( 'lines' );
 
@@ -763,24 +798,36 @@ class NsrTaxonImagesController extends NsrController
 
 			if ( !is_null($matches['taxa'][$key]) && !empty($filename) )
 			{
-				$d=
-					array(
-						'id' => null,
-						'project_id' => $this->getCurrentProjectId(),
-						'taxon_id' => $matches['taxa'][$key]['taxon_id'],
-						'file_name' => $filename,
-						'original_name' => $filename,
-						'mime_type' => @$this->_mime_types[pathinfo($filename, PATHINFO_EXTENSION)],
-						'sort_order' => 99
-					);
+				$media_id=null;
 
-				$mt=$this->models->MediaTaxon->save($d);
-
-				if ($mt==1)
+				if ($matches['files'][$key]['exists_in_db']==1)
 				{
+					$media_id=$matches['files'][$key]['db_id'];
+				}
+				else
+				{
+					$d=
+						array(
+							'id' => null,
+							'project_id' => $this->getCurrentProjectId(),
+							'taxon_id' => $matches['taxa'][$key]['taxon_id'],
+							'file_name' => $filename,
+							'original_name' => $filename,
+							'mime_type' => @$this->_mime_types[pathinfo($filename, PATHINFO_EXTENSION)],
+							'sort_order' => 99,
+							'file_size' => '0'
+						);
 
-					$media_id=$this->models->MediaTaxon->getNewId();
+					$mt=$this->models->MediaTaxon->save($d);
 
+					if ($mt==1)
+					{
+						$media_id=$this->models->MediaTaxon->getNewId();
+					}
+				}
+
+				if (!is_null($media_id))
+				{
 					$fieldssaved=0;
 
 					$concatfields=array();
@@ -801,7 +848,6 @@ class NsrTaxonImagesController extends NsrController
 									$checks[$key][$c]['data']['second']
 								);
 						}
-
 
 						if ( !empty($fields[$c]) && $c!=$col_file_name && $c!=$col_nsr_id)
 						{
@@ -826,9 +872,12 @@ class NsrTaxonImagesController extends NsrController
 							'project_id'=>$this->getCurrentProjectId(),
 							'media_id'=>$media_id,
 							'language_id'=>$this->getDefaultProjectLanguage(),
-							'sys_label'=>$label,
-							'meta_data'=>$val,
+							'sys_label'=>$label
 						);
+
+						$this->models->MediaMeta->delete( $md );
+
+						$md['meta_data']=$val;
 
 						if( stripos($label,'datum') )
 						{

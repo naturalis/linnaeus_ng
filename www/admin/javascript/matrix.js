@@ -128,6 +128,7 @@ function matrixGetStates(id)
 		async: allAjaxAsynchMode,
 		success : function (data)
 		{
+			//console.log(data);
 			obj = $.parseJSON(data);
 			if (obj) matrixSetStates(obj);
 		}
@@ -233,7 +234,10 @@ function matrixSetTaxa(obj)
 	{
 		for(var i=0;i<obj.taxa.length;i++)
 		{
-			$('#taxa').append('<option ondblclick="matrixDeleteTaxon()" value="'+obj.taxa[i].id+'">'+obj.taxa[i].taxon+'</option>').val(obj.taxa[i].id);
+			$('#taxa').append('<option ondblclick="matrixDeleteTaxon()" value="'+obj.taxa[i].id+'">'+
+				obj.taxa[i].taxon+
+				(obj.taxa[i].name.length>0 ? " ("+obj.taxa[i].name + ")" : "" )+
+				'</option>').val(obj.taxa[i].id);
 		}
 	}
 
@@ -340,7 +344,7 @@ function matrixGetLinks()
 		async: allAjaxAsynchMode,
 		success : function (data)
 		{
-			console.log(data);
+			//console.log(data);
 			matrixSetLinks($.parseJSON(data));
 		}
 	});
@@ -437,4 +441,154 @@ function matrixSaveOrder( id )
 	})
 
 	$('#theForm').submit();
+}
+
+
+function initRelationLists()
+{
+    $('.add-relation').off('click').on('click',function()
+    {
+        addTaxonRelation( $(this).attr('data-id') );
+    });
+
+    $('.remove-relation').off('click').on('click',function()
+    {
+        removeTaxonRelation( $(this).attr('data-id') );
+    });
+}
+
+function addTaxonRelation( addme )
+{
+    var current=$('#taxon').val();
+
+    if (addme.length==0||current.length==0) return;
+
+    $.ajax({
+        url : 'ajax_interface.php',
+        type: 'POST',
+        data : ({
+            action : 'add_taxon_relation',
+            time : allGetTimestamp(),
+            taxon : current,
+            relation : addme
+        }),
+        success : function(data)
+        {
+            //console.log(data);
+            if (data!=1) return;
+            addToRelated(addme);
+            removeFromUnrelated(addme);
+            sortRelated();
+            sortUnrelated();
+            initRelationLists();
+            updateTaxonListing();
+        }
+    });
+}
+
+function removeTaxonRelation( removeme )
+{
+    var current=$('#taxon').val();
+
+    if (removeme.length==0||current.length==0) return;
+
+    $.ajax({
+        url : 'ajax_interface.php',
+        type: 'POST',
+        data : ({
+            action : 'remove_taxon_relation',
+            time : allGetTimestamp(),
+            taxon : current,
+            relation : removeme
+        }),
+        success : function(data)
+        {
+            //console.log(data);
+            if (data!=1) return;
+            addToUnrelated(removeme);
+            removeFromRelated(removeme);
+            sortRelated();
+            sortUnrelated();
+            initRelationLists();
+            updateTaxonListing();
+        }
+    });
+}
+
+function addToUnrelated( item )
+{
+     $('#related li').each(function()
+     {
+        if ($(this).attr("data-id")==item)
+        {
+            $('#unrelated').append(
+                fetchTemplate('unrelatedItemTpl')
+                    .replace(/%ID%/g,$(this).attr("data-id"))
+                    .replace(/%LABEL%/g,$(this).attr("data-label"))
+            );
+        } 
+     })
+}
+
+function removeFromUnrelated( item )
+{
+     $('#unrelated li').each(function()
+     {
+        if ($(this).attr("data-id")==item)
+        {
+            $(this).remove();
+        } 
+     })
+}
+
+function addToRelated( item )
+{
+    $('#unrelated li').each(function()
+    {
+        if ($(this).attr("data-id")==item)
+        {
+            $('#related').append(
+                fetchTemplate('relatedItemTpl')
+                    .replace(/%ID%/g,$(this).attr("data-id"))
+                    .replace(/%LABEL%/g,$(this).attr("data-label"))
+            );
+        } 
+    })
+}
+
+function removeFromRelated( item )
+{
+    $('#related li').each(function()
+    {
+        if ($(this).attr("data-id")==item)
+        {
+            $(this).remove();
+        } 
+    })
+}
+
+function sortList( id )
+{
+    var mylist = $( id );
+    var listitems = mylist.children('li').get();
+    listitems.sort(function(a, b)
+    {
+       return $(a).text().toUpperCase().localeCompare($(b).text().toUpperCase());
+    })
+    $.each(listitems, function(idx, itm) { mylist.append(itm); });
+}
+
+function sortRelated()
+{
+    sortList( '#related' );
+}
+
+function sortUnrelated()
+{
+    sortList( '#unrelated' );
+}
+
+function updateTaxonListing()
+{
+    $('#taxon :selected').text($('#taxon :selected').text().trim().replace(/\([\d]+\)/,'('+$('#related li').length+')'));
 }

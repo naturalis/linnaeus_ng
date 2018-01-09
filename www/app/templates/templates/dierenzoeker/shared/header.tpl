@@ -9,7 +9,6 @@
 	<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />	<link rel="image_src" href="{$projectUrls.systemMedia}dierenzoeker-logo.png" />
 	<link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}basics.css" />
 	<link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}jquery-ui-1.10.0.custom.min.css" />
-    <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}prettyPhoto/prettyPhoto.css" />
 	<link href="{$projectUrls.systemMedia}favicon.ico" type="image/x-icon" rel="icon" />
     <link href="{$projectUrls.systemMedia}favicon.ico" type="image/x-icon" rel="shortcut icon" />        
 	<link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/inline_templates.css" />
@@ -31,6 +30,76 @@
 {/foreach}
 {/if}
 
-<script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/jquery.prettyPhoto.custom.js"></script>
+	<link rel="stylesheet" type="text/css" href="{$baseUrl}app/javascript/fancybox-3/jquery.fancybox.min.css">
+    <script type="text/javascript" src="{$baseUrl}app/javascript/fancybox-3/jquery.fancybox.min.js"></script>
 
 </head>
+
+{if $deviceInfo.isMobile}
+<style>
+.mobile.outer {
+	background-color:#25aad5;
+	height:180px;
+	width:100%;
+}
+
+.mobile .inner {
+	display: inline-block;;
+	background-color:#25aad5;	
+	height:100%;
+	color:white;
+	text-align:center;
+	padding-top:35px;
+	font-size: 2.1em;
+	line-height: 1.2em;
+	width:76%;
+}
+.mobile a {
+	color: #fff;
+}
+
+.mobile a.small {
+	font-size: 0.8em;
+}
+
+.support {
+	background-color:#25aad5;
+	width:10%;
+	display: inline-block;
+	text-align: center;
+}
+
+.close {
+	display: inline-block;
+	background-color:#25aad5;
+	font-size: 2em;
+	font-weight: bold;
+    border-radius: 15px;
+    padding: 2px 5px 7px 5px; 
+    width: 40px;
+    height: 40px;
+    border: 1px solid #ddd;
+    color: #fff;
+    cursor: pointer;
+}
+
+</style>
+
+<div class="mobile outer">
+	<div class="support"></div>
+	<div class="inner">
+		<b>Hallo mobiele dierenzoeker!</b><br />
+		{if $deviceInfo.isiOS}
+		<a href="https://itunes.apple.com/nl/app/dierenzoeker/id699543364">
+		{else}
+		<a href="https://play.google.com/store/apps/details?id=nl.naturalis.dierenzoeker">
+		{/if}
+		Download de Dierenzoeker app voor je {if $deviceInfo.isTablet}tablet{else}telefoon{/if}</a>
+	</div>
+	<div class="support">
+		<span class="close" title="mededeling sluiten" onclick="$('.mobile.outer').toggle(false);">&#10006;</span>
+	</div>
+</div>
+{/if}
+
+

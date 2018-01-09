@@ -199,7 +199,7 @@ class MatrixKeyController extends Controller
         $this->smarty->assign( 'matrices', $this->getAllMatrices() );
 		$this->smarty->assign( 'master_matrix', $this->getMasterMatrix() );
 		$this->smarty->assign( 'facetmenu', $this->getFacetMenu() );
-		$this->smarty->assign( 'states', $this->getCharacterStates( array("id"=>"*") ) );
+		$this->smarty->assign( 'states', $this->getCharacterStates() );
 
         $this->printPage();
     }
@@ -318,7 +318,7 @@ class MatrixKeyController extends Controller
 					'statecount'=>$this->setRemainingStateCount()
 				)));
 		}
-
+			
 		$this->printPage();
 	}
 
@@ -430,13 +430,13 @@ class MatrixKeyController extends Controller
 		return ( isset($id) && $id!='*' && isset($m[$id]) ? $m[$id] : ( isset($m) ? $m  : null ) ) ;
 	}
 
-    private function getCharacterStates( $p )
+    private function getCharacterStates( $p=null )
     {
 		$id=isset($p['id']) ? $p['id'] : null;
 		$char=isset($p['char']) ? $p['char'] : null;
 
-		if (is_null($id) && is_null($char))
-			return;
+		//if (is_null($id) && is_null($char))
+		//  return;
 
         $states = $this->models->MatrixkeyModel->getCharacterStates(array(
 			"language_id"=>$this->getCurrentLanguageId(),
@@ -445,13 +445,13 @@ class MatrixKeyController extends Controller
 			"characteristic_id"=>$char
 		));
 		
-
         // getCharacterStates may return array of records or single record...
         if (isset($states[0]))
 		{
             foreach ($states as $i => $state)
 			{
-				if (!filter_var($state['file_name'], FILTER_VALIDATE_URL) === false)
+				//if (!filter_var($state['file_name'], FILTER_VALIDATE_URL) === false)
+				if (!empty($state['file_name']))
 					continue;
 
                 $this->_mc->setItemId($state['id']);
@@ -472,7 +472,8 @@ class MatrixKeyController extends Controller
         } else
 		if (isset($states['id']))
 		{
-			if (!filter_var($states['file_name'], FILTER_VALIDATE_URL))
+			//if (!filter_var($states['file_name'], FILTER_VALIDATE_URL))
+			if (empty($states['file_name']))
 			{
 				$this->_mc->setItemId($states['id']);
 				$media = $this->_mc->getItemMediaFiles();
@@ -620,24 +621,21 @@ class MatrixKeyController extends Controller
 		{
 			foreach((array)$taxa as $key=>$val)
 			{
-				/*
-				 $d=$this->models->MediaTaxon->_get(array("id"=>
-					array(
-						"taxon_id"=>$val['id'],
-						"project_id" => $this->getCurrentProjectId(),
-						"overview_image"=>"1"
-				)));
-
-				if ( $d )
-				{
-					$taxa[$key]['info']['url_image']=$d[0]['file_name'];
-				}
-				*/
-
 			    $this->_smc->setItemId($val['id']);
 			    $taxa[$key]['info']['url_image'] = $this->_smc->getOverview();
 
 			}
+		}
+
+		foreach((array)$taxa as $key=>$val)
+		{
+			$taxa[$key]['images']=
+				$this->models->MediaTaxon->_get( [ "id"=> [
+					"taxon_id"=>$val['id'],
+					"project_id" => $this->getCurrentProjectId()
+				 ],
+				 "columns" => "file_name,thumb_name,overview_image" 
+			] );
 		}
 
 		$all=array_merge((array)$taxa,(array)$variations);
@@ -1671,8 +1669,5 @@ class MatrixKeyController extends Controller
 	{
 		return $this->_incUnknowns;
 	}
-
-
-
 
 }

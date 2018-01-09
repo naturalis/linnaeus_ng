@@ -46,45 +46,45 @@ input[type=text] {
 
 	{if $characteristic.type=='text'}
 
-    {foreach $languages v i}
-        <tr style="vertical-align:top">
-            <td>{$v.language}:</td>
-            <td><textarea
-				style="width:400px;height:150px;"
-				name="texts[{$v.language_id}]"
-				>{$state.texts[{$v.language_id}].text}</textarea></td>
-        </tr>
-    {/foreach}
+	    {foreach $languages v i}
+	        <tr style="vertical-align:top">
+	            <td>{$v.language}:</td>
+	            <td><textarea
+					style="width:400px;height:150px;"
+					name="texts[{$v.language_id}]"
+					>{$state.texts[{$v.language_id}].text}</textarea></td>
+	        </tr>
+	    {/foreach}
 
 	{elseif $characteristic.type=='media' && $state.id != ''}
     
-    {if $use_media}
+	    {if $use_media}
 
-	<tr style="vertical-align:top">
-		<td>
-		{if $state.file_name}
-		{t}Current image:{/t}
-		{else}
-		{t}Choose a file:{/t}
-		{/if}
-		</td>
-		<td{if $languages|@count>1} colspan="2"{/if}>
-		{if $state.file_name}
-			<img src="{$state.file_name}" onclick="allShowMedia('{$state.file_name}','');" class="image-preview" />
-			<input type="hidden" name="existing_file" value="{$state.file_name}" /><br />
-			<span class="a" onclick="matrixDeleteStateImage();">{t}delete image{/t}</span>
-		{else}
-			<a href="../media/upload.php?item_id={$state.id}&amp;module_id={$module_id}">{t}Upload{/t}</a> or
-			<a href="../media/select.php?item_id={$state.id}&amp;module_id={$module_id}">{t}attach media{/t}</a> {t}to this state{/t}.
-		{/if}
-		</td>
-	</tr>
-    
-    {else}
-    
-    <!-- state.file_name: {$state.file_name} -->
-    
-    {/if}
+		<tr style="vertical-align:top">
+			<td>
+			{if $state.file_name}
+			{t}Current image:{/t}
+			{else}
+			{t}Choose a file:{/t}
+			{/if}
+			</td>
+			<td{if $languages|@count>1} colspan="2"{/if}>
+			{if $state.file_name}
+				<img src="{$state.file_name}" onclick="allShowMedia('{$state.file_name}','');" class="image-preview" />
+				<input type="hidden" name="existing_file" value="{$state.file_name}" /><br />
+				<span class="a" onclick="matrixDeleteStateImage();">{t}delete image{/t}</span>
+			{else}
+				<a href="../media/upload.php?item_id={$state.id}&amp;module_id={$module_id}">{t}Upload{/t}</a> or
+				<a href="../media/select.php?item_id={$state.id}&amp;module_id={$module_id}">{t}attach media{/t}</a> {t}to this state{/t}.
+			{/if}
+			</td>
+		</tr>
+	    
+	    {else}
+	    
+	    <!-- state.file_name: {$state.file_name} -->
+	    
+	    {/if}
 
 	{elseif $characteristic.type=='range'}
 
@@ -132,8 +132,8 @@ input[type=text] {
 				<input type="button" onclick="matrixCheckStateForm()" value="{t}save and return to matrix{/t}" />&nbsp;
 				<input type="button" onclick="$('#repeat').val('1');matrixCheckStateForm();" value="{t _s1=$characteristic.label}save and add another state for &quot;%s&quot;{/t}" />&nbsp;
 				{if $state.id}<input type="button" value="{t}delete{/t}" onclick="matrixDeleteCharacteristic()" />&nbsp;{/if}
-				<input type="button" value="{t}back{/t}" onclick="window.open('edit.php','_top')" />
 			{/if}
+			<input type="button" value="{t}back{/t}" onclick="window.open('edit.php','_top')" />
 		</td>
 	</tr>
 </table>

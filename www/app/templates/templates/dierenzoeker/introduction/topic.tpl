@@ -114,15 +114,10 @@ ga('send', 'pageview');
 
 {/literal}
 
-$(document).ready(function(e) {
-    $('img').each(function(index, element) {
-        $(this).attr('src', '../../media/system/skins/dierenzoeker/' + $(this).attr('src') );
-    });
+$(document).ready(function(e)
+{
+	$.backstretch("../../media/system/skins/dierenzoeker/background.jpg");
 });
-
-
-
-
 
 </script>
 </html>

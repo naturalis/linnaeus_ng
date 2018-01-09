@@ -23,6 +23,7 @@ class SpeciesController extends Controller
         'literature_taxa',
         'media_descriptions_taxon',
         'media_taxon',
+        'media_meta',
         'pages_taxa',
         'pages_taxa_titles',
         'synonyms',
@@ -94,7 +95,10 @@ class SpeciesController extends Controller
         $this->_includeOverviewImageInMedia=$this->moduleSettings->getModuleSetting( array( 'setting'=>'include_overview_in_media','subst'=>true) );
 		$this->_defaultSpeciesTab=$this->moduleSettings->getModuleSetting( array( 'setting'=>'species_default_tab','subst'=>CTAB_CLASSIFICATION) );
 		$this->_inclHigherTaxaRankPrefix=$this->moduleSettings->getModuleSetting( array( 'setting'=>'higher_taxa_rank_prefix','subst'=>0) )==1;
-		
+        $this->_base_url_images_main=$this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_main','module'=>'species') );
+        $this->_base_url_images_thumb=$this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_thumb','module'=>'species') );
+        $this->_base_url_images_overview=$this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_overview','module'=>'species') );
+        
 		$this->smarty->assign('inclHigherTaxaRankPrefix',$this->_inclHigherTaxaRankPrefix);
     }
 
@@ -316,25 +320,53 @@ class SpeciesController extends Controller
 		$related=$this->getRelatedEntities(array('tId' => $this->rGetVal('id')));
 		foreach((array)$related as $key => $val)
 		{
-			$d = $this->getCommonname($val['relation_id']);
-			$related[$key]['label'] = $d;
-			$related[$key]['url_image'] = $this->getNbcExtras(array('id'=>$val['relation_id'],'name' => 'url_image'));
-			$related[$key]['url_thumbnail'] = $this->getNbcExtras(array('id'=>$val['relation_id'],'name' => 'url_thumbnail'));
+			$d = $this->getTaxonById($val['relation_id']);
+            $related[$key]['label'] = $d['commonname'];
+
+            $media=$this->getTaxonMedia( [ 'taxon'=>$val['relation_id'],'forceOld'=>true ] );
+
+            foreach((array)$media as $val)
+            {
+                if ($val['overview_image']==1)
+                {
+                    $related[$key]['url_image'] = $val['file_name'];
+                    $related[$key]['url_thumbnail'] = $val['thumb_name'];
+                }
+            }
 		}
-		$children=$this->models->Taxa->_get(array('id'=>array('project_id' => $this->getCurrentProjectId(),'parent_id' => $this->rGetVal('id'))));
+
+    	$children=$this->models->Taxa->_get(array('id'=>array('project_id' => $this->getCurrentProjectId(),'parent_id' => $this->rGetVal('id'))));
+
+        $children=$this->models->SpeciesModel->getTaxonChildrenNsr( [
+            'projectId' => $this->getCurrentProjectId(),
+            'taxonId' => $this->rGetVal('id'),
+            'languageId' => $this->getCurrentLanguageId(),
+            'predicateValidNameId' => $this->getNameTypeId(PREDICATE_VALID_NAME),
+            'predicatePreferredNameId' => $this->getNameTypeId(PREDICATE_PREFERRED_NAME)
+        ]);
+
 		foreach((array)$children as $key => $val)
 		{
-			$d = $this->getCommonname($val['id']);
-			$children[$key]['label'] = $d;
-			$children[$key]['url_image'] = $this->getNbcExtras(array('id'=>$val['id'],'name' => 'url_image'));
-			$children[$key]['url_thumbnail'] = $this->getNbcExtras(array('id'=>$val['id'],'name' => 'url_thumbnail'));
+
+            $media=$this->getTaxonMedia( [ 'taxon'=>$val['id'],'forceOld'=>true ] );
+
+            foreach((array)$media as $val)
+            {
+                if ($val['overview_image']==1)
+                {
+                    $children[$key]['url_image'] = $val['file_name'];
+                    $children[$key]['url_thumbnail'] = $val['thumb_name'];
+                }
+            }
+
 		}
-		if ($children)
-			usort($children,function($a,$b) {return ($a['label']>$b['label']?1:-1);});
+
+		if ($children) usort($children,function($a,$b) {return ($a['commonname']>$b['commonname']?1:-1);});
 
 		$taxon = $this->getTaxonById($this->rGetVal('id'));
 		$taxon['label']=$this->formatTaxon($taxon);
-		$taxon['taxon']=trim(str_replace('%VAR%','',$taxon['taxon']));
+		//$taxon['taxon']=trim(str_replace('%VAR%','',$taxon['taxon']));
+        $taxon['taxon']=preg_replace('/\%VAR(\d)*\%/','',trim($taxon['taxon']));
 		$parent = $this->getTaxonById($taxon['parent_id']);
 		$parent['label']=$this->formatTaxon($parent);
 		$categories = $this->getCategories(array('taxon' => $this->requestData['id']));
@@ -348,12 +380,8 @@ class SpeciesController extends Controller
 			'fieldAsIndex'=>'page_id'
 			)
 		);
-		$nbc=$this->getNbcExtras(array('id'=>$this->rGetVal('id')));
-
-		// hardcoding....
-		if (isset($nbc["url_image"])) $nbc["url_image_large"]=str_replace('280x190','original',$nbc["url_image"]);
-
-		$media=$this->getTaxonMedia(array('taxon'=>$this->rGetVal('id')));
+		
+		$media=$this->getTaxonMedia( [ 'taxon'=>$this->rGetVal('id'),'forceOld'=>true ] );
 
 		$contentparent = $this->models->ContentTaxa->_get(array(
 			'id' =>  array(
@@ -364,18 +392,20 @@ class SpeciesController extends Controller
 			'columns'=>'count(*) as total'
 			)
 		);
+
 		$parent['hasContent']=$contentparent[0]['total']>0;
 
 		$this->smarty->assign('taxon',$taxon);
 		$this->smarty->assign('parent',$parent);
-		$this->smarty->assign('categoryList', $categories['categoryList']);
+		$this->smarty->assign('categories', $categories);
 		$this->smarty->assign('content',$content);
-		$this->smarty->assign('nbc',$nbc);
 		$this->smarty->assign('children', $children);
 		$this->smarty->assign('related', $related);
 		$this->smarty->assign('media', $media);
 		$this->smarty->assign('back',$this->rGetVal('back'));
-
+        $this->smarty->assign('base_url_images_thumb',$this->_base_url_images_thumb);
+        $this->smarty->assign('base_url_images_main',$this->_base_url_images_main);
+        $this->smarty->assign('base_url_images_overview',$this->_base_url_images_overview);
 		$this->printPage();
     }
 
@@ -562,13 +592,11 @@ class SpeciesController extends Controller
 			'id' => array(
 				'project_id' => $this->getCurrentProjectId()
 			),
-			'order' => 'show_order',
 			'fieldAsIndex' => 'id'
 		));
 
 		foreach ((array) $tp as $key => $val)
 		{
-
 		    if (is_null($this->moduleSession->getModuleSetting('defaultCategory'))) {
                 $this->moduleSession->setModuleSetting(array(
                     'setting' => 'defaultCategory',
@@ -840,22 +868,52 @@ class SpeciesController extends Controller
 		return array('content'=>$content);
     }
 
+
 	protected function getTaxonMedia ($p)
 	{
 		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
 		$id = isset($p['id']) ? $p['id'] : null;
+		$forceOld = isset($p['forceOld']) ? $p['forceOld'] : false;
+
+        /*
+            forceOld should be replaced with a "use/don't use RS"-setting
+        */
+
 		$inclOverviewImage = isset($p['inclOverviewImage']) ? $p['inclOverviewImage'] : false;
 
-        if ($mt = $this->getlastVisitedCategory($taxon, CTAB_MEDIA))
+		if (!$forceOld)
 		{
-            return $mt;
-        }
+			if ($mt = $this->getlastVisitedCategory($taxon, CTAB_MEDIA))
+			{
+				return $mt;
+			}
 
-	    $this->_mc->setItemId(isset($taxon) ? $taxon : $id);
-	    $mt = $this->_mc->getItemMediaFiles();
-		$this->_mc->reformatOutput($mt, $inclOverviewImage);
-		
-		$this->setlastVisitedCategory($taxon, CTAB_MEDIA, $mt);
+			$this->_mc->setItemId(isset($taxon) ? $taxon : $id);
+			$mt = $this->_mc->getItemMediaFiles();
+			$this->_mc->reformatOutput($mt, $inclOverviewImage);
+
+			$this->setlastVisitedCategory($taxon, CTAB_MEDIA, $mt);
+		}
+		else
+		{
+			
+			$mt = $this->models->MediaTaxon->_get( [ 'id' => [ 'project_id' => $this->getCurrentProjectId(), 'taxon_id' => $taxon ] ] );
+
+            foreach ((array)$mt as $key => $value)
+            {
+                $mt[$key]['meta_data']=$this->models->MediaMeta->_get( [
+                    "id"=>[
+                            "project_id"=>$this->getCurrentProjectId(),
+                            "language_id"=>$this->getCurrentLanguageId(),
+                            'media_id'=>$value["id"]
+                    ],
+                    "columns"=>"sys_label, meta_data, meta_date, meta_number",
+                    "fieldAsIndex"=>"sys_label"
+                ] );
+            }
+		}
+
+
 
 		return $mt;
 	}

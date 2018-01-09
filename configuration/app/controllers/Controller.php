@@ -172,11 +172,11 @@ class Controller extends BaseClass
 		'session_module_settings',
         'logging_helper',
         'debug_tools',
-		'user_agent',
 		'functions',
 		'custom_array_sort',
 		'paginator',
-		'current_url'
+		'current_url',
+		'mobile_detect'
     );
     public $cssToLoadBase = array(
         'basics.css',
@@ -228,9 +228,14 @@ class Controller extends BaseClass
 		$this->setUrls();
 		$this->setSmartySettings();
 		$this->setCssFiles();
-		$this->setOtherStuff();
+        $this->setRandomValue();
+		$this->setSearchResultIndexActive();
+		$this->setRankIdConstants();
+		$this->setShowAutomaticHybridMarkers();
+		$this->setShowAutomaticInfixes();
 		$this->setGoogleAnalyticsCode();
 		$this->setGeneralHeaderSubtitle();
+		$this->assignMobileDeviceInfo();
     }
 
     /**
@@ -463,12 +468,14 @@ class Controller extends BaseClass
             'trashCanExists' => $this->models->TrashCan->getTableExists(),
 		    'projectId' => $this->getCurrentProjectId(),
 		    'languageId'=> $this->getCurrentLanguageId(),
-		    'taxonId' => $id
+		    'taxonId' => $id,
+            'predicateValidNameId' => $this->getNameTypeId(PREDICATE_VALID_NAME),
+            'predicatePreferredNameId' => $this->getNameTypeId(PREDICATE_PREFERRED_NAME)		    
 		));
     }
 
     /* Fetches preferred common name from names table rather than common_names */
-    public function getTaxonCommonNameAlternate ($id)
+    public function getTaxonCommonNameAlternate($id)
     {
         return $this->models->ControllerModel->getTaxonCommonNameAlternate(array(
 		    'project_id' => $this->getCurrentProjectId(),
@@ -477,9 +484,12 @@ class Controller extends BaseClass
 		));
     }
 
-	public function setSearchResultIndexActive($id)
+	public function setSearchResultIndexActive()
 	{
-		$_SESSION['app'][$this->spid()]['search']['lastResultSetIndexActive'] = $id;
+		if ($this->rHasVar('sidx'))
+		{
+			$_SESSION['app'][$this->spid()]['search']['lastResultSetIndexActive'] = $this->rHasVar('sidx');
+		}
 	}
 
 	public function getSearchResultIndexActive()
@@ -1868,47 +1878,24 @@ class Controller extends BaseClass
 
     private function setSkinName ()
     {
-
-		if ($this->controllerBaseName=='webservices') {
-
+		if ($this->controllerBaseName=='webservices')
+		{
 			$_SESSION['app']['system']['skinName'] = $this->generalSettings['app']['skinNameWebservices'];
 
-		} else {
+		} 
+		else
+		{
+			$skin = $this->getSetting('skin');
 
-			$force = $this->getSetting('force_skin_mobile')==1;
-
-			if ($force || isset($this->helpers->UserAgent)) {
-
-				if ($force || $this->helpers->UserAgent->isMobileDevice()) {
-
-					$d=$this->getSetting('skin_gsm');
-
-					if ($force || $this->helpers->UserAgent->isGSM() && isset($d))
-					{
-						$skin = $d;
-					}
-					else
-					{
-						$skin = $this->getSetting('skin_mobile');
-					}
-
-					if (isset($skin))
-						$skin = $this->doesSkinExist($skin) ? $skin : null;
-
-				}
-
-			}
-
-			$skin = empty($skin) ? $this->getSetting('skin') : $skin;
-
-			if (isset($skin) && $this->doesSkinExist($skin)) {
+			if (isset($skin) && $this->doesSkinExist($skin))
+			{
 				$_SESSION['app']['system']['skinName'] = $skin;
-			} else {
+			}
+			else
+			{
 				$_SESSION['app']['system']['skinName'] = $this->generalSettings['app']['skinName'];
 			}
-
 		}
-
     }
 
     private function doesSkinExist ($skin)
@@ -2536,22 +2523,6 @@ class Controller extends BaseClass
         return isset($this->_tmpTree[$id]) ? $this->_tmpTree[$id] : null;
     }
 
-
-	private function setOtherStuff()
-	{
-        $this->setRandomValue();
-
-		if ($this->rHasVar('sidx'))
-		{
-			$this->setSearchResultIndexActive($this->rGetVal('sidx'));
-		}
-
-		$this->setRankIdConstants();
-		$this->setShowAutomaticHybridMarkers();
-		$this->setShowAutomaticInfixes();
-	}
-
-
 	public function setSessionVar($name,$value=null)
 	{
 		if (is_null($name))
@@ -3118,8 +3089,7 @@ class Controller extends BaseClass
 	{
 		return $this->_generalHeaderSubtitle;
 	}
-	
-	
+
 	protected function setRobotsDirective( $r )
 	{
 		$this->_robotsDirective=$r;
@@ -3130,7 +3100,16 @@ class Controller extends BaseClass
 		if (!is_null($this->_robotsDirective)) return is_array($this->_robotsDirective) ? $this->_robotsDirective : [$this->_robotsDirective];
 	}
 
-
+	protected function assignMobileDeviceInfo()
+	{
+		$this->smarty->assign('deviceInfo',[
+			'isMobile'=>$this->helpers->MobileDetect->isMobile(),
+			'isTablet'=>$this->helpers->MobileDetect->isTablet(),
+			'isPhone'=>$this->helpers->MobileDetect->isPhone(),
+			'isAndroidOS'=>$this->helpers->MobileDetect->isAndroidOS(),
+			'isiOS'=>$this->helpers->MobileDetect->isiOS()
+		]);
+	}
 }
  
  
