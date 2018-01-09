@@ -1,16 +1,16 @@
 {function name=makeNameLink nametype=0}
 {if
-	$nametype==$smarty.const.PREDICATE_VALID_NAME ||
-	$nametype==$smarty.const.PREDICATE_HOMONYM ||
-	$nametype==$smarty.const.PREDICATE_BASIONYM ||
-	$nametype==$smarty.const.PREDICATE_SYNONYM ||
-	$nametype==$smarty.const.PREDICATE_SYNONYM_SL ||
-	$nametype==$smarty.const.PREDICATE_MISSPELLED_NAME ||
-	$nametype==$smarty.const.PREDICATE_INVALID_NAME
+    $nametype==$smarty.const.PREDICATE_VALID_NAME ||
+    $nametype==$smarty.const.PREDICATE_HOMONYM ||
+    $nametype==$smarty.const.PREDICATE_BASIONYM ||
+    $nametype==$smarty.const.PREDICATE_SYNONYM ||
+    $nametype==$smarty.const.PREDICATE_SYNONYM_SL ||
+    $nametype==$smarty.const.PREDICATE_MISSPELLED_NAME ||
+    $nametype==$smarty.const.PREDICATE_INVALID_NAME
 }synonym.php{else}name.php{/if}
 {*
-	$nametype==$smarty.const.PREDICATE_PREFERRED_NAME
-	$nametype==$smarty.const.PREDICATE_ALTERNATIVE_NAME
+    $nametype==$smarty.const.PREDICATE_PREFERRED_NAME
+    $nametype==$smarty.const.PREDICATE_ALTERNATIVE_NAME
 *}
 {/function}
 
@@ -215,7 +215,7 @@
         <a href="literature.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}literature{/t}</a><br />
         {if $show_nsr_specific_stuff}
         <a href="images.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}images{/t}</a><br />
-		{/if}
+        {/if}
         {foreach from=$traitgroups item=v}{if $v.taxon_count>0}
         <a href="../traits/taxon.php?id={$concept.id}&group={$v.id}" class="edit" style="margin:0;">{$v.sysname}</a><br />
         {/if}{/foreach}
@@ -233,7 +233,7 @@
         {if $k==0}<br /><br /><span class="small">{t}add traits{/t}:</span><br />{/if}
         <a href="../traits/taxon.php?id={$concept.id}&group={$v.id}" class="edit" style="margin:0;">{$v.sysname}</a><br />
         {assign var=k value=$k+1}
-		{/foreach}
+        {/foreach}
 
     </p>
 
@@ -259,35 +259,35 @@
 <script>
 $(document).ready(function()
 {
-	allLookupNavigateOverrideUrl('taxon.php?id=%s');
+    allLookupNavigateOverrideUrl('taxon.php?id=%s');
 
-	speciesBaseRankid={$smarty.const.SPECIES_RANK_ID};
-	genusBaseRankid={$smarty.const.GENUS_RANK_ID};
+    speciesBaseRankid={$smarty.const.SPECIES_RANK_ID};
+    genusBaseRankid={$smarty.const.GENUS_RANK_ID};
 
-	{if $concept}
-	dataid={$concept.id};
-	{if $concept.base_rank}taxonrank={$concept.base_rank};{/if}
-	$('#presence_reference_id').trigger('change');
-	{/if}
-	$('#data :input[type!=button]').each(function(key,value)
-	{
-		values.push( { name:$(this).attr('id'),current:$(this).val(), mandatory:$(this).attr('mandatory')=='mandatory' } );
-		$(this).on('change',function() { setnewvalue( { name:$(this).attr('id'),value:$(this).val() } ); } );
-	});
-	$(window).on('beforeunload',function() { return checkunsavedvalues() } );
-	//console.dir(values);
+    {if $concept}
+    dataid={$concept.id};
+    {if $concept.base_rank}taxonrank={$concept.base_rank};{/if}
+    $('#presence_reference_id').trigger('change');
+    {/if}
+    $('#data :input[type!=button]').each(function(key,value)
+    {
+        values.push( { name:$(this).attr('id'),current:$(this).val(), mandatory:$(this).attr('mandatory')=='mandatory' } );
+        $(this).on('change',function() { setnewvalue( { name:$(this).attr('id'),value:$(this).val() } ); } );
+    });
+    $(window).on('beforeunload',function() { return checkunsavedvalues() } );
+    //console.dir(values);
 
-	{if !$concept}
-	$('a.edit').each(function()
-	{
-		$(this).trigger('click');
-	});
-	{/if}
+    {if !$concept}
+    $('a.edit').each(function()
+    {
+        $(this).trigger('click');
+    });
+    {/if}
 
-	$('th[title]').each(function(key,value)
-	{
-		$(this).html('<span class="tooltip">'+$(this).html()+'</span>');
-	});
+    $('th[title]').each(function(key,value)
+    {
+        $(this).html('<span class="tooltip">'+$(this).html()+'</span>');
+    });
 
 });
 </script>
