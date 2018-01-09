@@ -88,7 +88,7 @@
 <div class="mobile outer">
 	<div class="support"></div>
 	<div class="inner">
-		<b>Hallo mobiele gebruiker!</b><br />
+		<b>Hallo mobiele dierenzoeker!</b><br />
 		{if $deviceInfo.isiOS}
 		<a href="https://itunes.apple.com/nl/app/dierenzoeker/id699543364">
 		{else}
