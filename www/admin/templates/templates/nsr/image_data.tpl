@@ -63,7 +63,8 @@
 			</td>
         </tr>
         {/foreach}
-        {foreach $meta_rest v k}
+
+        {foreach $meta_data_fields v k}
 	    <tr>
         	<td style="text-align:right">
 		        {$v}:
