@@ -23,8 +23,9 @@ function openeditor(caller)
 	var editor=CKEDITOR.replace('editor'+id,
 	{
 		toolbar:'Basic',
-		height: 300,
+		height: 300 /*,
 		entities_processNumerical: true
+		*/
 	});
 
 	editor.on( 'dataReady', function( evt )
