@@ -4235,7 +4235,7 @@ class SpeciesController extends Controller
 
             $this->models->ContentTaxa->execute(
             'update %table%
-					set content = replace(content,"[new litref]","' . mysql_real_escape_string($_SESSION['admin']['system']['literature']['newRef']) . '")
+					set content = replace(content,"[new litref]","' .  $this->models->Taxa->escapeString($_SESSION['admin']['system']['literature']['newRef']) . '")
 					where project_id = ' . $this->getCurrentProjectId() . '
 					and taxon_id = ' . $id);
         }
@@ -4244,7 +4244,7 @@ class SpeciesController extends Controller
 
             $this->models->ContentTaxa->execute(
             'update %table%
-					set content = replace(content,"[new media]","' . mysql_real_escape_string($_SESSION['admin']['system']['media']['newRef']) . '")
+					set content = replace(content,"[new media]","' .  $this->models->Taxa->escapeString($_SESSION['admin']['system']['media']['newRef']) . '")
 					where project_id = ' . $this->getCurrentProjectId() . '
 					and taxon_id = ' . $id);
         }
@@ -4749,7 +4749,7 @@ class SpeciesController extends Controller
 
 				where
 					_a.project_id =  ".$this->getCurrentProjectId()."
-					and _a.name like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
+					and _a.name like '".($matchStartOnly ? '':'%'). $this->models->Taxa->escapeString($search)."%'
 					and _a.type_id != ".
 						(
 							isset($this->_nameTypeIds[PREDICATE_VALID_NAME]['id']) ?
@@ -4781,7 +4781,7 @@ class SpeciesController extends Controller
 
 			where
 				_b.project_id = ".$this->getCurrentProjectId()."
-				and _b.taxon like '".($matchStartOnly ? '':'%').mysql_real_escape_string($search)."%'
+				and _b.taxon like '".($matchStartOnly ? '':'%'). $this->models->Taxa->escapeString($search)."%'
 
 			) as unification
 			where 1=1

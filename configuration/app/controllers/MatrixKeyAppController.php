@@ -69,7 +69,7 @@ class MatrixKeyAppController extends Controller
 			if (!isset($data['language']))
 				$data['language']=$this->getDefaultLanguageId();
 
-			$res=$this->$functions[$data['query']]($data);
+			$res=$this->{$functions[$data['query']]}($data);
 		}
 		echo json_encode($res);
 	}

@@ -382,7 +382,7 @@ class SpeciesMediaController extends Controller
 				{
 					$d=$this->models->Taxon->freeQuery(
 						"select * from  %PRE%nsr_ids where nsr_id = 'tn.nlsr.concept/".
-						str_pad(mysql_real_escape_string($this->rGetVal('newid')),12,'0',STR_PAD_LEFT)."' and item_type = 'taxon'"
+						str_pad($this->models->MediaTaxon->escapeString($this->rGetVal('newid')),12,'0',STR_PAD_LEFT)."' and item_type = 'taxon'"
 					);
 
 					if ($d)

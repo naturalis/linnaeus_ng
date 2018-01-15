@@ -335,7 +335,7 @@ final class ControllerModel extends AbstractModel
 		$s = preg_replace('/(\s+)/',' ',$s);
 
 		if (strpos($s,' ')===0) {
-		    return mysql_real_escape_string($this->databaseConnection, $s);
+		    return mysqli_real_escape_string($this->databaseConnection, $s);
 		}
 
 		$s = str_replace(' ','|',$s);

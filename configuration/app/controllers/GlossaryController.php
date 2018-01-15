@@ -204,7 +204,8 @@ class GlossaryController extends Controller
 					array(
 						'project_id' => $this->getCurrentProjectId(),
 						'language_id' => $this->getCurrentLanguageId(),
-						'term like' => '%'. ($search=='*' ? '' : mysql_real_escape_string($search)).'%'
+						'term like' => '%'. ($search=='*' ? '' : 
+							mysqli_real_escape_string($this->databaseConnection, $search)).'%'
 					),
 				'columns' => 'id,term as label,"glossary" as source'
 			)
@@ -217,7 +218,8 @@ class GlossaryController extends Controller
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
 						'language_id' => $this->getCurrentLanguageId(),
-						'synonym like' => '%'.($search=='*' ? '' : mysql_real_escape_string($search)).'%'
+						'synonym like' => '%'.($search=='*' ? '' : 
+							mysqli_real_escape_string($this->databaseConnection, $search)).'%'
 						),
 					'columns' => 'glossary_id as id,synonym as label,"glossary synonym" as source'
 				)

@@ -309,11 +309,11 @@ class IntroductionController extends Controller
 
 			if ($matchStartOnly)
 			{
-				$match = mysql_real_escape_string($search).'%';
+				$match = mysqli_real_escape_string($this->databaseConnection, $search).'%';
 			}
 			else
 			{
-				$match = '%'.mysql_real_escape_string($search).'%';
+				$match = '%'.mysqli_real_escape_string($this->databaseConnection, $search).'%';
 			}
 
 			$d['topic like'] = $match;

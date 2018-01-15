@@ -101,9 +101,10 @@
 	<li>
 		<div class="list-grid-info">
 			{if $input_type == 'single'}
-				<input type="radio" name="media_ids" value="%MEDIA_ID%" id="id_%MEDIA_ID%" %CHECKED%>
+				<input type="radio" name="media_ids" value="%MEDIA_ID%" id="id_%MEDIA_ID%" %CHECKED% >
 			{else}
-				<input type="checkbox" name="media_ids[%MEDIA_ID%]" id="id_%MEDIA_ID%" %CHECKED%>
+				{* <input type="checkbox" name="media_ids[%MEDIA_ID%]" id="id_%MEDIA_ID%" %CHECKED%> *}
+				<input type="checkbox" name="media_ids[%MEDIA_ID%]" id="id_%MEDIA_ID%" %CHECKED% >
 			{/if}
 			%URL_START%
 	 			<img class="thumbnail" src="%THUMBNAIL_SRC%" alt="%FILE_NAME%" />
@@ -214,6 +215,9 @@ function displayMedia () {
 		if (media.files[i].attached == '1') {
 			checked = 'checked disabled';
 		}
+		
+		console.dir(tpl);
+		
 		output += tpl.replace(/\%MEDIA_ID\%/g, media.files[i].media_id)
 		   .replace(/\%FILE_NAME\%/g, media.files[i].file_name)
 		   .replace('%THUMBNAIL_SRC%', media.files[i].thumbnails.medium)
@@ -225,6 +229,7 @@ function displayMedia () {
 		   .replace('%CHECKED%', checked);
 	}
 	$("#media-files").html(output);
+	//console.dir(output);
 }
 
 

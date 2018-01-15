@@ -59,8 +59,8 @@ final class GlossaryModel extends AbstractModel
 		if ($b) $b = '('.rtrim($b,',').')';
 
         $query = 'select * from  %PRE%glossary where
-			(term like "%' . mysql_real_escape_string($search) . '%"
-			or definition like "%' . mysql_real_escape_string($search) . '%" '.
+			(term like "%' . mysqli_real_escape_string($this->databaseConnection, $search) . '%"
+			or definition like "%' . mysqli_real_escape_string($this->databaseConnection, $search) . '%" '.
 			($b ? 'or id in '. $b .') ' : '').
 			'and project_id = ' . $projectId . '
 		    order by language_id,term';

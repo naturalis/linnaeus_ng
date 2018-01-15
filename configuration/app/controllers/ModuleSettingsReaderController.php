@@ -107,11 +107,11 @@ class ModuleSettingsReaderController extends Controller
 		{
 			if ( is_null($val['value']) && $this->getUseDefaultWhenNoValue() && !is_null($val['default_value']) )
 			{
-				$settings->$val['setting']=$val['default_value'];
+				$settings->{$val['setting']}=$val['default_value'];
 			}
 			else
 			{
-				$settings->$val['setting']=$val['value'];
+				$settings->{$val['setting']}=$val['value'];
 			}
 		}
 	}
@@ -123,11 +123,11 @@ class ModuleSettingsReaderController extends Controller
 		{
 			if ( is_null($val['value']) && $this->getUseDefaultWhenNoValue() && !is_null($val['default_value']) )
 			{
-				$settings->$val['setting']=$val['default_value'];
+				$settings->{$val['setting']}=$val['default_value'];
 			}
 			else
 			{
-				$settings->$val['setting']=$val['value'];
+				$settings->{$val['setting']}=$val['value'];
 			}
 		}
 	}

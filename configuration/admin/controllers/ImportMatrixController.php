@@ -1447,8 +1447,8 @@ class ImportMatrixController extends Controller
 								'project_id  = '.$pId. ' and
 								language_id = '.$thisLanguage. ' and
 								(
-									lower(label) = \''. mysql_real_escape_string(strtolower($val[1])) .'\' or
-									label like \''. mysql_real_escape_string(strtolower($val[1])) .'|%\'
+									lower(label) = \''. $this->models->CharacteristicsLabels->escapeString(strtolower($val[1])) .'\' or
+									label like \''. $this->models->CharacteristicsLabels->escapeString(strtolower($val[1])) .'|%\'
 								)'
 						)
 					);

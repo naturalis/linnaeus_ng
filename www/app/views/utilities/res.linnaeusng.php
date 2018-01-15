@@ -13,7 +13,7 @@
 //		const searchURL = 'http://linnaeus/app/views/linnaeus/r_search.php?search=%s&p=64&l=26'; //26 = def english
 		const searchURL = 'http://dev.eti.uva.nl/linnaeus_ng/app/views/linnaeus/r_search.php?search=%s&p=64&l=26'; //26 = def english
 
-		function linnaeusNG($searchString,$maxResults=false,$languageID=false,$outputMode=false) {
+		function __construct($searchString,$maxResults=false,$languageID=false,$outputMode=false) {
 		
 			$this->searchString = stripslashes('"'.$searchString.'"');
 
