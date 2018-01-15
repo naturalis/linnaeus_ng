@@ -52,7 +52,8 @@ div.pp_default .pp_description {
 
 {capture caption}
 {if $overview_image.meta_data.beeldbankOmschrijving.meta_data}<b>{$overview_image.meta_data.beeldbankOmschrijving.meta_data}</b><br />{/if}
-{if $overview_image.meta_data.beeldbankFotograaf.meta_data}Gemaakt door: {$overview_image.meta_data.beeldbankFotograaf.meta_data}{/if}
+{if $overview_image.meta_data.beeldbankFotograaf.meta_data}Gemaakt door: {$overview_image.meta_data.beeldbankFotograaf.meta_data}<br />{/if}
+{if $overview_image.meta_data.beeldbankLicentie.meta_data}Licentie: {$overview_image.meta_data.beeldbankLicentie.meta_data}{/if}
 {/capture}
 
 <div class="illustratie-wrapper">

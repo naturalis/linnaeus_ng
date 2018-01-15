@@ -20,13 +20,18 @@ function openeditor(caller)
 	$('#body'+id).addClass('passport-body-no-line');
 	$('#content'+id).html('<textarea id="editor'+id+'">'+$('#content'+id).html()+'</textarea>');
 
-	var editor=CKEDITOR.replace('editor'+id,{toolbar:'Basic',height: 300});
-
-	editor.on( 'dataReady', function( evt ) {
-		currenttexts[id]=evt.editor.getData();
-		//console.dir(currenttexts);
+	var editor=CKEDITOR.replace('editor'+id,
+	{
+		toolbar:'Basic',
+		height: 300 /*,
+		entities_processNumerical: true
+		*/
 	});
 
+	editor.on( 'dataReady', function( evt )
+	{
+		currenttexts[id]=evt.editor.getData();
+	});
 }
 
 function reverttext(caller)

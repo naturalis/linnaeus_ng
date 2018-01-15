@@ -116,16 +116,26 @@ class NsrTaxonImagesController extends NsrController
 			$this->addMessage( $this->translate('Metadata saved.') );
 		}
 
-		$image=$this->getTaxonMedia(array('media_id'=>$this->rGetId()));
-		$meta=$this->getTaxonMediaMetaDataFields();
+		
+		$meta_data_fields=
+			array_unique(
+				array_merge(
+					// pre-defined metadata fields
+					$this->availableMetaDataFields,
+					// metadata fields actually in use
+					$this->getTaxonMediaMetaDataFields()
+				)
+			);
 
+		$image=$this->getTaxonMedia(array('media_id'=>$this->rGetId()));
+		
 		foreach((array)$image['data'][0]['meta'] as $val)
 		{
-			unset($meta[array_search($val['sys_label'],$meta)]);;
+			unset($meta_data_fields[array_search($val['sys_label'],$meta_data_fields)]);;
 		}
 
 		$this->smarty->assign('image',$image);
-		$this->smarty->assign('meta_rest',$meta);
+		$this->smarty->assign('meta_data_fields',$meta_data_fields);
 
 		$this->printPage();
 	}
@@ -260,7 +270,7 @@ class NsrTaxonImagesController extends NsrController
 		$this->smarty->assign('checks',$checks);
 		$this->smarty->assign('matches',$matches);
 		$this->smarty->assign('fields',$fields);
-		$this->smarty->assign('cols',$this->availableMetaDataFields);
+		$this->smarty->assign('cols',array_merge([$this->sys_label_file_name,$this->sys_label_NSR_ID,''], $this->availableMetaDataFields));
 		$this->smarty->assign('raw',$raw);
 		$this->smarty->assign('ignorefirst',$ignorefirst);
 		$this->smarty->assign('no_image_exist_check',$no_image_exist_check);
@@ -293,10 +303,6 @@ class NsrTaxonImagesController extends NsrController
 			'columns'=>'id,nametype',
 			'fieldAsIndex'=>'nametype'
 		));
-
-		array_unshift($this->availableMetaDataFields,'');
-		array_unshift($this->availableMetaDataFields,$this->sys_label_NSR_ID);
-		array_unshift($this->availableMetaDataFields,$this->sys_label_file_name);
 
 		$this->moduleSettings=new ModuleSettingsReaderController;
 		$this->taxon_main_image_base_url=$this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_main','module'=>'species','subst'=>'http://images.naturalis.nl/original/') );
