@@ -278,7 +278,7 @@ class ExportAppController extends Controller
 		$this->_exportDump->ContentTaxa = $this->models->ContentTaxa->_get(array('id' => $where));
 		foreach((array)$this->_exportDump->ContentTaxa as $key=>$val)
 		{
-			$this->_exportDump->ContentTaxa[$key]['content']=trim(preg_replace('/<([^>]*)>/i', ' ', $val['content']));
+			$this->_exportDump->ContentTaxa[$key]['content']=trim(html_entity_decode(preg_replace('/<([^>]*)>/i', ' ', $val['content'])));
 		}
 
 		$this->_exportDump->MediaTaxon = $this->models->MediaTaxon->_get(array('id' => $where + ['overview_image' => 1 ]));
@@ -454,7 +454,6 @@ class ExportAppController extends Controller
 		}
 
 		$buffer[]="rmdir ".$tempdir;
-echo '<pre>';
 /*
 		header('Cache-Control: public');
 		header('Content-Description: File Transfer');
