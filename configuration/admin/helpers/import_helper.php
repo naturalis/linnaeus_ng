@@ -393,7 +393,7 @@ class ImportHelper
 	{
 		if (is_dir($dir)) {
 
-			$objects = scandir($dir);
+			$objects = scandir($dir,0);
 
 			foreach ($objects as $object) {
 

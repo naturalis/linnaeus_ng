@@ -1422,7 +1422,7 @@ class MatrixKeyController extends Controller
                 $result = false;
             }
             else
-			if ($data['lower'] != strval(floatval($data['lower'])))
+			if ($data['lower'] != (string)(float)$data['lower'])
 			{
                 $this->addError($this->translate('Invalid value for the lower boundary (must be integer or real).'));
                 $result = false;
@@ -1434,19 +1434,19 @@ class MatrixKeyController extends Controller
                 $result = false;
             }
             else
-			if ($data['upper'] != strval(floatval($data['upper'])))
+			if ($data['upper'] != (string)(float)$data['upper'])
 			{
                 $this->addError($this->translate('Invalid value for the upper boundary (must be integer or real).'));
                 $result = false;
             }
 
-            if ($result && (floatval($data['upper']) < floatval($data['lower'])))
+            if ($result && ((float)$data['upper'] < (float)$data['lower']))
 			{
                 $this->addError($this->translate('The upper boundary value must be larger than the lower boundary value.'));
                 $result = false;
             }
             else
-			if ($result && (floatval($data['upper']) == floatval($data['lower'])))
+			if ($result && ((float)$data['upper'] == (float)$data['lower']))
 			{
                 $this->addError($this->translate('The upper and lower boundary values cannot be the same.'));
                 $result = false;
@@ -1461,7 +1461,7 @@ class MatrixKeyController extends Controller
                 $result = false;
             }
             else
-			if ($data['mean'] != strval(floatval($data['mean'])))
+			if ($data['mean'] != (string)(float)$data['mean'])
 			{
                 $this->addError($this->translate('Invalid value for the mean (must be integer or real).'));
                 $result = false;
@@ -1472,7 +1472,7 @@ class MatrixKeyController extends Controller
                 $this->addError($this->translate('The value for one standard deviation is required.'));
                 $result = false;
             }
-            elseif ($data['sd'] != strval(floatval($data['sd'])) && $data['mean'] !== '0')
+            elseif ($data['sd'] != (string)(float)$data['sd'] && $data['mean'] !== '0')
 			{
                 $this->addError($this->translate('Invalid value for one standard deviation (must be integer or real).'));
                 $result = false;
@@ -1960,7 +1960,7 @@ class MatrixKeyController extends Controller
     private function saveCharacterGroup($p=null)
     {
 
-        $matrixId = isset($matrixId) ? $matrixId : $this->getCurrentMatrixId();
+        $matrixId = $this->getCurrentMatrixId();
         $label = isset($p['label']) ? trim($p['label']) : null;
 
 		if (is_null($label))
@@ -2088,7 +2088,7 @@ class MatrixKeyController extends Controller
 
     private function getCharacterGroups ($p=null)
     {
-        $matrixId = isset($matrixId) ? $matrixId : $this->getCurrentMatrixId();
+        $matrixId = $this->getCurrentMatrixId();
         $groupId = isset($p['groupId']) ? $p['groupId'] : null;
         $label = isset($p['label']) ? trim($p['label']) : null;
 

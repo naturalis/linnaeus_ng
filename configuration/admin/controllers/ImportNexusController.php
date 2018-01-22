@@ -128,7 +128,8 @@ class ImportNexusController extends Controller
 				$d=preg_split('/\n/',$d);
 				$charindex=explode(' ',preg_replace(array('/\[CHARACTERS(\s+)/','/(\s+)/'),array('',' '),trim($d[0])));
 				$taxa=array();
-				for($i=2;$i<count($d);$i++) {
+				$dCount = count($d);
+				for($i=2;$i<$dCount;$i++) {
 					$val=trim($d[$i]);
 					if (strpos($val,';')!==false)
 						continue;

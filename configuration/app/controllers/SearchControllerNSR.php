@@ -474,7 +474,7 @@ class SearchControllerNSR extends SearchController
 			$pres=array();
 			foreach((array)$p['presence'] as $key=>$val)
 			{
-				if ($val=='on') $pres[]=intval($key);
+				if ($val=='on') $pres[]= (int)$key;
 			}
 		}
 
@@ -529,6 +529,7 @@ class SearchControllerNSR extends SearchController
 			}
 		}
 
+        // @check_this: ancestor not defined or set in this scope, should it be ancestor_id instead?
 		return
 			array(
 				'count'=>$count,
@@ -584,7 +585,7 @@ class SearchControllerNSR extends SearchController
 		else
 		if (!empty($p['group_id']))
 		{
-			$group_id=intval($p['group_id']);
+			$group_id= (int)$p['group_id'];
 		}
 
 		if (!empty($p['name']))
@@ -594,7 +595,7 @@ class SearchControllerNSR extends SearchController
 
 		if (!empty($p['name_id']))
 		{
-			$name_id=intval($p['name_id']);
+			$name_id= (int)$p['name_id'];
 		}
 
 		if ( !empty($name) && !empty($name_id) )
@@ -616,7 +617,6 @@ class SearchControllerNSR extends SearchController
 			"photographer"=>$photographer,
 			"validator"=>$validator,
 			"project_id"=>$this->getCurrentProjectId(),
-			"group_id"=>$group_id,
 			"name_id"=>$name_id,
 			"sort"=>$sort,
 			"limit"=>$limit,
@@ -996,6 +996,8 @@ class SearchControllerNSR extends SearchController
 			else
 			if (!empty($val['date']) || !empty($val['date_end'])  && !empty($val['date_format_format']))
 			{
+			    // @TODO: Check the expression above. May be unclear what it actually does.
+
 				if (!empty($val['date']))
 				{
 					$r[$key]['date']=$this->formatDbDate($val['date'],$val['date_format_format']);

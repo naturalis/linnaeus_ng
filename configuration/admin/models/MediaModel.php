@@ -1,5 +1,5 @@
 <?php
-include_once (dirname(__FILE__) . "/AbstractModel.php");
+include_once (__DIR__ . "/AbstractModel.php");
 
 final class MediaModel extends AbstractModel
 {
@@ -82,8 +82,7 @@ final class MediaModel extends AbstractModel
             $groupBy = 't1.`id`';
         }
 
-        if (!isset($search['metadata']) && !isset($search['tags']) &&
-            !isset($search['file_name']) || !$projectId) {
+        if (!isset($search['metadata']) && !isset($search['tags']) && !isset($search['file_name']) || !$projectId) {
             return false;
         }
 

@@ -146,7 +146,7 @@ class UtilitiesController extends Controller
 		$this->smarty->assign('iniSettings', array(
 			'upload_max_filesize' => ini_get('upload_max_filesize'),
 			'post_max_size' => ini_get('post_max_size'),
-			'maximum' => min(intval(ini_get('post_max_size')),intval(ini_get('upload_max_filesize')))
+			'maximum' => min((int)ini_get('post_max_size'), (int)ini_get('upload_max_filesize'))
 		));
 
         $this->printPage();

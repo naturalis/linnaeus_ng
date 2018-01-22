@@ -347,7 +347,7 @@ class UsersController extends Controller
 		$this->helpers->EmailHelper->setUsername( $this->emailSettings->username );
 		$this->helpers->EmailHelper->setPassword( $this->emailSettings->password );
 		$this->helpers->EmailHelper->setSMTPSecure( $this->emailSettings->encryption );
-		$this->helpers->EmailHelper->setPort( intval($this->emailSettings->port) );
+		$this->helpers->EmailHelper->setPort((int)$this->emailSettings->port);
 		$this->helpers->EmailHelper->setSender( [ $this->emailSettings->sender_mail, $this->emailSettings->sender_name ]  );
 		$this->helpers->EmailHelper->addRecipient( [ $user['email_address'], $user['first_name']. ' '. $user['last_name'] ] );
 		$this->helpers->EmailHelper->addSubject( $this->translate('Linnaeus NG password reset') );

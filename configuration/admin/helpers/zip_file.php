@@ -39,7 +39,7 @@ class ZipFile
     private function setFileName( $filename )
 	{
 		$this->_filename=$filename; 
-		$this->_filename=strtolower(substr($this->_filename,-4))==".zip" ? substr($this->_filename,0,strlen($this->_filename)-4) : $this->_filename;
+		$this->_filename=strtolower(substr($this->_filename,-4))==".zip" ? substr($this->_filename,0,-4) : $this->_filename;
 	}
 
 }

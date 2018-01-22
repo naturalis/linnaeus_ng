@@ -80,7 +80,7 @@ class TranslatorController
     {
         $this->models = new stdClass();
 
-        require_once dirname(__FILE__) . '/../models/Table.php';
+        require_once __DIR__ . '/../models/Table.php';
 
         foreach ((array) $this->usedModels as $key)
 		{

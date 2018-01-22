@@ -211,7 +211,7 @@ class NsrTaxonManagement extends NsrController
 
         if ($this->rHasVal('ranks') && !$this->isFormResubmit())
         {
-            $pr = $this->newGetProjectRanks();
+            $newPr = $this->newGetProjectRanks();
 
             $parent = 'null';
 
@@ -269,29 +269,29 @@ class NsrTaxonManagement extends NsrController
             ));
 
 
-            foreach ((array) $pr as $key => $rank) {
+            foreach ((array) $newPr as $key => $newRank) {
 
-                if (!in_array($rank['rank_id'], $this->rGetVal('ranks'))) {
+                if (!in_array($newRank['rank_id'], $this->rGetVal('ranks'))) {
 
-                    $pr = $this->models->ProjectsRanks->_get(
+                    $oldPr = (array)$this->models->ProjectsRanks->_get(
                     array(
                         'id' => array(
                             'project_id' => $this->getCurrentProjectId(),
-                            'rank_id' => $rank['rank_id']
+                            'rank_id' => $newRank['rank_id']
                         )
                     ));
 
-                    foreach ((array) $pr as $key => $val) {
+                    foreach ($oldPr as $oldkey => $oldRank) {
 
                         $this->models->LabelsProjectsRanks->delete(array(
                             'project_id' => $this->getCurrentProjectId(),
-                            'project_rank_id' => $val['id']
+                            'project_rank_id' => $oldRank['id']
                         ));
                     }
 
                     $this->models->ProjectsRanks->delete(array(
                         'project_id' => $this->getCurrentProjectId(),
-                        'rank_id' => $rank['rank_id']
+                        'rank_id' => $newRank['rank_id']
                     ));
                 }
             }

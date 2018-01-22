@@ -1,5 +1,5 @@
 <?php
-include_once (dirname(__FILE__) . "/AbstractModel.php");
+include_once (__DIR__ . "/AbstractModel.php");
 
 class SpeciesModel extends AbstractModel
 {
@@ -104,7 +104,7 @@ class SpeciesModel extends AbstractModel
         $taxa = $this->freeQuery($query);
 
 		$count = $this->freeQuery('select found_rows() as total');
-		$total = $count[0]['total'];
+        $total = isset($count) ? $count[0]['total'] : 0;
 
 		// Non-associative array, so list() can be used to quickly assign variables in controller
 		return array($taxa, $total);
@@ -732,7 +732,7 @@ class SpeciesModel extends AbstractModel
 
         $d = $this->freeQuery($query);
 
-		return $d[0]['total'] > 0;
+		return isset($d) ? ($d[0]['total'] > 0) : false;
     }
 
     public function getFirstTaxonIdNsr($params)
@@ -1041,7 +1041,7 @@ class SpeciesModel extends AbstractModel
         $media = $this->freeQuery($query);
 
 		$count = $this->freeQuery('select found_rows() as total');
-		$total = $count[0]['total'];
+		$total = isset($count) ? $count[0]['total'] : 0;
 
 		// Non-associative array, so list() can be used to quickly assign variables in controller
 		return array($media, $total);
@@ -1213,7 +1213,7 @@ class SpeciesModel extends AbstractModel
         $media = $this->freeQuery($query);
 
 		$count = $this->freeQuery('select found_rows() as total');
-		$total = $count[0]['total'];
+		$total = isset($count) ? $count[0]['total'] : 0;
 
 		// Non-associative array, so list() can be used to quickly assign variables in controller
 		return array($media, $total);

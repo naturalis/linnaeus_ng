@@ -17,7 +17,7 @@
 
 // Included nicejson function to beautify the result JSON file.
 // This library is not mandatory.
-if( file_exists(dirname(__FILE__).'/nicejson/nicejson.php') ) {
+if( file_exists( dirname(__FILE__) .'/nicejson/nicejson.php') ) {
 	include_once dirname(__FILE__).'/nicejson/nicejson.php';
 }
 

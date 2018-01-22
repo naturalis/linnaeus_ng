@@ -328,7 +328,12 @@ class FileUploadHelper
     {
 	
 		if (file_exists($dir.$filename.'.'.$extension)) {
-			
+
+            if ($this->_overwrite=='skip') {
+
+                return null;
+
+            }
 			if ($this->_overwrite=='overwrite') {
 
 				$d = unlink($dir.$filename.'.'.$extension);
@@ -337,12 +342,7 @@ class FileUploadHelper
 					$this->addError(_('Could not delete existing file '.$filename.'.'.$extension));
 					return false;
 				}
-			} else
-			if ($this->_overwrite=='skip') {
-
-				return null;
-	
-			} else
+			}
 			if ($this->_overwrite=='rename') {
 				// default behaviour below
 			} 
@@ -513,7 +513,7 @@ class FileUploadHelper
 	{
 		if (is_dir($dir)) {
 
-			$objects = scandir($dir);
+			$objects = scandir($dir,0);
 
 			foreach ($objects as $object) {
 

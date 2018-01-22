@@ -245,7 +245,7 @@ class TraitsController extends Controller
 		return $r;
 	}
 
-	public function __null_check($value,$trait)
+	public function _null_check($value,$trait)
 	{
 		if (empty($value))
 		{
@@ -347,7 +347,7 @@ class TraitsController extends Controller
 		$value=isset($p['value']) ? $p['value'] : null;
 		$trait=isset($p['trait']) ? $p['trait'] : null;
 		
-		$check=$this->__null_check($value,$trait);
+		$check=$this->_null_check($value,$trait);
 		if (!empty($check)) return $check;
 
 		$value=strtolower($value);
@@ -376,7 +376,7 @@ class TraitsController extends Controller
 		$boolean_data=isset($p['boolean_data']) ? $p['boolean_data'] : null;
 		$actual_value=isset($p['actual_value']) ? $p['actual_value'] : null;
 
-		$check=$this->__null_check($value,$trait);
+		$check=$this->_null_check($value,$trait);
 		if (!empty($check)) return $check;
 
 		if ($boolean_data)
@@ -424,7 +424,7 @@ class TraitsController extends Controller
 		$trait=isset($p['trait']) ? $p['trait'] : null;
 		$actual_value=isset($p['actual_value']) ? $p['actual_value'] : null;
 
-		$check=$this->__null_check($value,$trait);
+		$check=$this->_null_check($value,$trait);
 		if (!empty($check)) return $check;
 		
 		if ($boolean_data)
@@ -459,7 +459,7 @@ class TraitsController extends Controller
 		$value=isset($p['value']) ? $p['value'] : null;
 		$trait=isset($p['trait']) ? $p['trait'] : null;
 
-		$check=$this->__null_check($value,$trait);
+		$check=$this->_null_check($value,$trait);
 		if (!empty($check)) return $check;
 
 		$check=$this->__free_string_length_check($value,$trait);
@@ -477,7 +477,7 @@ class TraitsController extends Controller
 		$value=isset($p['value']) ? $p['value'] : null;
 		$trait=isset($p['trait']) ? $p['trait'] : null;
 
-		$check=$this->__null_check($value,$trait);
+		$check=$this->_null_check($value,$trait);
 		if (!empty($check)) return $check;
 
 		

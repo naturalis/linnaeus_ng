@@ -1,5 +1,5 @@
 <?php
-include_once (dirname(__FILE__) . "/SpeciesModel.php");
+include_once (__DIR__ . "/SpeciesModel.php");
 
 /* This model is a clone of SpeciesModel */
 

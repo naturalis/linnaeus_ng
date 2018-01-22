@@ -325,12 +325,12 @@ class SpeciesController extends Controller
 
             $media=$this->getTaxonMedia( [ 'taxon'=>$val['relation_id'],'forceOld'=>true ] );
 
-            foreach((array)$media as $val)
+            foreach((array)$media as $file)
             {
-                if ($val['overview_image']==1)
+                if ($file['overview_image']==1)
                 {
-                    $related[$key]['url_image'] = $val['file_name'];
-                    $related[$key]['url_thumbnail'] = $val['thumb_name'];
+                    $related[$key]['url_image'] = $file['file_name'];
+                    $related[$key]['url_thumbnail'] = $file['thumb_name'];
                 }
             }
 		}
@@ -348,14 +348,14 @@ class SpeciesController extends Controller
 		foreach((array)$children as $key => $val)
 		{
 
-            $media=$this->getTaxonMedia( [ 'taxon'=>$val['id'],'forceOld'=>true ] );
+            $media=(array)$this->getTaxonMedia( [ 'taxon'=>$val['id'],'forceOld'=>true ] );
 
-            foreach((array)$media as $val)
+            foreach($media as $file)
             {
-                if ($val['overview_image']==1)
+                if ($file['overview_image']==1)
                 {
-                    $children[$key]['url_image'] = $val['file_name'];
-                    $children[$key]['url_thumbnail'] = $val['thumb_name'];
+                    $children[$key]['url_image'] = $file['file_name'];
+                    $children[$key]['url_thumbnail'] = $file['thumb_name'];
                 }
             }
 
@@ -381,7 +381,7 @@ class SpeciesController extends Controller
 			)
 		);
 		
-		$media=$this->getTaxonMedia( [ 'taxon'=>$this->rGetVal('id'),'forceOld'=>true ] );
+		$media=(array)$this->getTaxonMedia( [ 'taxon'=>$this->rGetVal('id'),'forceOld'=>true ] );
 
 		$contentparent = $this->models->ContentTaxa->_get(array(
 			'id' =>  array(
@@ -536,28 +536,26 @@ class SpeciesController extends Controller
             ));
 
 		}
+		$taxa = $browseOrder[$this->getTaxonType()];
 
 		$prev=$next=false;
-		while (list ($key, $val) = each($browseOrder[$this->getTaxonType()])) {
+
+        $keys = array_keys($taxa);
+        foreach ($keys as $index => $key)
+        {
+            $val = $taxa[$key];
 
 			if ($val['id']==$id) {
 
-				// current = next because the pointer has already shifted forward
-				$next = current($browseOrder[$this->getTaxonType()]);
+                $next = array_key_exists($index+1, $keys) ? $taxa[$keys[$index+1]] : null;
 
 				return array(
-					'prev' => $prev!==false ? array(
-						'id' => $prev['id'],
-						'label' => $prev['taxon']
-					) : null,
-					'next' => $next!==false ? array(
-						'id' => $next['id'],
-						'label' => $next['taxon']
-					) : null
+					'prev' => $prev!==false ? array( 'id' => $prev['id'], 'label' => $prev['taxon'] ) : null,
+					'next' => $next!==false ? array( 'id' => $next['id'], 'label' => $next['taxon'] ) : null
 				);
 			}
 
-			$prev=$val;
+			$prev = $val;
 
 		}
 
@@ -1234,7 +1232,7 @@ class SpeciesController extends Controller
         $search = isset($p['search']) ? $p['search'] : null;
         $matchStartOnly = isset($p['match_start']) ? $p['match_start'] == '1' : false;
         $getAll = isset($p['get_all']) ? $p['get_all'] == '1' : false;
-		$listMax = isset($p['list_max']) ? ($p['list_max']=='0' ? null : intval($p['list_max'])) : $this->_lookupListMaxResults;
+		$listMax = isset($p['list_max']) ? ($p['list_max']=='0' ? null : (int)$p['list_max']) : $this->_lookupListMaxResults;
 
         if (empty($search) && !$getAll)
             return;
@@ -1252,12 +1250,12 @@ class SpeciesController extends Controller
 			}
 		}
 
-        list($taxa, $total) = $this->models->{$this->_model}->getTaxa(array(
+        [$taxa, $total] = $this->models->{$this->_model}->getTaxa(array(
             'projectId' => $this->getCurrentProjectId(),
             'taxonType' => $lower ? 'lower' : 'higher', //$this->getTaxonType(),
             'getAll' => $getAll,
             'listMax' => $listMax,
-            'regExp' => ($matchStartOnly?'^':'').preg_quote($search)
+            'regExp' => ($matchStartOnly?'^':'').preg_quote($search, '/')
         ));
 
 		$ranks=$this->getProjectRanks();

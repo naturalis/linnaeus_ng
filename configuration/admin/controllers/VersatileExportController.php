@@ -140,13 +140,10 @@ class VersatileExportController extends Controller
 			}
 		}
 		
-		foreach ((array)$this->columnHeaders as $key=>$val)
+		foreach ($this->columnHeaders as $key=>$val)
 		{
-			foreach((array)$this->columnHeaders as $key=>$val)
-			{
-				$this->columnHeaders[$key]=$this->translate($val);
-			}
-		}		
+            $this->columnHeaders[$key]=$this->translate($val);
+		}
     }
 
     public function exportAction()

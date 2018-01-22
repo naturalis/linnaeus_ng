@@ -154,7 +154,7 @@ class ImportSDDController extends ImportController
 
         if ($_SESSION['admin']['system']['import']['file']['path']  && !$this->isFormResubmit()) {
 
-			$xml=simplexml_load_file($_SESSION['admin']['system']['import']['file']['path']);
+			$xml = simplexml_load_string(file_get_contents($_SESSION['admin']['system']['import']['file']['path']));
 
 			// matrix name
 			$matrixname=(string)$xml->Dataset->Representation->Label;

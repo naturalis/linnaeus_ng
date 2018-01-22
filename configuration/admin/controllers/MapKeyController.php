@@ -1013,7 +1013,7 @@ class MapKeyController extends Controller
 
 		if (empty($search)) return;
 		
-		$regexp = '/'.preg_quote($search).'/i';
+		$regexp = '/'.preg_quote($search,'/').'/i';
 
 		$l = array();
 		
@@ -2034,11 +2034,11 @@ class MapKeyController extends Controller
 	
 		$this->models->L2OccurrenceTaxonCombi->delete(array('project_id' => $this->getCurrentProjectId()));
 
-		$t = $this->getGeodataTypes();
+		$t = (array) $this->getGeodataTypes();
 		
-		foreach((array)$t as $key => $val) {
+		foreach($t as $key => $val) {
 	
-			$ot = $this->models->L2OccurrenceTaxon->_get(
+			$ot = (array)$this->models->L2OccurrenceTaxon->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
@@ -2053,16 +2053,17 @@ class MapKeyController extends Controller
 			$prev = null;
 			$divIndex = array();
 	
-			foreach((array)$ot as $key => $val) {
+			foreach ($ot as $key => $occurrence) {
 			
 				// preparing diversity index
-				if (isset($divIndex[$val['map_id']][$val['square_number']][$val['type_id']]))
-					$divIndex[$val['map_id']][$val['square_number']][$val['type_id']]++;
-				else
-					$divIndex[$val['map_id']][$val['square_number']][$val['type_id']]=1;
+				if (isset($divIndex[$occurrence['map_id']][$occurrence['square_number']][$occurrence['type_id']])) {
+                    $divIndex[$occurrence['map_id']][$occurrence['square_number']][$occurrence['type_id']]++;
+                } else {
+                    $divIndex[$occurrence['map_id']][$occurrence['square_number']][$occurrence['type_id']] = 1;
+                }
 	
 				// combined squares
-				if (!is_null($prev) && $prev != $val['taxon_id'].':'.$val['map_id'].':'.$val['type_id']) {
+				if (!is_null($prev) && $prev != $occurrence['taxon_id'].':'.$occurrence['map_id'].':'.$occurrence['type_id']) {
 				
 					$this->models->L2OccurrenceTaxonCombi->save(
 						array(
@@ -2079,9 +2080,9 @@ class MapKeyController extends Controller
 				
 				}
 	
-				$b .= $val['square_number'].',';
+				$b .= $occurrence['square_number'].',';
 				
-				$prev = $val['taxon_id'].':'.$val['map_id'].':'.$val['type_id'];
+				$prev = $occurrence['taxon_id'].':'.$occurrence['map_id'].':'.$occurrence['type_id'];
 		
 			}
 	

@@ -17,10 +17,7 @@ class ArrayToXml
 	public function toXml($data, $rootNodeName = 'data', $xml=null)
 	{
 		
-		// turn off compatibility mode as simple xml throws a wobbly if you don't.
-		if (ini_get('zend.ze1_compatibility_mode') == 1) ini_set ('zend.ze1_compatibility_mode', 0);
-		 
-		if ($xml == null) 
+		if ($xml == null)
 			/*$xml = simplexml_load_string("<?xml version='1.0' encoding='utf-8'?><$rootNodeName />");*/
 			$xml= new SimpleXMLExtended("<?xml version='1.0' encoding='utf-8'?><$rootNodeName />");
 		 

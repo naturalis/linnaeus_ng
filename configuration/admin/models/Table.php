@@ -1,6 +1,6 @@
 <?php
 
-include_once (dirname(__FILE__) . "/AbstractModel.php");
+include_once (__DIR__ . "/AbstractModel.php");
 
 final class Table extends AbstractModel
 {
@@ -29,10 +29,14 @@ final class Table extends AbstractModel
 
         $this->getTableColumnInfo();
 
+        /*
+         * @TODO: can we get rid of this?
+         *
         if (!$this->getTableExists()) {
 			// fatal stop disabled while we are transitioning from old to new LNG modules
             //die(_('FATAL: table "' . $this->tableName . '" does not exist'));
         }
+         */
 
     }
 

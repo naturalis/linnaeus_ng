@@ -1,5 +1,5 @@
 <?php
-include_once (dirname(__FILE__) . "/AbstractModel.php");
+include_once (__DIR__ . "/AbstractModel.php");
 
 final class KeyModel extends AbstractModel
 {

@@ -106,8 +106,8 @@
 
 if (!defined('GENERAL_SETTINGS_ID')) define('GENERAL_SETTINGS_ID',-1);
 
-include_once (dirname(__FILE__) . "/../BaseClass.php");
-include_once (dirname(__FILE__) . "/../../../smarty/Smarty.class.php");
+include_once (__DIR__ . "/../BaseClass.php");
+include_once (__DIR__ . "/../../../smarty/Smarty.class.php");
 
 class Controller extends BaseClass
 {
@@ -320,7 +320,7 @@ class Controller extends BaseClass
             if (!$p)
                 $this->setCurrentProjectId(null);
             else
-                $this->setCurrentProjectId(intval($this->rGetVal('p')));
+                $this->setCurrentProjectId((int)$this->rGetVal('p'));
         }
         else {
 
@@ -1960,28 +1960,28 @@ class Controller extends BaseClass
         $this->models = new stdClass();
 
         // Load base controller model first
-		require_once dirname(__FILE__) . '/../models/ControllerModel.php';
+		require_once __DIR__ . '/../models/ControllerModel.php';
 		$this->models->ControllerModel = new ControllerModel;
 
         $t = ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $this->getControllerBaseName())))) . 'Model';
 
-        if (file_exists(dirname(__FILE__) . '/../models/' . $t . '.php'))
+        if (file_exists(__DIR__ . '/../models/' . $t . '.php'))
 		{
-            require_once dirname(__FILE__) . '/../models/' . $t . '.php';
+            require_once __DIR__ . '/../models/' . $t . '.php';
             $this->models->$t = new $t;
         }
 
 		// Load controller-specific model by override
 		if ( isset($this->modelNameOverride) )
 		{
-			if (file_exists(dirname(__FILE__) . '/../models/' . $this->modelNameOverride . '.php'))
+			if (file_exists(__DIR__ . '/../models/' . $this->modelNameOverride . '.php'))
 			{
-				require_once dirname(__FILE__) . '/../models/' . $this->modelNameOverride . '.php';
+				require_once __DIR__ . '/../models/' . $this->modelNameOverride . '.php';
 				$this->models->{$this->modelNameOverride} = new $this->modelNameOverride;
 			}
 		}
 
-        require_once dirname(__FILE__) . '/../models/Table.php';
+        require_once __DIR__ . '/../models/Table.php';
 
         foreach ((array) $d as $key)
 		{
@@ -2112,9 +2112,9 @@ class Controller extends BaseClass
 
         foreach ((array) $d as $key) {
 
-            if (file_exists(dirname(__FILE__) . '/../helpers/' . $key . '.php')) {
+            if (file_exists(__DIR__ . '/../helpers/' . $key . '.php')) {
 
-                require_once (dirname(__FILE__) . '/../helpers/' . $key . '.php');
+                require_once (__DIR__ . '/../helpers/' . $key . '.php');
 
                 $c = str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
 
@@ -2139,15 +2139,14 @@ class Controller extends BaseClass
 				$logDir;
 
         	die();
-		} else
-		if (file_exists($logDir.$logFile) && !is_writable($logDir.$logFile)) {
-
-        	echo '<p>The main log file is not writeable.
-        	    Linnaeus NG cannot progress until this is corrected:</p>'.
-				$logDir.$logFile;
-
-        	die();
 		}
+        if (file_exists($logDir . $logFile) && !is_writable($logDir . $logFile)) {
+
+            echo '<p>The main log file is not writeable. Linnaeus NG cannot progress until this is corrected:</p>' .
+                $logDir . $logFile;
+
+            die();
+        }
 
         $this->helpers->LoggingHelper->setLogFile($logDir . $logFile );
         $this->helpers->LoggingHelper->setLevel(0);
@@ -3082,7 +3081,8 @@ class Controller extends BaseClass
 			'setting' => 'site_header_subtitle'
 		));
 
-		$this->_generalHeaderSubtitle = $d ? $d : null;
+        /** @noinspection ElvisOperatorCanBeUsedInspection */
+        $this->_generalHeaderSubtitle = $d ? $d : null;
 	}
 
 	protected function getGeneralHeaderSubtitle()

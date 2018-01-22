@@ -340,7 +340,7 @@ class ImportMatrixController extends Controller
 								{
 									$data['species'][$line]['related'][] = trim($cVal);
 								}
-								array_walk($data['species'][$line]['related'], create_function('&$val', '$val = trim($val);'));
+                                $data['species'][$line]['related'] = array_map('trim', $data['species'][$line]['related']);
 							}
 							// catch optional group (will turn into parent of rank family)
 							else
@@ -840,14 +840,12 @@ class ImportMatrixController extends Controller
 			
 			// insert all
 		}
-		else
-		if ( $this->taxon_treatment=='add' )
+		else if ( $this->taxon_treatment=='add' )
 		{
 			// insert if not exists
 			// match if does
 		}
-		else
-		if ( $this->taxon_treatment=='sync' )
+		else if ( $this->taxon_treatment=='sync' )
 		{
 			// insert if not exists
 			// match if does

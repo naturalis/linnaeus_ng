@@ -705,10 +705,8 @@ class MediaController extends Controller
                     'mime_type' => $file['type'],
                     'file_size' => $file['size'],
                     'rs_original' => $media->files[0]->src,
-                    'rs_resized_1' => isset($media->files[1]->src) ?
-                        $media->files[1]->src : null,
-                    'rs_resized_1' => isset($media->files[2]->src) ?
-                        $media->files[2]->src : null,
+                    'rs_resized_1' => $media->files[1]->src ?? null,
+                    'rs_resized_2' => $media->files[2]->src ?? null,
                     'rs_thumb_small' => $media->thumbnails->small,
                     'rs_thumb_medium' => $media->thumbnails->medium,
                     'rs_thumb_large' => $media->thumbnails->large
@@ -986,7 +984,7 @@ class MediaController extends Controller
 
     private function getUploadProgress ($formKey)
     {
-        if (!intval(ini_get('session.upload_progress.enabled')) || empty($formKey)) {
+        if (!(int)ini_get('session.upload_progress.enabled') || empty($formKey)) {
             return false;
         }
 

@@ -1,5 +1,5 @@
 <?php
-include_once (dirname(__FILE__) . "/AbstractModel.php");
+include_once (__DIR__ . "/AbstractModel.php");
 
 final class IndexModel extends AbstractModel
 {
@@ -217,7 +217,9 @@ final class IndexModel extends AbstractModel
 
 		$d=$this->freeQuery( [ 'query' => $query, 'fieldAsIndex' => 'lower_taxon' ] );
 
-		return ['has_lower'=>$d[1]['has_values']==1,'has_higher'=>$d[0]['has_values']==1];
+        if (!empty($d) && isset($d[0]) && isset($d[1])) {
+            return ['has_lower'=>$d[1]['has_values']==1,'has_higher'=>$d[0]['has_values']==1];
+        }
 	}
 
     public function getHasNames( $p )
@@ -244,7 +246,9 @@ final class IndexModel extends AbstractModel
 
         $d=$this->freeQuery( $query );
 
-		return [ 'has_names'=>$d[0]['total']>0 ];
+        if (!empty($d) && isset($d[0])) {
+            return [ 'has_names'=>$d[0]['total']>0 ];
+        }
     }
 
     public function getScientificNameList( $p )

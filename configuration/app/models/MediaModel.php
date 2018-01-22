@@ -1,5 +1,5 @@
 <?php
-include_once (dirname(__FILE__) . "/AbstractModel.php");
+include_once (__DIR__ . "/AbstractModel.php");
 
 final class MediaModel extends AbstractModel
 {
@@ -33,6 +33,7 @@ final class MediaModel extends AbstractModel
         $sort = isset($p['sort']) && !empty($p['sort']) ?
             $p['sort'] : 'name';
 
+        // @TODO: verify the expression! Hard to understand, may contain bug, rewrite or fix.
         if (!isset($search['metadata']) && !isset($search['tags']) &&
             !isset($search['file_name']) || !$projectId) {
             return false;

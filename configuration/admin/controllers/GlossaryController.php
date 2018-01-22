@@ -539,10 +539,7 @@ class GlossaryController extends Controller
 
 	private function embedGlossaryLink($matches)
 	{
-		if (trim($matches[0])=='')
-			return $matches[0];
-		else
-			return '<span class="glossary-term-highlight" onmouseover="glossTextOver('.$this->_currentGlossaryId.',this)">'.$matches[0].'</span>';
+        return trim($matches[0]) == '' ? $matches[0] : '<span class="glossary-term-highlight" onmouseover="glossTextOver(' . $this->_currentGlossaryId . ',this)">' . $matches[0] . '</span>';
 	}
 
 	private function getWordList($languageId,$force=false)

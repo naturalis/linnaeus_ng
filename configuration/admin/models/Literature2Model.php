@@ -1,5 +1,5 @@
 <?php
-include_once (dirname(__FILE__) . "/AbstractModel.php");
+include_once (__DIR__ . "/AbstractModel.php");
 
 final class Literature2Model extends AbstractModel
 {
@@ -185,7 +185,7 @@ final class Literature2Model extends AbstractModel
 					(is_array($publicationTypeId) ?
 						"_a.publication_type_id in (" . implode(",",array_map('intval',$publicationTypeId)). ")" :
 						"_a.publication_type_id = " .
-					        mysqli_real_escape_string($this->databaseConnection, intval($publicationTypeId)) ) :
+					        mysqli_real_escape_string($this->databaseConnection, (int)$publicationTypeId) ) :
 					"" )."" .
 
                 ($incomplete ? ' and _a.actor_id = -1' : '');

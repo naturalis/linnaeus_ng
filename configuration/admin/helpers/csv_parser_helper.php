@@ -149,7 +149,8 @@ class CsvParserHelper
 			}
 
 			$is_text=true;
-			for($i=0;$i<strlen($b);$i++)
+			$bLength = strlen($b);
+			for($i=0;$i<$bLength;$i++)
 			{
 				$v = substr($b,$i,1);
 				if(ord($v)==0)

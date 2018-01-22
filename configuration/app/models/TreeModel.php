@@ -1,5 +1,5 @@
 <?php
-include_once (dirname(__FILE__) . "/AbstractModel.php");
+include_once (__DIR__ . "/AbstractModel.php");
 
 final class TreeModel extends AbstractModel
 {
@@ -177,7 +177,9 @@ final class TreeModel extends AbstractModel
 
 		$d=$this->freeQuery($query);
 
-		return $d[0]['total'];
+		if (!empty($d)) {
+            return $d[0]['total'];
+        }
 	}
 
 	public function getBranchSpeciesCount( $params )
@@ -259,8 +261,10 @@ final class TreeModel extends AbstractModel
 		;
 
 		$d=$this->freeQuery( $query );
-		
-		return $d[0]['total']>0;
+
+		if (!empty($d)) {
+            return $d[0]['total']>0;
+        }
 	}
 
 

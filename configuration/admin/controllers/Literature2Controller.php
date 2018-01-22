@@ -270,6 +270,8 @@ class Literature2Controller extends NsrController
 		$this->smarty->assign('languages',$this->getLanguages());
 		$this->smarty->assign('actors',$this->getActors());
 		$this->smarty->assign('publicationTypes',$publicationTypes);
+
+		// @TODO: check this template not set in this scope???
 		$this->printPage(isset($template) ? $template : null);
 	}
 

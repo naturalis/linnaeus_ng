@@ -1637,6 +1637,7 @@ class ImportL2Controller extends ImportController
         if (empty($importRank))
             return;
 
+        // @TODO: 1==1 is always true? Is this useful?
         if (1==1 || !isset($_SESSION['admin']['system']['import']['loaded']['ranks'][$importRank])) {
 
             $r = $this->models->Ranks->_get(array(
@@ -1982,7 +1983,7 @@ class ImportL2Controller extends ImportController
         if (count(explode(' ', $taxon)) > 2) {
 
             foreach ($l2Markers as $marker) {
-                if (stristr($taxon, $marker) !== false) {
+                if (false !== stripos($taxon, $marker)) {
                     $taxon = str_replace($marker, '', $taxon);
                     break;
                 }
@@ -2459,7 +2460,7 @@ class ImportL2Controller extends ImportController
                 continue;
 
                 // No links in resulting string
-            if (strstr($line, '[l]') === false) {
+            if (false === strpos($line, '[l]')) {
                 $author = trim(str_replace($synonym, '', $line));
 
                 // Links present, remove these
@@ -2478,7 +2479,7 @@ class ImportL2Controller extends ImportController
             if (in_array($author[0], $cleanUp))
                 $author = trim(substr($author, 1));
             if (in_array($author[strlen($author) - 1], $cleanUp))
-                $author = trim(substr($author, 0, strlen($author) - 1));
+                $author = trim(substr($author, 0, - 1));
 
             return $author;
         }
@@ -2554,7 +2555,7 @@ class ImportL2Controller extends ImportController
         // Add counter for safety check to prevent endless loops; max 10 hits
         $i = 0;
 
-        while (strstr($line, '[l]') !== false || $i < 10) {
+        while (false !== strpos($line, '[l]') || $i < 10) {
 
             $i++;
 
@@ -2583,13 +2584,13 @@ class ImportL2Controller extends ImportController
 
 			//might be 1991c
 			$f = substr($y, -1);
-			$y2 = substr($y, 0, strlen($y) - 1);
+			$y2 = substr($y, 0, -1);
 
 			if (!is_numeric($y2)) {
 
 				//should be 1991ab
 				$f = substr($y, -2);
-				$y2 = substr($y, 0, strlen($y) - 2);
+				$y2 = substr($y, 0, -2);
 
 				//not even that!? you're on your own
 				if (!is_numeric($y2))
@@ -3119,7 +3120,7 @@ class ImportL2Controller extends ImportController
         array(
             'id' => null,
             'project_id' => $this->getNewProjectId(),
-            'number' => ($step == 'god' ? -1 : (intval(trim((string) $step->pagenumber)) + $stepAdd)),
+            'number' => ($step == 'god' ? -1 : ((int)trim((string) $step->pagenumber) + $stepAdd)),
             'is_start' => 0,
             'image' => $fileName
         ));
@@ -3858,13 +3859,13 @@ class ImportL2Controller extends ImportController
 
                     $d = explode(',', trim((string) $vVal->specs));
 
-                    $lat1 = floatval($d[0]);
-                    $lat2 = floatval($d[2]);
-                    $lon1 = floatval($d[1]);
-                    $lon2 = floatval($d[3]);
+                    $lat1 = (float)$d[0];
+                    $lat2 = (float)$d[2];
+                    $lon1 = (float)$d[1];
+                    $lon2 = (float)$d[3];
 
-                    $sqW = floatval($d[4]);
-                    $sqH = floatval($d[5]);
+                    $sqW = (float)$d[4];
+                    $sqH = (float)$d[5];
 
                     $widthInSquares = (($lon1 >= $lon2) ? $lon1 - $lon2 : 360 + $lon1 - $lon2) / $sqW;
                     $heightInSquares = (($lat1 - $lat2) / $sqH);
@@ -3873,17 +3874,17 @@ class ImportL2Controller extends ImportController
 
                         //620,10,300,280,10,10	= y,x,y,x,w,h
                         $af = $this->bombAmersfoort($lat1, $lon1);
-                        $lat1 = floatval($af[0]);
-                        $lon1 = floatval($af[1]);
+                        $lat1 = (float)$af[0];
+                        $lon1 = (float)$af[1];
                         $af = $this->bombAmersfoort($lat2, $lon2);
-                        $lat2 = floatval($af[0]);
-                        $lon2 = floatval($af[1]);
+                        $lat2 = (float)$af[0];
+                        $lon2 = (float)$af[1];
 
                         $heightInSquares = ($d[0] - $d[2]) / $d[4];
                         $widthInSquares = ($d[3] - $d[1]) / $d[5];
 
-                        $sqH = floatval(($lat1 - $lat2) / $heightInSquares);
-                        $sqW = floatval(($lon2 - $lon1) / $widthInSquares);
+                        $sqH = (float)(($lat1 - $lat2) / $heightInSquares);
+                        $sqW = (float)(($lon2 - $lon1) / $widthInSquares);
                     }
 
                     $coordinates = array(

@@ -254,7 +254,7 @@ class KeyController extends Controller
 			}
 
 			// get the choice's parent step
-			$step = $this->getKeystep($d[0]['keystep_id']);
+			$parentStep = $this->getKeystep($d[0]['keystep_id']);
 
 			// find the choice that lead to this step, i.e., the previous step in the path
 			$prevChoice = $this->models->ChoicesKeysteps->_get(
@@ -273,12 +273,12 @@ class KeyController extends Controller
 			array_unshift(
 				$this->tmp['results'],
 				array(
-					'id' => $step['id'],
-					'step_number' => $step['number'],
-					'step_title' => $step['title'],
-					'is_start' => $step['is_start'],
+					'id' => $parentStep['id'],
+					'step_number' => $parentStep['number'],
+					'step_title' => $parentStep['title'],
+					'is_start' => $parentStep['is_start'],
 					'choice_marker' => $choiceMarker,
-					'choice_txt' => $this->formatPathChoice($choice, $step['number'], $choiceMarker)
+					'choice_txt' => $this->formatPathChoice($choice, $parentStep['number'], $choiceMarker)
 				)
 			);
 
@@ -521,12 +521,18 @@ class KeyController extends Controller
 		$step = $params['step'];
 		$choice = isset($params['choice']) ? $params['choice'] : null;
 		$fromPath = isset($params['fromPath']) ? $params['fromPath'] : null;
+
+		// @TODO: taxon is not used at all in this function
 		$taxon = isset($params['taxon']) ? $params['taxon'] : null;
 
+		/*
+		 * @TODO: can we get rid of this?
+		 *
 		if (is_null($this->moduleSession->getModuleSetting('path')))
 		{
 			//$this->setStoredKeypath($step);
 		}
+		*/
 
 		if (!is_null($this->moduleSession->getModuleSetting('path')))
 		{

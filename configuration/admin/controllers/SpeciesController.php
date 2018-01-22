@@ -210,9 +210,9 @@ class SpeciesController extends Controller
 		$this->moduleSettings=new ModuleSettingsReaderController;
 		$this->useVariations=$this->moduleSettings->getModuleSetting( array( 'setting'=>'use_taxon_variations','subst'=>false) );
 		$matrixtype=$this->moduleSettings->getModuleSetting( array( 'setting'=>'matrixtype','module'=>'matrixkey','subst'=>'l2') );
+
         // variations & related are only shown for NBC matrix projects
         $this->_useNBCExtras = $this->useRelated =  ($matrixtype=='nbc');
-        $this->_lookupListMaxResults=$this->_lookupListMaxResults;
 
 		$this->_nameTypeIds=$this->models->NameTypes->_get(array(
 			'id'=>array(
@@ -308,6 +308,7 @@ class SpeciesController extends Controller
 				'order' => 'show_order'
 			));
 
+			$defaultPage = null;
 			foreach ((array)$taxonPages as $key => $val)
 			{
 
@@ -430,9 +431,9 @@ class SpeciesController extends Controller
 			$str = preg_replace('/(\s+)/',' ',$str);
 			$buffer = '';
 			$start = 0;
-			if (preg_match_all('/(\s)/',$str,$m,PREG_OFFSET_CAPTURE)!==false) {
-				foreach((array)$m[0] as $val) {
-					$end=$val[1];
+			if (preg_match_all('/(\s)/',$str,$matches,PREG_OFFSET_CAPTURE)!==false) {
+				foreach((array)$matches[0] as $offset) {
+					$end=$offset[1];
 					$buffer.=($start!=0 ? sprintf($splitpoint,$start) : '').trim(substr($str,$start,$end-$start));
 					$start=$end;
 				}
@@ -442,7 +443,6 @@ class SpeciesController extends Controller
 			$s[$key]['splitter']= $buffer;
 
 		}
-
 
 		$this->smarty->assign('synonyms',$s);
 
@@ -758,8 +758,7 @@ class SpeciesController extends Controller
 
                     if ($hasErrorButCanSave) {
                         $this->addMessage(
-                        '
-                        	Please be aware of the warnings above before saving.<br />
+                        'Please be aware of the warnings above before saving.<br />
                         	<input type="button" onclick="taxonOverrideSaveNew()" value="' . $this->translate('save anyway') . '" />');
                     }
                     else {
@@ -1473,18 +1472,18 @@ class SpeciesController extends Controller
                                and need to use the parent of the previous occurrence.
                                we ignore the immediately preceding taxon, because if that is the same as
                                the current one, we are simple still on the same level. */
-                            foreach ((array) $predecessors as $key => $val) {
+                            foreach ((array) $predecessors as $idx => $pre) {
 
-                                if ($rank == $val[0] && $key != count((array) $predecessors) - 1) {
+                                if ($rank == $pre[0] && $idx != count((array) $predecessors) - 1) {
                                     // found a previous occurrence
 
-                                    if (isset($predecessors[$key - 1])) {
+                                    if (isset($predecessors[$idx - 1])) {
 
                                         // get the name of the previous occurrence's parent
-                                        $parentName = $predecessors[$key - 1][1];
+                                        $parentName = $predecessors[$idx - 1][1];
 
                                         // apparantly we are at the start of a new branch, so chop off the previous one
-                                        $predecessors = array_slice($predecessors, 0, $key);
+                                        $predecessors = array_slice($predecessors, 0, $idx);
 
                                         // and add the first child of the next one
                                         $predecessors[] = array(
@@ -1724,7 +1723,7 @@ class SpeciesController extends Controller
 									'columns' => 'length(content) as l'
 								));
 
-								if (intval($argh[0]['l']) != strlen($fVal)) {
+								if ((int)$argh[0]['l'] != strlen($fVal)) {
 									$odd++;
 									$this->addMessage(sprintf('mismatched content size for %s (%s)',$tIdOrName,$this->models->ContentTaxa->getNewId()));
 								}
@@ -2716,22 +2715,20 @@ class SpeciesController extends Controller
 		}
 
 		$prev=$next=false;
-		while (list ($key, $val) = each($_SESSION['admin']['species']['browse_order'][$type])) {
+		$taxa = $_SESSION['admin']['species']['browse_order'][$type];
+		$keys = array_keys($taxa);
+
+        foreach ($keys as $index => $key)
+        {
+            $val = $taxa[$key];
 
 			if ($val['id']==$taxon['id']) {
 
-				// current = next because the pointer has already shifted forward
-				$next = current($_SESSION['admin']['species']['browse_order'][$type]);
+                $next = array_key_exists($index+1, $keys) ? $taxa[$keys[$index+1]] : null;
 
 				return array(
-					'prev' => $prev!==false ? array(
-						'id' => $prev['id'],
-						'label' => $prev['taxon']
-					) : null,
-					'next' => $next!==false ? array(
-						'id' => $next['id'],
-						'label' => $next['taxon']
-					) : null
+				    'prev' => $prev!==false ? array( 'id' => $prev['id'], 'label' => $prev['taxon'] ) : null,
+					'next' => $next!==false ? array( 'id' => $next['id'], 'label' => $next['taxon'] ) : null
 				);
 			}
 
@@ -4360,17 +4357,13 @@ class SpeciesController extends Controller
 
     private function fixNameCasting ($name)
     {
-
-        return
-        	preg_replace_callback(
-        		'/\([a-z]{1}/',
-        		create_function(
-		            '$matches',
-		            'return strtoupper($matches[0]);'
-        		),
-	        	ucfirst(strtolower($name))
-    	    );
-
+        return preg_replace_callback(
+            '/\([a-z]{1}/',
+            function($matches) {
+                return strtoupper($matches[0]);
+            },
+            ucfirst(strtolower($name))
+        );
 	}
 
     private function checkNameSpaces ($name, $projRankId, $parentId)

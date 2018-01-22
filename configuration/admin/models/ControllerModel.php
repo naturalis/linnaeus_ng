@@ -1,5 +1,5 @@
 <?php
-include_once (dirname(__FILE__) . "/AbstractModel.php");
+include_once (__DIR__ . "/AbstractModel.php");
 
 final class ControllerModel extends AbstractModel
 {
@@ -329,7 +329,7 @@ final class ControllerModel extends AbstractModel
 
 		// if string enclosed by " take it literally
 		if (preg_match('/^"(.+)"$/',$s)) {
-		    return '(' . mysqli_real_escape_string($this->databaseConnection, substr($s,1,strlen($s)-2)).')';
+		    return '(' . mysqli_real_escape_string($this->databaseConnection, substr($s,1,-2)).')';
 		}
 
 		$s = preg_replace('/(\s+)/',' ',$s);

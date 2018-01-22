@@ -1144,13 +1144,13 @@ class MatrixKeyController extends Controller
 
 					$sd = str_replace(',','.',$sd);
 
-                    $d['mean >=#'] = '(' . strval(floatval($value)) . ' - (' . strval(intval($sd)) . ' * sd))';
-                    $d['mean <=#'] = '(' . strval(floatval($value)) . ' + (' . strval(intval($sd)) . ' * sd))';
+                    $d['mean >=#'] = '(' . (string)(float)$value . ' - (' . (string)(int)$sd . ' * sd))';
+                    $d['mean <=#'] = '(' . (string)(float)$value . ' + (' . (string)(int)$sd . ' * sd))';
                 }
                 // or mark just mark the upper and lower boundaries of the value
                 else {
 
-                    $d['lower <='] = $d['upper >='] =  floatval($value);
+                    $d['lower <='] = $d['upper >='] = (float)$value;
                 }
 
                 // get any states that correspond with these values
@@ -1255,13 +1255,13 @@ class MatrixKeyController extends Controller
                 if (isset($sd))
 				{
 					$sd = str_replace(',','.',$sd);
-                    $d['mean >=#'] = '(' . strval(floatval($value)) . ' - (' . strval(intval($sd)) . ' * sd))';
-                    $d['mean <=#'] = '(' . strval(floatval($value)) . ' + (' . strval(intval($sd)) . ' * sd))';
+                    $d['mean >=#'] = '(' . (string)(float)$value . ' - (' . (string)(int)$sd . ' * sd))';
+                    $d['mean <=#'] = '(' . (string)(float)$value . ' + (' . (string)(int)$sd . ' * sd))';
                 }
                 // if there isn't, just mark the upper and lower boundaries of the value
                 else
 				{
-                    $d['lower <='] = $d['upper >='] =  floatval($value);
+                    $d['lower <='] = $d['upper >='] = (float)$value;
                 }
 
                 // get any states that correspond with these values...
@@ -1376,13 +1376,13 @@ class MatrixKeyController extends Controller
 
 			if ($groupByChar)
 			{
-	            $results[$val['characteristic_id']]['states'][$val['state_id']] = intval($val['tot']);
+	            $results[$val['characteristic_id']]['states'][$val['state_id']] = (int)$val['tot'];
 	            $results[$val['characteristic_id']]['tot'] =
-					(isset($all[$val['characteristic_id']]['tot']) ? $all[$val['characteristic_id']]['tot'] : 0) + intval($val['tot']);
+					(isset($all[$val['characteristic_id']]['tot']) ? $all[$val['characteristic_id']]['tot'] : 0) + (int)$val['tot'];
 			}
 			else
 			{
-	            $results[$val['state_id']] = intval($val['tot']);
+	            $results[$val['state_id']] = (int)$val['tot'];
 			}
         }
 
@@ -1448,13 +1448,13 @@ class MatrixKeyController extends Controller
 
 					if (isset($sd))
 					{
-						$d['mean >=#'] = '(' . strval(intval($value)) . ' - (' . strval(intval($sd)) . ' * sd))';
-						$d['mean <=#'] = '(' . strval(intval($value)) . ' + (' . strval(intval($sd)) . ' * sd))';
+						$d['mean >=#'] = '(' . (string)(int)$value . ' - (' . (string)(int)$sd . ' * sd))';
+						$d['mean <=#'] = '(' . (string)(int)$value . ' + (' . (string)(int)$sd . ' * sd))';
 
 					}
 					else
 					{
-						$d['lower <='] = $d['upper >='] = intval($value);
+						$d['lower <='] = $d['upper >='] = (int)$value;
 					}
 
 					$cs = $this->models->CharacteristicsStates->_get(array('id' => $d));
@@ -1487,6 +1487,7 @@ class MatrixKeyController extends Controller
             $dM = str_replace('ref_matrix_id is null', 'variation_id is null', str_replace('taxon_id', 'ref_matrix_id', $dT));
 		}
 
+        // @check_this: fsM not defined or set in this scope
 		return
 			array(
 				'dT' => isset($dT) ? $dT : null,

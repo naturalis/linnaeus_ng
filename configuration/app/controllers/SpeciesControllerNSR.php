@@ -157,7 +157,7 @@ class SpeciesControllerNSR extends SpeciesController
 				{
 					$template=
 						substr($external_content->template,-4)=='.tpl' ?
-							substr($external_content->template,0,strlen($external_content->template)-4) :
+							substr($external_content->template,0,-4) :
 							$external_content->template;
 				}
 
@@ -338,10 +338,10 @@ class SpeciesControllerNSR extends SpeciesController
 		{
 			$this->tmp[$key]['previous_is_notho']=$prevNotho;
 			$prevNotho=
-				defined('NOTHOSUBSPECIES_RANK_ID') ? $val['base_rank_id']==NOTHOSUBSPECIES_RANK_ID : false ||
-				defined('NOTHOVARIETAS_RANK_ID') ? $val['base_rank_id']==NOTHOVARIETAS_RANK_ID : false ||
-				defined('NOTHOGENUS_RANK_ID') ? $val['base_rank_id']==NOTHOGENUS_RANK_ID : false ||
-				defined('NOTHOSPECIES_RANK_ID') ? $val['base_rank_id']==NOTHOSPECIES_RANK_ID : false;
+                (defined('NOTHOSUBSPECIES_RANK_ID') ? $val['base_rank_id']===NOTHOSUBSPECIES_RANK_ID : false) ||
+                (defined('NOTHOVARIETAS_RANK_ID') ? $val['base_rank_id']===NOTHOVARIETAS_RANK_ID : false) ||
+                (defined('NOTHOGENUS_RANK_ID') ? $val['base_rank_id']===NOTHOGENUS_RANK_ID : false) ||
+                (defined('NOTHOSPECIES_RANK_ID') ? $val['base_rank_id']===NOTHOSPECIES_RANK_ID : false);
 		}
 
 		return $this->tmp;
@@ -1036,8 +1036,8 @@ class SpeciesControllerNSR extends SpeciesController
 		{
 			$synonyms=array_splice($names,$synonymStartIndex,$synonymCount,array());
 			usort($synonyms,function($a,$b){
-				$aa=!empty($a['authorship_year']) ? intval($a['authorship_year']) : intval(preg_replace('/\D/',"",$a['name']));
-				$bb=!empty($b['authorship_year']) ? intval($b['authorship_year']) : intval(preg_replace('/\D/',"",$b['name']));
+				$aa=!empty($a['authorship_year']) ? (int)$a['authorship_year'] : (int)preg_replace('/\D/',"",$a['name']);
+				$bb=!empty($b['authorship_year']) ? (int)$b['authorship_year'] : (int)preg_replace('/\D/',"",$b['name']);
 				return ( $aa > $bb ? 1 : ( $aa < $bb ? -1 : 0 ) );
 			});
 
@@ -1103,7 +1103,7 @@ class SpeciesControllerNSR extends SpeciesController
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resPicsPerPage;
 		$sort=!empty($p['sort']) ? $p['sort'] : '_meta4.meta_date desc,_meta1.meta_date desc';
 
-		list($data, $total) = $this->models->{$this->_model}->getTaxonMediaNsr(array(
+		[$data, $total] = $this->models->{$this->_model}->getTaxonMediaNsr(array(
             'projectId' => $this->getCurrentProjectId(),
     		'languageId' => $this->getCurrentLanguageId(),
     		'taxonId' => $id,
@@ -1141,7 +1141,7 @@ class SpeciesControllerNSR extends SpeciesController
 		if (empty($id))
 			return;
 
-		list($data, $total) = $this->models->{$this->_model}->getCollectedLowerTaxonMediaNsr(array(
+		[$data, $total] = $this->models->{$this->_model}->getCollectedLowerTaxonMediaNsr(array(
             'projectId' => $this->getCurrentProjectId(),
     		'languageId' => $this->getCurrentLanguageId(),
     		'taxonId' => $id,

@@ -200,7 +200,7 @@ class MySQL2SQLite
 		if(substr($carry[(count($carry) - 2)],-1) == ',')
 			$carry[(count($carry) -2)] = substr($carry[(count($carry) - 2)], 0, -1);
 
-		$rv = join("\n",$carry);
+		$rv = implode("\n",$carry);
 		
 		$rv = preg_replace(array('/(ENGINE=)([^\s]*)/','/(AUTO_INCREMENT=)([^\s]*)/','/(DEFAULT CHARSET)([^\s;]*)/'),'',$rv);
 		

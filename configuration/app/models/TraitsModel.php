@@ -1,5 +1,5 @@
 <?php
-include_once (dirname(__FILE__) . "/AbstractModel.php");
+include_once (__DIR__ . "/AbstractModel.php");
 
 class TraitsModel extends AbstractModel
 {
@@ -65,7 +65,9 @@ class TraitsModel extends AbstractModel
 		
 		$r=$this->freeQuery($query);
 
-		return isset($r[0]) ? $r[0] : null;
+		if (!empty($r)) {
+            return isset($r[0]) ? $r[0] : null;
+        }
 	}
 
     public function getTraitsTaxonValues( $params )

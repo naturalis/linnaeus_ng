@@ -1,7 +1,7 @@
 <?php
 
-include_once (dirname(__FILE__) . "/../BaseClass.php");
-include_once (dirname(__FILE__) . "/../Db.php");
+include_once (__DIR__ . "/../BaseClass.php");
+include_once (__DIR__ . "/../Db.php");
 
 class AbstractModel extends BaseClass
 {
@@ -250,7 +250,7 @@ class AbstractModel extends BaseClass
 		$q=null;
 
         // inserts return an id, not a query
-		if (is_integer($query))
+		if (is_int($query))
 		{
             $q = 'select * from ' . $this->tableName . ' where id = ' .$query;
         }

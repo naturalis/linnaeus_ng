@@ -1,5 +1,5 @@
 <?php
-include_once (dirname(__FILE__) . "/AbstractModel.php");
+include_once (__DIR__ . "/AbstractModel.php");
 
 final class SearchNSRModel extends AbstractModel
 {
@@ -819,7 +819,7 @@ final class SearchNSRModel extends AbstractModel
 				".(isset($photographer)  ? "and ".$photographer : "")." 		
 				".(isset($validator)  ? "and ".$validator : "")." 		
 				".(!empty($group_id) ? "and  ( MATCH(_q.parentage) AGAINST ('". $this->generateTaxonParentageId( $group_id )."' in boolean mode) or _m.taxon_id = " .$group_id. ") "  : "")."
-				".(!empty($name_id) ? "and _m.taxon_id = ".intval($name_id)  : "")." 		
+				".(!empty($name_id) ? "and _m.taxon_id = ". (int)$name_id : "")." 		
 				".(!empty($name) ? "and _j.name like '". $this->escapeString($name)."%'"  : "")."
 
 			".(isset($sort) ? "order by ".$sort : "")."
@@ -1606,7 +1606,6 @@ final class SearchNSRModel extends AbstractModel
 				
 				switch ($trait['type_sysname'])
 				{
-					case 'datefree':
 					case 'datelist':
 					case 'datelistfree':
 					case 'datefree':

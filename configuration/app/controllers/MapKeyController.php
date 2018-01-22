@@ -388,7 +388,14 @@ class MapKeyController extends Controller
 		if (isset($taxa))
 		{
 			// hell knows why, but $.parseJSON(data); started complaining about the "'s in the <span> all of a sudden
-			array_walk($taxa, create_function('&$v,$k', '$v[\'label\'] = addslashes($v[\'label\']);'));
+            //
+			// 'create_function' is DEPRECATED:
+            // array_walk($taxa, create_function('&$v,$k', '$v[\'label\'] = addslashes($v[\'label\']);'));
+            // new construction using anonymous function and array_map instead
+			$taxa = array_map(function($value) {
+			    $value['label'] = addslashes($value['label']);
+			    return $value;
+            }, $taxa);
 
 			$this->smarty->assign('taxa',
 				$this->makeLookupList(array(
@@ -446,6 +453,7 @@ class MapKeyController extends Controller
 
 		$index = $this->l2GetDiversityIndex($mapId,null);
 
+		// @check_this: selectedCell and selectedDatatypes not defined or set in this scope
 		if (isset($selectedCell)) $this->smarty->assign('selectedCell',$selectedCell);
 		if (isset($selectedDatatypes)) $this->smarty->assign('selectedDatatypes',$selectedDatatypes);
 
@@ -886,11 +894,11 @@ class MapKeyController extends Controller
 
 		if ($matchStartOnly)
 		{
-			$regexp = '/^'.preg_quote($search).'/i';
+			$regexp = '/^'.preg_quote($search, '/').'/i';
 		}
 		else
 		{
-			$regexp = '/'.preg_quote($search).'/i';
+			$regexp = '/'.preg_quote($search, '/').'/i';
 		}
 
 		$l = array();
@@ -1223,24 +1231,31 @@ class MapKeyController extends Controller
 	private function getAdjacentItems($id)
 	{
 		$taxa = $this->getTaxaWithOccurrences();
-		reset($taxa);
+
+        if (empty($taxa))
+            return null;
+        reset($taxa);
+
 		$prev = $next = null;
-		while (list($key, $val) = each($taxa))
-		{
-			if ($key==$id)
-			{
-				$next = current($taxa); // current = next because the pointer has already shifted forward
+        if (!empty($taxa)) {
+            $keys = array_keys($taxa);
+            foreach ($keys as $index => $key)
+            {
+                $val = $taxa[$key];
+                if ($key==$id)
+                {
+                    $next = array_key_exists($index+1, $keys) ? $taxa[$keys[$index+1]] : null;
 
-				return array(
-					'prev' => isset($prev) ? array('id' => $prev['id'],'label' => $prev['taxon']) : null,
-					'next' => isset($next) ? array('id' => $next['id'],'label' => $next['taxon']) : null
-				);
+                    return array(
+                        'prev' => isset($prev) ? array('id' => $prev['id'],'label' => $prev['taxon']) : null,
+                        'next' => isset($next) ? array('id' => $next['id'],'label' => $next['taxon']) : null
+                    );
 
-			}
+                }
 
-			$prev = $val;
-
-		}
+                $prev = $val;
+            }
+        }
 
 		return null;
 	}
@@ -1302,25 +1317,26 @@ class MapKeyController extends Controller
 		$taxa = $this->getAllTaxaWithOcc();
 
 		if (empty($taxa))
-			return;
-
+			return null;
 		reset($taxa);
 
 		$prev = $next = null;
 
-		while (list($key, $val) = each($taxa))
-		{
-			if ($val['id']==$id)
-			{
-				$next = current($taxa); // current = next because the pointer has already shifted forward
-				return array(
-					'prev' => isset($prev) ? array('id' => $prev['id'],'label' => $prev['taxon']) : null,
-					'next' => isset($next) ? array('id' => $next['id'],'label' => $next['taxon']) : null
-				);
-			}
-			$prev = $val;
-		}
-		return;
+        $keys = array_keys($taxa);
+        foreach ($keys as $index => $key) {
+            $val = $taxa[$key];
+            if ($val['id'] == $id) {
+                $next = array_key_exists($index + 1, $keys) ? $taxa[$keys[$index + 1]] : null;
+
+                return array(
+                    'prev' => isset($prev) ? array('id' => $prev['id'], 'label' => $prev['taxon']) : null,
+                    'next' => isset($next) ? array('id' => $next['id'], 'label' => $next['taxon']) : null
+                );
+            }
+            $prev = $val;
+        }
+
+		return null;
 	}
 
 	private function l2GetTaxonOccurrences($id,$mapId,$typeId=null)

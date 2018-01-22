@@ -33,9 +33,8 @@ class MediaController extends Controller
     public static $mimeTypes = array(
         'image' => array(
             'image/png' => 'png',
-            'image/jpeg' => 'jpe',
             'image/jpeg' => 'jpeg',
-            'image/jpeg' => 'jpg',
+            'image/jpg' => 'jpg',
             'image/gif' => 'gif',
         ),
         'video' => array(

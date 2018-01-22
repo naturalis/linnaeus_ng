@@ -877,7 +877,7 @@ class ProjectDeleteController extends Controller
 				$boom = explode('/',$file);
 				$boom = array_pop($boom);
 				if (is_numeric($boom))
-					$pInUse[intval($boom)] = intval($boom);
+					$pInUse[(int)$boom] = (int)$boom;
 			}
 		}
 

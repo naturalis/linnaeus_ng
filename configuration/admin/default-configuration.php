@@ -11,7 +11,7 @@ class configuration
     {
         $d = $this->getGeneralSettings();
         $d['app']['pathName'];
-        $this->_appFileRoot = dirname(__FILE__);
+        $this->_appFileRoot = __DIR__;
         $this->_appFileRoot = str_replace('\\','/',
             substr_replace($this->_appFileRoot,'', -1 * (strlen($d['app']['pathName']) + strlen('configuration')+1)));
     }

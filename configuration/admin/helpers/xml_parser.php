@@ -58,7 +58,8 @@ class XmlParser
 
 		if ($d->open($this->_fileName)) {
 
-			while ($d->read() && $d->name !== $this->_nodeName);
+			while ($d->read() && $d->name !== $this->_nodeName)
+                ;
 			
 			while ($d->name === $this->_nodeName) {
 				

@@ -663,7 +663,6 @@ class SpeciesMediaController extends Controller
 			$d=$this->models->MediaTaxon->delete(array(
 				'project_id' => $this->getCurrentProjectId(),
 				'id'=>$subject,
-				'project_id'=>$this->getCurrentProjectId(),
 				'taxon_id'=>$taxon
 
 			));

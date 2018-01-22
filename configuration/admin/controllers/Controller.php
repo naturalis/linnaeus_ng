@@ -1,7 +1,7 @@
 <?php
 
-include_once (dirname(__FILE__) . "/../BaseClass.php");
-include_once (dirname(__FILE__) . "/../../../smarty/Smarty.class.php");
+include_once (__DIR__ . "/../BaseClass.php");
+include_once (__DIR__ . "/../../../smarty/Smarty.class.php");
 
 include_once ('UserRightsController.php');
 include_once ('TranslatorController.php');
@@ -1785,7 +1785,7 @@ class Controller extends BaseClass
      */
     private function startSession()
     {
-        if (version_compare(phpversion(), '5.4.0', '<')) {
+        if (version_compare(PHP_VERSION, '5.4.0', '<')) {
             if (session_id() == '') {
                session_start();
             }
@@ -2017,15 +2017,15 @@ class Controller extends BaseClass
         $this->models = new stdClass();
 
         // Load base controller model first
-		require_once dirname(__FILE__) . '/../models/ControllerModel.php';
+		require_once __DIR__ . '/../models/ControllerModel.php';
 		$this->models->ControllerModel = new ControllerModel;
 
 		// Load controller-specific model
         $t = ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $this->getControllerBaseName())))) . 'Model';
 
-        if (file_exists(dirname(__FILE__) . '/../models/' . $t . '.php'))
+        if (file_exists(__DIR__ . '/../models/' . $t . '.php'))
 		{
-            require_once dirname(__FILE__) . '/../models/' . $t . '.php';
+            require_once __DIR__ . '/../models/' . $t . '.php';
             $this->models->$t = new $t;
         }
 
@@ -2033,9 +2033,9 @@ class Controller extends BaseClass
 		if ( isset($this->modelNameOverride) )
 		{
 			if (!isset($this->models->{$this->modelNameOverride}) &&
-                file_exists(dirname(__FILE__) . '/../models/' . $this->modelNameOverride . '.php'))
+                file_exists(__DIR__ . '/../models/' . $this->modelNameOverride . '.php'))
 			{
-			    require_once dirname(__FILE__) . '/../models/' . $this->modelNameOverride . '.php';
+			    require_once __DIR__ . '/../models/' . $this->modelNameOverride . '.php';
 				$this->models->{$this->modelNameOverride} = new $this->modelNameOverride;
 			}
 		}
@@ -2046,16 +2046,16 @@ class Controller extends BaseClass
 			foreach ((array) $this->extraModels as $key)
 			{
 				if (!isset($this->models->{$key}) &&
-					file_exists(dirname(__FILE__) . '/../models/' . $key . '.php'))
+					file_exists(__DIR__ . '/../models/' . $key . '.php'))
 				{
-					require_once dirname(__FILE__) . '/../models/' . $key . '.php';
+					require_once __DIR__ . '/../models/' . $key . '.php';
 					$this->models->{$key} = new $key;
 				}
 			}
 		}
 
         // Load models for each table, as specified in used models
-        require_once dirname(__FILE__) . '/../models/Table.php';
+        require_once __DIR__ . '/../models/Table.php';
         foreach ((array) $d as $key)
 		{
             $t = str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
@@ -2110,9 +2110,9 @@ class Controller extends BaseClass
 
         foreach ((array) $d as $key)
 		{
-            if (file_exists(dirname(__FILE__) . '/../helpers/' . $key . '.php'))
+            if (file_exists(__DIR__ . '/../helpers/' . $key . '.php'))
 			{
-                require_once (dirname(__FILE__) . '/../helpers/' . $key . '.php');
+                require_once (__DIR__ . '/../helpers/' . $key . '.php');
 
                 $d = str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
 
@@ -2510,8 +2510,8 @@ class Controller extends BaseClass
 	 */
 	protected function loadExternalModel ($model)
 	{
-        if (file_exists(dirname(__FILE__) . "/../models/{$model}.php")) {
-            include_once dirname(__FILE__) . "/../models/{$model}.php";
+        if (file_exists(__DIR__ . "/../models/{$model}.php")) {
+            include_once __DIR__ . "/../models/{$model}.php";
             $this->models->{$model} = new $model;
         }
 	}

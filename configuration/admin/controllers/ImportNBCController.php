@@ -1153,7 +1153,7 @@ class ImportNBCController extends ImportController
 								else {
 									$data['species'][$line]['related'][] = trim($cVal);
 								}
-								array_walk($data['species'][$line]['related'], create_function('&$val', '$val = trim($val);'));
+                                $data['species'][$line]['related'] = array_map('trim', $data['species'][$line]['related']);
 							}
 							// catch optional group (will turn into parent of rank family)
 							else if ($diergroepColumn>0 && $cKey==$diergroepColumn) {
@@ -1179,7 +1179,7 @@ class ImportNBCController extends ImportController
 									else {
 										$data['species'][$line]['states'][$cKey][] = trim($cVal);
 									}
-									array_walk($data['species'][$line]['states'][$cKey], create_function('&$val', '$val = trim($val);'));
+                                    $data['species'][$line]['states'][$cKey] = array_map('trim', $data['species'][$line]['states'][$cKey]);
 								}
 							}
 						}

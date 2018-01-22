@@ -608,6 +608,7 @@ class SearchControllerGeneral extends SearchController
 			self::S_EXTENDED_SEARCH => $extended
 		);
 
+        // @check_this: restrict not defined or set in this scope
 		if (isset($restrict))
 			$p['restrict']=$restrict;
 
