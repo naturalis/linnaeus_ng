@@ -44,7 +44,7 @@
 		function getURL($url,$timeout=10) {
 			$oldTimeout = ini_set('default_socket_timeout', $timeout);
 
-			$file = @fopen($url, 'r');
+			$file = @fopen($url, 'rb');
 			if ($file !== false) {
 				$buffer = '';
 				while (!feof($file)) {

@@ -64,7 +64,7 @@
 
 		public function setMaxBatchSize( $size )
 		{
-			$this->maxBatchSize = intval($size);
+			$this->maxBatchSize = (int)$size;
 		}
 
 		public function setFileNameBase( $fileNameBase )
@@ -90,13 +90,15 @@
 
 				if ( is_array($this->ranksToExport) )
 				{
-					array_walk($this->ranksToExport,function(&$a,$i) { $a = intval( $a ); } );
+					array_walk($this->ranksToExport,function(&$a,$i) { $a = (int)$a; } );
 					$this->ranksToExport=array_unique($this->ranksToExport);
-					if (count((array)$this->ranksToExport)==1) $this->ranksToExport=$this->ranksToExport[0];
+					if (count((array)$this->ranksToExport)==1) {
+                        $this->ranksToExport = $this->ranksToExport[0];
+                    }
 				}
 				else
 				{
-					$this->ranksToExport = intval( $this->ranksToExport );
+					$this->ranksToExport = (int)$this->ranksToExport;
 				}
 			}
 
@@ -201,16 +203,34 @@
 
 		private function checkEssentials()
 		{
-			if ( empty($this->connector->user) ) $b[]="missing database user";
-			if ( empty($this->connector->host) ) $b[]="missing database host";
-			if ( empty($this->connector->database) ) $b[]="missing database name";
-			if ( empty($this->connector->project_id) ) $b[]="missing project id";
-			if ( is_null($this->languageId) ) $b[]="missing language id";
-			if ( is_null($this->exportFolder) ) $b[]="missing export folder";
-			if ( !is_writable($this->exportFolder) ) $b[]="export folder not writable";
-			if ( is_null($this->fileNameBase) ) $b[]="missing export filename";
+			if ( empty($this->connector->user) ) {
+                $b[] = "missing database user";
+            }
+			if ( empty($this->connector->host) ) {
+                $b[] = 'missing database host';
+            }
+			if ( empty($this->connector->database) ) {
+                $b[] = "missing database name";
+            }
+			if ( empty($this->connector->project_id) ) {
+                $b[] = "missing project id";
+            }
+			if ( is_null($this->languageId) ) {
+                $b[] = "missing language id";
+            }
+			if ( is_null($this->exportFolder) ) {
+                $b[] = "missing export folder";
+            }
+			if ( !is_writable($this->exportFolder) ) {
+                $b[] = "export folder not writable";
+            }
+			if ( is_null($this->fileNameBase) ) {
+                $b[] = "missing export filename";
+            }
 
-			if ( !empty( $b ) ) throw new Exception( implode("\n",$b) );
+			if ( !empty( $b ) ) {
+                throw new \Exception(implode("\n", $b));
+            }
 		}
 
 		private function connectDatabase()
@@ -602,8 +622,11 @@
 			}
 			return $a;
 		}
-					
-		private function writeData()
+
+        /**
+         * @throws Exception
+         */
+        private function writeData()
 		{
 			$this->feedback( "writing data" );
 			
@@ -694,13 +717,9 @@
 					unset($val['classification']);
 				}
 
-				unset($val['id']);
-				unset($val['status_status']);
-				unset($val['status_reference_title']);
-				unset($val['status_expert_name']);
-				unset($val['status_organisation_name']);
+                unset($val['id'], $val['status_status'], $val['status_reference_title'], $val['status_expert_name'], $val['status_organisation_name']);
 
-				unset($this->taxa[$key]);
+                unset($this->taxa[$key]);
 
 				$xml= '<taxon></taxon>';
 		

@@ -54,7 +54,7 @@
 		function getURL($url,$timeout=10) {
 			$oldTimeout = ini_set('default_socket_timeout', $timeout);
 
-			$file = @fopen($url, 'r');
+			$file = @fopen($url, 'rb');
 			if ($file !== false) {
 				$buffer = '';
 				while (!feof($file)) {
@@ -90,7 +90,7 @@
 
 		function getRemoteImgSize($url,$timeout=10) {
 			$oldTimeout = ini_set('default_socket_timeout',$timeout);
-			$dummy = @fopen($url, 'r');
+			$dummy = @fopen($url, 'rb');
 			if ($dummy !== false) {
 				$dummy = getimagesize($url);
 			}

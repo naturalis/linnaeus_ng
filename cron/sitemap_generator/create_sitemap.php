@@ -62,10 +62,8 @@
                 die("Domains should be set in an array: please refer to docs for instruction!\n");
             }
             // Test if output directory exists; if not try to create it
-            if (!file_exists($this->outputDir)) {
-                if (!mkdir($this->outputDir)) {
-                    die('Cannot create directory ' . $this->outputDir . "\n");
-                }
+            if (!file_exists($this->outputDir) && !mkdir($this->outputDir) && !is_dir($this->outputDir)) {
+                die('Cannot create directory ' . $this->outputDir . "\n");
             }
 		    // Test output directory
 		    if (!is_writable($this->outputDir)) {
@@ -80,7 +78,7 @@
 
 		private function getConfig ()
 		{
-            require_once dirname(__FILE__) . '/../../configuration/admin/configuration.php';
+            require_once __DIR__ . '/../../configuration/admin/configuration.php';
             $this->config = new configuration();
 		}
 

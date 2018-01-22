@@ -76,12 +76,22 @@
 
 		private function checkEssentials()
 		{
-			if ( empty($this->connector->user) ) $b[]="missing database user";
-			if ( empty($this->connector->host) ) $b[]="missing database host";
-			if ( empty($this->connector->database) ) $b[]="missing database name";
-			if ( empty($this->connector->project_id) ) $b[]="missing project id";
+			if ( empty($this->connector->user) ) {
+                $b[] = "missing database user";
+            }
+			if ( empty($this->connector->host) ) {
+                $b[] = "missing database host";
+            }
+			if ( empty($this->connector->database) ) {
+                $b[] = "missing database name";
+            }
+			if ( empty($this->connector->project_id) ) {
+                $b[] = "missing project id";
+            }
 
-			if ( !empty( $b ) ) throw new Exception( implode("\n",$b) );
+			if ( !empty( $b ) ) {
+                throw new Exception(implode("\n", $b));
+            }
 		}
 
 		private function connectDatabase()
@@ -141,8 +151,9 @@
 			
 			while($row=$result->fetch_assoc())
 			{
-				if ( !empty($row['id']) )
-					$rows[]=$row;
+				if ( !empty($row['id']) ) {
+                    $rows[] = $row;
+                }
 			}
 
 			$result->close();
@@ -218,10 +229,13 @@
 					values
 						(null,".$this->connector->project_id.",".$val['id'].",'".implode(' ',$val['parentage'])."')";
 				
-				if ( $this->mysqli->query( $query ) )
-					$this->number_updated++;
+				if ( $this->mysqli->query( $query ) ) {
+                    $this->number_updated++;
+                }
 				else
+				{
 					$this->number_failed++;
+                }
 			}
 		}
 
