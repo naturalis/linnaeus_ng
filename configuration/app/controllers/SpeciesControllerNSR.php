@@ -1103,7 +1103,7 @@ class SpeciesControllerNSR extends SpeciesController
 		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resPicsPerPage;
 		$sort=!empty($p['sort']) ? $p['sort'] : '_meta4.meta_date desc,_meta1.meta_date desc';
 
-		[$data, $total] = $this->models->{$this->_model}->getTaxonMediaNsr(array(
+		list($data, $total) = $this->models->{$this->_model}->getTaxonMediaNsr(array(
             'projectId' => $this->getCurrentProjectId(),
     		'languageId' => $this->getCurrentLanguageId(),
     		'taxonId' => $id,
@@ -1141,7 +1141,7 @@ class SpeciesControllerNSR extends SpeciesController
 		if (empty($id))
 			return;
 
-		[$data, $total] = $this->models->{$this->_model}->getCollectedLowerTaxonMediaNsr(array(
+		list($data, $total) = $this->models->{$this->_model}->getCollectedLowerTaxonMediaNsr(array(
             'projectId' => $this->getCurrentProjectId(),
     		'languageId' => $this->getCurrentLanguageId(),
     		'taxonId' => $id,
