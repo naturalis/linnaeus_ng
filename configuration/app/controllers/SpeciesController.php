@@ -1250,7 +1250,7 @@ class SpeciesController extends Controller
 			}
 		}
 
-        [$taxa, $total] = $this->models->{$this->_model}->getTaxa(array(
+        list($taxa, $total) = $this->models->{$this->_model}->getTaxa(array(
             'projectId' => $this->getCurrentProjectId(),
             'taxonType' => $lower ? 'lower' : 'higher', //$this->getTaxonType(),
             'getAll' => $getAll,
