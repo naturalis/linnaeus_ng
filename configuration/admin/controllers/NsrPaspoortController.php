@@ -1,5 +1,4 @@
 <?php
-
 /*
 	TAB_VERSPREIDING::$this->getPresenceData($taxon)
 	TAB_BEDREIGING_EN_BESCHERMING::EZ
@@ -42,17 +41,26 @@ class NsrPaspoortController extends NsrController
 	private $taxonId;
 	private $obsoleteTabs=array();
 
+    /**
+     * NsrPaspoortController constructor.
+     */
     public function __construct()
     {
         parent::__construct();
 		$this->initialize();
     }
 
+    /**
+     * Destructor
+     */
     public function __destruct()
     {
         parent::__destruct();
     }
 
+    /**
+     * Paspoort action, shows actors, tabs (pages), concept
+     */
     public function paspoortAction()
     {
 		if (!$this->rHasId())
@@ -79,6 +87,9 @@ class NsrPaspoortController extends NsrController
 		$this->printPage();
 	}
 
+    /**
+     * Paspoort Meta action, shows actors, tabs (pages), concept
+     */
     public function paspoortMetaAction()
     {
 		if (!$this->rHasId())
@@ -110,6 +121,9 @@ class NsrPaspoortController extends NsrController
 		$this->printPage();
 	}
 
+    /**
+     * ajaxInterface
+     */
     public function ajaxInterfaceAction ()
     {
         if (!$this->rHasVal('action'))
@@ -138,6 +152,9 @@ class NsrPaspoortController extends NsrController
         $this->printPage('ajax_interface');
     }
 
+    /**
+     * initialize the controller with tabs
+     */
     private function initialize()
     {
 		// creating constants for the tab id's (id for page 'Schade en nut' becomes TAB_SCHADE_EN_NUT)
@@ -162,7 +179,10 @@ class NsrPaspoortController extends NsrController
 		 $this->setObsoleteTabs();
 	}
 
-	private function setObsoleteTabs()
+    /**
+     *  set Tabs no longer used
+     */
+    private function setObsoleteTabs()
 	{
 		foreach((array)json_decode($this->moduleSettings->getModuleSetting( ['setting'=>'obsolete_passport_tabs','module'=> 'species' ] ) ) as $key=>$val)
 		{
@@ -171,16 +191,25 @@ class NsrPaspoortController extends NsrController
 		}
 	}
 
+    /**
+     *  set id of the Taxon
+     */
 	private function setTaxonId($id)
 	{
 		$this->TaxonId=$id;
 	}
 
+    /**
+     *  get id of the Taxon
+     */
 	private function getTaxonId()
 	{
 		return isset($this->TaxonId) ? $this->TaxonId : false;
 	}
 
+    /**
+     *  get the passport categories
+     */
     private function getPassportCategories()
     {
 		$categories=$this->getCategories();
@@ -243,15 +272,21 @@ class NsrPaspoortController extends NsrController
 
     }
 
-    private function getPassport($p=null)
+    /**
+     *  get the passport
+     */
+    private function getPassport($qry=null)
     {
-		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
-		$category = isset($p['category']) ? $p['category'] : null;
-		$isLower = isset($p['isLower']) ? $p['isLower'] : true;
-		$limit=isset($p['limit']) ? $p['limit'] : null;
-		$offset=isset($p['offset']) ? $p['offset'] : null;
+		$taxon = isset($qry['taxon']) ? $qry['taxon'] : null;
+		$category = isset($qry['category']) ? $qry['category'] : null;
 
-		$content=$rdf=null;
+		// the following values are all not used
+		$isLower = isset($qry['isLower']) ? $qry['isLower'] : true;
+		$limit=isset($qry['limit']) ? $qry['limit'] : null;
+		$offset=isset($qry['offset']) ? $qry['offset'] : null;
+
+		$content=null;
+		$rdf=null;
 
         switch ($category)
 		{
@@ -309,7 +344,12 @@ class NsrPaspoortController extends NsrController
 		return array('content'=>$content,'rdf'=>$rdf,'publish'=>$publish,'page'=>$page);
     }
 
-	private function doDeletePassportMeta($id)
+    /**
+     * Delete passport meta values
+     *
+     * @param $id
+     */
+    private function doDeletePassportMeta($id)
 	{
 		if (empty($id)) return;
 
@@ -318,69 +358,85 @@ class NsrPaspoortController extends NsrController
 		$this->Rdf->deleteRdfValue(array('subject_type'=>'passport','subject_id'=>$id,'predicate'=>'hasAuthor'));
 	}
 
-	private function savePassport($p)
+    /**
+     * Save passport
+     *
+     * @param $qry
+     */
+    private function savePassport($qry)
+    {
+        $taxon = isset($qry['taxon']) ? $qry['taxon'] : null;
+        $page = isset($qry['page']) ? $qry['page'] : null;
+        $content = isset($qry['content']) ? $qry['content'] : null;
+        $publish = isset($qry['publish']) && $qry['publish'] == 1 ? '1' : '0';
+        $langid = isset($qry['langid']) ? $qry['langid'] : $this->getDefaultProjectLanguage();
+
+        $concept = $this->getConcept($taxon);
+        $before = $this->getPassport(array('category' => $page, 'taxon' => $taxon));
+
+        if (empty($content)) {
+            $rec = $this->models->ContentTaxa->delete(array(
+                'project_id' => $this->getCurrentProjectId(),
+                'taxon_id' => $taxon,
+                'language_id' => $langid,
+                'page_id' => $page
+            ));
+
+            $this->logChange(array('before' => $before, 'note' => 'deleted passport tabpage  ' . $before['page'] . ' of ' . $concept['taxon']));
+            return $rec;
+
+        } else {
+
+            $oldrec = $this->models->ContentTaxa->_get(array(
+                'id' => array(
+                    'project_id' => $this->getCurrentProjectId(),
+                    'taxon_id' => $taxon,
+                    'language_id' => $langid,
+                    'page_id' => $page
+                )
+            ));
+
+            $id = !empty($oldrec[0]['id']) ? $oldrec[0]['id'] : null;
+
+            //
+            // @todo: here is the content saved with only the default language
+            //
+            $rec = $this->models->ContentTaxa->save(array(
+                'id' => $id,
+                'project_id' => $this->getCurrentProjectId(),
+                'taxon_id' => $taxon,
+                'language_id' => $langid,
+                'page_id' => $page,
+                'content' => $content,
+                'publish' => $publish
+            ));
+
+            $after = $this->getPassport(array('category' => $page, 'taxon' => $taxon));
+
+            $this->logChange(
+                array(
+                    'before' => $before,
+                    'after' => $after,
+                    'note' => ($id ? 'updated passport tabpage' : 'new passport tabpage') . ' ' . $after['page'] . ' of ' . $concept['taxon']
+                )
+            );
+
+            return $rec;
+        }
+
+    }
+
+    /**
+     * Save passport meta information
+     * @param $postMeta
+     */
+    private function savePassportMeta($postMeta)
 	{
-		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
-		$page = isset($p['page']) ? $p['page'] : null;
-		$content = isset($p['content']) ? $p['content'] : null;
-		$publish = isset($p['publish']) && $p['publish']==1 ? '1' : '0';
-
-		$concept=$this->getConcept($taxon);
-		$before=$this->getPassport(array('category'=>$page,'taxon'=>$taxon));
-
-		if (empty($content))
-		{
-			$r=$this->models->ContentTaxa->delete(array(
-				'project_id' => $this->getCurrentProjectId(),
-				'taxon_id'=>$taxon,
-				'language_id'=>$this->getDefaultProjectLanguage(),
-				'page_id'=>$page
-			));
-
-			$this->logChange(array('before'=>$before,'note'=>'deleted passport tabpage  '.$before['page'].' of '.$concept['taxon']));
-			return $r;
-
-		}
-		else
-		{
-			$d=$this->models->ContentTaxa->_get(array(
-				'id'=>array(
-					'project_id' => $this->getCurrentProjectId(),
-					'taxon_id'=>$taxon,
-					'language_id'=>$this->getDefaultProjectLanguage(),
-					'page_id'=>$page
-				)
-			));
-
-			$id=!empty($d[0]['id']) ? $d[0]['id'] : null;
-
-			$r=$this->models->ContentTaxa->save(array(
-				'id'=>$id,
-				'project_id'=>$this->getCurrentProjectId(),
-				'taxon_id'=>$taxon,
-				'language_id'=>$this->getDefaultProjectLanguage(),
-				'page_id'=>$page,
-				'content' => $content,
-				'publish' => $publish
-			));
-
-			$after=$this->getPassport(array('category'=>$page,'taxon'=>$taxon));
-
-			$this->logChange(array('before'=>$before,'after'=>$after,'note'=>($id ? 'updated passport tabpage' : 'new passport tabpage').' '.$after['page'].' of '.$concept['taxon']));
-
-			return $r;
-
-		}
-
-	}
-
-	private function savePassportMeta($p)
-	{
-		$taxon = isset($p['id']) ? $p['id'] : null;
-		$updatereach = isset($p['update-reach']) ? $p['update-reach'] : null;
-		$actors = isset($p['actor_id']) ? $p['actor_id'] : null;
-		$organisations = isset($p['organisation_id']) ? $p['organisation_id'] : null;
-		$references = isset($p['reference_id']) ? $p['reference_id'] : null;
+		$taxon = isset($postMeta['id']) ? $postMeta['id'] : null;
+		$updatereach = isset($postMeta['update-reach']) ? $postMeta['update-reach'] : null;
+		$actors = isset($postMeta['actor_id']) ? $postMeta['actor_id'] : null;
+		$organisations = isset($postMeta['organisation_id']) ? $postMeta['organisation_id'] : null;
+		$references = isset($postMeta['reference_id']) ? $postMeta['reference_id'] : null;
 
 		if (empty($taxon)||empty($updatereach))
 			return;
@@ -395,77 +451,73 @@ class NsrPaspoortController extends NsrController
 		$categories=$this->getPassportCategories();
 		$shouldUpdate=array();
 
-		foreach((array)$categories as $val)
+		foreach((array)$categories as $category)
 		{
-			if ($val['obsolete']==1 && strlen($val['content'])==0)
+			if ($category['obsolete']==1 && strlen($category['content'])==0)
 				continue;
 
-			if ($updatereach=="all-text")
-			{
+			if ($updatereach=="all-text") {
 				// alle huidige tabbladen met tekst
-				if (strlen($val['content'])>0)
-					array_push($shouldUpdate,$val['content_id']);
+				if (strlen($category['content'])>0)
+					$shouldUpdate[] = $category['content_id'];
 			}
 			else
-			if ($updatereach=="text-no-meta")
-			{
+			if ($updatereach=="text-no-meta") {
 				// huidige tabbladen met tekst zonder meta-gegevens
 				if (
-					(strlen($val['content'])>0) &&
-					(!isset($val['rdf']) || count((array)$val['rdf'])==0)
+					(strlen($category['content'])>0) &&
+					(!isset($category['rdf']) || count((array)$category['rdf'])==0)
 				)
-				array_push($shouldUpdate,$val['content_id']);
+				$shouldUpdate[] = $category['content_id'];
 			}
 			else
-			if (is_numeric($updatereach) && $updatereach==$val['content_id'])
-			{
-				array_push($shouldUpdate,$val['content_id']);
+			if (is_numeric($updatereach) && $updatereach==$category['content_id']) {
+				$shouldUpdate[] = $category['content_id'];
 			}
 
 		}
 
-		foreach((array)$shouldUpdate as $val)
-		{
+		foreach((array)$shouldUpdate as $category) {
 
-			$this->doDeletePassportMeta($val);
+			$this->doDeletePassportMeta($category);
 
-			$d=array(
+			$rdf = array(
 				'subject_type'=>'passport',
-				'subject_id'=>$val,
+				'subject_id'=>$category,
 			);
 
-			foreach((array)$actors as $actor)
-			{
-				$d['predicate']='hasAuthor';
-				$d['object_type']='actor';
-				$d['object_id']=$actor;
-				$this->Rdf->saveRdfValue($d);
+			foreach((array)$actors as $actor) {
+				$rdf['predicate']='hasAuthor';
+				$rdf['object_type']='actor';
+				$rdf['object_id']=$actor;
+				$this->Rdf->saveRdfValue($rdf);
 			}
 
-			foreach((array)$organisations as $organisation)
-			{
-				$d['predicate']='hasPublisher';
-				$d['object_type']='actor';
-				$d['object_id']=$organisation;
-				$this->Rdf->saveRdfValue($d);
+			foreach((array)$organisations as $organisation) {
+				$rdf['predicate']='hasPublisher';
+				$rdf['object_type']='actor';
+				$rdf['object_id']=$organisation;
+				$this->Rdf->saveRdfValue($rdf);
 			}
 
-			foreach((array)$references as $reference)
-			{
-				$d['predicate']='hasReference';
-				$d['object_type']='reference';
-				$d['object_id']=$reference;
-				$this->Rdf->saveRdfValue($d);
+			foreach((array)$references as $reference) {
+				$rdf['predicate']='hasReference';
+				$rdf['object_type']='reference';
+				$rdf['object_id']=$reference;
+				$this->Rdf->saveRdfValue($rdf);
 			}
-
 
 		}
 
 	}
 
-	private function deletePassportMeta($p)
+    /**
+     * delete Passport Meta
+     * @param $posted
+     */
+    private function deletePassportMeta($posted)
 	{
-		$tab=isset($p['tab']) ? $p['tab'] : null;
+		$tab=isset($posted['tab']) ? $posted['tab'] : null;
 
 		if (empty($tab)) return;
 
@@ -481,8 +533,6 @@ class NsrPaspoortController extends NsrController
 		{
 			$this->doDeletePassportMeta($tab);
 		}
-
 	}
-
 
 }

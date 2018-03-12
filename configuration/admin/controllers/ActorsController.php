@@ -37,23 +37,35 @@ class ActorsController extends NsrController
 
 	private $actorBefore;
 
+    /**
+     * ActorsController constructor.
+     */
     public function __construct ()
     {
         parent::__construct();
 		$this->initialise();
     }
 
+    /**
+     * Initialises with the RsdController
+     */
     private function initialise()
     {
 		$this->Rdf = new RdfController;
     }
 
+    /**
+     * Destructor
+     */
     public function __destruct ()
     {
         parent::__destruct();
     }
 
 
+    /**
+     * Shows the actors
+     */
     public function indexAction()
 	{
 		$this->checkAuthorisation();
@@ -67,10 +79,13 @@ class ActorsController extends NsrController
 		$this->printPage();
 	}
 
+    /**
+     * Edit actor
+     */
     public function editAction()
 	{
-		if ($this->rHasId() && $this->rHasVal('action','delete'))
-		{
+		if ($this->rHasId() && $this->rHasVal('action','delete')) {
+
 			$this->UserRights->setActionType( $this->UserRights->getActionDelete() );
 			$this->checkAuthorisation();
 
@@ -80,10 +95,9 @@ class ActorsController extends NsrController
 			$this->setActorId(null);
 			$this->logChange(array('before'=>$this->getActorBefore(),'note'=>'deleted actor '.$this->getActorBefore('name')));
 			$template='_delete_result';
-		}
-		else
-		if ($this->rHasId() && $this->rHasVal('action','save'))
-		{
+
+		} else if ($this->rHasId() && $this->rHasVal('action','save')) {
+
 			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 			$this->checkAuthorisation();
 
@@ -92,15 +106,15 @@ class ActorsController extends NsrController
 			$this->setActorBefore();
 			$this->updateActor();
 			$this->logChange(array('before'=>$this->getActorBefore(),'after'=>$this->getActor(),'note'=>'updated actor '.$this->getActorBefore('name')));
-		}
-		else
-		if (!$this->rHasId() && $this->rHasVal('action','save'))
-		{
+
+		} else if (!$this->rHasId() && $this->rHasVal('action','save')) {
+
 			$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
 			$this->checkAuthorisation();
 
 			$this->smarty->assign('reference',$this->rGetAll());
 			$this->saveActor();
+
 		}
 
 		if ($this->rHasId())
@@ -127,34 +141,45 @@ class ActorsController extends NsrController
 	}
 
 
-
+    /**
+     * ajax Interface
+     */
     public function ajaxInterfaceAction ()
     {
         if (!$this->rHasVar('action')) return;
 
-		if ( !$this->getAuthorisationState() )
-			return;
+		if ( !$this->getAuthorisationState() ) return;
 
-		$return=null;
 		$return=$this->getActorLookupList($this->rGetAll());
+
         $this->allowEditPageOverlay = false;
 		$this->smarty->assign('returnText',$return);
         $this->printPage();
     }
 
 
-
-	private function setActorId($id)
+    /**
+     * Setter
+     * @param $id
+     */
+    private function setActorId($id)
 	{
 		$this->actorId=$id;
 	}
 
+    /**
+     * Getter
+     * @return id or false
+     */
 	private function getActorId()
 	{
-		return isset($this->actorId) ? $this->actorId : false;
+        return isset($this->actorId) ? $this->actorId : false;
 	}
 
-	private function saveActor()
+    /**
+     * save Actor
+     */
+    private function saveActor()
 	{
 		$name=$this->rGetVal('name');
 
@@ -165,29 +190,28 @@ class ActorsController extends NsrController
 			return;
 		}
 
-		$d=$this->models->Actors->save(
-		array(
+		$newActor = $this->models->Actors->save(array(
 			'project_id' => $this->getCurrentProjectId(),
 			'name' => $name
 		));
 
-		if ($d)
-		{
+		if ($newActor) {
 			$this->setActorId($this->models->Actors->getNewId());
 			$this->createNsrIds(array('id'=>$this->getActorId(),'type'=> 'actor', 'subtype'=> ( $this->rHasVal('is_company','1') ? 'organization' : 'person' )));
 			$this->addMessage('New actor created.');
 			$this->updateActor();
 			$this->logChange(array('after'=>$this->getActor(),'note'=>'new actor '.$name));
-		}
-		else
-		{
+		} else {
 			$this->addError('Could not create new actor.');
 		}
 	}
 
-	private function updateActor()
+    /**
+     * Update Actor
+     */
+    private function updateActor()
 	{
-		$f=array(
+		$fields = array(
 			'name' => 'Naam',
 			'name_alt' => 'Alternatieve naam',
 			'gender' => 'Geslacht',
@@ -196,24 +220,27 @@ class ActorsController extends NsrController
 			'employee_of_id' => '"Werkzaam bij"'
 		);
 
-		foreach($f as $field=>$label)
-		{
-			if ($this->rHasVar($field))
-			{
-				if ($this->updateActorValue($field,$this->rGetVal($field)))
-				{
+		foreach($fields as $field => $label) {
+
+			if ($this->rHasVar($field)) {
+				if ($this->updateActorValue($field,$this->rGetVal($field))) {
 					if ($this->models->Actors->getAffectedRows()!=0)
 						$this->addMessage($label.' saved.');
-				}
-				else
-				{
+				} else {
 					$this->addError($label.' not saved.');
 				}
 			}
+
 		}
 	}
 
-	private function updateActorValue($name,$value)
+    /**
+     * Update a field in a Actor model
+     * @param $name
+     * @param $value
+     * @return mixed
+     */
+    private function updateActorValue($name, $value)
 	{
 		return $this->models->Actors->update(
 			array($name=>(empty($value) ? 'null' : trim($value))),
@@ -221,7 +248,10 @@ class ActorsController extends NsrController
 		);
 	}
 
-	private function deleteActor()
+    /**
+     * Delete Actor
+     */
+    private function deleteActor()
 	{
 		$id=$this->getActorId();
 
@@ -230,45 +260,6 @@ class ActorsController extends NsrController
 			$this->addError("No ID.");
 			return;
 		}
-
-		/*
-		 * Free queries should be update/delete statements! Rewritten
-		 *
-        $this->models->Names->freeQuery(
-			"update %PRE%names set expert_id = null where project_id = ".$this->getCurrentProjectId()." and expert_id = ".$id
-		);
-		$this->addMessage("Expert verwijderd van ".$this->models->Names->getAffectedRows()." namen.");
-
-        $this->models->Names->freeQuery(
-			"update %PRE%names set organisation_id = null where project_id = ".$this->getCurrentProjectId()." and organisation_id = ".$id
-		);
-		$this->addMessage("Organisatie verwijderd van ".$this->models->Names->getAffectedRows()." namen.");
-
-        $this->models->PresenceTaxa->freeQuery(
-			"update %PRE%presence_taxa set actor_id = null where project_id = ".$this->getCurrentProjectId()." and actor_id = ".$id
-		);
-		$this->addMessage("Expert verwijderd van ".$this->models->PresenceTaxa->getAffectedRows()." statussen.");
-
-        $this->models->PresenceTaxa->freeQuery(
-			"update %PRE%presence_taxa set actor_org_id = null where project_id = ".$this->getCurrentProjectId()." and actor_org_id = ".$id
-		);
-		$this->addMessage("Organisatie verwijderd van ".$this->models->PresenceTaxa->getAffectedRows()." statussen.");
-
-		$this->models->Literature2Authors->freeQuery(
-			"delete from %PRE%literature2_authors where project_id = ".$this->getCurrentProjectId()." and actor_id = ".$id
-		);
-		$this->addMessage("Auteur ontkoppeld van ".$this->models->Literature2Authors->getAffectedRows()." literatuurreferenties.");
-
-
-		$this->models->Actors->freeQuery("delete from %PRE%rdf where object_id=".$id." and object_type='actor'");
-		$this->addMessage("Auteur verwijderd van ".$this->models->Actors->getAffectedRows()." tabbladen.");
-
-		$this->models->Actors->freeQuery("delete from %PRE%nsr_ids where project_id = ".$this->getCurrentProjectId()." and lng_id=".$id." and item_type='actor'");
-		$this->addMessage("Actor NSR ID verwijderd.");
-
-		$this->models->Actors->freeQuery("delete from %PRE%actors where project_id = ".$this->getCurrentProjectId()." and id = ".$id." limit 1");
-		$this->addMessage("Actor verwijderd.");
-		*/
 
 		$this->models->Names->update(
 			array('expert' => null),
@@ -315,50 +306,60 @@ class ActorsController extends NsrController
 
 	}
 
-	private function getCompanyAlphabet()
+    /**
+     * Returns the alphabet of actors in a project
+     * @return mixed
+     */
+    private function getCompanyAlphabet()
 	{
-		$alpha=$this->models->Actors->freeQuery("
-			select
-				distinct if(ord(substr(lower(name),1,1))<97||ord(substr(lower(name),1,1))>122,'#',substr(lower(name),1,1)) as letter
-			from
-				%PRE%actors
+		$alpha = $this->models->Actors->freeQuery(sprintf('select
+				distinct if(ord(substr(lower(name),1,1))<97||ord(substr(lower(name),1,1))>122,"#",substr(lower(name),1,1)) as letter
+			from %%PRE%%actors
 			where
-				project_id = ".$this->getCurrentProjectId()."
+				project_id = %d 
 				and is_company = 1
-			order by letter
-		");
+			order by letter', $this->getCurrentProjectId()));
 
 		return $alpha;
 	}
 
+    /**
+     * Returns the alphabet of actors in a project
+     * @return mixed
+     */
 	private function getIndividualAlphabet()
 	{
 		return $this->models->ActorsModel->getCompanyAlphabet($this->getCurrentProjectId());
 	}
 
-	private function getActor($id=null)
+    /**
+     * Get the Actor by id
+     * @param null $id
+     */
+    private function getActor($id=null)
 	{
-		if (empty($id))
-			$id=$this->getActorId();
+		if (empty($id)) {
+            $id = $this->getActorId();
+        }
 
-		if (empty($id))
-			return;
+        // no Id, no actor
+		if (empty($id)) return;
 
-		$l = $this->models->ActorsModel->getIndividualAlphabet(array(
+		$alphabet = $this->models->ActorsModel->getIndividualAlphabet(array(
             'projectId' => $this->getCurrentProjectId(),
     		'actorId' => $id
 		));
 
-		if ($l)
+		if ($alphabet)
 		{
 
-			$actor=$l[0];
+			$actor=$alphabet[0];
 
 			// catching up...
 			if ( empty($actor['nsr_id']) )
 			{
-				$d=$this->createNsrIds(array('id'=>$actor['id'],'type'=> 'actor', 'subtype'=> ( $l[0]['is_company']==1 ? 'organization' : 'person' )));
-				$actor['nsr_id']=$d['nsr_id'];
+				$nsrIds = $this->createNsrIds(array('id'=>$actor['id'],'type'=> 'actor', 'subtype'=> ( $alphabet[0]['is_company']==1 ? 'organization' : 'person' )));
+				$actor['nsr_id'] = $nsrIds['nsr_id'];
 			}
 
 			return $actor;
@@ -366,11 +367,15 @@ class ActorsController extends NsrController
 
 	}
 
-    private function getAllActors( $p )
+    /**
+     * Get all actors by search
+     * @param $qry
+     */
+    private function getAllActors($qry)
     {
-        $search=isset($p['search']) ? $p['search'] : null;
-        $matchStartOnly = isset($p['match_start']) ? $p['match_start']==1 : false;
-        $isCompany=isset($p['is_company']) ? $p['is_company'] : null;
+        $search=isset($qry['search']) ? $qry['search'] : null;
+        $matchStartOnly = isset($qry['match_start']) ? $qry['match_start']==1 : false;
+        $isCompany=isset($qry['is_company']) ? $qry['is_company'] : null;
 
         if (empty($search))
             return;
@@ -384,11 +389,16 @@ class ActorsController extends NsrController
 
 	}
 
-    private function getActorLookupList( $p )
+    /**
+     * Get a lookup list of actors
+     * @param $qry
+     * @return array|string
+     */
+    private function getActorLookupList($qry )
     {
-		$data=$this->getAllActors($p);
+		$data=$this->getAllActors($qry);
 
-        $maxResults=isset($p['max_results']) && (int)$p['max_results']>0 ? (int)$p['max_results'] : $this->_lookupListMaxResults;
+        $maxResults=isset($qry['max_results']) && (int)$qry['max_results']>0 ? (int)$qry['max_results'] : $this->_lookupListMaxResults;
 
 		return
 			$this->makeLookupList(array(
@@ -401,19 +411,23 @@ class ActorsController extends NsrController
 
     }
 
-    private function getActorLinks( $p )
+    /**
+     * Get Actor links
+     * @param $qry
+     * @return array|void
+     */
+    private function getActorLinks($qry )
     {
-        $id = isset($p['id']) ? $p['id'] : null;
-        $name = isset($p['name']) ? $p['name'] : null;
-        $name_alt = isset($p['name_alt']) ? $p['name_alt'] : null;
+        $id = isset($qry['id']) ? $qry['id'] : null;
+        $name = isset($qry['name']) ? $qry['name'] : null;
+        $name_alt = isset($qry['name_alt']) ? $qry['name_alt'] : null;
 
 		if ( empty($id) && empty($name) && empty($name_alt) )
 		{
 			$id=$this->getActorId();
 		}
 
-		if ( empty($id) )
-			return;
+		if ( empty($id) ) return;
 
 		// NAMES
 		$names = $this->models->ActorsModel->getActorNames(array(
@@ -422,12 +436,10 @@ class ActorsController extends NsrController
     		'expertId' => $id
 		));
 
-		foreach((array)$names as $key=>$val)
-		{
+		foreach((array)$names as $key=>$val) {
 			$names[$key]['name']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['name'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['taxon_id'],'parent_id'=>$val['parent_id'] ] );
 
-			if ($val['nametype']==PREDICATE_VALID_NAME)
-			{
+			if ($val['nametype']==PREDICATE_VALID_NAME) {
 				$names[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['taxon_id'],'parent_id'=>$val['parent_id'] ] );
 			}
 
@@ -441,8 +453,7 @@ class ActorsController extends NsrController
     		'expertId' => $id
 		));
 
-		foreach((array)$presences as $key=>$val)
-		{
+		foreach((array)$presences as $key=>$val) {
 			$presences[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['taxon_id'],'parent_id'=>$val['parent_id'] ] );
 		}
 
@@ -453,8 +464,7 @@ class ActorsController extends NsrController
     		'expertId' => $id
 		));
 
-		foreach((array)$passports as $key=>$val)
-		{
+		foreach((array)$passports as $key=>$val) {
 			$passports[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['taxon_id'],'parent_id'=>$val['parent_id'] ] );
 		}
 
@@ -466,33 +476,35 @@ class ActorsController extends NsrController
 		    'nameAlt' => $name_alt
 		));
 
-		return
-			array(
+		$result = array(
 				'names' => $names,
 				'presences'=>$presences,
 				'passports'=>$passports,
 				'literature'=>$literature,
-			);
+		);
+
+		return $result;
 	}
 
-	private function setActorBefore()
+    /**
+     * set last Actor
+     */
+    private function setActorBefore()
 	{
-		$this->actorBefore=$this->getActor();
+		$this->actorBefore = $this->getActor();
 	}
 
-	private function getActorBefore( $f=null )
+    /**
+     * get the Actor before this actor
+     */
+	private function getActorBefore($key=null )
 	{
-		if ( $f && isset($this->actorBefore[$f]) )
-		{
-			return $this->actorBefore[$f];
-		}
-		else
-		{
+		if ( $key && isset($this->actorBefore[$key]) ) {
+			return $this->actorBefore[$key];
+		} else {
 			return $this->actorBefore;
 		}
 	}
-
-
 
 }
 
