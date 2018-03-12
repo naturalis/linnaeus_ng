@@ -12,7 +12,6 @@
 
 <h2><span style="font-size:12px;font-style:normal">{t}concept{/t}:</span> {$concept.taxon}</h2>
 <h3>{t}passport{/t}</h3>
-
 <a class="toggle-all" href="#" onclick="$('.passport-toggles').trigger('click');$('.toggle-all').toggle();return false;">{t}show all{/t}</a>
 <a class="toggle-all" href="#" onclick="$('.passport-toggles').trigger('click');$('.toggle-all').toggle();return false;" style="display:none" href="">{t}hide all{/t}</a>
 
@@ -21,6 +20,7 @@
 <form>
 <input type="hidden" id="taxon_id" value="{$concept.id}" />
 <input type="hidden" id="rnd" name="rnd" value="{$rnd}" />
+<input type="hidden" id="language_id" name="activeLanguage" value="{$activeLanguage}" />
 	<ul>
     {assign var=hasObsolete value=false}
 	{foreach from=$tabs item=v key=k}
@@ -53,6 +53,7 @@
 
 		</span>
 		<div class="passport-body" id="body{$k}">
+
             <span class="passport-content" id="content{$k}">{$v.content}</span>
 
 			<a href="#" class="edit" id="edit{$k}" onclick="openeditor(this);return false;" style="margin-left:0;">edit</a>
@@ -100,6 +101,14 @@
 	<!--<a id="media-overlay-links" href="#" class="edit" style="margin:0">{t}media overlay{/t}</a><br>-->
 
 </p>
+
+<p>
+	<br>Language:
+	<select name="languageid" id="languagechanger" onchange="changeLanguage(this);">
+        {foreach from=$languages item=l key=i}
+			<option value="{$l.language_id}" {if ($l.language_id == $activeLanguage)}selected="selected"{/if}>{$l.language}</option>
+        {/foreach}
+	</select></p>
 
 <p>
 	<a href="taxon.php?id={$concept.id}">{t}back{/t}</a>

@@ -40,6 +40,7 @@ class NsrPaspoortController extends NsrController
     public $includeLocalMenu = false;
 	private $taxonId;
 	private $obsoleteTabs=array();
+	private $activeLanguage;
 
     /**
      * NsrPaspoortController constructor.
@@ -80,6 +81,8 @@ class NsrPaspoortController extends NsrController
 		$this->smarty->assign( 'tabs', $this->getPassportCategories() );
 		$this->smarty->assign( 'concept', $this->getTaxonById($this->getTaxonId()) );
 		$this->smarty->assign( 'obsolete_tabs', $this->obsoleteTabs );
+        $this->smarty->assign( 'languages', $this->getProjectLanguages());
+        $this->smarty->assign( 'activeLanguage', $this->getActiveLanguage());
 
 		$this->UserRights->setActionType( $this->UserRights->getActionPublish() );
 		$this->smarty->assign( 'can_publish', $this->getAuthorisationState() );
@@ -174,7 +177,9 @@ class NsrPaspoortController extends NsrController
 		if (!defined('CTAB_DNA_BARCODES')) define('CTAB_DNA_BARCODES','dna barcodes');
 		if (!defined('CTAB_NOMENCLATURE')) define('CTAB_NOMENCLATURE','Nomenclature');
 
-		$this->moduleSettings=new ModuleSettingsReaderController;
+        $activeLanguage =  ($this->rGetVal('activeLanguage')) ? $this->rGetVal('activeLanguage') : $this->getDefaultProjectLanguage();
+        $this->setActiveLanguage($activeLanguage);
+		$this->moduleSettings = new ModuleSettingsReaderController;
 
 		 $this->setObsoleteTabs();
 	}
@@ -215,7 +220,7 @@ class NsrPaspoortController extends NsrController
 		$categories=$this->getCategories();
 
 		$content=$this->models->ContentTaxa->_get(["id"=>[
-			"language_id"=>$this->getDefaultProjectLanguage(),
+			"language_id"=>$this->getActiveLanguage(),
 			"taxon_id"=>$this->getTaxonId(),
 			"project_id"=>$this->getCurrentProjectId()
 		],"fieldAsIndex"=>"page_id"]);
@@ -362,6 +367,7 @@ class NsrPaspoortController extends NsrController
      * Save passport
      *
      * @param $qry
+     * @return array $rec
      */
     private function savePassport($qry)
     {
@@ -369,7 +375,7 @@ class NsrPaspoortController extends NsrController
         $page = isset($qry['page']) ? $qry['page'] : null;
         $content = isset($qry['content']) ? $qry['content'] : null;
         $publish = isset($qry['publish']) && $qry['publish'] == 1 ? '1' : '0';
-        $langid = isset($qry['langid']) ? $qry['langid'] : $this->getDefaultProjectLanguage();
+        $langid = isset($qry['lang']) ? $qry['lang'] : $this->getDefaultProjectLanguage();
 
         $concept = $this->getConcept($taxon);
         $before = $this->getPassport(array('category' => $page, 'taxon' => $taxon));
@@ -534,5 +540,21 @@ class NsrPaspoortController extends NsrController
 			$this->doDeletePassportMeta($tab);
 		}
 	}
+
+    /**
+     * @return mixed
+     */
+    public function getActiveLanguage()
+    {
+        return $this->activeLanguage;
+    }
+
+    /**
+     * @param mixed $activeLanguage
+     */
+    public function setActiveLanguage($activeLanguage)
+    {
+        $this->activeLanguage = $activeLanguage;
+    }
 
 }
