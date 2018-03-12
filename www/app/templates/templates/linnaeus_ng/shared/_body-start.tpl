@@ -18,4 +18,4 @@
 		<div class="scroll__container">
 			<div id="container">
 				
-			<!-- form method="get" action="{$smarty.server.PHP_SELF}" id="theForm"></form -->
+			<form method="get" action="{$smarty.server.PHP_SELF}" id="theForm"></form>
