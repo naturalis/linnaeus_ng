@@ -1,5 +1,4 @@
 <?php
-
 include_once ('Controller.php');
 include_once ('ModuleSettingsReaderController.php');
 include_once ('LoginController.php');
@@ -47,20 +46,29 @@ class WebservicesController extends Controller
 
 	private $_generalParameters=array('callback'=>array('mandatory'=>false,'description'=>'name of JSONP callback function'));
 
+    /**
+     * WebservicesController constructor.
+     * @param null $p
+     */
     public function __construct($p=null)
     {
         parent::__construct( $p );
 		$this->initialise();
     }
 
+    /**
+     * WebservicesController destructor.
+     */
     public function __destruct ()
     {
         parent::__destruct();
     }
 
 
-
-	public function indexAction()
+    /**
+     * Show the index page
+     */
+    public function indexAction()
 	{
 		$this->authenticateUser();
 	    $this->smarty->assign( 'base_url', 'https://' . '%AUTH%' . $_SERVER['HTTP_HOST'] . pathinfo($_SERVER['PHP_SELF'])['dirname'] . '/' );
@@ -71,9 +79,10 @@ class WebservicesController extends Controller
 	}
 
 
-
-
-	public function projectsAction()
+    /**
+     * Show the projects page
+     */
+    public function projectsAction()
 	{
 		$this->authenticateUser();
 	    $this->_head->service='projects';
@@ -92,9 +101,13 @@ class WebservicesController extends Controller
 			$this->_data[]=$d;
 		}
 
+        header('Content-Type: application/json');
 		$this->printOutput();
 	}
 
+    /**
+     * Show the project users page
+     */
 	public function projectUsersAction()
 	{
 		$this->authenticateUser();
@@ -107,6 +120,9 @@ class WebservicesController extends Controller
 		$this->printOutput();
 	}
 
+    /**
+     * Show the users page
+     */
 	public function usersAction()
 	{
 		$this->authenticateUser();
@@ -118,6 +134,52 @@ class WebservicesController extends Controller
 		$this->printOutput();
 	}
 
+    /**
+     * Get the linnaeus data
+     */
+	private function getLinnaeusData()
+    {
+        $branch = [];
+        $hash = '';
+        $latestHash = '';
+        $ahead = 0;
+        $behind = 0;
+
+        exec('git rev-parse --abbrev-ref HEAD', $branch);
+        exec('git fetch ' . $branch[0]);
+        exec('git rev-parse HEAD', $hash);
+        exec('git rev-parse origin/' . $branch[0], $latestHash);
+        exec('git rev-list origin/' . $branch[0] . '..HEAD --count', $ahead);
+        exec('git rev-list HEAD..origin/' . $branch[0] . ' --count', $behind);
+        exec('git describe', $description);
+        exec('git show -s --format=%ci', $lastcommit);
+
+        $data = $this->models->ProjectsModel->getProjectsWithUsers();
+
+        foreach ($data as $i => $row) {
+            $data[$i]['git_branch'] = $branch[0];
+            $data[$i]['git_hash'] = $hash[0];
+            $data[$i]['git_latest_hash'] = $latestHash[0];
+            $data[$i]['git_commits_ahead'] = $ahead[0];
+            $data[$i]['git_commits_behind'] = $behind[0];
+            $data[$i]['git_commit_date'] = $lastcommit[0];
+            $data[$i]['code_up_to_date'] =
+                ($data[$i]['git_hash'] == $data[$i]['git_latest_hash']) ? 'yes' : 'no';
+            $data[$i]['project_is_published'] =
+                ($data[$i]['project_is_published'] == 1) ? 'yes' : 'no';
+            $data[$i]['user_is_active'] =
+                ($data[$i]['user_is_active'] == 1) ? 'yes' : 'no';
+            $data[$i]['server_ip'] = $_SERVER['SERVER_ADDR'];
+            $data[$i]['server_name'] = gethostbyaddr($data[$i]['server_ip']);
+            $data[$i]['check_date'] = date("Y-m-d H:m:s");
+        }
+
+        return $data;
+    }
+
+    /**
+     * scan the servers show the data
+     */
     public function scanServersAction ()
     {
 		$this->_head->service = 'projects and users';
@@ -128,34 +190,15 @@ class WebservicesController extends Controller
             die('<p>Incorrect key!</p><p><img src="../../media/system/access-denied.gif"></p>');
 
         } else {
-
-            exec('git rev-parse --abbrev-ref HEAD', $branch);
-            exec('git rev-parse HEAD', $hash);
-            exec('git rev-parse origin/' . $branch[0], $latestHash);
-
-            $data = $this->models->ProjectsModel->getProjectsWithUsers();
-
-        	foreach ($data as $i => $row) {
-                $data[$i]['git_branch'] = $branch[0];
-                $data[$i]['git_hash'] = $hash[0];
-                $data[$i]['git_latest_hash'] = $latestHash[0];
-    	        $data[$i]['project_is_published'] =
-                    ($data[$i]['project_is_published'] == 1) ? 'yes' : 'no';
-                $data[$i]['user_is_active'] =
-                    ($data[$i]['user_is_active'] == 1) ? 'yes' : 'no';
-                $data[$i]['code_up_to_date'] =
-                    ($data[$i]['git_hash'] == $data[$i]['git_latest_hash']) ? 'yes' : 'no';
-                $data[$i]['server_ip'] = $_SERVER['SERVER_ADDR'];
-                $data[$i]['server_name'] = gethostbyaddr($data[$i]['server_ip']);
-                $data[$i]['check_date'] = date("Y-m-d H:m:s");
-        	}
-
-    		$this->_data = $data;
+    		$this->_data = $this->getLinnaeusData();
         }
 
 		$this->printOutput();
     }
 
+    /**
+     * scan the servers push the data to a central server
+     */
     public function linnaeusDataPushAction ()
     {
 		$this->_head->service = 'push Linnaeus data';
@@ -167,26 +210,7 @@ class WebservicesController extends Controller
 
         } else {
 
-            exec('git rev-parse --abbrev-ref HEAD', $branch);
-            exec('git rev-parse HEAD', $hash);
-            exec('git rev-parse origin/' . $branch[0], $latestHash);
-
-            $data = $this->models->ProjectsModel->getProjectsWithUsers();
-
-        	foreach ($data as $i => $row) {
-                $data[$i]['git_branch'] = $branch[0];
-                $data[$i]['git_hash'] = $hash[0];
-                $data[$i]['git_latest_hash'] = $latestHash[0];
-    	        $data[$i]['project_is_published'] =
-                    ($data[$i]['project_is_published'] == 1) ? 'yes' : 'no';
-                $data[$i]['user_is_active'] =
-                    ($data[$i]['user_is_active'] == 1) ? 'yes' : 'no';
-                $data[$i]['code_up_to_date'] =
-                    ($data[$i]['git_hash'] == $data[$i]['git_latest_hash']) ? 'yes' : 'no';
-                $data[$i]['server_ip'] = $_SERVER['SERVER_ADDR'];
-                $data[$i]['server_name'] = gethostbyaddr($data[$i]['server_ip']);
-                $data[$i]['check_date'] = date("Y-m-d H:m:s");
-        	}
+            $data = $this->getLinnaeusData();
 
         	$url = !empty($this->generalSettings['pushUrl']) ?
         	   $this->generalSettings['pushUrl'] : 'http://linnaeus.naturalis.nl/admin/server_csv.php';
@@ -201,17 +225,25 @@ class WebservicesController extends Controller
     }
 
 
-
+    /**
+     * set project Id
+     */
 	private function setProjectId()
 	{
 		$this->_projectId=$this->rGetVal('pid');
 	}
 
+    /**
+     * get project Id
+     */
 	private function getProjectId()
 	{
 		return $this->_projectId;
 	}
 
+    /**
+     * initialise the web services controller
+     */
     private function initialise()
     {
 		$this->setProjectId();
@@ -220,12 +252,18 @@ class WebservicesController extends Controller
 		$this->_head=new stdClass;
 	}
 
+    /**
+     * set the Project
+     */
     private function setProject()
     {
 		$d=$this->models->ProjectsModel->getUserProjects( array( 'user_id'=>$this->getCurrentUserId(), 'show_all'=>true, 'project_id'=> $this->getProjectId()) );
 		$this->_project=$d[0];
 	}
 
+    /**
+     * authenticate User
+     */
 	private function authenticateUser()
 	{
 		$this->loginController=new LoginController;
@@ -240,6 +278,9 @@ class WebservicesController extends Controller
 		$this->helpers->HttpBasicAuthentication->authenticate() or die('not authorized');
 	}
 
+    /**
+     * authenticate Project
+     */
 	private function authenticateProject()
 	{
 		if ( is_null($this->getProjectId()) ) die('no project id');
@@ -256,6 +297,9 @@ class WebservicesController extends Controller
 		if ( !$this->getAuthorisationState() ) die('user not authorized for project');
     }
 
+    /**
+     * print the result in json
+     */
 	private function printOutput()
 	{
 		$this->_server=new stdClass;
@@ -275,6 +319,9 @@ class WebservicesController extends Controller
 		echo $this->_JSON;
 	}
 
+    /**
+     *  check if jsonp callback
+     */
 	private function checkJSONPCallback()
 	{
 		if ($this->rHasVal('callback'))
@@ -283,16 +330,25 @@ class WebservicesController extends Controller
 		}
 	}
 
+    /**
+     *  set callback
+     */
 	private function setJSONPCallback($callback)
 	{
 		$this->_JSONPCallback=$callback;
 	}
 
+    /**
+     *  get callback
+     */
 	private function getJSONPCallback()
 	{
 		return $this->_JSONPCallback;
 	}
 
+    /**
+     *  check callback
+     */
 	private function hasJSONPCallback()
 	{
 		return $this->getJSONPCallback()!=false;
