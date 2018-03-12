@@ -54,6 +54,7 @@ class ExportAppController extends Controller
 		'pages_taxa_titles',
 		'pages_taxa',
 		'synonyms',
+		'tab_order',
 		'taxa_relations',
 		'taxon_quick_parentage',
 		'taxongroups',
@@ -278,8 +279,9 @@ class ExportAppController extends Controller
 		$this->_exportDump->ContentTaxa = $this->models->ContentTaxa->_get(array('id' => $where));
 		foreach((array)$this->_exportDump->ContentTaxa as $key=>$val)
 		{
-			$this->_exportDump->ContentTaxa[$key]['content']=trim(preg_replace('/<([^>]*)>/i', ' ', $val['content']));
+			$this->_exportDump->ContentTaxa[$key]['content']=trim(html_entity_decode(preg_replace('/<([^>]*)>/i', ' ', $val['content'])));
 		}
+		$this->_exportDump->TabOrder = $this->models->TabOrder->_get(array('id' => $where));
 
 		$this->_exportDump->MediaTaxon = $this->models->MediaTaxon->_get(array('id' => $where + ['overview_image' => 1 ]));
 		foreach((array)$this->_exportDump->MediaTaxon as $key=>$val)
@@ -454,7 +456,6 @@ class ExportAppController extends Controller
 		}
 
 		$buffer[]="rmdir ".$tempdir;
-echo '<pre>';
 /*
 		header('Cache-Control: public');
 		header('Content-Description: File Transfer');
