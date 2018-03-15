@@ -18,7 +18,7 @@ $(document).ready(function()
 {
 	allLookupAlwaysFetch=true;
 
-    $('.focusfirst').focus();
+    $('.focusfirst').focus().select();
 });
   
 </script>
