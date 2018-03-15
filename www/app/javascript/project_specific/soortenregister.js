@@ -217,15 +217,44 @@ function bindKeys()
 				return;
 			}
 
-			if (e.keyCode!=undefined && e.keyCode!=13) // !enter
-			{
+			if (e.keyCode!=undefined && e.keyCode!=13) {
 				// empty ID value of user 
 				$('#'+ele+'_id').val('');
+			} else {
+				var selected = $('#'+ele+'_suggestion ul li.selected');
+				if (!selected) {
+                    var selected = $('#'+ele+'_suggestion ul li').first();
+				}
+
+			    setSuggestionId(selected);
+                e.preventDefault();
+
+			    return;
 			}
 
-			if ($.inArray(e.keyCode,[37,38,39,40])==-1) // !(l,r,t,d)
-			{
+			if ($.inArray(e.keyCode,[37,38,39,40])==-1) {
+				// !(left,up,right,down)
 				doSuggestions({type:ele,match:match});
+			} else {
+			    if ($.inArray(e.keyCode,[38,40])>-1) {
+                    var current = $('#' + ele + '_suggestion ul li.selected');
+                    if (e.keyCode == 38) {
+                        $('#'+ele+'_suggestion ul li').removeClass('selected');
+                        $(current).prev().addClass('selected');
+                    }
+                    if (e.keyCode == 40) {
+                        var next = $(current).next();
+                        if (current.length==0) {
+                            $('#' + ele + '_suggestion ul li').first().addClass('selected');
+                        }
+                        if (next.length>0) {
+                            $('#' + ele + '_suggestion ul li').removeClass('selected');
+                            $(next).addClass('selected');
+                        }
+                    }
+                    e.preventDefault();
+                    return false;
+				}
 			}
 		});
 	

@@ -16,48 +16,84 @@
         private $_linnaeusServers = array();
 	    private $_ipRanges = array();
 
-        public function setLinnaeusProtocol ($p) {
+        /**
+         * Set http or https
+         * @param string $p
+         */
+        public function setLinnaeusProtocol ($p)
+        {
             $this->_linnaeusProtocol = $p;
         }
 
+        /**
+         * @param array $p
+         */
         public function setIpRanges ($p) {
             $this->_ipRanges = (array)$p;
         }
 
+        /**
+         * Add a range of ip addresses
+         *
+         * @param string $p
+         */
         public function addIpRange ($p) {
             $this->_ipRanges[] = $p;
         }
 
-	    public function setLinnaeusServers ($p) {
+        /**
+         * @param Add ip addresses of the linnaeus servers $p
+         */
+        public function setLinnaeusServers ($p) {
             $this->_linnaeusServers = (array)$p;
         }
 
+        /**
+         * @param Add ip address of the linnaeus server $p
+         */
         public function addLinnaeusServer ($p) {
             $this->_linnaeusServers[] = $p;
         }
 
+        /**
+         * @param string $p
+         */
         public function setCsvPath ($p) {
             $this->_csvPath = $p;
         }
 
+        /**
+         * @param string $p
+         */
         public function setCsvFile ($p) {
             $this->_csvFile = $p;
         }
 
-	    private function openFp () {
+        /**
+         * open the csv file
+         */
+        private function openFp () {
             if (!$this->_fp) {
                 $this->_fp = fopen($this->_csvFile, 'w') or
                     die("FATAL ERROR: cannot write to " . $this->_csvFile . "\n\n");
             }
         }
 
-        private function closeFp () {
+        /**
+         * close the csv file
+         */
+        private function closeFp ()
+        {
             if ($this->_fp) {
                 fclose($this->_fp);
             }
         }
 
-        public function run () {
+        /**
+         * collect the information from the server, store as csv
+         */
+        public function run ()
+        {
 
             $this->openFp();
 
@@ -85,7 +121,12 @@
             echo "\nData exported to csv file " . $this->_csvFile . "\n\n";
         }
 
-        private function exportData () {
+
+        /**
+         * retrieve the information from a linnaeus server, write to csv
+         */
+        private function exportData ()
+        {
             $this->setCurlResult(array(
                 'url' => $this->_linnaeusUrl
             ));
@@ -97,6 +138,9 @@
             }
         }
 
+        /**
+         * set the Linnaeus server url
+         */
         private function setLinnaeusUrl ($p) {
             $server = isset($p['server']) ? $p['server'] : false;
             $ip = isset($p['ip']) ? $p['ip'] : null;
@@ -108,6 +152,11 @@
                 '/' . $this->_linnaeusWebservice . '?key=' . $this->_linnaeusWebserviceKey;
         }
 
+        /**
+         * Do the curl call, set the result in the object
+         * @param $p
+         * @return bool
+         */
         private function setCurlResult ($p) {
             $user = isset($p['user']) ? $p['user'] : false;
             $password = isset($p['password']) ? $p['password'] : false;
@@ -121,6 +170,8 @@
             $options = array(
                 CURLOPT_RETURNTRANSFER => 1,
                 CURLOPT_URL => $url,
+                CURLOPT_FOLLOWLOCATION => 1,
+                CURLOPT_SSL_VERIFYPEER => 0,
                 CURLOPT_CONNECTTIMEOUT => $timeout,
                 CURLOPT_USERAGENT => 'Linnaeus'
             );
@@ -132,6 +183,9 @@
             curl_close($curl);
         }
 
+        /**
+         * Write _curlResult to the open csv file
+         */
         private function writeToCsv () {
             $r = json_decode($this->_curlResult, true);
             if ($r && isset($r['results'][0]['git_branch'])) {
@@ -150,15 +204,23 @@
         }
 	}
 
+	// Create scanner
 	$ls = new LinnaeusServerScan();
+
+	// Add servers
 	$ls->setLinnaeusServers(array(
         '145.136.240.186',
         '145.136.240.185',
         '145.136.240.187'
 	));
 	$ls->addLinnaeusServer('145.136.240.192');
+
 	// Alternatively it may be easier to do:
 	// $ls->addIpRange('http://145.136.240.*');
-	$ls->setCsvFile(dirname(__FILE__) . '/output/linnaeus_servers.csv');
+
+    // set the export file
+	$ls->setCsvFile(__DIR__ . '/output/linnaeus_servers.csv');
+
+	// start scanning
 	$ls->run();
 

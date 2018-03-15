@@ -185,17 +185,11 @@ final class Table extends AbstractModel
 			else
 			if ($d && (!empty($val) || $val===0 || $val==='0'))
 			{
-                if ($d['numeric'] == 1)
-				{
+                if ($d['numeric'] == 1) {
                     $query .= " `" . $key . "` = " . $val . ", ";
-                }
-                else
-				if ($d['type'] == 'datetime')
-				{
+                } else if ($d['type'] == 'datetime') {
                     $query .= " `" . $key . "` = '" . $val . "', ";
-                }
-                else
-				{
+                } else {
                     $query .= " `" . $key . "` = ".($val=='null' ? 'null' : "'" . $val . "'").", ";
                 }
             }

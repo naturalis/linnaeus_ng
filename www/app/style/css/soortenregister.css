@@ -1489,9 +1489,10 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
     min-height: 50px;
     color: #e3004a; }
 
-.suggestion li:hover {
+.suggestion li:hover, #mobilegroup_suggestion ul li.selected, #desktopgroup_suggestion ul li.selected {
   background-color: #e3004a;
-  color: #fff; }
+  color: #fff;
+}
 
 #formSearchFacetsSpecies {
   background-color: #fff; }

@@ -125,6 +125,10 @@ final class ProjectsModel extends AbstractModel
 
     public function getProjectsWithUsers ()
     {
+        // @todo: temporarily changed the t3.last_login to last_change,
+        // because last_login was no longer saved correctly in many linnaeus
+        // installations, this needs to be corrected again
+
         $query = '
             select
                 t1.sys_name as project,
@@ -135,7 +139,7 @@ final class ProjectsModel extends AbstractModel
                 t4.role as role,
                 t3.email_address,
                 t3.active as user_is_active,
-                t3.last_login,
+                t3.last_change,
                 t2.last_project_select as project_last_selected,
                 t3.last_password_change as password_last_changed
             from

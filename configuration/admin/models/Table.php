@@ -1,5 +1,4 @@
 <?php
-
 include_once (__DIR__ . "/AbstractModel.php");
 
 final class Table extends AbstractModel
@@ -7,6 +6,10 @@ final class Table extends AbstractModel
 
     public $columns;
 
+    /**
+     * Table constructor.
+     * @param bool $tableBaseName
+     */
     public function __construct ($tableBaseName = false)
     {
         parent::__construct();
@@ -17,29 +20,20 @@ final class Table extends AbstractModel
             mysqli_connect_error() . '. Correct the getDatabaseSettings() settings
         	in configuration/admin/config.php.'));
 
-        if (!$tableBaseName)
-		{
+        if (! $tableBaseName) {
             die(_('FATAL: no table basename defined'));
-        }
-        else
-		{
+        } else {
             $this->_tablePrefix = $this->databaseSettings['tablePrefix'];
             $this->tableName = $this->_tablePrefix . $tableBaseName;
         }
 
         $this->getTableColumnInfo();
-
-        /*
-         * @TODO: can we get rid of this?
-         *
-        if (!$this->getTableExists()) {
-			// fatal stop disabled while we are transitioning from old to new LNG modules
-            //die(_('FATAL: table "' . $this->tableName . '" does not exist'));
-        }
-         */
-
     }
 
+    /**
+     * Destruction method
+     *
+     */
     public function __destruct ()
     {
         if ($this->databaseConnection)
@@ -49,38 +43,49 @@ final class Table extends AbstractModel
         parent::__destruct();
     }
 
+    /**
+     * @param bool $state
+     */
     public function setTableExists($state)
 	{
 		$this->tableExists=$state;
 	}
 
+    /**
+     * @return bool
+     */
     public function getTableExists()
 	{
 		return $this->tableExists;
 	}
 
-	public function getTablePrefix()
+    /**
+     * @return string
+     */
+    public function getTablePrefix()
 	{
 		return $this->_tablePrefix;
 	}
 
+    /**
+     * @param array $data
+     * @return bool|string
+     */
     public function save($data)
     {
-        if ($this->hasId($data))
-		{
+        if ($this->hasId($data)) {
             return $this->update($data);
-        }
-		else
-		{
+        } else {
             return $this->insert($data);
         }
     }
 
     public function insert ($data)
     {
-        foreach ((array) $data as $key => $val)
-		{
-			if (!is_array($val) && !(substr($val,0,1)=='#')) $data[$key] = $this->escapeString($val);
+        foreach ((array) $data as $key => $val) {
+			if (!is_array($val) && !(substr($val,0,1)=='#')) {
+                $data[$key] = $this->escapeString($val);
+            }
         }
 
         $fields = null;
@@ -88,11 +93,13 @@ final class Table extends AbstractModel
 
         foreach ((array) $data as $key => $val)
 		{
-            if (is_array($val))
+            if (is_array($val)) {
                 continue;
+            }
 
-            if (empty($this->columns[$key]))
+            if (empty($this->columns[$key])) {
                 continue;
+            }
 
             $d = $this->columns[$key];
 
@@ -101,40 +108,30 @@ final class Table extends AbstractModel
 				$this->_projectId = $val;
 			}
 
-            if ($d && (!empty($val) || $val===0 || $val==='0') && $val!='null')
-			{
+            if ($d && (!empty($val) || $val===0 || $val==='0') && $val!='null') {
                 $fields .= "`".$key ."`, ";
 
 				// # at beginning of value is signal to take the value literal
                 if (substr($val,0,1)=='#')
 				{
 					$values .= substr($val,1) . ", ";
-				}
-				else
-				if ($d['type'] == 'date' || $d['type'] == 'datetime' || $d['type'] == 'timestamp')
-				{
+				} else if ($d['type'] == 'date' || $d['type'] == 'datetime' || $d['type'] == 'timestamp') {
+
 					if ($this->isDateTimeFunction($val)) {
                         $values .= $val . ", ";
-                    }
-                    else
-					{
+                    } else {
                         $values .= "'" . $val . "', ";
                     }
-                }
-                else
-				if ($d['numeric']==1)
-				{
+
+                } else if ($d['numeric']==1) {
                     $values .= $val . ", ";
-                }
-                else
-				{
+                } else {
                     $values .= "'" . $val . "', ";
                 }
             }
         }
 
-        if (array_key_exists('created', $this->columns) && !array_key_exists('created', $data))
-		{
+        if (array_key_exists('created', $this->columns) && !array_key_exists('created', $data)) {
             $fields .= 'created,';
             $values .= 'CURRENT_TIMESTAMP,';
         }
@@ -144,13 +141,10 @@ final class Table extends AbstractModel
         $this->retainDataBeforeQuery(null);
         $this->setLastQuery($query);
 
-        if (!mysqli_query($this->databaseConnection, $query))
-		{
+        if (!mysqli_query($this->databaseConnection, $query)) {
 			$this->logQueryResult(false,$query,'ins');
             return mysqli_error($this->databaseConnection);
-        }
-        else
-		{
+        } else {
 			$this->setAffectedRows();
             $this->newId = mysqli_insert_id($this->databaseConnection);
 			$this->retainDataAfterQuery($this->newId);
@@ -158,45 +152,41 @@ final class Table extends AbstractModel
         }
     }
 
+    /**
+     * @param array $data
+     * @param bool $where
+     * @return bool|string
+     */
     public function update ($data, $where = false)
     {
-        foreach ((array) $data as $key => $val)
-		{
+        foreach ((array) $data as $key => $val) {
 			if (!is_array($val) && !(substr($val,0,1)=='#')) $data[$key] = $this->escapeString($val);
         }
 
         $query = "update " . $this->tableName . " set ";
 
-        foreach ((array) $data as $key => $val)
-		{
+        foreach ((array) $data as $key => $val) {
             if (!isset($this->columns[$key]))
                 continue;
 
             $d = $this->columns[$key];
-			if ($key=='project_id')
-			{
+			if ($key=='project_id') {
 				$this->_projectId = $val;
 			}
 
 			// # at beginning of value is signal to take the value literal
-			if (substr($val,0,1)=='#')
-			{
+			if (substr($val,0,1)=='#') {
 				$query .= " `" . $key . "` = " . substr($val,1) . ", ";
-			}
-			else
-			if ($d && (!empty($val) || $val===0 || $val==='0'))
-			{
-                if ($d['numeric'] == 1)
-				{
+			} else if ($d && (!empty($val) || $val===0 || $val==='0')) {
+                if (($d['numeric'] == 1) || ($val == 'now()')) {
                     $query .= " `" . $key . "` = " . $val . ", ";
-                }
-                else
-				if ($d['type'] == 'datetime')
-				{
-                    $query .= " `" . $key . "` = '" . $val . "', ";
-                }
-                else
-				{
+                } else if ($d['type'] == 'date' || $d['type'] == 'datetime' || $d['type'] == 'timestamp') {
+                    if ($this->isDateTimeFunction($val)) {
+                        $query .= " `" . $key . "` = " . $val . ", ";
+                    } else {
+                        $query .= " `" . $key . "` = '" . $val . "', ";
+                    }
+                } else {
                     $query .= " `" . $key . "` = ".($val=='null' ? 'null' : "'" . $val . "'").", ";
                 }
             }
@@ -204,41 +194,30 @@ final class Table extends AbstractModel
 
         // this might seem odd as all the last_change columns are defined with 'ON UPDATE CURRENT_TIMESTAMP'
         // occasionally, it is necessary to update only the last_change column, as with the heartbeats table
-        if (array_key_exists('last_change', $this->columns) && array_key_exists('last_change', $data))
-		{
+        if (array_key_exists('last_change', $this->columns) && array_key_exists('last_change', $data)) {
             $query .= 'last_change = CURRENT_TIMESTAMP,';
         }
 
         $query = rtrim($query, ', ');
 
-        if (!$where)
-		{
+        if (!$where) {
             $query .= " where id = " . $data['id'];
-        }
-        else
-		if (is_array($where))
-		{
+        } else if (is_array($where)) {
             $query .= " where id = id ";
             foreach ((array) $where as $col => $val)
 			{
-                if (strpos($col, ' ') === false)
-				{
+                if (strpos($col, ' ') === false) {
                     $operator = '=';
-                }
-                else
-				{
+                } else {
                     $operator = trim(substr($col, strpos($col, ' ')));
                     $col = trim(substr($col, 0, strpos($col, ' ')));
                 }
 
 	            $d = $this->columns[$col];
 
-                if ($d['numeric'] == 1)
-				{
+                if ($d['numeric'] == 1) {
 	                $query .= ' and `' . $col . "` " . $operator . " " . $this->escapeString($val);
-				}
-				else
-				{
+				} else {
 	                $query .= ' and `' . $col . "` " . $operator . " '" . $this->escapeString($val) . "'";
     			}
             }
@@ -247,20 +226,22 @@ final class Table extends AbstractModel
         $this->retainDataBeforeQuery($query);
         $this->setLastQuery($query);
 
-        if (!mysqli_query($this->databaseConnection, $query))
-		{
+        if (!mysqli_query($this->databaseConnection, $query)) {
 			$this->logQueryResult(false,$query,'upd');
 			$this->retainDataAfterQuery($query,true);
             return mysqli_error($this->databaseConnection);
-        }
-        else
-		{
+        } else {
 			$this->setAffectedRows();
 			$this->retainDataAfterQuery($query);
             return true;
         }
     }
 
+    /**
+     * Deletes the record in the table when called with id
+     * @param bool $id
+     * @return bool|string|void
+     */
     public function delete ($id = false)
     {
         if (!$id)
@@ -273,57 +254,40 @@ final class Table extends AbstractModel
 
             foreach ((array) $id as $col => $val)
 			{
-                if (strpos($col,' ')===false)
-				{
+                if (strpos($col,' ')===false) {
                     $operator = '=';
-                }
-				else
-				{
+                } else {
                     $operator = trim(substr($col, strpos($col,' ')));
                     $col = trim(substr($col, 0, strpos($col,' ')));
                 }
 
-				if ($col=='project_id')
-				{
+				if ($col=='project_id') {
 					$this->_projectId = $val;
 				}
 
 				// operator ending with # signals to use val literally (for queries like: "mean = (23 + (sd * 2))"
-                if (substr($operator,-1)=='#')
-				{
+                if (substr($operator,-1)=='#') {
                     $query .= " and `" . $col . "` " . substr($operator,0,-1) . " " . $val;
-                }
-				else
-				{
+                } else {
 	                $query .= " and `" . $col . "` " . $operator . " '" . $this->escapeString($val) . "'";
 				}
             }
-        } else
-		if (is_numeric($id))
-		{
+        } else if (is_numeric($id)) {
             $query = 'delete from ' . $this->tableName . ' where id = ' . ($id ? $id : $this->id) . ' limit 1';
-        }
-		else
-		if (is_string($id))
-		{
+        } else if (is_string($id)) {
             $query = str_replace('%table%', $this->tableName, $id);
-        }
-		else
-		{
+        } else {
             return;
         }
         $this->retainDataBeforeQuery($query);
         $this->setLastQuery($query);
         $result = mysqli_query($this->databaseConnection, $query);
 
-        if (!$result)
-		{
+        if (!$result) {
 			$this->logQueryResult(false,$query,'del');
 			$this->retainDataAfterQuery($query,true);
             return mysqli_error($this->databaseConnection);
-        }
-        else
-		{
+        } else {
 			$this->setAffectedRows();
 			$this->retainDataAfterQuery($query);
             return true;
@@ -364,11 +328,14 @@ final class Table extends AbstractModel
 
     }
 
-    /*
+    /**
      * Returns single column from result as non-associative array:
      * array(0 => array(param => x), 1 => array(param => y)) becomes
      * array(0 => x, 1 => y). This can be handy to quickly generate
      * lookup tables.
+     *
+     * @param $params
+     * @return bool
      */
     public function getSingleColumn ($params) {
         $r = $this->_get($params);
@@ -381,31 +348,56 @@ final class Table extends AbstractModel
         return false;
     }
 
+    /**
+     * Get the new Id
+     * @return mixed
+     */
     public function getNewId ()
     {
         return $this->newId;
     }
 
+    /**
+     * Get the number of affected rows
+     * @return mixed
+     */
     public function getAffectedRows()
     {
         return $this->_affectedRows;
     }
 
+    /**
+     * Get the Last Query
+     * @return mixed
+     */
     public function getLastQuery ()
     {
         return $this->lastQuery;
     }
 
-	public function setNoKeyViolationLogging($state)
+    /**
+     * @param $state
+     */
+    public function setNoKeyViolationLogging($state)
 	{
-		if (is_bool($state)) $this->noKeyViolationLogging = $state;
+		if (is_bool($state)) {
+            $this->noKeyViolationLogging = $state;
+        }
 	}
 
-	public function getTableName()
+    /**
+     * Get the name of the Table handled by the model
+     *
+     * @return string
+     */
+    public function getTableName()
 	{
 		return $this->tableName;
 	}
 
+    /**
+     * Get table column details
+     */
     private function getTableColumnInfo ()
     {
 		$query = 'select * from ' . $this->tableName . ' limit 1';
@@ -420,12 +412,10 @@ final class Table extends AbstractModel
 
         $i = 0;
 
-        while ($i < mysqli_num_fields($r))
-		{
+        while ($i < mysqli_num_fields($r)) {
             $info = mysqli_fetch_field($r);
 
-            if ($info)
-			{
+            if ($info) {
                 $this->columns[$info->name] = array(
                     'numeric' => in_array($info->type, array(16,1,2,9,3,8,4,5,246)) ? 1 : 0,
                     'table' => $info->table,
@@ -436,12 +426,16 @@ final class Table extends AbstractModel
         }
     }
 
+    /**
+     * Check if the array has an 'id' field
+     * @param $data
+     * @return bool
+     */
     private function hasId($data)
     {
         foreach ((array) $data as $col => $val)
 		{
-            if ($col == 'id' && $val != null)
-			{
+            if ($col == 'id' && $val != null) {
                 $this->id = $val;
                 return true;
             }
@@ -449,21 +443,21 @@ final class Table extends AbstractModel
         return false;
     }
 
+    /**
+     * Setting the values in a record
+     * function can take as $id:
+     * - a single $id to find the corresponding row
+     * - an array of column/value-pairs (array('last_name' => 'turing' ))
+     * standard operator is '=' but it is possible to tag another operator
+     * after the column-value (array('last_name !=' => 'gates' ))
+     * - a full query with %table% as tablename
+     * - * for no where clause
+     * $cols can hold a string that replaces the defualt * in 'select * from...'
+     *
+     * @param $params
+     */
     private function set($params)
     {
-        /*
-
-			function can take as $id:
-				- a single $id to find the corresponding row
-				- an array of column/value-pairs (array('last_name' => 'turing' ))
-				  standard operator is '=' but it is possible to tag another operator
-				  after the column-value (array('last_name !=' => 'gates' ))
-				- a full query with %table% as tablename
-				- * for no where clause
-			$cols can hold a string that replaces the defualt * in 'select * from...'
-
-		*/
-
 		$id = isset($params['id']) ? $params['id'] : false;
 		$cols = isset($params['columns']) ? $params['columns'] : false;
 		$order = isset($params['order']) ? $params['order'] : false;
@@ -475,7 +469,7 @@ final class Table extends AbstractModel
 
 		$this->setCurrentWhereArray($id);
 
-        $query = false;
+        $query = "";
 
 		if ($fieldAsIndex!=false && $cols!=false && $cols!='*' && stripos(','.$cols.',',','.$fieldAsIndex.',')===false)
 			$cols .= ','.$fieldAsIndex;
@@ -491,153 +485,94 @@ final class Table extends AbstractModel
 				$colLiteral	= false;
 
                 if (strpos($col, ' ') === false) {
-
                     $operator = '=';
-
                 } else {
-
                     $operator = trim(substr($col, strpos($col, ' ')));
-
                     $col = trim(substr($col, 0, strpos($col, ' ')));
-
                 }
 
 				if ($col=='project_id') {
-
 					$this->_projectId = $val;
-
 				}
 
 				if (isset($this->columns[$col])) {
-
 	            	$d = $this->columns[$col];
-
-				} else
-				if (strtolower(trim($col))=='%literal%') {
-
+				} else if (strtolower(trim($col))=='%literal%') {
 	            	$colLiteral = true;
-
-				}
-				else {
-
+				} else {
 					continue;
-
 				}
 
 				if ($colLiteral) {
-
                     $query .= " and " . $val;
-
-				} else
-				// operator ending with # signals to use val literally (for queries like: "mean = (23 + (sd * 2))"
-                if (substr($operator,-1) == '#') {
-
+				} elseif (substr($operator,-1) == '#') {
+                    // operator ending with # signals to use val literally (for queries like: "mean = (23 + (sd * 2))"
                     $query .= " and `" . $col . "` " . substr($operator,0,-1) . " " . $val;
-
                 } elseif ($val===null) {
-
                     $query .= " and `" . $col . "` " . $operator . " null ";
-
                 } elseif ($operator == 'like') {
-
                     $query .= " and `" . $col . "` " . $operator . " '" . mb_strtolower($val,'UTF-8')."'";
-
                 } elseif ($d['numeric'] == 1) {
-
                     $query .= " and `" . $col . "` " . $operator . " " . $this->escapeString(mb_strtolower($val,'UTF-8'));
-
                 } elseif ($d['type'] == 'datetime') {
-
                     $query .= " and `" . $col . "` " . $operator . " '" . $this->escapeString(mb_strtolower($val,'UTF-8'))."'";
-
                 } elseif ($ignoreCase && is_string($val)) {
-
                     $query .= " and lower(`" . $col . "`) " . $operator . " '" . $this->escapeString(mb_strtolower($val,'UTF-8')) . "'";
-
                 } else {
-
                     $query .= " and `" . $col . "` " . $operator . " '" . $this->escapeString($val) . "'";
-
                 }
 
             }
 
             $query .= $group ? " group by " . $group : '';
-
             $query .= $order ? " order by " . $order : '';
-
             $query .= $limit ? " limit " . $limit : '';
 
             $set = mysqli_query($this->databaseConnection, $query);
-
 			$this->logQueryResult($set,$query,'set,normal');
-
             $this->setLastQuery($query);
 
             while ($row = @mysqli_fetch_assoc($set)) {
-
 				if ($fieldAsIndex!==false && isset($row[$fieldAsIndex])) {
-
 	                $this->data[$row[$fieldAsIndex]] = $row;
-
 				} else {
-
 	                $this->data[] = $row;
-
             	}
-
             }
 
         } elseif ($id=='*') {
 
             $query = 'select ' . (!$cols ? '*' : $cols) . ' from ' . $this->tableName;
-
             $query .= $group ? " group by " . $group : '';
-
             $query .= $order ? " order by " . $order : '';
-
             $query .= $limit ? " limit " . $limit : '';
 
             $this->setLastQuery($query);
 
             $set = mysqli_query($this->databaseConnection, $query);
-
 			$this->logQueryResult($set,$query,'set,*');
 
             while ($row = @mysqli_fetch_assoc($set)) {
-
 				if ($fieldAsIndex!==false && isset($row[$fieldAsIndex])) {
-
 	                $this->data[$row[$fieldAsIndex]] = $row;
-
 				} else {
-
 	                $this->data[] = $row;
-
             	}
-
             }
 
         } elseif (is_numeric($id)) {
 
             $query = 'select ' . (!$cols ? '*' : $cols) . ' from ' . $this->tableName . ' where id =' . $this->escapeString($id) . ' limit 1';
-
             $this->setLastQuery($query);
-
 			$m = mysqli_query($this->databaseConnection, $query);
-
 			$this->logQueryResult($m,$query,'set,id only');
-
             $this->data = @mysqli_fetch_assoc($m);
 
         } elseif ($where!==false) {
 
             $query = 'select ' . (!$cols ? '*' : $cols) . ' from ' . $this->tableName . ' where ' . $where;
-
             $query .= $group ? " group by " . $group : '';
-
             $query .= $order ? " order by " . $order : '';
-
             $query .= $limit ? " limit " . $limit : '';
 
             $this->setLastQuery($query);
@@ -650,43 +585,31 @@ final class Table extends AbstractModel
             while ($row = @mysqli_fetch_assoc($set)) {
 
 				if ($fieldAsIndex!==false && isset($row[$fieldAsIndex])) {
-
 	                $this->data[$row[$fieldAsIndex]] = $row;
-
 				} else {
-
 	                $this->data[] = $row;
-
             	}
 
             }
 
-        } elseif (!is_null($id)) {
+        } elseif (! is_null($id)) {
 
 			$query = str_ireplace('%table%', $this->tableName, $id);
-
             $set = mysqli_query($this->databaseConnection, $query);
-
 			$this->logQueryResult($set,$query,'set,full query');
-
             $this->setLastQuery($query);
 
             while ($row = @mysqli_fetch_assoc($set)) {
 
-				if ($fieldAsIndex!==false && isset($row[$fieldAsIndex]))
-				{
+				if ($fieldAsIndex!==false && isset($row[$fieldAsIndex])) {
 	                $this->data[$row[$fieldAsIndex]] = $row;
-				}
-				else
-				{
+				} else {
 	                $this->data[] = $row;
             	}
             }
-        }
-		else
-		{
+        } else {
 			$this->log('Called _get with an empty query (poss. cause: "...\'id\' => \'null\' " instead of " => null ")',1);
 		}
     }
-
 }
+

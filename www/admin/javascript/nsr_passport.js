@@ -64,6 +64,23 @@ function geteditordata(editor)
 	return data;
 }
 
+function changeLanguage(caller)
+{
+    var query = window.location.search;
+    var params = query.slice(1).split('&');
+    var newquery = "?";
+    for (var i=0; i < params.length; i++) {
+    	if (params[i].search('activeLanguage=') < 0) {
+    		newquery = newquery + params[i] + "&";
+		}
+	}
+	newquery = newquery + "activeLanguage=" + $(caller).val();
+
+    window.location = window.location.origin + window.location.pathname + newquery;
+
+	return false;
+}
+
 function closeeditor(caller)
 {
 	var id=getcallerid(caller);
@@ -101,6 +118,7 @@ function saveeditordata(caller)
 
 	var page=$('#page'+id).val();
 	var taxon=$('#taxon_id').val();
+    var lang=$('#language_id').val();
 
 	$.ajax({
 		url : 'paspoort_ajax_interface.php',
@@ -108,6 +126,7 @@ function saveeditordata(caller)
 		data: {
 			action: 'save_passport',
 			taxon: taxon,
+            lang: lang,
 			page : page,
 			content : content,
 			publish : publish,
