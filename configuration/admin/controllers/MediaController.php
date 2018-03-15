@@ -292,7 +292,7 @@ class MediaController extends Controller
             }
 
             // Test plugin urls
-            foreach (array($this->_rsUploadApi, $this->_rsNewUserApi, $this->_rsSearchApi) as $plugin) {
+            foreach (array($this->_rsUploadApi, $this->_rsNewUserApi) as $plugin) {
                 $headers = get_headers($this->_rsBaseUrl . $plugin);
                 if (substr($headers[0], 9, 3) != 301) {
                     die('FATAL: ResourceSpace plugin "' . $plugin . '" returns ' . $headers[0] . '.
