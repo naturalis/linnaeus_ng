@@ -1,5 +1,4 @@
 {include file="../shared/header.tpl"}
-<!-- {include file="../shared/flexslider.tpl"} -->
 <style>
 .options-panel {
 	margin-top:5px;

@@ -193,8 +193,7 @@ class SearchControllerNSR extends SearchController
     {
 		$search=$this->rGetAll();
 
-		if ($this->rHasVal('action','export'))
-		{
+		if ($this->rHasVal('action','export')) {
 			$search['limit']=1000;
 			$template='export_search_extended';
 			$this->smarty->assign('csvExportSettings',$this->csvExportSettings);
@@ -206,9 +205,7 @@ class SearchControllerNSR extends SearchController
 					'charset'=>'utf-8',
 					'filename'=>'NSR-export-'.date('Ymd-his').$this->csvExportSettings['file-extension'])
 					);
-		}
-		else
-		{
+		} else {
 			$this->smarty->assign('search',$search);
 			$this->smarty->assign('querystring',$this->reconstructQueryString(array('search'=>$search,'ignore'=>array('page'))));
 			$this->smarty->assign('presence_statuses',$this->getPresenceStatuses());
@@ -218,8 +215,7 @@ class SearchControllerNSR extends SearchController
 
 		$this->traitGroupsToInclude=$this->getTraitGroups();
 
-		if (count((array)$this->traitGroupsToInclude)>0)
-		{
+		if (count((array)$this->traitGroupsToInclude)>0) {
 			$search['traits']=$this->rHasVal('traits') ? json_decode(urldecode($search['traits']),true) : null;
 			$search['trait_group']=$this->rHasVal('trait_group') ? $search['trait_group'] : null;
 
@@ -253,8 +249,7 @@ class SearchControllerNSR extends SearchController
     {
 		$search=$this->requestData;
 
-		if ($this->rHasVal('action','export'))
-		{
+		if ($this->rHasVal('action','export')) {
 			$search['limit']=1000;
 			$template='export_search_pictures';
 			$this->smarty->assign('csvExportSettings',$this->csvExportSettings);
@@ -265,9 +260,7 @@ class SearchControllerNSR extends SearchController
 					'charset'=>'utf-8',
 					'filename'=>'NSR-export-'.date('Ymd-his').$this->csvExportSettings['file-extension'])
 					);
-		}
-		else
-		{
+		} else {
 			$template=null;
 			$this->smarty->assign('photographers',$this->getPhotographersPictureCount($search));
 			$this->smarty->assign('validators',$this->getValidatorPictureCount($search));
@@ -276,8 +269,7 @@ class SearchControllerNSR extends SearchController
 			$this->smarty->assign('imageExport',true);
 		}
 
-		if ($this->rHasVal('show','photographers'))
-		{
+		if ($this->rHasVal('show','photographers')) {
 			$this->smarty->assign('show','photographers');
 			$search['limit']='*';
 		}
@@ -426,64 +418,57 @@ class SearchControllerNSR extends SearchController
 
 	}
 
-	private function doExtendedSearch($p)
+	private function doExtendedSearch($params)
 	{
 
-		$d=null;
+		$suggestionsGroup=null;
 
-		if (!empty($p['group_id']))
-		{
-			$d=$this->getSuggestionsGroup(array('id'=>(int)trim($p['group_id']),'match'=>'id'));
-			if (empty($d))
-			{
-				$ancestor_id=$p['group_id'];
+		if (!empty($params['group_id'])) {
+			$suggestionsGroup=$this->getSuggestionsGroup(array('id'=>(int)trim($params['group_id']),'match'=>'id'));
+			if (empty($suggestionsGroup)) {
+				$ancestor_id=$params['group_id'];
+			} else {
+				$ancestor_id=$suggestionsGroup ? $suggestionsGroup[0]['id'] : null;
 			}
-			else
-			{
-				$ancestor_id=$d ? $d[0]['id'] : null;
-			}
-		}
-		else
-		if (!empty($p['group']))
-		{
-			$d=$this->getSuggestionsGroup(array('search'=>$p['group'],'match'=>'exact'));
-			$ancestor_id=$d ? $d[0]['id'] : null;
+		} else if (!empty($params['group'])) {
+			$suggestionsGroup=$this->getSuggestionsGroup(array('search'=>$params['group'],'match'=>'exact'));
+			$ancestor_id=$suggestionsGroup ? $suggestionsGroup[0]['id'] : null;
 		}
 
-		$images_on=(!empty($p['images_on']) && $p['images_on']=='on' ? true : null);
-		$images_off=(!empty($p['images_off']) && $p['images_off']=='on' ? true : null);
+		$images_on=(!empty($params['images_on']) && $params['images_on']=='on' ? true : null);
+		$images_off=(!empty($params['images_off']) && $params['images_off']=='on' ? true : null);
 		$images=!is_null($images_on) || !is_null($images_off);
 
-		$distribution_on=(!empty($p['distribution_on']) && $p['distribution_on']=='on' ? true : null);
-		$distribution_off=(!empty($p['distribution_off']) && $p['distribution_off']=='on' ? true : null);
+		$distribution_on=(!empty($params['distribution_on']) && $params['distribution_on']=='on' ? true : null);
+		$distribution_off=(!empty($params['distribution_off']) && $params['distribution_off']=='on' ? true : null);
 		$distribution=!is_null($distribution_on) || !is_null($distribution_off);
 
-		$trend_on=(!empty($p['trend_on']) && $p['trend_on']=='on' ? true : null);
-		$trend_off=(!empty($p['trend_off']) && $p['trend_off']=='on' ? true : null);
+		$trend_on=(!empty($params['trend_on']) && $params['trend_on']=='on' ? true : null);
+		$trend_off=(!empty($params['trend_off']) && $params['trend_off']=='on' ? true : null);
 		$trend=!is_null($trend_on) || !is_null($trend_off);
 
-		$dna=(!empty($p['dna']) || !empty($p['dna_insuff']));
-		$dna_insuff=!empty($p['dna_insuff']);
-		$traits=isset($p['traits']) ? $p['traits'] : null;
-		$trait_group=isset($p['trait_group']) ? $p['trait_group'] : null;
-		$auth=!empty($p['author']) ? $p['author'] : null;
+		$dna=(!empty($params['dna']) || !empty($params['dna_insuff']));
+		$dna_insuff=!empty($params['dna_insuff']);
+		$traits=isset($params['traits']) ? $params['traits'] : null;
+		$trait_group=isset($params['trait_group']) ? $params['trait_group'] : null;
+		$auth=!empty($params['author']) ? $params['author'] : null;
 
 		$pres=null;
-		if (!empty($p['presence']))
+		if (!empty($params['presence']))
 		{
 			$pres=array();
-			foreach((array)$p['presence'] as $key=>$val)
+			foreach((array)$params['presence'] as $key=> $val)
 			{
 				if ($val=='on') $pres[]= (int)$key;
 			}
 		}
 
-		$limit=!empty($p['limit']) ? $p['limit'] : $this->_resSpeciesPerPage;
-		$offset=(!empty($p['page']) ? $p['page']-1 : 0) * $this->_resSpeciesPerPage;
-		$sort=!empty($p['sort']) ? $p['sort'] : null;
-		$just_species=!empty($p['just_species']) ? $p['just_species'] : false;
+		$limit=!empty($params['limit']) ? $params['limit'] : $this->_resSpeciesPerPage;
+		$offset=(!empty($params['page']) ? $params['page']-1 : 0) * $this->_resSpeciesPerPage;
+		$sort=!empty($params['sort']) ? $params['sort'] : null;
+		$just_species=!empty($params['just_species']) ? $params['just_species'] : false;
 
-		$d=$this->models->SearchNSRModel->doExtendedSearch(array(
+		$suggestionsGroup=$this->models->SearchNSRModel->doExtendedSearch(array(
 			"images"=>$images,
 			"images_on"=>$images_on,
 			"images_off"=>$images_off,
@@ -510,8 +495,8 @@ class SearchControllerNSR extends SearchController
 			"operators"=>$this->_operators
 		));
 
-		$data=$d['data'];
-		$count=$d['count'];
+		$data=$suggestionsGroup['data'];
+		$count=$suggestionsGroup['count'];
 
 		foreach((array)$data as $key=>$val)
 		{
@@ -529,13 +514,11 @@ class SearchControllerNSR extends SearchController
 			}
 		}
 
-        // @check_this: ancestor not defined or set in this scope, should it be ancestor_id instead?
 		return
 			array(
 				'count'=>$count,
 				'data'=>$data,
-				'perpage'=>$this->_resSpeciesPerPage,
-				'ancestor'=>isset($ancestor) ? $ancestor : null
+				'perpage'=>$this->_resSpeciesPerPage
 			);
 	}
 
@@ -723,7 +706,7 @@ class SearchControllerNSR extends SearchController
 	private function getSuggestionsName( $p )
 	{
 		$search=$this->removeSearchNoise($p['search']);
-		
+
 		$data=$this->models->SearchNSRModel->getSuggestionsName(array(
 			"search"=>$search,
 			"order"=>isset($p['order']) ? $p['order'] : null,
