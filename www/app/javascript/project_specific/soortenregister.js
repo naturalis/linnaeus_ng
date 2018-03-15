@@ -222,7 +222,7 @@ function bindKeys()
 				$('#'+ele+'_id').val('');
 			} else {
 				var selected = $('#'+ele+'_suggestion ul li.selected');
-				if (!selected) {
+				if (selected.length==0) {
                     var selected = $('#'+ele+'_suggestion ul li').first();
 				}
 
