@@ -18,7 +18,9 @@ function nbcPrettyPhotoInit() {
 	$('[data-fancybox]').fancybox({
 		arrows : false,
 		infobar : true,
-		animationEffect : false
+		animationEffect : false,
+		parentEl : '#body',
+		clickContent : false
 	});
 
 }

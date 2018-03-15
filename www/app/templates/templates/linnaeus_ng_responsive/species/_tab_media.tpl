@@ -155,7 +155,12 @@ $(document).ready(function()
 <!--
 <div class="imageInGrid3 taxon-page">
     <div class="thumbContainer">
-        <a data-fancybox="gallery" href="{$taxon_base_url_images_main}%image%" data-caption='%meta_data%'>
+        <a
+        	data-fancybox="gallery"
+        	data-type="image"
+            data-srcset="{$taxon_base_url_images_main}%image% 1600w, {$taxon_base_url_images_main|replace:'original':'1200x750'}%image% 1200w, {$taxon_base_url_images_main|replace:'original':'w800'}%image% 800w"
+        	href="{$taxon_base_url_images_main}%image%"
+        	data-caption="%meta_data%">
             <div class="imageGradient"></div>
 	        <img class="speciesimage" alt="Foto %photographer%" title="Foto %photographer%" src="{$taxon_base_url_images_thumb}%thumb%" />
     	    <ul>

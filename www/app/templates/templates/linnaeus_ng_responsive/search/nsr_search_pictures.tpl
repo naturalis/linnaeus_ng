@@ -40,6 +40,8 @@
 						<div class="thumbContainer">
 							<a 
                                 data-fancybox="gallery"
+								data-type="image"
+								data-srcset="{$taxon_base_url_images_main}{$v.image} 1600w, {$taxon_base_url_images_main|replace:'original':'1200x750'}{$v.image} 1200w, {$taxon_base_url_images_main|replace:'original':'w800'}{$v.image} 800w"
                                 data-caption="{$v.meta_data|@escape}"
                                 href="{$taxon_base_url_images_main}{$v.image}">
 								<div class="imageGradient"></div>
