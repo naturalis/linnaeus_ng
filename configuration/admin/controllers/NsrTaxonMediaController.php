@@ -114,12 +114,12 @@ class NsrTaxonMediaController extends NsrController
 		}
 
 		$this->smarty->assign('media', $this->_mc->getItemMediaFiles());
-		$this->smarty->assign('taxon', $taxon);
+		$this->smarty->assign('taxon', $this->taxon);
 		$this->smarty->assign('languages', $this->getProjectLanguages());
 		$this->smarty->assign('defaultLanguage', $this->getDefaultProjectLanguage());
 		$this->smarty->assign('language_id', $this->languageId);
 		$this->smarty->assign('module_id', $this->getCurrentModuleId());
-		$this->smarty->assign('item_id', $taxon['id']);
+		$this->smarty->assign('item_id', $this->taxon['id']);
 
         $this->printPage();
     }
@@ -131,10 +131,6 @@ class NsrTaxonMediaController extends NsrController
     {
 		$this->moduleSettings = new ModuleSettingsReaderController;
 
-		$id1 = $this->rGetId();
-		$id2 = $this->rHasId();
-		$id3 = $this->rHasVal('taxon_id');
-        $id4 = $this->rHasVal('id');
         $this->taxonId = $this->rHasId() ? $this->rGetId() :
             ($this->rHasVal('taxon_id') ? $this->rGetVal('taxon_id') : false);
 

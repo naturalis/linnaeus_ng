@@ -34,7 +34,8 @@ class MediaController extends Controller
     private $languageId;
     private $itemsPerPage = 100;
 
-    protected $_mi;
+    private $_mi;
+
     protected $_result;
     protected $_files;
     protected $mediaId;
@@ -924,6 +925,8 @@ class MediaController extends Controller
                 'module_id' => $this->moduleId,
                 'item_id' => $this->itemId
             ));
+            $media = $this->getMediaFile($k);
+            $this->logChange(['note' => sprintf($this->translate('Attach medium "%s" to "%s"'),$media['name'], $this->_mi->getItemName())]);
         }
 
         $this->addMessage(sprintf(_('Attached %s file(s).'), count($mediaIds)));
@@ -952,10 +955,15 @@ class MediaController extends Controller
             // Delete link in media_modules
             $mm = $this->models->MediaModules->delete($where);
 
-            $media = $this->getMediaFile($mediaId);
-            $item = $this->_mi->getItemName();
+            $mi = new ModuleIdentifierController();
+            $mi->setModuleId($this->moduleId);
+            $mi->setItemId($this->itemId);
+            $mi->setLanguageId($this->languageId);
 
-            $this->logChange(['note' => sprintf($this->translate("Remove medium '%s' from '%s", $media['name'], $item))]);
+            $media = $this->getMediaFile($mediaId);
+            $item = $mi->getItemName();
+
+            $this->logChange(['note' => sprintf($this->translate("Remove medium '%s' from '%s'"), $media['name'], $item)]);
 
             return true;
         }
@@ -1526,9 +1534,14 @@ class MediaController extends Controller
             )
 		);
         $media = $this->getMediaFile($mediaId);
+
+        $mi = new ModuleIdentifierController();
+        $mi->setModuleId($this->moduleId);
+        $mi->setItemId($this->itemId);
+        $mi->setLanguageId($this->languageId);
         $item = $this->_mi->getItemName();
 
-        $this->logChange(['note' => sprintf($this->translate("Set overview Image '%s' to '%s", $media['name'], $item))]);
+        $this->logChange(['note' => sprintf($this->translate("Set overview Image '%s' to '%s'"), $media['name'], $item)]);
 
 
     }
