@@ -141,9 +141,7 @@ class ProjectsController extends Controller
                     'project_id' => $this->getCurrentProjectId(),
                     'active' => 'n'
                 ));
-            }
-            else
-			{
+            } else {
                 $this->addError(sprintf($this->translate('There is a maximum of %s self-defined modules.'), $this->freeModulesMax));
             }
         }

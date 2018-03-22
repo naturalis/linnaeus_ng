@@ -1,4 +1,7 @@
 <?php
+/**
+ * Controller used for deleting before a new import.
+ */
 
 /*
 
@@ -127,12 +130,18 @@ class ProjectDeleteController extends Controller
         'variation_relations'
     );
 
+    /**
+     * ProjectDeleteController constructor.
+     */
     public function __construct ()
     {
         parent::__construct();
         $this->initialize();
     }
 
+    /**
+     * Initialize with the models.
+     */
     private function initialize ()
     {
         // Disable retaining query results, as this will cause memory errors for large tables
@@ -141,11 +150,19 @@ class ProjectDeleteController extends Controller
         }
     }
 
+    /**
+     * Destructor
+     */
     public function __destruct ()
     {
         parent::__destruct();
     }
 
+    /**
+     * Delete the whole project
+     *
+     * @param $projectId
+     */
     public function doDeleteProjectAction ($projectId)
     {
 		set_time_limit(600);
@@ -153,6 +170,11 @@ class ProjectDeleteController extends Controller
 		$this->doDeleteProjectItself($projectId);
 	}
 
+    /**
+     * First delete all, except the main project
+     *
+     * @param $projectId
+     */
     public function doDeleteAllButProjectItself ($projectId)
     {
         $this->deleteNBCKeydata($projectId);
@@ -178,6 +200,11 @@ class ProjectDeleteController extends Controller
         $this->deleteOtherStuff($projectId);
     }
 
+    /**
+     * Also delete the main project
+     *
+     * @param $projectId
+     */
     public function doDeleteProjectItself ($projectId)
     {
         $this->deleteProjectUsers($projectId);
@@ -687,7 +714,8 @@ class ProjectDeleteController extends Controller
         $this->models->FreeModuleMedia->delete($d);
 
         unset($d);
-/*
+
+        /*
         $d['project_id'] = $id;
 
         if (isset($moduleId))
@@ -696,7 +724,8 @@ class ProjectDeleteController extends Controller
         $this->models->FreeModulesProjectsUsers->delete($d);
 
         unset($d);
-*/
+        */
+
         $d['project_id'] = $id;
 
         if (isset($moduleId))
@@ -898,6 +927,5 @@ class ProjectDeleteController extends Controller
 		}
 
 	}
-
 
 }

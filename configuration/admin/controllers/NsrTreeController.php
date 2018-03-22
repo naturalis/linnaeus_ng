@@ -1,4 +1,7 @@
 <?php
+/**
+ * Controller to setup and manage the taxonomic tree
+ */
 
 /*
 
@@ -37,12 +40,18 @@ class NsrTreeController extends NsrController
 	private $_nameTypeIds;
 	private $_noTreeCaching=false;
 
+    /**
+     * NsrTreeController constructor.
+     */
     public function __construct()
     {
         parent::__construct();
         $this->initialize();
     }
 
+    /**
+     * Initalize the controller and the taxonomic tree
+     */
     private function initialize()
     {
 		$this->_nameTypeIds=$this->models->NameTypes->_get(array(
@@ -59,12 +68,18 @@ class NsrTreeController extends NsrController
 		$this->smarty->assign( 'tree_show_upper_taxon',$this->_tree_show_upper_taxon, false );
     }
 
+    /**
+     * Destructor
+     */
     public function __destruct()
     {
         parent::__destruct();
     }
 
 
+    /**
+     * Index shows the tree
+     */
     public function indexAction()
     {
 		$this->UserRights->setActionType( $this->UserRights->getActionRead() );
@@ -76,13 +91,18 @@ class NsrTreeController extends NsrController
 		$this->_growTree();
     }
 
+    /**
+     * Shows the tree search
+     */
     public function treeAction()
     {
 		$this->UserRights->setActionType( $this->UserRights->getActionRead() );
 
 		$this->checkAuthorisation();
 
-		if ( $this->rHasVal('node') ) $this->smarty->assign('node',$this->rGetVal('node'));
+		if ( $this->rHasVal('node') ) {
+            $this->smarty->assign('node', $this->rGetVal('node'));
+        }
 
 		$this->_growTree( 'tree' );
     }
@@ -90,14 +110,12 @@ class NsrTreeController extends NsrController
 
     private function _growTree( $tpl=null )
     {
-		$tree=$this->restoreTree();
+		$tree = $this->restoreTree();
 
 		if ( empty($tree) || $this->rHasVar('tree-reset'))
 		{
 			$this->smarty->assign('nodes',json_encode($this->getTreeNode(array('node'=>false,'count'=>'species'))));
-		}
-		else
-		{
+		} else {
 			$this->smarty->assign('tree',json_encode($tree));
 		}
 
@@ -105,36 +123,31 @@ class NsrTreeController extends NsrController
     }
 
 
+    /**
+     * The ansynchronous action
+     */
     public function ajaxInterfaceAction()
     {
-        if (!$this->rHasVal('action'))
+        if (!$this->rHasVal('action')) {
             return;
+        }
 
 		$this->UserRights->setActionType( $this->UserRights->getActionRead() );
-		if ( $this->getAuthorisationState()==false )
-			return;
+		if ( $this->getAuthorisationState()==false ) {
+            return;
+        }
 
 		if ($this->rHasVal('action', 'get_tree_node'))
 		{
 			$return=json_encode($this->getTreeNode($this->rGetAll()));
-        }
-		else
-		if ($this->rHasVal('action', 'store_tree'))
-		{
+        } else if ($this->rHasVal('action', 'store_tree')) {
 	        $_SESSION['admin']['user']['species'][$this->getCurrentProjectId()]['tree']=$this->rGetVal('tree');
 			$return='saved';
-        }
-		else
-		if ($this->rHasVal('action', 'restore_tree'))
-		{
+        } else if ($this->rHasVal('action', 'restore_tree')) {
 	        $return=json_encode($this->restoreTree());
-        }
-		else
-		if ($this->rHasVal('action', 'get_parentage') && $this->rHasId())
-		{
+        } else if ($this->rHasVal('action', 'get_parentage') && $this->rHasId()) {
 	        $return=json_encode($this->getTaxonParentage($this->rGetId()));
         }
-
 
         $this->allowEditPageOverlay = false;
 
@@ -144,16 +157,27 @@ class NsrTreeController extends NsrController
     }
 
 
-	private function restoreTree()
+    /**
+     * Returns the whole tree
+     * @return mixed|null
+     */
+    private function restoreTree()
 	{
-		return
-			!$this->_noTreeCaching && isset($_SESSION['admin']['user']['species'][$this->getCurrentProjectId()]['tree']) ?
-				$_SESSION['admin']['user']['species'][$this->getCurrentProjectId()]['tree'] : null;
+	    if (!$this->_noTreeCaching && isset($_SESSION['admin']['user']['species'][$this->getCurrentProjectId()]['tree'])) {
+	        return $_SESSION['admin']['user']['species'][$this->getCurrentProjectId()]['tree'];
+        }
+
+		return null;
 	}
 
-	private function getTreeNode( $p=null )
+    /**
+     * Returns a node of the tree
+     *
+     * @param null $p
+     * @return array|void
+     */
+    private function getTreeNode($p=null )
 	{
-		
 		$topNode=isset($p['node']) && $p['node']!==false ? $p['node'] : $this->treeGetTop();
 
 		if (is_null($topNode)) return;
@@ -202,23 +226,21 @@ class NsrTreeController extends NsrController
 
 		}
 
-		$x1=$this->_hybridMarkerHtml;
-		$x2=$this->_hybridMarker_graftChimaera;
-		$x3=$this->_hybridMarker;
+		$hybrid=$this->_hybridMarkerHtml;
+		$chimaera=$this->_hybridMarker_graftChimaera;
+		$marker=$this->_hybridMarker;
 
 		usort(
 			$progeny,
-			function($a,$b) use ($x1,$x2,$x3)
+			function($a,$b) use ($hybrid,$chimaera,$marker)
 			{
-				$aa=strtolower(str_replace([$x1,$x2,$x3,' '], '' , strip_tags($a['label'])));
-				$bb=strtolower(str_replace([$x1,$x2,$x3,' '], '' , strip_tags($b['label'])));
+				$aa=strtolower(str_replace([$hybrid,$chimaera,$marker,' '], '' , strip_tags($a['label'])));
+				$bb=strtolower(str_replace([$hybrid,$chimaera,$marker,' '], '' , strip_tags($b['label'])));
 				return ($aa==$bb ? 0 : ($aa>$bb ? 1 : -1));
 			}
 		);
 
 		return [ 'node'=>$taxon, 'progeny'=>$progeny ];
-
 	}
-
 
 }

@@ -963,7 +963,7 @@ class MediaController extends Controller
             $media = $this->getMediaFile($mediaId);
             $item = $mi->getItemName();
 
-            $this->logChange(['note' => sprintf($this->translate("Remove medium '%s' from '%s'"), $media['name'], $item)]);
+            $this->logChange(['note' => sprintf($this->translate("Detach medium '%s' from '%s'"), $media['name'], $item)]);
 
             return true;
         }
