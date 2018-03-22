@@ -60,14 +60,22 @@ class IndexController extends Controller
     }
 
 
-	public function setTaxonType ($type)
+    /**
+     * Set Taxon Type
+     * @param $type
+     */
+    public function setTaxonType ($type)
 	{
 
 		$this->_taxonType = ($type=='higher') ? 'higher' : 'lower';
 
 	}
 
-	private function getTaxonType ()
+    /**
+     * Get Taxon Type
+     * @return string
+     */
+    private function getTaxonType ()
 	{
 
 		return isset($this->_taxonType) ? $this->_taxonType : 'lower';
@@ -111,6 +119,9 @@ class IndexController extends Controller
 
 	}
 
+    /**
+     *
+     */
     private function _indexAction ()
     {
 
@@ -143,6 +154,9 @@ class IndexController extends Controller
 
 	}
 
+    /**
+     *
+     */
     public function commonAction ()
     {
 
@@ -247,7 +261,12 @@ class IndexController extends Controller
 
     }
 
-	private function getLookupList($search)
+    /**
+     * Search the species lookup
+     *
+     * @param $search
+     */
+    private function getLookupList($search)
 	{
 
 		/*

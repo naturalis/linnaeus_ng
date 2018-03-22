@@ -125,6 +125,7 @@ class SearchControllerNSR extends SearchController
 		
 		$this->smarty->assign( 'automatic_tabs', $this->cTabs );
 
+        /** @setting: 'db_lc_time_names' */
 		$this->models->Taxa->freeQuery("SET lc_time_names = '".$this->moduleSettings->getGeneralSetting( array('setting'=>'db_lc_time_names','subst'=>'nl_NL') )."'");
 
 		$this->_nameTypeIds=$this->models->NameTypes->_get(array(

@@ -110,14 +110,9 @@ class NsrActivityLogController extends NsrController
 		if ((!is_array($a) && is_array($b)) || (is_array($a) && !is_array($b)))
 		{
 			return array('before'=>$a,'after'=>$b);
-		}
-		else
-		if (!is_array($a))
-		{
+		} else if (!is_array($a)) {
 			return $a==$b ? null : array('before'=>$a,'after'=>$b);
-		}
-		else
-		{
+		} else {
 			$ta=array();
 			$tb=array();
 			$tc=array();
@@ -129,9 +124,7 @@ class NsrActivityLogController extends NsrController
 				{
 					$ta[$key]=array_diff($a[$key],$b[$key]);
 					$tb[$key]=array_diff($b[$key],$a[$key]);
-				}
-				else
-				{
+				} else {
 					$tc[$key]=$a[$key];
 					$td[$key]=$b[$key];
 				}
@@ -150,13 +143,17 @@ class NsrActivityLogController extends NsrController
 
 	private function reconstructQueryString($ignore)
 	{
-		if (null===$this->rGetAll()) return;
+		if (null===$this->rGetAll()) {
+            return;
+        }
 
 		$querystring=null;
 
 		foreach((array)$this->rGetAll() as $key=>$val)
 		{
-			if (in_array($key,$ignore)) continue;
+			if (in_array($key,$ignore)) {
+                continue;
+            }
 
 			if (is_array($val))
 			{

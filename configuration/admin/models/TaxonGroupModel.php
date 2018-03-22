@@ -277,4 +277,3 @@ final class TaxonGroupModel extends AbstractModel
 
 }
 
-?>

@@ -64,9 +64,9 @@
 
 		private function getGitInfo ()
 		{
+
             $c = $this->config->getGeneralSettings();
-            $path = isset($c['applicationFileRoot']) ? $c['applicationFileRoot'] :
-                '/var/www/linnaeusng';
+            $path = isset($c['applicationFileRoot']) ? $c['applicationFileRoot'] : '/var/www/linnaeusng';
 
             // First cd to Linnaeus root!
             exec('cd ' . str_replace(" ", "\\ ", $path));
@@ -150,8 +150,7 @@
 
 		private function setServerName ()
 		{
-            return isset($this->server->hostname) ? $this->server->hostname :
-                '** Check cron script! **';
+            return isset($this->server->hostname) ? $this->server->hostname : '** Check cron script! **';
 		}
 
 		private function printResult ()

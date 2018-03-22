@@ -39,11 +39,13 @@ class FileManagementController extends Controller
     {
 		$this->moduleSettings=new ModuleSettingsReaderController;
 
+        /** @setting: enable_file_management (boolean) */
 		if ( !$this->moduleSettings->getGeneralSetting( [ 'setting'=>'enable_file_management', 'subst'=>false ] ) )
 		{
 			$this->redirect('../projects/overview.php');	
 		}
 
+		/** @setting: allowed_file_management_extensions (json array, example: [".jpg", ".gif", ".xml"]) */
 		$this->allowed_extensions=json_decode($this->moduleSettings->getGeneralSetting( [ 'setting'=>'allowed_file_management_extensions' ]));
 
 		if (!empty($this->allowed_extensions))
@@ -96,6 +98,8 @@ class FileManagementController extends Controller
         $this->checkAuthorisation();
         $this->setPageName($this->translate('Upload'));
 
+        $results = array('updated' => [], 'saved' => [], 'failed' => []);
+
 		if ( $this->requestDataFiles )
 		{
 			foreach($this->requestDataFiles as $file)
@@ -107,43 +111,51 @@ class FileManagementController extends Controller
 				{
 					$target=$this->_fileDir . $file['name'];
 					$d=file_exists($target);
-					
+
 					if (move_uploaded_file($file['tmp_name'], $target))
 					{
-						if ($d)
-						{
-							if ( $this->rHasVal('action','multi') )
-								$this->addMessage( $this->translate('updated file') );
-							else
-								$this->addMessage( sprintf($this->translate('Updated file "%s"'),$file['name']) );
+						if ($d) {
+							if ( $this->rHasVal('action','multi') ) {
+                                $this->addMessage($this->translate('updated file'));
+                            } else {
+                                $this->addMessage(sprintf($this->translate('Updated file "%s"'), $file['name']));
+                            }
+                            $results['updated'][] = $file['name'];
+						} else {
+							if ( $this->rHasVal('action','multi') ) {
+                                $this->addMessage($this->translate('saved file'));
+                            } else {
+                                $this->addMessage(sprintf($this->translate('Saved file "%s"'), $file['name']));
+                            }
+                            $results['saved'][] = $file['name'];
 						}
-						else
-						{
-							if ( $this->rHasVal('action','multi') )
-								$this->addMessage( $this->translate('saved file') );
-							else
-								$this->addMessage( sprintf($this->translate('Saved file "%s"'),$file['name']) );
-						}
-					}
-					else
-					{
-						if ( $this->rHasVal('action','multi') )
-							$this->addError( $this->translate('failed') );
-						else
-							$this->addMessage( sprintf($this->translate('Failed saving "%s"'),$file['name']) );
-					}
+					} else {
+						if ( $this->rHasVal('action','multi') ) {
+                            $this->addError($this->translate('failed'));
+                        } else {
+                            $this->addMessage(sprintf($this->translate('Failed saving "%s"'), $file['name']));
+                        }
+                        $results['failed'][] = $file['name'];
+                    }
 
-					
-				}
-				else
-				{
-					if ( $this->rHasVal('action','multi') )
-						$this->addError( sprintf($this->translate('discarded (disallowed extension "%s")'),$ext) );
-					else
-						$this->addMessage( sprintf($this->translate('Discarding uploaded file "%s" (disallowed extension "%s")'),$file['name'],$ext) );
+				} else {
+					if ( $this->rHasVal('action','multi') ) {
+                        $this->addError(sprintf($this->translate('discarded (disallowed extension "%s")'), $ext));
+                    } else {
+                        $this->addMessage(sprintf($this->translate('Discarding uploaded file "%s" (disallowed extension "%s")'), $file['name'], $ext));
+                    }
+                    $results['failed'][] = $file['name'];
 				}
 			}
-			
+
+			$msg = "Files upload. ";
+			foreach($results as $name => $files) {
+			    if (count($files) > 0) {
+                    $msg .= "  " . $name . ": " . implode(', ', $files);
+                }
+            }
+
+            $this->logChange(array('note' => $msg));
 		}
 
         $this->smarty->assign( 'response_only',  $this->rHasVal('action','multi') );
@@ -170,6 +182,8 @@ class FileManagementController extends Controller
 
 	private function deleteFiles()
 	{
+	    $notes = array('success' => [], 'error' => []);
+
 		foreach((array)$this->_selectedfiles as $key)
 		{
 			if ( isset($this->_files[$key]) )
@@ -178,24 +192,31 @@ class FileManagementController extends Controller
 				{
 					if ( unlink($this->_files[$key]['pathName']) )
 					{
+					    $notes['success'][] = $this->_files[$key]['fileName'];
 						$this->addMessage( sprintf($this->translate('Deleted file "%s"'),$this->_files[$key]['fileName']));
-					}
-					else
-					{
+					} else {
+                        $notes['error'][] = $this->_files[$key]['fileName'];
 						$this->addError( sprintf($this->translate('Could not delete file "%s"'),$this->_files[$key]['fileName']));
 					}
-				}
-				else
-				{
+				} else {
+                    $notes['error'][] = $this->_files[$key]['fileName'];
 					$this->addError( sprintf($this->translate('File "%s" no longer exists'),$this->_files[$key]['fileName']));
 				}
-			}
-			else
-			{
+			} else {
+                $notes['error'][] = $this->_files[$key]['fileName'];
 				$this->addError( sprintf($this->translate('File "%s" no longer exists'),$key));
 			}
 		}
-		
+
+
+        $msg = "Deleting files -";
+        foreach($notes as $name => $issues) {
+            if (count($issues) > 0) {
+                $msg .= "  " . $name . ": " . implode(', ', $issues);
+            }
+        }
+        $this->logChange(array('note' => $msg));
+
 	}	
 	
 	private function scanMediaDir()

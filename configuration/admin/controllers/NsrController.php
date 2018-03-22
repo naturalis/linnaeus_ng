@@ -1,12 +1,13 @@
 <?php
-
 /*
-	TAB_VERSPREIDING::$this->getPresenceData($taxon)
-	TAB_BEDREIGING_EN_BESCHERMING::EZ
-	CTAB_LITERATURE
-	CTAB_MEDIA
-	CTAB_DNA_BARCODES
-*/
+ *  NSR Controller
+ *
+ *  TAB_VERSPREIDING::$this->getPresenceData($taxon)
+ *  TAB_BEDREIGING_EN_BESCHERMING::EZ
+ *  CTAB_LITERATURE
+ *  CTAB_MEDIA
+ *  CTAB_DNA_BARCODES
+ */
 
 include_once ('Controller.php');
 include_once ('RdfController.php');
@@ -408,24 +409,26 @@ class NsrController extends Controller
 		return str_pad($r,12,'0',STR_PAD_LEFT);
 	}
 
-	private function createNsrCode( $prefix )
+    /**
+     * NSR ID prefixes (inherited from Trezorix)
+     * -----------------------------------------
+     * taxon concept	tn.nlsr.concept/
+     * taxon name		tn.nlsr.name/
+     * actor (indiv.)	nlsr.person/
+     * actor (comp.)	nlsr.organization/
+     * reference		tn.nlsr.reference/
+     *
+     * to be determined (item_type exists in table, but ID's never issued)
+     * -------------------------------------------------------------------
+     * taxon_presence
+     * habitat
+     * presence
+     * rank
+     * @param $prefix
+     * @return null|string|void
+     */
+    private function createNsrCode($prefix )
 	{
-		/*
-		NSR ID prefixes (inherited from Trezorix)
-		-----------------------------------------
-		taxon concept	tn.nlsr.concept/
-		taxon name		tn.nlsr.name/
-		actor (indiv.)	nlsr.person/
-		actor (comp.)	nlsr.organization/
-		reference		tn.nlsr.reference/
-
-		to be determined (item_type exists in table, but ID's never issued)
-		-------------------------------------------------------------------
-		taxon_presence
-		habitat
-		presence
-		rank
-		*/
 
 		$exists=true;
 		$i=0;
@@ -434,6 +437,7 @@ class NsrController extends Controller
 		while( $exists )
 		{
 			$code=$prefix."/".$this->generateNsrCode();
+
 			$d = $this->models->ControllerModel->checkNsrCode(array(
                 'projectId' => $this->getCurrentProjectId(),
     			'nsrCode' => $code

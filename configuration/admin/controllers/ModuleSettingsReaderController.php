@@ -17,6 +17,10 @@ class ModuleSettingsReaderController extends Controller
 	public $modelNameOverride = 'ModuleSettingsModel';
 	private $lastSettingId;
 
+    /**
+     * ModuleSettingsReaderController constructor.
+     * @param null $p
+     */
     public function __construct($p = null)
     {
         parent::__construct($p);
@@ -24,7 +28,10 @@ class ModuleSettingsReaderController extends Controller
 		$this->setModuleController( $this->controllerBaseName );
 		$this->initialize();
 	}
-	
+
+    /**
+     * ModuleSettingsReaderController destructor
+     */
     public function __destruct()
     {
         parent::__destruct();
@@ -35,8 +42,14 @@ class ModuleSettingsReaderController extends Controller
 		$this->setModuleController( $controller );
 		$this->initialize();
 	}
-	
-    public function getModuleSetting( $p )
+
+    /**
+     * Picks the value of a module setting read from the database
+     *
+     * @param $p
+     * @return mixed|null
+     */
+    public function getModuleSetting($p )
     {
 		//if ( !$this->getAuthorisationState() ) return;
 
@@ -76,7 +89,13 @@ class ModuleSettingsReaderController extends Controller
 		}
     }
 
-    public function getGeneralSetting( $p )
+    /**
+     * Picks the value of a general setting read from the database
+     *
+     * @param $p
+     * @return mixed|null
+     */
+    public function getGeneralSetting($p )
     {
 		if ( is_array( $p ))
 		{
@@ -94,6 +113,9 @@ class ModuleSettingsReaderController extends Controller
 		
 		$this->lastSettingId=null;
 
+        /**
+         *  Traverse the general settings array and match
+         */
 		foreach((array)$this->getGeneralSettingsValues() as $val)
 		{
 			if ($val['setting']==$setting) $this->lastSettingId=$val['id'];
@@ -262,6 +284,5 @@ class ModuleSettingsReaderController extends Controller
 			return $subst;
 		}
     }
-
 
 }

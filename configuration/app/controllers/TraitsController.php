@@ -1,5 +1,4 @@
 <?php
-
 /*
 http://localhost/linnaeus_ng/app/views/traits/get.php?taxon=172145&group=1&language=24&project=1
 http://localhost/linnaeus_ng/app/views/traits/get.php?taxon=172145&group=1&language=24&project=1

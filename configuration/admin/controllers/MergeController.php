@@ -1,6 +1,10 @@
 <?php
+/**
+ * Merges the data of projects after an import
+ */
 
 include_once ('Controller.php');
+
 class MergeController extends Controller
 {
 

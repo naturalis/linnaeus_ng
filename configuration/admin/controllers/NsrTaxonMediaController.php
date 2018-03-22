@@ -1,7 +1,10 @@
 <?php
-/*
+/**
  * Original controller for NSR is NsrTaxonImagesController.php, which is now
  * called through images_nsr.php/.tpl
+ *
+ * This controller is used to upload new images or attach existing images to a certain Taxon.
+ *
  */
 
 include_once ('NsrController.php');
@@ -36,6 +39,7 @@ class NsrTaxonMediaController extends NsrController
     private $_mc;
     private $taxonId;
     private $languageId;
+    private $taxon;
 
     /*
     public $modelNameOverride = 'NsrTaxonMediaModel';
@@ -63,12 +67,19 @@ class NsrTaxonMediaController extends NsrController
 			'svgz' => 'image/svg+xml',
 		);
 */
+
+    /**
+     * NsrTaxonMediaController constructor.
+     */
     public function __construct()
     {
         parent::__construct();
         $this->initialize();
 	}
 
+    /**
+     * NsrTaxonMediaController destructor.
+     */
     public function __destruct()
     {
         parent::__destruct();
@@ -82,8 +93,8 @@ class NsrTaxonMediaController extends NsrController
 			$this->redirect('index.php');
 		}
 
-		$taxon = $this->getTaxonById($this->rGetId());
-		$this->setPageName(sprintf($this->translate('Media for "%s"'), $taxon['taxon']), $this->translate('Media'));
+		$this->taxon = $this->getTaxonById($this->rGetId());
+		$this->setPageName(sprintf($this->translate('Media for "%s"'), $this->taxon['taxon']), $this->translate('Media'));
 
 		if ($this->rHasVal('action','delete')) {
 			$r = $this->detachMedia();
@@ -113,10 +124,17 @@ class NsrTaxonMediaController extends NsrController
         $this->printPage();
     }
 
+    /**
+     * Initialize the controller
+     */
     private function initialize()
     {
 		$this->moduleSettings = new ModuleSettingsReaderController;
 
+		$id1 = $this->rGetId();
+		$id2 = $this->rHasId();
+		$id3 = $this->rHasVal('taxon_id');
+        $id4 = $this->rHasVal('id');
         $this->taxonId = $this->rHasId() ? $this->rGetId() :
             ($this->rHasVal('taxon_id') ? $this->rGetVal('taxon_id') : false);
 
@@ -126,7 +144,10 @@ class NsrTaxonMediaController extends NsrController
         $this->setMediaController();
 	}
 
-	private function setMediaController()
+    /**
+     * Set the media controller
+     */
+    private function setMediaController()
 	{
         $this->_mc = new MediaController();
         $this->_mc->setModuleId($this->getCurrentModuleId());
@@ -134,7 +155,11 @@ class NsrTaxonMediaController extends NsrController
         $this->_mc->setLanguageId($this->languageId);
 	}
 
-
+    /**
+     * Change the order of images
+     *
+     * @return bool|null|void
+     */
     private function moveImageInOrder()
     {
 		$mediaId = $this->rHasVal('subject') ? $this->rGetVal('subject') : false;
@@ -183,6 +208,9 @@ class NsrTaxonMediaController extends NsrController
 
     }
 
+    /**
+     * Detach the media from a Taxon
+     */
     private function detachMedia ()
     {
     	$mediaId = $this->rHasVal('subject') ? $this->rGetVal('subject') : false;
@@ -194,6 +222,9 @@ class NsrTaxonMediaController extends NsrController
 		return $this->deleteItemMedia($mediaId);
     }
 
+    /**
+     * Set the captions to a connected media
+     */
     private function saveCaptions ()
     {
 		$captions = $this->rHasVal('captions') ? $this->rGetVal('captions') : array();
@@ -208,6 +239,9 @@ class NsrTaxonMediaController extends NsrController
 		}
     }
 
+    /**
+     * Set the overview image of a certain taxon
+     */
     private function setOverviewImage ()
     {
         $mediaId = $this->rHasVal('overview-image') ?
@@ -217,12 +251,21 @@ class NsrTaxonMediaController extends NsrController
 
     }
 
+    /**
+     * Delete the connection to a media item
+     *
+     * @param $mediaId
+     * @return string
+     */
     private function deleteItemMedia ($mediaId)
     {
         $r = $this->_mc->deleteItemMedia($mediaId);
 
-        return $r ?  $this->translate('Detached file') :
-            $this->translate('Could not detach file');
+        if ($r) {
+            return $this->translate('Detached file');
+        }
+
+        return $this->translate('Could not detach file');
     }
 
 

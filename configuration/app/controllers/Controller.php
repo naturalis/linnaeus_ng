@@ -959,11 +959,8 @@ class Controller extends BaseClass
     public function rHasVal($var, $val = null)
     {
         if ($val !== null) {
-
             return isset($this->requestData[$var]) && $this->requestData[$var] === $val;
-        }
-        else {
-
+        } else {
             return isset($this->requestData[$var]) && $this->requestData[$var] !== '';
         }
     }

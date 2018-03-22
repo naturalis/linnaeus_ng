@@ -74,8 +74,10 @@ class SpeciesControllerNSR extends SpeciesController
 		$this->smarty->assign( 'taxon_base_url_images_overview',$this->_taxon_base_url_images_overview );
 
 		// not actually implemented to do anything yet
+        /** @setting: tree_show_upper_taxon */
 		$this->smarty->assign( 'tree_show_upper_taxon', $this->moduleSettings->getGeneralSetting( 'tree_show_upper_taxon', 0 ) );
 
+        /** @setting: show_nsr_specific_stuff */
 		$this->show_nsr_specific_stuff=$this->moduleSettings->getGeneralSetting( 'show_nsr_specific_stuff' , 0)==1;
 
 		$this->_use_embedded_templates = $this->moduleSettings->getModuleSetting( 'use_embedded_templates', 0 )==1;

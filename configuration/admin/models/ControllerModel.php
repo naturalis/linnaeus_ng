@@ -379,4 +379,3 @@ final class ControllerModel extends AbstractModel
 
 }
 
-?>

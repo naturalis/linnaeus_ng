@@ -312,8 +312,9 @@ class ImportMatrixController extends Controller
 						{
 							if ($isReadyColumn>0 && preg_match('/(ja|yes|j|y)/i',$val[$isReadyColumn])!==1)
 							{
-								if ($cKey==0)
-									$this->addMessage($this->storeError('Skipping line '.($line+1).' (ready="'.$val[$isReadyColumn].'")','Species import'));
+								if ($cKey==0) {
+                                    $this->addMessage($this->storeError('Skipping line ' . ($line + 1) . ' (ready="' . $val[$isReadyColumn] . '")', 'Species import'));
+                                }
 								continue;
 							}
 

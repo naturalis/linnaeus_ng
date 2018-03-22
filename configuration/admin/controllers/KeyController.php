@@ -1,5 +1,4 @@
 <?php
-
 include_once ('Controller.php');
 include_once ('MediaController.php');
 include_once ('ModuleSettingsReaderController.php');
@@ -316,10 +315,10 @@ class KeyController extends Controller
             // redirect to self with id
             // $this->redirect('step_edit.php?id='.$id);
             $this->redirect('step_show.php?id=' . $id . ($this->rHasVal('insert') ? '&insert=' . $this->rGetVal('insert') : ''));
-        }
-        // id present
-        else
-		{
+        } else {
+
+            // id present
+
 			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 			$this->checkAuthorisation();
 
@@ -647,12 +646,9 @@ class KeyController extends Controller
 
         $step=$this->getKeystep($this->rGetId());
 
-		if ($this->rGetId()==$this->getStartKeystepId())
-		{
+		if ($this->rGetId()==$this->getStartKeystepId()) {
 	        $this->setPageName(sprintf($this->translate('Insert a step before step %s'), $step['number']), $this->translate('Insert a step before step x'));
-		}
-		else
-		{
+		} else {
 			$prevstep=$this->getKeystep($this->rHasVal('c'));
     	    $this->setPageName(sprintf($this->translate('Insert a step between step %s and %s'), $prevstep['number'], $step['number']), $this->translate('Insert a step between step x and y'));
 		}

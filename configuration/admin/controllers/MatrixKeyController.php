@@ -153,9 +153,9 @@ class MatrixKeyController extends Controller
 
 				if ( $id )
 				{
-					$names=$this->rGetVal( 'name' );
+					$names=(array)$this->rGetVal( 'name' );
 
-					foreach((array)$names as $language_id => $name)
+					foreach($names as $language_id => $name)
 					{
 						$this->saveMatrixName([
 							'matrix_id' => $id,
@@ -167,14 +167,12 @@ class MatrixKeyController extends Controller
 					$this->setCurrentMatrixId( $id );
 
 					$this->redirect('edit.php');
-				}
-				else
-				{
+
+				} else {
+
 					$this->addError( $this->translate('Could not create new matrix.') );
 				}
-			}
-			else
-			{
+			} else {
 				$this->addError( 'Internal name is required.' );
 				$this->smarty->assign( 'name' ,  $this->rGetVal( 'name' ) );
 			}
@@ -237,19 +235,21 @@ class MatrixKeyController extends Controller
 
 				if ( $this->rHasVar( 'sys_name' ) && !empty($this->rGetVal( 'sys_name' ) ) )
 				{
-					$n=$this->saveMatrixSysName([
+					$n = $this->saveMatrixSysName([
 						'matrix_id' => $this->rGetId(),
 						'name' => $this->rGetVal( 'sys_name' )
 					]);
 
-					if ($n>0) $this->addMessage( sprintf( 'Saved "%s".', $this->rGetVal( 'sys_name' ) ) );
+					if ($n>0) {
+					    $this->addMessage( sprintf( 'Saved "%s".', $this->rGetVal( 'sys_name' ) ) );
+                    }
 				}
 
 				$names=$this->rGetVal( 'name' );
 
 				foreach((array)$names as $language_id => $name)
 				{
-					$n=$this->saveMatrixName([
+					$n = $this->saveMatrixName([
 						'matrix_id' => $this->rGetId(),
 						'language_id' =>  $language_id,
 						'name' => $name

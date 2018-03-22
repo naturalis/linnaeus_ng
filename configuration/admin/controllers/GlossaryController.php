@@ -233,9 +233,7 @@ class GlossaryController extends Controller
 			$this->moduleSession->setModuleSetting(array('setting'=>'activeLanguage','value'=>$gloss['language_id']));
     	    $this->setPageName(sprintf($this->translate('Editing glossary term "%s"'),$gloss['term']), $this->translate('Editing glossary term'));
 			$navList = $this->getGlossaryTermsNavList();
-		}
-		else
-		{
+		} else {
     	    $this->setPageName($this->translate('New glossary term'));
 		}
 
@@ -249,28 +247,24 @@ class GlossaryController extends Controller
 
 			$b=$this->getGlossaryTerm($this->rGetId());
 			$this->deleteGlossaryTerm($this->rGetId());
+
 			$this->logChange(array('before'=>$b,'note'=>sprintf('deleted glossary term "%s"',$b['term'])));
+
 			$d = $this->getFirstGlossaryTerm();
 			$navList = $this->getGlossaryTermsNavList(true);
 			$this->redirect('edit.php?id='.$d['id']);
 		}
 
-		if ($this->rHasVal('activeLanguage'))
-		{
+		if ($this->rHasVal('activeLanguage')) {
 			$activeLanguage = $this->rGetVal('activeLanguage');
-		}
-		elseif (isset($gloss))
-		{
+		} elseif (isset($gloss)) {
 			$activeLanguage = $gloss['language_id'];
-		}
-		else
-		{
+		} else {
 			$activeLanguage = $this->getDefaultProjectLanguage();
 		}
 
 		if ($this->rHasVal('term') && $this->rHasVal('definition') && !$this->rHasVal('action','browse') && !$this->isFormResubmit())
 		{
-
 			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 	        $this->checkAuthorisation();
 
@@ -282,15 +276,11 @@ class GlossaryController extends Controller
 
 			$b=$this->rHasId() ? $this->getGlossaryTerm($this->rGetId()) : null;
 
-			if ($data['id']==null && $this->getGlossaryTerms(array('term' => $data['term'],'language_id' => $data['language_id'])))
-			{
+			if ($data['id']==null && $this->getGlossaryTerms(array('term' => $data['term'],'language_id' => $data['language_id']))) {
 				$this->addError($this->translate('Glossary term already exists.'));
 				$gloss = $this->rGetAll();
 				$activeLanguage = $this->rGetVal('language_id');
-			}
-			else
-			if ($this->models->Glossary->save($data))
-			{
+			} else if ($this->models->Glossary->save($data)) {
 				$navList = $this->getGlossaryTermsNavList(true);
 				$id = $this->rHasId() ? $this->rGetId() : $this->models->Glossary->getNewId();
 
@@ -318,24 +308,19 @@ class GlossaryController extends Controller
 
 				$a=$this->getGlossaryTerm($id);
 
-				if (is_null($b))
-					$this->logChange(array('after'=>$a,'note'=>sprintf('created glossary term "%s"',$a['term'])));
-				else
-					$this->logChange(array('before'=>$b,'after'=>$a,'note'=>sprintf('updated glossary term "%s"',$a['term'])));
+				if (is_null($b)) {
+                    $this->logChange(array('after' => $a, 'note' => sprintf('created glossary term "%s"', $a['term'])));
+                } else {
+                    $this->logChange(array('before' => $b, 'after' => $a, 'note' => sprintf('updated glossary term "%s"', $a['term'])));
+                }
 
 				$this->clearTempValues();
 
-				if ($this->rHasVal('action','media'))
-				{
+				if ($this->rHasVal('action','media')) {
 					$this->redirect('media.php?id='.$id);
-				}
-				else
-				if ($this->rHasVal('action','preview'))
-				{
+				} else if ($this->rHasVal('action','preview')) {
 					$this->redirect('preview.php?id='.$id);
-				}
-				else
-				{
+				} else {
 				    $this->moduleSession->setModuleSetting( array('setting'=>'activeLetter','value'=> strtolower(substr($this->rGetVal('term'),0,1))));
 				    $this->moduleSession->setModuleSetting( array('setting'=>'activeLanguage','value'=> $this->rGetVal('language_id')));
 					$this->redirect('edit.php?id='.$id);

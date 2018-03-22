@@ -1,7 +1,6 @@
 <?php
-
-
 include_once ('Controller.php');
+
 class InterfaceController extends Controller
 {
     private $_idDutch = 24;
@@ -107,8 +106,6 @@ class InterfaceController extends Controller
 
             //
 
-
-
         $this->printPage('index');
     }
 
@@ -183,8 +180,6 @@ class InterfaceController extends Controller
         $this->printPage();
     }
 
-
-
     private function saveTranslation ()
     {
         $p = $this->rGetVal('param');
@@ -196,6 +191,8 @@ class InterfaceController extends Controller
             $this->smarty->assign('returnText', 'not saved<br/>(' . (is_null($id) ? 'no id' : 'no lang. id') . ')');
             return;
         }
+
+        $before = $this->models->InterfaceTranslations->_get(array('where' => 'interface_text_id = ' . $id . " AND language_id=" . $lan));
 
         $this->models->InterfaceTranslations->delete(array(
             'interface_text_id' => $id,
@@ -209,6 +206,9 @@ class InterfaceController extends Controller
                 'language_id' => $lan,
                 'translation' => $newVal
             ));
+
+            $after = $this->models->InterfaceTranslations->_get(array('where' => 'interface_text_id = ' . $id . " AND language_id=" . $lan));
+            $this->logChange(array('before'=>$before,'note'=>'translated interface', 'after' => $after));
         }
 
         $this->smarty->assign('returnText', 'saved');

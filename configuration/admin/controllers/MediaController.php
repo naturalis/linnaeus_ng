@@ -1,10 +1,9 @@
 <?php
-
-/*
- * To do
+/**
+ * Controller for uploading (media) files to resourcespace
  *
- * - check mime type on upload
- * - check max_file_uploads, memory_limit, post_max_size
+ * @todo: check mime type on upload
+ * @todo: check max_file_uploads, memory_limit, post_max_size
  *
  */
 
@@ -35,13 +34,18 @@ class MediaController extends Controller
     private $languageId;
     private $itemsPerPage = 100;
 
+    protected $_mi;
     protected $_result;
     protected $_files;
     protected $mediaId;
 
     protected $_moduleSettingsReader;
 
-    // Used to setup RS
+    /**
+     * Array containing the default parameters for the media upload server
+     *
+     * @var array rsSetupParameters
+     */
     public static $rsSetupParameters = array(
         'rs_base_url' => array(
             'default' => 'https://resourcespace.naturalis.nl/plugins/',
@@ -90,6 +94,11 @@ class MediaController extends Controller
         'creator'//'photographer'
     );
 
+    /**
+     * Allowed mimeTypes
+     *
+     * @var array $mimeTypes
+     */
     public static $mimeTypes = array(
         'image' => array(
             'png' => 'image/png',
@@ -151,8 +160,8 @@ class MediaController extends Controller
 
     /**
      * Constructor, calls parent's constructor
-     *
      * @access     public
+     * @param null $p
      */
     public function __construct ($p = null)
     {
@@ -170,9 +179,13 @@ class MediaController extends Controller
     {
         $this->moduleId = $this->rHasVal('module_id') ? $this->rGetVal('module_id') : -1;
         $this->itemId = $this->rHasVal('item_id') ? $this->rGetVal('item_id') : -1;
-        $this->languageId = $this->rHasVar('language_id') ?
-            $this->rGetVal('language_id') : $this->getDefaultProjectLanguage();
+        $this->languageId = $this->rHasVar('language_id') ? $this->rGetVal('language_id') : $this->getDefaultProjectLanguage();
         $this->offset = $this->rHasVar('offset') ? $this->rGetVal('offset') : 0;
+
+        $this->_mi = new ModuleIdentifierController();
+        $this->_mi->setModuleId($this->moduleId);
+        $this->_mi->setItemId($this->itemId);
+        $this->_mi->setLanguageId($this->languageId);
 
 		if (isset($p['module_settings_reader'])) {
 			$this->_moduleSettingsReader = $p['module_settings_reader'];
@@ -207,11 +220,18 @@ class MediaController extends Controller
         $this->languageId = isset($id) && is_numeric($id) ? $id : $this->getDefaultProjectLanguage();
     }
 
+    /**
+     * Adds the succesfully uploaded file messages
+     * @param $e
+     */
     private function addUploaded ($e)
     {
         $this->_uploaded[] = $e;
     }
 
+    /**
+     * Set the ResourceSpace Settings
+     */
     private function setRsSettings ()
     {
         $this->_rsBaseUrl = $this->_moduleSettingsReader->getModuleSetting(array(
@@ -263,6 +283,10 @@ class MediaController extends Controller
             'key=' . $this->rGetVal('rs_master_key');
     }
 
+    /**
+     * Check the ResourceSpace Settings
+     * @return bool
+     */
     private function checkRsSettings ()
     {
         // As checking urls takes time, do this only once per session
@@ -305,6 +329,10 @@ class MediaController extends Controller
         }
     }
 
+    /**
+     * Get the module id
+     * @return bool
+     */
     private function getMediaModuleId ()
     {
         $d = $this->getProjectModules();
@@ -318,6 +346,10 @@ class MediaController extends Controller
         return false;
     }
 
+    /**
+     * Single setting value saver
+     * @return bool|void
+     */
     private function saveRsSetting ($setting, array $values)
     {
         $d = $this->models->ModuleSettings->getSingleColumn(array(
@@ -365,6 +397,10 @@ class MediaController extends Controller
         }
     }
 
+    /**
+     * Asynchronous action handler
+     * @return bool|void
+     */
     public function ajaxInterfaceAction ()
     {
         if ( !$this->getAuthorisationState() ) return;
@@ -424,18 +460,12 @@ class MediaController extends Controller
 
         if ($this->moduleId != -1 && $this->itemId != -1) {
 
-            $mi = new ModuleIdentifierController();
-            $mi->setModuleId($this->moduleId);
-            $mi->setItemId($this->itemId);
-            $mi->setLanguageId($this->languageId);
+            $type = in_array($this->_mi->getModuleController(), $this::$singleMediaFileControllers) ? 'single' : 'multiple';
 
-            $type = in_array($mi->getModuleController(), $this::$singleMediaFileControllers) ?
-                'single' : 'multiple';
-
-            $this->smarty->assign('module_name', $mi->getModuleName());
-            $this->smarty->assign('item_name', $mi->getItemName());
+            $this->smarty->assign('module_name', $this->_mi->getModuleName());
+            $this->smarty->assign('item_name', $this->_mi->getItemName());
             //$this->smarty->assign('back_url', $this->setBackUrl());
-            $this->smarty->assign('back_url', $mi->setMediaBackUrl());
+            $this->smarty->assign('back_url', $this->_mi->setMediaBackUrl());
             $this->smarty->assign('input_type', $type);
         }
 
@@ -567,6 +597,12 @@ class MediaController extends Controller
             'old_media' => $oldMedia,
             'new_media' => $newMedia
         ));
+
+        $this->logChange(array(
+            'before' => $oldMedia,
+            'note' => 'Reattach media',
+            'after' => $newMedia
+        ));
     }
 
     private function getMediaLinks ($mediaId)
@@ -584,16 +620,10 @@ class MediaController extends Controller
 		));
 
         if (!empty($d)) {
-
             $mi = new ModuleIdentifierController();
-            $mi->setLanguageId($this->languageId);
 
             foreach ($d as $row) {
                 $mi->setModuleId($row['module_id']);
-
-                // Item id should be adapted for key...
-                $itemId = $mi->getModuleController() == 'key' ? :
-                    $row['item_id'];
 
                 $mi->setItemId($row['item_id']);
 
@@ -607,6 +637,9 @@ class MediaController extends Controller
        return false;
     }
 
+    /**
+     * Handle the upload action
+     */
     public function uploadAction ()
     {
 		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
@@ -621,16 +654,11 @@ class MediaController extends Controller
 
         if ($this->moduleId != -1 && $this->itemId != -1) {
 
-            $mi = new ModuleIdentifierController();
-            $mi->setModuleId($this->moduleId);
-            $mi->setItemId($this->itemId);
-            $mi->setLanguageId($this->languageId);
-
-            $type = in_array($mi->getModuleController(), $this::$singleMediaFileControllers) ?
+            $type = in_array($this->_mi->getModuleController(), $this::$singleMediaFileControllers) ?
                 'single' : 'multiple';
 
-            $this->smarty->assign('module_name', $mi->getModuleName());
-            $this->smarty->assign('item_name', $mi->getItemName());
+            $this->smarty->assign('module_name', $this->_mi->getModuleName());
+            $this->smarty->assign('item_name', $this->_mi->getItemName());
             $this->smarty->assign('back_url', $this->setBackUrl());
             $this->smarty->assign('input_type', $type);
         }
@@ -663,20 +691,31 @@ class MediaController extends Controller
 		$this->printPage();
     }
 
+    /**
+     * Handle the uploaded files
+     *
+     * @param bool $p
+     * @return bool
+     */
     protected function uploadFiles ($p = false)
     {
         if (empty($this->_files)) {
             return false;
         }
 
+        $notes = array('success');
+
         foreach ($this->_files as $i => $file) {
 
             // Check mime type, file size, etc.
             if (!$this->uploadedFileIsValid($file)) {
+                $this->logChange(array(
+                    'note' => sprintf('File "%s" not uploaded, invalid',$file['name'])
+                ));
                 continue;
             }
 
-            $this->upload(array(
+            $result = $this->upload(array(
                 'file' => array(
                     'name' => $file['tmp_name'],
                     'mimetype' => $file['type'],
@@ -686,30 +725,34 @@ class MediaController extends Controller
             ));
 
             // Store data
-            if (!empty($this->_result) && empty($this->_result->error) &&
-                is_object($this->_result)) {
+            if (is_object($result) && empty($result->error)) {
 
                 // Store core data
-                $media = $this->_result->resource;
+                $media = $result->resource;
 
-                $this->models->Media->save(array(
+                $mediaRecord = array(
                     'id' => null,
                     'project_id' => $this->getCurrentProjectId(),
                     'rs_id' => $media->ref,
                     'name' => $file['name'],
                     'title' => $media->field8,
-                    'width' => is_int($media->files[0]->width) ?
-                        $media->files[0]->width : -1,
-                    'height' => is_int($media->files[0]->height) ?
-                        $media->files[0]->height : -1,
+                    'width' => is_int($media->files[0]->width) ? $media->files[0]->width : -1,
+                    'height' => is_int($media->files[0]->height) ? $media->files[0]->height : -1,
                     'mime_type' => $file['type'],
                     'file_size' => $file['size'],
                     'rs_original' => $media->files[0]->src,
                     'rs_resized_1' => isset($media->files[1]->src) ? $media->files[1]->src : null,
-                    'rs_resized_1' => isset($media->files[2]->src) ? $media->files[2]->src : null,
+                    'rs_resized_2' => isset($media->files[2]->src) ? $media->files[2]->src : null,
                     'rs_thumb_small' => $media->thumbnails->small,
                     'rs_thumb_medium' => $media->thumbnails->medium,
                     'rs_thumb_large' => $media->thumbnails->large
+                );
+
+                $this->models->Media->save($mediaRecord);
+
+                $this->logChange(array(
+                    'note' => sprintf('Uploaded "%s" to ResourceSpace',$file['name']),
+                    'after' => $mediaRecord
                 ));
 
                 $this->setMediaId($this->models->Media->getNewId());
@@ -728,14 +771,10 @@ class MediaController extends Controller
                         'id' => null,
                         'project_id' => $this->getCurrentProjectId(),
                         'media_id' => $this->mediaId,
-                        'module_id' => $this->rHasVal('module_id') ?
-                             $this->rGetVal('module_id') : $this->moduleId,
-                        'item_id' => $this->rHasVal('item_id') ?
-                            $this->rGetVal('item_id') : $this->itemId,
-                        'overview_image' => isset($p['overview']) ?
-                            $p['overview'] : 0,
-                        'sort_order' => isset($p['sort_order']) ?
-                            $p['sort_order'] : 0,
+                        'module_id' => $this->rHasVal('module_id') ? $this->rGetVal('module_id') : $this->moduleId,
+                        'item_id' => $this->rHasVal('item_id') ? $this->rGetVal('item_id') : $this->itemId,
+                        'overview_image' => isset($p['overview']) ? $p['overview'] : 0,
+                        'sort_order' => isset($p['sort_order']) ? $p['sort_order'] : 0,
                      ));
                 }
 
@@ -745,10 +784,13 @@ class MediaController extends Controller
 
             } else {
 
-                $error = isset($this->_result->error) ?
-                    $this->_result->error : $this->_result;
+                $error = isset($this->_result->error) ? $this->_result->error : $this->_result;
 
                 $this->addError(_('Could not upload media') . ': ' . $error);
+
+                $this->logChange(array(
+                    'note' => sprintf('Could not upload "%s" to ResourceSpace: %s',$file['name'], $error)
+                ));
             }
         }
     }
@@ -849,6 +891,12 @@ class MediaController extends Controller
         $mediaIds = $this->rGetVal('media_ids');
 
         foreach ($mediaIds as $k => $v) {
+            $media = $this->models->Media->_get(array('id' => $k, 'project_id' => $this->getCurrentProjectId()));
+            $this->logChange(array(
+                'before' => $media,
+                'note' => sprintf('Media "%s" deleted',$media['name'])
+            ));
+
             $this->models->Media->update(
     			array('deleted' => 1),
     			array('id' => $k, 'project_id' => $this->getCurrentProjectId())
@@ -887,7 +935,6 @@ class MediaController extends Controller
         if (!$mediaId || !is_numeric($mediaId)) {
             return false;
         }
-
         $where = array(
             'project_id' => $this->getCurrentProjectId(),
             'media_id' => $mediaId,
@@ -904,6 +951,11 @@ class MediaController extends Controller
 
             // Delete link in media_modules
             $mm = $this->models->MediaModules->delete($where);
+
+            $media = $this->getMediaFile($mediaId);
+            $item = $this->_mi->getItemName();
+
+            $this->logChange(['note' => sprintf($this->translate("Remove medium '%s' from '%s", $media['name'], $item))]);
 
             return true;
         }
@@ -1201,7 +1253,6 @@ class MediaController extends Controller
         return $list;
     }
 
-
     protected function upload ($p)
     {
         // File should contain path, mime type and name
@@ -1256,8 +1307,8 @@ class MediaController extends Controller
     }
 
 
-    /*
-    * Reformat $_FILES array into something more logical
+   /**
+    * Reformats $_FILES array into something more logical
     */
     private function setFiles ()
     {
@@ -1474,6 +1525,11 @@ class MediaController extends Controller
     		    'item_id' => $this->itemId
             )
 		);
+        $media = $this->getMediaFile($mediaId);
+        $item = $this->_mi->getItemName();
+
+        $this->logChange(['note' => sprintf($this->translate("Set overview Image '%s' to '%s", $media['name'], $item))]);
+
 
     }
 
@@ -1607,5 +1663,4 @@ class MediaController extends Controller
             ));
         }
     }
-
 }

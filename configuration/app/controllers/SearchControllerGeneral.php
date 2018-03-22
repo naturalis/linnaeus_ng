@@ -134,18 +134,9 @@ class SearchControllerGeneral extends SearchController
 		$this->_minSearchLength=$this->moduleSettings->getModuleSetting(array('setting'=>'min_search_length','subst'=>3));
 		$this->_maxSearchLength=$this->moduleSettings->getModuleSetting(array('setting'=>'max_search_length','subst'=>50));
 
-		$this->_excerptPostMatchLength=
-			null !== $this->moduleSettings->getModuleSetting( 'excerpt_post-match_length' ) ?
-				$this->moduleSettings->getModuleSetting( 'excerpt_post-match_length' ) :
-				35;
-		$this->_excerptPreMatchLength =
-			null !== $this->moduleSettings->getModuleSetting( 'excerpt_pre-match_length ' ) ?
-				$this->moduleSettings->getModuleSetting( 'excerpt_pre-match_length ' ) :
-				35;
-		$this->_excerptPrePostMatchString =
-			null !== $this->moduleSettings->getModuleSetting( 'excerpt_pre_post_match_string' ) ?
-				$this->moduleSettings->getModuleSetting( 'excerpt_pre_post_match_string' ) :
-				'...';
+		$this->_excerptPostMatchLength = $this->moduleSettings->getModuleSetting( 'excerpt_post-match_length',35);
+		$this->_excerptPreMatchLength = $this->moduleSettings->getModuleSetting( 'excerpt_pre-match_length ',35);
+		$this->_excerptPrePostMatchString = $this->moduleSettings->getModuleSetting( 'excerpt_pre_post_match_string', '...');
 	}
 
     public function __destruct ()
@@ -155,7 +146,9 @@ class SearchControllerGeneral extends SearchController
 
     public function ajaxInterfaceAction ()
     {
-        if (!$this->rHasVal('action')) return;
+        if (!$this->rHasVal('action')) {
+            return;
+        }
         if ($this->rHasVal('action','get_search_result_index'))
 		{
 			$this->smarty->assign(
@@ -205,9 +198,7 @@ class SearchControllerGeneral extends SearchController
 								'extended'=>true
 							)
 						);
-				}
-				else
-				{
+				} else {
 					$search='"'.trim($modified_search,'"').'"';
 
 					$results=
@@ -266,11 +257,15 @@ class SearchControllerGeneral extends SearchController
         $this->printPage();
     }
 
-	private function tokenizeSearchString( $s, $skipMarkers = false )
+    /**
+     * splits search string in groups delimited by ". if there's an uneven number of ", the last one is ignored.
+     *
+     * @param $s
+     * @param bool $skipMarkers
+     * @return array
+     */
+    private function tokenizeSearchString($s, $skipMarkers = false )
 	{
-		/*
-			splits search string in groups delimited by ". if there's an uneven number of ", the last one is ignored.
-		*/
 		$parts = preg_split('/('.$this->_searchStringGroupDelimiter.')/i',$s,-1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 
 		$b = null;    // buffer
@@ -290,15 +285,14 @@ class SearchControllerGeneral extends SearchController
 				}
 				// and toggle "rec"
 				$r = !$r;
-			}
-			else
-			{
+			} else {
 				// concatenate consecutive parts when "rec" is on (i.e., we are inside a "...")
-				if($r)
-					$b .= $val;
-				// else split the part on spaces and add them as separate results
-				else
-					$t = array_merge($t,explode(' ',$val));
+				if($r) {
+                    $b .= $val;
+                } else {
+                    // else split the part on spaces and add them as separate results
+                    $t = array_merge($t, explode(' ', $val));
+                }
 			}
 		}
 		// take out the empty ones and return
@@ -320,7 +314,6 @@ class SearchControllerGeneral extends SearchController
         }
 
 		return $terms;
-
 	}
 
 	private function prefabFullTextLikeString( $s )
@@ -351,33 +344,25 @@ class SearchControllerGeneral extends SearchController
 
 	private function filterResultsWithTokenizedSearch( $p )
 	{
-		//OVERRIDE: the use of LIKE rather than MATCH make the post-filtering in PHP superfluous (i think)
+	    // @todo: Ask Maarten about this
+		// OVERRIDE: the use of LIKE rather than MATCH make the post-filtering in PHP superfluous (i think)
+        //
 		foreach((array)$p[1] as $key => $val) {
-			if (isset($p[1][$key][self::__CONCAT_RESULT__])) unset($p[1][$key][self::__CONCAT_RESULT__]);
+			if (isset($p[1][$key][self::__CONCAT_RESULT__])) {
+                unset($p[1][$key][self::__CONCAT_RESULT__]);
+            }
 		}
 		return $p[1];
-		//OVERRIDE
-
-
-		/*
-			$p[0] : array of search parameters:
-				$s[self::S_TOKENIZED_TERMS]	: array of tokens
-				$s[self::S_FULLTEXT_STRING]	: string for fulltext search (not used in this function)
-				$s[self::S_CONTAINS_LITERALS]	: boolean, indicates the presence of literal token(s) ("aa bb")
-			$p[1] : array of results
-			$p[2] : array of fields to check (optional; defaults to array('label','content'))
-		*/
 
 		$s = isset($p[0]) ? $p[0] : null;
 		$r = isset($p[1]) ? $p[1] : null;
 
-		if (!isset($s) || !isset($s[self::S_CONTAINS_LITERALS]) || !isset($s[self::S_TOKENIZED_TERMS]) ||$s[self::S_CONTAINS_LITERALS]==false) return $r;
+		if (!isset($s) || !isset($s[self::S_CONTAINS_LITERALS]) || !isset($s[self::S_TOKENIZED_TERMS]) || $s[self::S_CONTAINS_LITERALS] == false) {
+            return $r;
+        }
 
 		// really shouldn't happen but just in case i should forget to add the self::__CONCAT_RESULT__ field in the query
-		if (isset($r[0][self::__CONCAT_RESULT__]))
-			$concatField = self::__CONCAT_RESULT__;
-		else
-			$concatField = 'content';
+        $concatField = isset($r[0][self::__CONCAT_RESULT__]) ? self::__CONCAT_RESULT__ : 'content';
 
 
 		if ($s[self::S_CONTAINS_LITERALS]) {
@@ -397,7 +382,9 @@ class SearchControllerGeneral extends SearchController
 				// loop through all tokens
 				foreach((array)$s[self::S_TOKENIZED_TERMS] as $token) {
 
-					if ($match==true) break;
+					if ($match) {
+                        break;
+                    }
 
 					// match if token exists in value of specific field of each result
 					$match = $s[self::S_IS_CASE_SENSITIVE] ? strpos($d,$token)!==false : stripos($d,$token)!==false;
@@ -405,10 +392,12 @@ class SearchControllerGeneral extends SearchController
 				}
 
 				if ($match) {
-					if ($concatField== self::__CONCAT_RESULT__)
-						unset($result[self::__CONCAT_RESULT__]);
-					else
-						$result['warning'] = 'you forgot to add self::__CONCAT_RESULT__ to your query! these results based on matches in the assumed \'content\' column.';
+					if ($concatField == self::__CONCAT_RESULT__)
+					{
+                        unset($result[self::__CONCAT_RESULT__]);
+                    } else {
+                        $result['warning'] = 'you forgot to add self::__CONCAT_RESULT__ to your query! these results based on matches in the assumed \'content\' column.';
+                    }
 					array_push($filtered,$result);
 				}
 
@@ -418,9 +407,7 @@ class SearchControllerGeneral extends SearchController
 
 		}
 
-		// just in case
 		return $r;
-
 	}
 
 	private function getExcerptsSurroundingMatches( $p )
@@ -430,9 +417,13 @@ class SearchControllerGeneral extends SearchController
 		$f = isset($p['fields']) ? $p['fields'] : array('label','content');	// fields to match
 		$x = isset($p['excerpt']) ? $p['excerpt'] : array('content');		// fields to be excerpted (rather than returned completely)
 
-		if (!is_array($x)) $x = array(); // for when called with 'excerpt' => false (excerpt none of the fields)
+		if (!is_array($x)) {
+            $x = array();
+        } // for when called with 'excerpt' => false (excerpt none of the fields)
 
-		if (!isset($s) || !isset($s[self::S_TOKENIZED_TERMS]) ) return $r;
+		if (!isset($s) || !isset($s[self::S_TOKENIZED_TERMS]) ) {
+            return $r;
+        }
 
 		foreach((array)$r as $rKey => $result)
 		{
@@ -503,14 +494,13 @@ class SearchControllerGeneral extends SearchController
 		}
 
 		return $r;
-
 	}
 
 	private function sortResultsByMostTokensFound( $data, $secondaryfield=null)
 	{
-
-		if (count((array)$data)<2)
-			return $data;
+		if (count((array)$data)<2) {
+            return $data;
+        }
 
 		uasort($data,function($a,$b) use ($secondaryfield)
 		{
@@ -526,27 +516,22 @@ class SearchControllerGeneral extends SearchController
 				{
 					$bCount+=$count;
 				}
-			}
-			else
-			{
+			} else {
 				$aCount=count((array)$a['matches']);
 				$bCount=count((array)$b['matches']);
 			}
 
 			$r=0;
-			if ($aCount>$bCount)
-				$r=-1;
-			else
-			if ($aCount<$bCount)
-				$r=1;
-			else
-			if (!empty($secondaryfield))
-			{
-				if ($a[$secondaryfield]<$b[$secondaryfield])
-					$r=-1;
-				else
-				if ($a[$secondaryfield]>$b[$secondaryfield])
-					$r=1;
+			if ($aCount>$bCount) {
+                $r = -1;
+            } else if ($aCount<$bCount) {
+                $r = 1;
+            } else if (!empty($secondaryfield)) {
+				if ($a[$secondaryfield]<$b[$secondaryfield]) {
+                    $r = -1;
+                } else if ($a[$secondaryfield]>$b[$secondaryfield]) {
+                    $r = 1;
+                }
 			}
 			return $r;
 		});
@@ -559,8 +544,9 @@ class SearchControllerGeneral extends SearchController
 	{
 		// creates like-clause  ((taxon like '%phyllum a%' or taxon like '%orchid%'))
 		$r=array();
-		foreach((array)$c as $v)
-			$r[] = str_replace(self::S_LIKETEXT_REPLACEMENT,$v,$s);
+		foreach((array)$c as $v) {
+            $r[] = str_replace(self::S_LIKETEXT_REPLACEMENT, $v, $s);
+        }
 
 		return '('.implode(' or ',$r).')';
 	}
@@ -909,38 +895,6 @@ class SearchControllerGeneral extends SearchController
 			$numOfResults+=count((array)$content);
 
 		}
-
-		/*
-
-		if (isset($synonyms))
-		{
-			$results[self::C_TAXA_SYNONYMS]=
-				array(
-					'label' => $this->translate('Species synonyms'),
-					'url' => '../species/taxon.php?cat=names&id=%s',
-					'data' => $synonyms,
-					'numOfResults' => count((array)$synonyms)
-				);
-
-			$numOfResults+=count((array)$synonyms);
-
-		}
-
-		if (isset($commonnames))
-		{
-			$results[self::C_TAXA_VERNACULARS]=
-				array(
-					'label' => $this->translate('Species common names'),
-					'url' => '../species/taxon.php?cat=names&id=%s',
-					'data' => $commonnames,
-					'numOfResults' => count((array)$commonnames)
-				);
-
-			$numOfResults+=count((array)$commonnames);
-
-		}
-
-		*/
 
 		if (isset($names))
 		{
@@ -1494,3 +1448,4 @@ class SearchControllerGeneral extends SearchController
 	}
 
 }
+

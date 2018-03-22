@@ -1,55 +1,51 @@
 <?php
-
-/*
-
-	settings that work but not in the list:
-		general: support_email (support email adress)
-		general: show_hidden_modules_in_select_list (toggle for showing "show_in_menu=false" modules in project selection list)
-		general: admin_message_fade_out_delay (delay in ms before the admin messaged fade out)
-		general: front_end_use_basic_auth
-
-		species: 404_content ('{"title":"Page not found","body":"The requested page could not be found."}' )
-		species: use_embedded_templates (allow embedded templates in passports; see SpeciesController::processEmbeddedTemplates   )
-		species: use_page_blocks (allow "building" passport pages from other pages; see SpeciesController::buildPageFromBlocks   )
-		species: show_inherited_literature (also show links to literature about taxa higher up in the classification on the literature tab.)
-		species: tree_taxon_count_style (possible values: species_only (show only species count), species_established (species count & established count), none (removes count altogether))
-		species: tree_initital_expand_levels (initial taxon tree auto expansion for n levels
-		species: show_inherited_literature
-		species: suppress_parent_child_relation_checks (suppresses the strenuous checks on parent/child relations while editing taxonomy. only requirement is that the rank of a taxon is below that of its parent.)
-
-		search: show_presence_in_results (show the presence status in results)
-		search: show_all_preferred_names_in_results (show all preferred names in results, not just the one in the active language)
-
-		
-
-	to do technical:
-	- create default settings-set as base data
-	- create default value set for new projects
-
-
-	to do content:
-	- simplify settings (for instance multiple image base URLs)
-
-	move the traits settings!
-
-
-	// usage
-	include_once ('ModuleSettingsReaderController.php');
-	
-	$this->moduleSettings=new ModuleSettingsReaderController;
-	
-	// optional:
-	$this->moduleSettings->setController( 'species' );
-	$this->moduleSettings->setUseDefaultWhenNoValue( true );
-	$this->moduleSettings->assignModuleSettings( $this->settings );
-	
-	$a=$this->moduleSettings->getModuleSetting('a_setting');
-	$b=$this->moduleSettings->getModuleSetting( array( 'setting'=>'a_setting','subst'=>alt_value,'module'=>'other_module'));
-	$g=$this->moduleSettings->getGeneralSetting('a_setting');
-
-// values are max 512 characters!
-
-*/
+/**
+ * Module Settings Controller, has access to module specific settings
+ *
+ * Settings that work but not in the list:
+ * 	general: support_email (support email adress)
+ * 	general: show_hidden_modules_in_select_list (toggle for showing "show_in_menu=false" modules in project selection list)
+ * 	general: admin_message_fade_out_delay (delay in ms before the admin messaged fade out)
+ * 	general: front_end_use_basic_auth
+ *
+ * 	species: 404_content ('{"title":"Page not found","body":"The requested page could not be found."}' )
+ * 	species: use_embedded_templates (allow embedded templates in passports; see SpeciesController::processEmbeddedTemplates   )
+ * 	species: use_page_blocks (allow "building" passport pages from other pages; see SpeciesController::buildPageFromBlocks   )
+ * 	species: show_inherited_literature (also show links to literature about taxa higher up in the classification on the literature tab.)
+ * 	species: tree_taxon_count_style (possible values: species_only (show only species count), species_established (species count & established count), none (removes count altogether))
+ * 	species: tree_initital_expand_levels (initial taxon tree auto expansion for n levels
+ * 	species: show_inherited_literature
+ * 	species: suppress_parent_child_relation_checks (suppresses the strenuous checks on parent/child relations while editing taxonomy. only requirement is that the rank of a taxon is below that of its parent.)
+ *
+ * 	search: show_presence_in_results (show the presence status in results)
+ * 	search: show_all_preferred_names_in_results (show all preferred names in results, not just the one in the active language)
+ *
+ * @todo: technical
+ * - create default settings-set as base data
+ * - create default value set for new projects
+ *
+ * @todo: content
+ * - simplify settings (for instance multiple image base URLs)
+ *
+ * @todo: move the traits settings!
+ *
+ * @usage
+ * include_once ('ModuleSettingsReaderController.php');
+ *
+ * $this->moduleSettings=new ModuleSettingsReaderController;
+ *
+ * // optional:
+ * $this->moduleSettings->setController( 'species' );
+ * $this->moduleSettings->setUseDefaultWhenNoValue( true );
+ * $this->moduleSettings->assignModuleSettings( $this->settings );
+ *
+ * $a=$this->moduleSettings->getModuleSetting('a_setting');
+ * $b=$this->moduleSettings->getModuleSetting( array( 'setting'=>'a_setting','subst'=>alt_value,'module'=>'other_module'));
+ * $g=$this->moduleSettings->getGeneralSetting('a_setting');
+ *
+ *  values are max 512 characters!
+ *
+ */
 
 include_once ('Controller.php');
 
@@ -69,17 +65,26 @@ class ModuleSettingsController extends Controller
 	private $_settingid;
 	private $_settingsvalues;
 
+    /**
+     * ModuleSettingsController constructor.
+     */
     public function __construct ()
     {
         parent::__construct();
 		$this->initialize();
     }
 
+    /**
+     * ModuleSettingsController destructor.
+     */
     public function __destruct ()
     {
         parent::__destruct();
     }
 
+    /**
+     * ModuleSettingsController initialisation
+     */
 	private function initialize()
 	{
 		if (!defined('GENERAL_SETTINGS_ID')) define('GENERAL_SETTINGS_ID',-1);
@@ -89,6 +94,9 @@ class ModuleSettingsController extends Controller
 		$this->setModules();
 	}
 
+    /**
+     * ModuleSettingsController showing the settings page
+     */
     public function indexAction()
     {
         $this->checkAuthorisation();
@@ -100,6 +108,9 @@ class ModuleSettingsController extends Controller
 		$this->printPage();
     }
 
+    /**
+     * ModuleSettingsController change settings
+     */
     public function settingsAction()
     {
 		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );	
@@ -141,6 +152,9 @@ class ModuleSettingsController extends Controller
 		$this->printPage();
     }
 
+    /**
+     * ModuleSettingsController change values of settings
+     */
     public function valuesAction()
     {
         $this->checkAuthorisation();
@@ -176,6 +190,9 @@ class ModuleSettingsController extends Controller
 		$this->printPage();
     }
 
+    /**
+     * ModuleSettingsController edit settings asynchronous
+     */
     public function ajaxInterfaceAction ()
     {
 		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );	
@@ -197,15 +214,20 @@ class ModuleSettingsController extends Controller
 	}
 
 
-
-
-	private function setModules()
+    /**
+     * set the Modules
+     */
+    private function setModules()
 	{
 		$this->_modules = $this->models->ModuleSettingsModel->setModules();
 
 		$this->_modules[]=array( "id"=>GENERAL_SETTINGS_ID, "module"=>$this->translate("General settings") );
 	}
 
+    /**
+     * get the Modules
+     * @return array
+     */
 	private function getModules()
 	{
 		return $this->_modules;
@@ -240,7 +262,10 @@ class ModuleSettingsController extends Controller
 		return $this->_module;
 	}
 
-	private function setModuleSettings()
+    /**
+     * set the Module settings
+     */
+    private function setModuleSettings()
 	{
 		$this->_settings=$this->models->ModuleSettings->_get(array(
 			"id"=> array("module_id"=>$this->getModuleId()),
@@ -254,12 +279,14 @@ class ModuleSettingsController extends Controller
 		return $this->_settings;
 	}
 
-	private function getModuleSetting( $p )
+	private function getModuleSetting( $p , $default = null)
 	{
 		$id=isset($p['id']) ? $p['id'] : null;
 		$setting=isset($p['setting']) ? $p['setting'] : null;
 
-		if ( empty($id) && empty($setting) ) return;
+		if ( empty($id) && empty($setting) ) {
+		    return $default;
+        }
 
 		foreach((array)$this->getModuleSettings() as $val)
 		{
@@ -271,6 +298,8 @@ class ModuleSettingsController extends Controller
 				return $val;
 			}
 		}
+
+		return $default;
 	}
 
 	private function setSettingId( $id )
@@ -441,13 +470,15 @@ class ModuleSettingsController extends Controller
 
 
 
-	/*
-		below are semi-manual conversion functions that can be removed once all active 
-		projects have run it once. if you do remove them, be sure to also remove:
-		- convert_old_settings.tpl
-		- convert_old_settings.php
-		- `settings` table
-	*/
+    /**
+     * getOldSettings is the old way settings were set in modules
+     *
+     * below are semi-manual conversion functions that can be removed once all active
+     * projects have run it once. if you do remove them, be sure to also remove:
+     * - convert_old_settings.tpl
+     * - convert_old_settings.php
+     * - `settings` table
+     */
 	private function getOldSettings()
 	{
 		return $this->models->ModuleSettings->freeQuery(array(
@@ -499,6 +530,9 @@ class ModuleSettingsController extends Controller
 			"fieldAsIndex"=>"old_value_id"));
 	}
 
+    /**
+     * convert Old settings to the new settings
+     */
     public function convertOldSettingsAction()
     {
         $this->checkAuthorisation();

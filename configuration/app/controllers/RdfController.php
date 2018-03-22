@@ -1,5 +1,4 @@
 <?php
-
 include_once ('Controller.php');
 
 class RdfController extends Controller
@@ -126,7 +125,5 @@ class RdfController extends Controller
 			$predicate;
 
 	}
-		
-
 
 }

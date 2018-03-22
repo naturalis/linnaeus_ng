@@ -1,10 +1,12 @@
 <?php
+/**
+ * Batch converts all local media to the ResourceSpace infrastructure
+ */
 
 /*
  * TODO: remove limit 6000 from MediaModel getConverterTaxonMedia()!!!!!
  *
  */
-
 
 include_once ('MediaController.php');
 
@@ -63,11 +65,19 @@ class MediaConverterController extends MediaController
         $this->initialize();
     }
 
+    /**
+     * Destructor
+     *
+     * @access     public
+     */
     public function __destruct ()
     {
         parent::__destruct();
     }
 
+    /**
+     * Initializes Controller
+     */
     private function initialize ()
     {
         $this->setProjectModules();
@@ -118,6 +128,11 @@ class MediaConverterController extends MediaController
         }
     }
 
+    /**
+     * Shows the progress of the conversion
+     *
+     * @param bool $cli
+     */
     public function printConversionProgressAction ($cli = false)
     {
         if ($cli) $this->setCli();
@@ -146,9 +161,8 @@ class MediaConverterController extends MediaController
                         // Item has already been attached to specific item in a previous conversion
                         if ($this->itemHasBeenAttached()) {
                             echo "Already attached: $this->_currentFileName $this->_br";
-
-                        // File has been converted but not yet attached to item
                         } else {
+                            // File has been converted but not yet attached to item
                             $this->attachFile();
                             echo "Attached: $this->_currentFileName $this->_br";
                         }
@@ -176,12 +190,6 @@ class MediaConverterController extends MediaController
             '</p><p><b>Converting internal media links</b><br>';
 
         $this->convertInternalMediaLinks();
-/*
-        if ($this->fixKeystepMedia() !== false) {
-            echo $this->_cli ? "\n\nKeystep media fixed\n" :
-                '</p><p>Keystep media fixed<br>';
-        }
-*/
     }
 
     /* Keystep media should be copied to keystep table and deleted from media_modules */
@@ -555,6 +563,7 @@ class MediaConverterController extends MediaController
 
     private function setCurrentItem ($row)
     {
+        // @todo: what is happening here?
         if (!isset($row['file_name']) || !isset($row['item_id'])) {
             $this->_currentFileName = $this->_currentItemId = false;
         }
@@ -573,9 +582,14 @@ class MediaConverterController extends MediaController
 
     private function resetProperties ()
     {
-        $this->_currentMediaId = $this->_files = $this->_result =
-            $this->originalMediaId = $this->mediaId = $this->rsFile =
-            $this->_originalFileName = $this->_error = false;
+        $this->_currentMediaId = false;
+        $this->_files = false;
+        $this->_result = false;
+        $this->originalMediaId = false;
+        $this->mediaId = false;
+        $this->rsFile = false;
+        $this->_originalFileName = false;
+        $this->_error = false;
         $this->_overview = $this->_sortOrder = 0;
     }
 

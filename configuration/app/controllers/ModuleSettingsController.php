@@ -1,18 +1,18 @@
 <?php
-
-/*
-
-		$this->moduleSettings=new ModuleSettingsController;
-			echo $this->moduleSettings->getModuleSetting( 'setting_name' );
-		or
-			$this->moduleSettings->assignModuleSettings( $this->settings );
-			echo $this->settings->setting_name;
-
-*/
-
-// general settings are stored under module_id -1
+/**
+ *
+ *  	$this->moduleSettings=new ModuleSettingsController;
+ *		echo $this->moduleSettings->getModuleSetting( 'setting_name' );
+ *      or
+ *		$this->moduleSettings->assignModuleSettings( $this->settings );
+ *		echo $this->settings->setting_name;
+ *
+ *      general settings are stored under module_id -1
+ *
+ */
 
 include_once ('Controller.php');
+
 class ModuleSettingsController extends Controller
 {
     public $usedModels = array('module_settings','module_settings_values');

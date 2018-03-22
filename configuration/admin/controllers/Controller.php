@@ -2696,6 +2696,7 @@ class Controller extends BaseClass
 
 	protected function getWikiUrl()
 	{
+	    /** @setting wiki_base_url (string) */
 		$wiki_base_url=$this->models->ControllerModel->getGeneralSettingValue(
 			array(
 				'project_id' => $this->getCurrentProjectId(),

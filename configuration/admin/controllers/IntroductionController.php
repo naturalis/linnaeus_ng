@@ -109,8 +109,7 @@ class IntroductionController extends Controller
     {
 		$this->checkAuthorisation();
 
-		if (!$this->rHasId())
-		{
+		if (!$this->rHasId()) {
 			$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
 			$this->checkAuthorisation();
 
@@ -118,39 +117,31 @@ class IntroductionController extends Controller
 			$this->logChange(array('after'=>["id"=>$id],'note'=>'created new page'));
 
 			// redirecting to protect against resubmits
-			if ($id)
-			{
+			if ($id) {
 				$this->redirect('edit.php?id=' . $id);
-			}
-			else
-			{
+			} else {
 				$this->addError($this->translate('Could not create page.'));
 			}
-		}
-		else
-		{
+		} else {
 			if ($this->rHasVal('action','delete'))
 			{
 				$this->UserRights->setActionType( $this->UserRights->getActionDelete() );
 				$this->checkAuthorisation();
 				$before=$this->getPage();
 				$this->deletePage();
+
 				$this->logChange(array('before'=>$before,'note'=>'deleted page '.$before['topic']));
+
 				$this->redirect('index.php');
-			}
-			else
-			if ($this->rHasVal('action','deleteImage'))
-			{
+			} else if ($this->rHasVal('action','deleteImage')) {
 				$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 				$this->checkAuthorisation();
 				//$this->deleteMedia();
 				$before=$this->getPage();
 				$this->detachAllMedia();
+
 				$this->logChange(array('before'=>$before,'after'=>$this->getPage(),'note'=>'deleted media from '.$before['topic']));
-			}
-			else
-			if ($this->rHasVal('action','preview'))
-			{
+			} else if ($this->rHasVal('action','preview')) {
 				$this->saveAllContent($this->rGetAll());
 				$this->redirect('preview.php?id=' . $this->rGetId());
 			}
@@ -160,9 +151,7 @@ class IntroductionController extends Controller
 			if ($page['got_content']==0)
 			{
 		        $this->setPageName($this->translate('Creating new page'));
-			}
-			else
-			{
+			} else {
 		        $this->setPageName($this->translate('Editing page'));
 			}
 		}
@@ -175,8 +164,12 @@ class IntroductionController extends Controller
 
 		$navList = $this->getPageNavList(true);
 
-		if ( isset($navList) ) $this->smarty->assign('navList', $navList);
-		if ( isset($page) ) $this->smarty->assign('page', $page);
+		if ( isset($navList) ) {
+		    $this->smarty->assign('navList', $navList);
+        }
+		if ( isset($page) ) {
+		    $this->smarty->assign('page', $page);
+        }
 
 		$this->smarty->assign( 'navCurrentId', $this->rHasId() ? $this->rGetId() : null );
 		$this->smarty->assign( 'id', $this->rHasId() ? $this->rGetId() : $id );
@@ -222,10 +215,7 @@ class IntroductionController extends Controller
 
 			$this->addMessage($this->translate('New order saved.'));
 
-		}
-		else
-		if ($this->rHasVal('sortAlpha') && !$this->isFormResubmit())
-		{
+		} else if ($this->rHasVal('sortAlpha') && !$this->isFormResubmit()) {
 			$d = $this->getPageHeaders();
 
 			$this->customSortArray($d, array(
@@ -234,8 +224,7 @@ class IntroductionController extends Controller
 				'case' => 'i'
 			));
 
-			foreach((array)$d as $key => $val)
-			{
+			foreach((array)$d as $key => $val) {
 				 $this->models->IntroductionPages->update(
 					array(
 						'show_order' => $key + 1,
@@ -248,12 +237,10 @@ class IntroductionController extends Controller
 			}
 
 			$this->addMessage($this->translate('Alphabetic order saved.'));
-
 		}
 
 		$this->smarty->assign('pages',$this->getPageHeaders());
         $this->printPage();
-
 	}
 
     public function mediaUploadAction()
@@ -273,6 +260,8 @@ class IntroductionController extends Controller
 
 			if ($filesToSave && $this->rHasId())
 			{
+                $results = array('updated' => [], 'saved' => [], 'failed' => []);
+
 				foreach((array)$filesToSave as $key => $file)
 				{
 
@@ -309,17 +298,22 @@ class IntroductionController extends Controller
 						)
 					);
 
-					if ($fmm)
-					{
+					if ($fmm) {
+                        $results['success'][] = $file['original_name'];
 						$this->addMessage(sprintf($this->translate('Saved: %s (%s)'),$file['original_name'],$file['media_name']));
-					}
-					else
-					{
+					} else {
+                        $results['failed'][] = $file['original_name'];
 						$this->addError($this->translate('Failed writing uploaded file to database.'),1);
 					}
 
 				}
-
+                $msg = "Media upload. ";
+                foreach($results as $name => $files) {
+                    if (count($files) > 0) {
+                        $msg .= "  " . $name . ": " . implode(', ', $files);
+                    }
+                }
+                $this->logChange(array('note' => $msg));
 			}
 
 		}

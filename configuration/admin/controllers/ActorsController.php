@@ -101,7 +101,6 @@ class ActorsController extends NsrController
 			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 			$this->checkAuthorisation();
 
-			$before=$this->getActor();
 			$this->setActorId($this->rGetId());
 			$this->setActorBefore();
 			$this->updateActor();

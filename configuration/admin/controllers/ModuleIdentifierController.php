@@ -1,4 +1,7 @@
 <?php
+/**
+ * Controller which supplies information about projects and modules to other controllers. Used by MediaController and ProjectsController
+ */
 
 include_once ('Controller.php');
 class ModuleIdentifierController extends Controller

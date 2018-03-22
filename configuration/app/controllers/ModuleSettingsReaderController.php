@@ -1,4 +1,8 @@
 <?php
+/**
+ * Controller wich reads and sets the module and general settings
+ *
+ */
 
 include_once ('Controller.php');
 
@@ -16,7 +20,11 @@ class ModuleSettingsReaderController extends Controller
 	private $_usedefaultwhennovalue=false;
 	public $modelNameOverride = 'ModuleSettingsModel';
 
-    public function __construct( $p=null )
+    /**
+     * ModuleSettingsReaderController constructor.
+     * @param null $p
+     */
+    public function __construct($p=null )
     {
         parent::__construct( $p );
 
@@ -29,6 +37,9 @@ class ModuleSettingsReaderController extends Controller
 		return GENERAL_SETTINGS_ID;
     }
 
+    /**
+     * ModuleSettingsReaderController destructor.
+     */
     public function __destruct()
     {
         parent::__destruct();
@@ -39,8 +50,14 @@ class ModuleSettingsReaderController extends Controller
 		$this->setModuleController( $controller );
 		$this->initialize();
 	}
-	
-    public function getModuleSetting( $p )
+
+    /**
+     * Retrieving a module setting
+     *
+     * @param $p
+     * @return mixed|null|void
+     */
+    public function getModuleSetting($p )
     {
 		if ( is_array( $p ))
 		{
@@ -74,6 +91,12 @@ class ModuleSettingsReaderController extends Controller
 		}
     }
 
+    /**
+     * Retrieving a general setting
+     *
+     * @param $p
+     * @return mixed|null|void
+     */
     public function getGeneralSetting( $p )
     {
 		if ( is_array( $p ))
@@ -100,6 +123,11 @@ class ModuleSettingsReaderController extends Controller
 		}
     }
 
+    /**
+     * Assing a module setting
+     *
+     * @param $settings
+     */
 	public function assignModuleSettings( &$settings )
 	{
 		$settings = new stdClass();
@@ -116,6 +144,11 @@ class ModuleSettingsReaderController extends Controller
 		}
 	}
 
+    /**
+     * Assing a general setting
+     *
+     * @param $settings
+     */
 	public function assignGeneralSettings( &$settings )
 	{
 		$settings = new stdClass();
@@ -132,12 +165,20 @@ class ModuleSettingsReaderController extends Controller
 		}
 	}
 
+    /**
+     * Set a default value
+     *
+     * @param bool $state
+     */
     public function setUseDefaultWhenNoValue( $state )
     {
 		if ( is_bool($state) ) $this->_usedefaultwhennovalue=$state;
     }
 
-	private function initialize()
+    /**
+     * Initialize the settings
+     */
+    private function initialize()
 	{
 		$this->setModuleId();
 		$this->setModuleSettingsValues();
@@ -238,6 +279,4 @@ class ModuleSettingsReaderController extends Controller
 			return $subst;
 		}
     }
-
-
 }

@@ -240,6 +240,8 @@ class FreeModuleController extends Controller
 
 			if ($filesToSave && $this->rHasId())
 			{
+			    $results = array('success' => [], 'failed' => []);
+
 				foreach((array)$filesToSave as $key => $file)
 				{
 
@@ -270,15 +272,25 @@ class FreeModuleController extends Controller
 						)
 					);
 
-					if ($fmm)
-					{
-						$this->addMessage(sprintf($this->translate('Saved: %s (%s)'),$file['original_name'],$file['media_name']));
-					}
-					else
-					{
+					if ($fmm) {
+					    $msg = sprintf($this->translate('Saved: %s (%s)'),$file['original_name'],$file['media_name']);
+					    $results['success'][] = $file['original_name'];
+
+						$this->addMessage($msg);
+					} else {
+                        $results['failed'][] = $file['original_name'];
+
 						$this->addError($this->translate('Failed writing uploaded file to database.'),1);
 					}
 				}
+				$result_msg = "Uploaded media. ";
+				foreach($results as $group => $files) {
+				    if (count($files) > 0) {
+				        $result_msg .= $group . ": " . implode(', ', $files);
+                    }
+                }
+
+                $this->logChange(array('note' => $result_msg));
 			}
 		}
 

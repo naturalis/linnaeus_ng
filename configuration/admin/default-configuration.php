@@ -1,14 +1,17 @@
 <?php
+/**
+ *  Default configuration, which can be extended by the custom configuration.
+ */
 
 ini_set('memory_limit', '512M');
 if(file_exists( __DIR__ . '/custom-configuration.php')) include_once( __DIR__ . '/custom-configuration.php' );
 class configuration
 {
-
     private $_appFileRoot;
 
     public function __construct ()
     {
+        // get All GeneralSettings from the config file
         $d = $this->getGeneralSettings();
         $d['app']['pathName'];
         $this->_appFileRoot = __DIR__;

@@ -1,4 +1,7 @@
 <?php
+/**
+ *  The webservices controller handles the Webservices api
+ */
 include_once ('Controller.php');
 include_once ('ModuleSettingsReaderController.php');
 include_once ('LoginController.php');
@@ -18,6 +21,7 @@ class WebservicesController extends Controller
 	private $_JSON=null;
 
 	// Hard-coded for the time being...
+    // @todo: this should also move to the settings?
 	private $_key = 'gNXhIb4LDKrA7MQmNo7wpV';
 
     public $usedHelpers = array(
@@ -212,9 +216,14 @@ class WebservicesController extends Controller
 
             $data = $this->getLinnaeusData();
 
+            /** @setting 'push_Url' defines the central push server to push installation information to */
         	$url = !empty($this->generalSettings['pushUrl']) ?
         	   $this->generalSettings['pushUrl'] : 'http://linnaeus.naturalis.nl/admin/server_csv.php';
 
+        	/**
+             * Post the information to the central server by http post
+             * @var _data
+             */
     		$this->_data = $this->getCurlResult(array(
                 'url' => $url,
                 'post' => http_build_query(array('lng_data' => json_encode($data)))

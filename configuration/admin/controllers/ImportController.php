@@ -1,6 +1,6 @@
 <?php
-
 include_once ('Controller.php');
+
 class ImportController extends Controller
 {
     public $usedModels = array(
@@ -224,9 +224,5 @@ class ImportController extends Controller
 		return $id;
 
 	}
-
-
-
-
 
 }

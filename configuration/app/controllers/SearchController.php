@@ -1,5 +1,4 @@
 <?php
-
 include_once ('Controller.php');
 include_once ('ModuleSettingsController.php');
 
@@ -49,8 +48,8 @@ class SearchController extends Controller
 	{
 		$this->moduleSettings=new ModuleSettingsController;
 		$this->moduleSettings->setUseDefaultWhenNoValue( true );
-		$this->_minSearchLength = null !== $this->moduleSettings->getModuleSetting( 'min_search_length' ) ? $this->moduleSettings->getModuleSetting( 'min_search_length' ) : 3;
-		$this->_maxSearchLength = null !== $this->moduleSettings->getModuleSetting( 'max_search_length' ) ? $this->moduleSettings->getModuleSetting( 'max_search_length' ) : 50;
+		$this->_minSearchLength = $this->moduleSettings->getModuleSetting( 'min_search_length',3);
+		$this->_maxSearchLength = $this->moduleSettings->getModuleSetting( 'max_search_length',50);
 	}
 
 	protected function validateSearchString($s)

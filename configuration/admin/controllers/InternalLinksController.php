@@ -48,7 +48,10 @@ class InternalLinksController extends Controller
 
     }
 
-	public function intLinksAction()
+    /**
+     *
+     */
+    public function intLinksAction()
 	{
 
 		if ($this->rHasVal('language'))
@@ -62,7 +65,10 @@ class InternalLinksController extends Controller
 
 	}
 
- 	private function intLinkGetGlossaryTerms()
+    /**
+     * @return null
+     */
+    private function intLinkGetGlossaryTerms()
 	{
 
 		$l = $this->models->Glossary->_get(
@@ -85,7 +91,10 @@ class InternalLinksController extends Controller
 
 	}
 
-	private function intLinkGetGlossaryAlpha()
+    /**
+     * @return null
+     */
+    private function intLinkGetGlossaryAlpha()
 	{
 
 		$l = $this->models->Glossary->_get(
@@ -150,7 +159,9 @@ class InternalLinksController extends Controller
 			)
 		);
 
-		foreach((array)$l as $key => $val)  $l[$key]['label'] = $val['id'];
+		foreach((array)$l as $key => $val) {
+            $l[$key]['label'] = $val['id'];
+        }
 
 		return $l;
 
