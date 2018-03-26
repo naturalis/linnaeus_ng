@@ -2808,15 +2808,17 @@ class Controller extends BaseClass
 			}
 
 			/*
-			 *  @todo: Check this piece of code. This fails in NSR with taxon's without a parent
+			 *  @todo: Check (and remove) this piece of code. This fails in NSR with taxon's without a parent
 			 *  for instance in the NSR it goes wrong with these entries:
 			 *
 			 *  182598, 182599, 182686, 183197  (Daphnea Rostrata)
 			 *
+
 			if ( is_null($parent_id) && !is_null($taxon_id) )
 			{
 				$parent_id=$this->getTaxonById($this->getTaxonById($taxon_id)['parent_id'])['id'];
 			}
+
 			*/
 
 			if ( !is_null($parent_id) )
