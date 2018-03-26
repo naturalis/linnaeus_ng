@@ -733,8 +733,7 @@ class Controller extends BaseClass
 		if ( !empty($taxon['taxon']) )
 		{
 			$taxon['taxon_no_infix']=$taxon['taxon'];
-			if (!$addNoMarkers)
-			{
+			if (!$addNoMarkers) {
 				$taxon['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$taxon['taxon'],'base_rank_id'=>$taxon['base_rank_id'],'taxon_id'=>$taxon['id'],'parent_id'=>$taxon['parent_id'] ] );
 			}
 		}
@@ -2737,51 +2736,28 @@ class Controller extends BaseClass
 	{
 		$base_rank_id=isset($p['base_rank_id']) ? $p['base_rank_id'] : null;
 
-		if ( defined("NOTHOVARIETAS_RANK_ID") && $base_rank_id==NOTHOVARIETAS_RANK_ID )
-		{
+		if ( defined("NOTHOVARIETAS_RANK_ID") && $base_rank_id==NOTHOVARIETAS_RANK_ID ) {
 			$p['name']=$this->addHybridMarker( $p );
 			return $this->addVarietasInfix( $p );
-		}
-		else
-		if ( defined("NOTHOSUBSPECIES_RANK_ID") && $base_rank_id==NOTHOSUBSPECIES_RANK_ID )
-		{
+		} else if ( defined("NOTHOSUBSPECIES_RANK_ID") && $base_rank_id==NOTHOSUBSPECIES_RANK_ID ) {
 			$p['name']=$this->addHybridMarker( $p );
 			return $this->addSubspeciesInfix( $p );
-		}
-		else
-		if ( (defined("NOTHOGENUS_RANK_ID") && $base_rank_id==NOTHOGENUS_RANK_ID) ||
-			 (defined("NOTHOSPECIES_RANK_ID") && $base_rank_id==NOTHOSPECIES_RANK_ID ) )
-		{
+		} else if ( (defined("NOTHOGENUS_RANK_ID") && $base_rank_id==NOTHOGENUS_RANK_ID) ||
+			 (defined("NOTHOSPECIES_RANK_ID") && $base_rank_id==NOTHOSPECIES_RANK_ID ) ) {
 			return $this->addHybridMarker( $p );
-		}
-		else
-		if ( defined("VARIETAS_RANK_ID") && $base_rank_id==VARIETAS_RANK_ID )
-		{
+		} else if ( defined("VARIETAS_RANK_ID") && $base_rank_id==VARIETAS_RANK_ID ) {
 			return $this->addVarietasInfix( $p );
-		}
-		else
-		if ( defined("SUBSPECIES_RANK_ID") && $base_rank_id==SUBSPECIES_RANK_ID  )
-		{
+		} else if ( defined("SUBSPECIES_RANK_ID") && $base_rank_id==SUBSPECIES_RANK_ID  ) {
 			return $this->addSubspeciesInfix( $p );
-		}
-		else
-		if ( defined("FORMA_RANK_ID") && $base_rank_id==FORMA_RANK_ID )
-		{
+		} else if ( defined("FORMA_RANK_ID") && $base_rank_id==FORMA_RANK_ID ) {
 			return $this->addFormaInfix( $p );
 		}
 
-		if ( !empty($p['specific_epithet']) )
-		{
+		if ( !empty($p['specific_epithet']) ) {
 			return $p['specific_epithet'];
-		}
-		else
-		if ( !empty($p['uninomial']) )
-		{
+		} else if ( !empty($p['uninomial']) ) {
 			return $p['uninomial'];
-		}
-		else
-		if ( !empty($p['name']) )
-		{
+		} else if ( !empty($p['name']) ) {
 			return $p['name'];
 		}
 	}
@@ -2831,11 +2807,17 @@ class Controller extends BaseClass
 				return $marker . $uninomial;
 			}
 
-
+			/*
+			 *  @todo: Check this piece of code. This fails in NSR with taxon's without a parent
+			 *  for instance in the NSR it goes wrong with these entries:
+			 *
+			 *  182598, 182599, 182686, 183197  (Daphnea Rostrata)
+			 *
 			if ( is_null($parent_id) && !is_null($taxon_id) )
 			{
 				$parent_id=$this->getTaxonById($this->getTaxonById($taxon_id)['parent_id'])['id'];
 			}
+			*/
 
 			if ( !is_null($parent_id) )
 			{
@@ -2849,34 +2831,19 @@ class Controller extends BaseClass
 			if ( empty($name) )
 			{
 				return $marker;
-			}
-			else
-			{
-				/*
-				$ied=explode(' ', $name, 2);
-				return $ied[0]. '  ' . $marker . $ied[1];
-				 */
-
+			} else {
 			    $f = strip_tags($name);
 			    $ied=explode(' ', $f, 2);
 				$r = $ied[0]. ' ' . $marker . $ied[1];
-				return str_replace($f, $r, $name);
 
+				return str_replace($f, $r, $name);
 			}
-		}
-		else
-		{
-			if ( !empty($specific_epithet) )
-			{
+		} else {
+			if ( !empty($specific_epithet) ) {
 				return $specific_epithet;
-			}
-			else
-			if ( !empty($uninomial) )
-			{
+			} else if ( !empty($uninomial) ) {
 				return $uninomial;
-			}
-			else
-			{
+			} else {
 				return $name;
 			}
 		}
@@ -2905,19 +2872,12 @@ class Controller extends BaseClass
 				$ied[2] = '</span><span>' . $marker . '</span>' . ' <span class="italics">' . $ied[2];
 				return implode(' ',$ied);
 			}
-		}
-		else
-		if ( $base_rank_id==NOTHOVARIETAS_RANK_ID )
-		{
+		} else if ( $base_rank_id==NOTHOVARIETAS_RANK_ID ) {
 			$marker=$this->getShowAutomaticInfixes() ? 'notho' . $marker : '';
 
-			if ( !empty($infra_specific_epithet) )
-			{
-				return $marker . $specific_epithet;
-			}
-			else
-			if ( !empty($name) && strpos($name,' ')!==false )
-			{
+			if ( !empty($infra_specific_epithet) ) {
+			    return $marker . $specific_epithet;
+			} else if ( !empty($name) && strpos($name,' ')!==false ) {
 				$ied=explode( ' ',  $name );
 				$ied[2] = '</span><span>' . $marker . '</span>' . ' <span class="italics">' . $ied[2];
 				return implode(' ',$ied);
@@ -2951,36 +2911,28 @@ class Controller extends BaseClass
 				{
 					$ied[2] = '</span><span>' . $marker . '</span>' . ' <span class="italics">' . $ied[2];
 					return implode(' ',$ied);
-				}
-				else
-				{
+				} else {
 					return $name;
 				}
 
 			}
 		}
 		else
-		if ( $base_rank_id==NOTHOSUBSPECIES_RANK_ID )
-		{
+		if ( $base_rank_id==NOTHOSUBSPECIES_RANK_ID ) {
+
 			// REFAC2015: $this->_nothoInfixPrefix . $marker --> should come from ranks.abbreviation
+
 			$marker=$this->getShowAutomaticInfixes() ? $this->_nothoInfixPrefix . $marker : '';
 			
-			if ( !empty($infra_specific_epithet) )
-			{
+			if ( !empty($infra_specific_epithet) ) {
 				return $marker . $specific_epithet;
-			}
-			else
-			if ( !empty($name) && strpos($name,' ')!==false )
-			{
+			} else if ( !empty($name) && strpos($name,' ')!==false ) {
 				$ied=explode( ' ',  $name );
 
-				if ( isset($ied[2]) )
-				{
+				if ( isset($ied[2]) ) {
 					$ied[2] = '</span><span>' . $marker . '</span>' . ' <span class="italics">' . $ied[2];
 					return implode(' ',$ied);
-				}
-				else
-				{
+				} else {
 					return $name;
 				}
 
@@ -3030,11 +2982,11 @@ class Controller extends BaseClass
 	protected function setShowAutomaticInfixes()
 	{
 		$this->_showAutomaticInfixes =
-			$this->models->ControllerModel->getSetting(array(
+            ($this->models->ControllerModel->getSetting(array(
 			'project_id' => $this->getCurrentProjectId(),
 			'module_id' => GENERAL_SETTINGS_ID,
 			'setting' => 'show_automatic_infixes'
-		))==1;
+		)) == 1);
 	}
 
 	protected function getShowAutomaticHybridMarkers()

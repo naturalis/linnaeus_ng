@@ -39,6 +39,9 @@ class ProjectsController extends Controller
     );
 	private $freeModulesMax=5;
 
+    /**
+     * ProjectsController constructor.
+     */
     public function __construct ()
     {
         parent::__construct();
@@ -47,11 +50,17 @@ class ProjectsController extends Controller
 		$this->allow_file_management=$this->moduleSettings->getGeneralSetting( [ 'setting'=>'enable_file_management', 'subst'=>false ] );
 	}
 
+    /**
+     * ProjectsController descructor
+     */
     public function __destruct ()
     {
         parent::__destruct();
     }
 
+    /**
+     * Show the list of projects to choose from
+     */
 	public function chooseProjectAction()
 	{
         $this->checkDefaultProjectSelect();
@@ -73,6 +82,9 @@ class ProjectsController extends Controller
         $this->printPage();
     }
 
+    /**
+     * Set the chosen project
+     */
 	public function doChooseProject( $project_id )
 	{
         if ( $project_id && $this->isCurrentUserAuthorizedForProject($project_id) )
@@ -81,6 +93,9 @@ class ProjectsController extends Controller
 		}
     }
 
+    /**
+     * Show the project management page
+     */
     public function indexAction()
     {
         $this->checkAuthorisation();
@@ -88,6 +103,9 @@ class ProjectsController extends Controller
         $this->printPage();
     }
 
+    /**
+     * Show the project overview
+     */
     public function overviewAction()
     {
 		$this->UserRights->setDisableUserAccesModuleCheck( true );
@@ -146,22 +164,12 @@ class ProjectsController extends Controller
             }
         }
 
-/*
-		$d = $this->show_hidden_modules_in_select_list ? '*' : ['show_in_menu'=>1];
-
-        $modules = $this->models->Modules->_get(array(
-            'id' => $d,
-            'order' => 'show_order'
-        ));
-*/
-
         $modules = $this->models->ProjectsModel->getProjectManagementModules(array(
             'project_id' => $this->getCurrentProjectId(),
             'show_hidden' => $this->show_hidden_modules_in_select_list ? true : false
         ));
 
-        foreach ((array) $modules as $key => $val)
-		{
+        foreach ((array) $modules as $key => $val) {
 		    $mp = $this->models->ModulesProjects->_get(
             array(
                 'id' => array(
@@ -323,9 +331,7 @@ class ProjectsController extends Controller
                     $this->smarty->assign('saved', true);
                     $this->addMessage(sprintf($this->translate('Project \'%s\' saved.'), $this->rGetVal('title')));
                     $this->addMessage(sprintf('You have been assigned to the new project as system administrator.'));
-                }
-                else
-				{
+                } else {
                     $this->addError($this->translate('Could not save project (duplicate name?).'));
                 }
             }
@@ -338,6 +344,9 @@ class ProjectsController extends Controller
         $this->printPage();
     }
 
+    /**
+     * Delete Project Action
+     */
     public function deleteAction ()
     {
 		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );
@@ -354,9 +363,10 @@ class ProjectsController extends Controller
 		{
             $this->doDeleteProjectAction($this->rGetId());
             $this->addMessage('Project deleted.');
-        }
-        else
-		{
+            $this->logChange(array(
+                'note' => sprintf($this->translate('Project %d deleted'),$this->rGetId())
+            ));
+        } else {
             $d = $this->rHasVal('p') ? array(
                 'id' => $this->rGetVal('p')
             ) : '*';
@@ -379,6 +389,9 @@ class ProjectsController extends Controller
         $this->printPage();
     }
 
+    /**
+     * Delete Project orphan Action
+     */
     public function deleteOrphanAction ()
     {
 		$this->UserRights->setRequiredLevel( ID_ROLE_SYS_ADMIN );
@@ -817,7 +830,13 @@ class ProjectsController extends Controller
 
 	}
 
-	private function doChangeProjectId($oldId,$newId)
+    /**
+     * Change the id of a project
+     *
+     * @param $oldId
+     * @param $newId
+     */
+    private function doChangeProjectId($oldId, $newId)
 	{
 
 		$data = $this->models->Projects->freeQuery('show tables');
@@ -846,22 +865,38 @@ class ProjectsController extends Controller
 			$this->generalSettings['directories']['mediaDirProject'].'/'.$this->getProjectFSCode($oldId),
 			$this->generalSettings['directories']['mediaDirProject'].'/'.$this->getProjectFSCode($newId)
 		);
-
 		$this->addMessage('Renamed media directory');
 
+		$b = $this->models->Projects->_get(['id' => $oldId]);
 		$this->models->Projects->update(
 			array('id'=>$newId),
 			array('id'=>$oldId)
 		);
+        $a = $this->models->Projects->_get(['id' => $newId]);
+
+		$this->logChange(
+		    array(
+		        'before' => $b,
+		        'note' => 'Changed project id',
+                'after' => $a
+            )
+        );
 
 		$this->addMessage('Updated project table');
 
 	}
 
-	private function saveProjectData( $data )
+    /**
+     * Save the changed project data
+     *
+     * @param $data
+     */
+    private function saveProjectData($data )
 	{
 
 		$data['id']=$this->getCurrentProjectId();
+
+        $b = $this->models->Projects->_get(['id' => $data['id']]);
 
 		if ( !$this->isCurrentUserSysAdmin() )
 		{
@@ -898,9 +933,24 @@ class ProjectsController extends Controller
 
 		$this->models->Projects->save( $data );
 
+        $a = $this->models->Projects->_get(['id' => $data['id']]);
+
+        $this->logChange(
+            array(
+                'before' => $b,
+                'note' => 'Saved project',
+                'after' => $a
+            )
+        );
+
 	}
 
-	private function getCurrentUserProjects()
+    /**
+     * List Current user projects
+     *
+     * @return mixed
+     */
+    private function getCurrentUserProjects()
 	{
 		$d=array( 'user_id'=>$this->getCurrentUserId() );
 
@@ -912,6 +962,12 @@ class ProjectsController extends Controller
 		return $this->models->ProjectsModel->getUserProjects( $d );
 	}
 
+    /**
+     * Valid access of the current user to the project
+     *
+     * @param $id
+     * @return mixed
+     */
 	private function isCurrentUserAuthorizedForProject($id)
 	{
 		if ( $this->UserRights->isSysAdmin() ) return true;
@@ -925,6 +981,11 @@ class ProjectsController extends Controller
 		return false;
 	}
 
+    /**
+     * Set the current project Id
+     *
+     * @param int $id
+     */
     private function setCurrentProjectId($id)
     {
         $_SESSION['admin']['project']['id'] = $id;
@@ -938,7 +999,12 @@ class ProjectsController extends Controller
         ));
     }
 
-	private function doSetProject( $id )
+    /**
+     * Set the project Id
+     *
+     * @param $id
+     */
+    private function doSetProject($id )
 	{
 		$this->unsetProjectSessionData();
 		$this->setCurrentProjectId( $id );
@@ -946,6 +1012,9 @@ class ProjectsController extends Controller
 		//$this->setCurrentUserRoleId();
 	}
 
+    /**
+     * Check default selected project
+     */
     private function checkDefaultProjectSelect()
     {
 		$projects=$this->getCurrentUserProjects();
@@ -977,6 +1046,11 @@ class ProjectsController extends Controller
 		}
     }
 
+    /**
+     * Change the data of the current project
+     *
+     * @param null $data
+     */
     private function setCurrentProjectData ($data = null)
     {
         if ($data == null)
@@ -1022,12 +1096,5 @@ class ProjectsController extends Controller
             $_SESSION['admin']['project'][$key] = $val;
         }
     }
-
-
-
-
-
-
-
-
 }
+
