@@ -15,13 +15,27 @@
     "Project",
     "Naturalis"
   ],
-  "author": "Maarten Schermer",
+  "author": "Joep Vermaat and Ruud Altenburg",
   "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/naturalis/linnaeus_ng/issues"
   },
   "homepage": "https://github.com/naturalis/linnaeus_ng#readme",
   "dependencies": {
-    "jquery": "^3.3.1"
+    "@allmarkedup/purl": "git+https://github.com/allmarkedup/purl.git",
+    "@fancyapps/fancybox": "^3.2.5",
+    "ckeditor": "^4.9.1",
+    "dropzone": "git+https://github.com/enyo/dropzone.git",
+    "jquery": "^3.3.1",
+    "jquery-sortable": "git+https://github.com/johnny/jquery-sortable.git",
+    "jquery-ui": "^1.12.1",
+    "modaldialog": "^0.2.8",
+    "modernizr": "^3.6.0",
+    "morris-js-module": "^1.2.1",
+    "nestedSortable": "git+https://github.com/ilikenwf/nestedSortable.git",
+    "prettyPhoto": "git+https://github.com/fredriks/prettyphoto.git",
+    "sprintf-js": "git+https://github.com/alexei/sprintf.js.git",
+    "tablesorter": "^2.30.1",
+    "tinymce": "^4.7.9"
   }
 }
