@@ -141,7 +141,7 @@ class SpeciesController extends Controller
         'col_loader_helper',
         'csv_parser_helper',
         'file_upload_helper',
-        'image_thumber_helper',
+        //'image_thumber_helper',
         'hr_filesize_helper'
     );
     public $cacheFiles = array(

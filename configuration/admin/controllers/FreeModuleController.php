@@ -18,7 +18,7 @@ class FreeModuleController extends Controller
 
     public $usedHelpers = array(
         'file_upload_helper',
-        'image_thumber_helper',
+        //'image_thumber_helper',
         'csv_parser_helper'
     );
 
