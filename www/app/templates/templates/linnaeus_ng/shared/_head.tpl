@@ -44,10 +44,8 @@
  	
 	<script type="text/javascript" src="{$baseUrl}app/javascript/sprintf-0.7-beta1.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.urlparser.2.1.1.js"></script>
-	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.shrinkText.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.prettyDialog.js"></script>
     <script type="text/javascript" src="{$baseUrl}app/javascript/inline_templates.js"></script>
-    <!-- script type="text/javascript" src="{$projectUrls.projectCSS}../css/fancybox2/jquery.fancybox.pack.js"></script -->
 
 
 	<link rel="stylesheet" type="text/css" href="{$baseUrl}app/javascript/fancybox-3/jquery.fancybox.min.css">

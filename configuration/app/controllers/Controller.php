@@ -14,7 +14,7 @@
 		"www/linnaeus_ng/www/app/style/original_skin/"
 		"www/linnaeus_ng/www/app/media/system/skins/original_skin/"
 		"www/linnaeus_ng/www/app/templates/templates/original_skin/matrixkey/"
-	otherwise, the default skin, "linnaeus_2", will be used.
+	otherwise, the default skin, "linnaeus_ng", will be used.
 	one exception to all this are the webservices. all views in
 		app/views/webservices/
 	have no design, therefore no skin. their templates all reside in:

@@ -61,20 +61,6 @@ $(document).ready(function()
 		$("a[rel^='prettyPhoto']").prettyDialog();
 	}
 
-	/*
-	if( jQuery().shrinkText )
-	{
-		$("#title a").shrinkText();
-		$("#header-title").shrinkText();
-
-		$( window ).resize(function()
-		{
-			$("#title a").shrinkText();
-			$("#header-title").shrinkText();
-		});
-	}
-	*/
-
 	{if $search}onSearchBoxSelect('');{/if}
 	{foreach from=$requestData key=k item=v}
 	{if !$v|@is_array}

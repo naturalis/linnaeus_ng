@@ -2814,12 +2814,10 @@ class Controller extends BaseClass
 			 *
 			 *  182598, 182599, 182686, 183197  (Daphnea Rostrata)
 			 *
-
 			if ( is_null($parent_id) && !is_null($taxon_id) )
 			{
 				$parent_id=$this->getTaxonById($this->getTaxonById($taxon_id)['parent_id'])['id'];
 			}
-
 			*/
 
 			if ( !is_null($parent_id) )

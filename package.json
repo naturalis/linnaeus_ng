@@ -1,0 +1,27 @@
+{
+  "name": "linnaeus_ng",
+  "version": "2.5.0",
+  "description": "Linnaeus NG",
+  "main": "www/index.php",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/naturalis/linnaeus_ng.git"
+  },
+  "keywords": [
+    "Linnaeus",
+    "Project",
+    "Naturalis"
+  ],
+  "author": "Maarten Schermer",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/naturalis/linnaeus_ng/issues"
+  },
+  "homepage": "https://github.com/naturalis/linnaeus_ng#readme",
+  "dependencies": {
+    "jquery": "^3.3.1"
+  }
+}

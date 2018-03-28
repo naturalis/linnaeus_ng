@@ -1784,13 +1784,6 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
     font-size: 16px;
     color: #009ee0; }
 
-@media screen and (max-width: 500px) {
-  body .flexsliderContainer, body #taxonImage {
-    height: 200px; } }
-@media screen and (max-width: 500px) {
-  body .flexsliderContainer .flexslider, body #taxonImage .flexslider {
-    height: 200px; } }
-
 #header {
   position: absolute;
   height: auto;
@@ -2078,53 +2071,6 @@ body {
 .whiteBox {
   background-color: #fff;
   padding: 30px; }
-
-.flexsliderContainer {
-  height: 400px;
-  overflow: hidden; }
-  @media screen and (max-width: 1454px) {
-    .flexsliderContainer .flexslider {
-      height: 400px; } }
-  .flexsliderContainer .flexslider .imageGradient {
-    z-index: 10; }
-  .flexsliderContainer .flexslider li {
-    max-height: 400px; }
-  .flexsliderContainer .flexslider .photoInformation {
-    width: 100%;
-    max-width: 994px;
-    position: absolute;
-    bottom: 30px;
-    left: 50%;
-    -webkit-transform: translateX(-50%);
-        -ms-transform: translateX(-50%);
-            transform: translateX(-50%);
-    text-align: right;
-    color: #fff;
-    z-index: 100; }
-  .flexsliderContainer .flexslider .scientificName {
-    color: #fff;
-    font-weight: light;
-    fill: #fff;
-    text-decoration: none;
-    font-style: italic;
-    font-weight: light;
-    margin-top: 3px;
-    margin-bottom: 3px;
-    display: block; }
-  .flexsliderContainer .flexslider .subtitle {
-    color: #009ee0; }
-  .flexsliderContainer .flexslider img {
-    width: 100%;
-    height: auto; }
-  @media screen and (max-width: 1454px) {
-    .flexsliderContainer .flexslider img {
-      position: absolute;
-      left: 50%;
-      -webkit-transform: translateX(-50%);
-          -ms-transform: translateX(-50%);
-              transform: translateX(-50%);
-      width: auto;
-      height: 400px; } }
 
 table tr td {
   padding: 5px 5px 2px 0

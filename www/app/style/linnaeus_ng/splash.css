@@ -3,7 +3,7 @@
 #splash {
 	width: 599px;
 	height: 313px;
-	background-image:url('../../../../app/media/system/skins/linnaeus_2/splash.png');
+	background-image:url('../../../../app/media/system/skins/linnaeus/splash.png');
 }
 
 
@@ -70,7 +70,7 @@ border-top-left-radius: 30px 30px;
 	left: 0;
 	height: 100%;
 	width: 100%;
-	background-image: url('../../../media/system/skins/linnaeus_2/transparent.png');
+	background-image: url('../../../media/system/skins/linnaeus/transparent.png');
 	z-index: 100;
 }
 

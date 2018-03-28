@@ -381,16 +381,6 @@ function allGeneralGetLabels(language,action,postFunction,id,alturl)
 function allShowMedia(url,name) {
 
 	if (!url) return;
-/*
-	$.colorbox({
-		href:url,
-		title: name ? name : url,
-		transition:"elastic",
-		maxWidth:800,
-		width:"100%",
-		opacity:0
-	});
-*/
 	$.prettyPhoto.open(url,'',name);
 
 }

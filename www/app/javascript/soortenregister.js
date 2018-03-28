@@ -97,5 +97,4 @@ $(function(){
     $(this).parent().find('.up').toggle();
   });
 
-	$('.flexslider').flexslider();
 });
