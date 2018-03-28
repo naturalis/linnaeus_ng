@@ -1,7 +1,8 @@
 <?php
 
 include_once (__DIR__ . "/../BaseClass.php");
-include_once (__DIR__ . "/../../../smarty/Smarty.class.php");
+include_once (__DIR__ . "/../../../vendor/autoload.php");
+//include_once (__DIR__ . "/../../../smarty/Smarty.class.php");
 
 include_once ('UserRightsController.php');
 include_once ('TranslatorController.php');

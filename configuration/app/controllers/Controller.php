@@ -107,7 +107,8 @@
 if (!defined('GENERAL_SETTINGS_ID')) define('GENERAL_SETTINGS_ID',-1);
 
 include_once (__DIR__ . "/../BaseClass.php");
-include_once (__DIR__ . "/../../../smarty/Smarty.class.php");
+include_once (__DIR__ . "/../../../vendor/autoload.php");
+// include_once (__DIR__ . "/../../../smarty/Smarty.class.php");
 
 class Controller extends BaseClass
 {
@@ -235,7 +236,7 @@ class Controller extends BaseClass
 		$this->setShowAutomaticInfixes();
 		$this->setGoogleAnalyticsCode();
 		$this->setGeneralHeaderSubtitle();
-		$this->assignMobileDeviceInfo();
+		//$this->assignMobileDeviceInfo();
     }
 
     /**
@@ -2108,8 +2109,8 @@ class Controller extends BaseClass
         $this->helpers = new stdClass();
 
         foreach ((array) $d as $key) {
-
-            if (file_exists(__DIR__ . '/../helpers/' . $key . '.php')) {
+        	
+             if (file_exists(__DIR__ . '/../helpers/' . $key . '.php')) {
 
                 require_once (__DIR__ . '/../helpers/' . $key . '.php');
 
@@ -3097,6 +3098,7 @@ class Controller extends BaseClass
 		if (!is_null($this->_robotsDirective)) return is_array($this->_robotsDirective) ? $this->_robotsDirective : [$this->_robotsDirective];
 	}
 
+	/*
 	protected function assignMobileDeviceInfo()
 	{
 		$this->smarty->assign('deviceInfo',[
@@ -3107,6 +3109,7 @@ class Controller extends BaseClass
 			'isiOS'=>$this->helpers->MobileDetect->isiOS()
 		]);
 	}
+	*/
 }
  
  
