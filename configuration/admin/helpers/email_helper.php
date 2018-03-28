@@ -2,7 +2,7 @@
 
 // uses: https://github.com/Synchro/PHPMailer
 
-require '../../../../tools/PHPMailer-master/PHPMailerAutoload.php';
+require '../../../../vendor/autoload.php';
 
 class EmailHelper {
 	
@@ -26,7 +26,7 @@ class EmailHelper {
 				
 	public function __construct()
 	{
-		$this->mail = new PHPMailer;
+		$this->mail = new PHPMailer\PHPMailer\PHPMailer;
 	}
 
 	public function setSMTPDebug( $level )
