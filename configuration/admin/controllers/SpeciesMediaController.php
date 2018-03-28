@@ -13,7 +13,7 @@ class SpeciesMediaController extends Controller
 
     public $usedHelpers = array(
         'file_upload_helper',
-        'image_thumber_helper',
+        //'image_thumber_helper',
         'hr_filesize_helper'
     );
     public $cssToLoad = array(

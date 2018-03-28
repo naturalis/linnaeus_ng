@@ -120,3 +120,5 @@ www/app/templates/templates/linnaeus_ng/index/index--IMPROVED (work in progress)
 cron/nsr-nba-export/nsr-nba-export.php
 external
 
+/vendor/
+/composer.lock
