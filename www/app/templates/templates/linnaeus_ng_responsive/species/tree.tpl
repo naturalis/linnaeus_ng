@@ -1,5 +1,4 @@
 {include file="../shared/header.tpl"}
-<!-- {include file="../shared/flexslider.tpl"} -->
 
 <div id="dialogRidge">
 	<!-- <div id="left">

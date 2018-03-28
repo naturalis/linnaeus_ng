@@ -20,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/naturalis/linnaeus_ng/issues"
   },
-  "homepage": "https://github.com/naturalis/linnaeus_ng#readme"
+  "homepage": "https://github.com/naturalis/linnaeus_ng#readme",
+  "dependencies": {
+    "jquery": "^3.3.1"
+  }
 }

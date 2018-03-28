@@ -14,7 +14,6 @@
 	<title>{$session.app.project.title|@strip_tags:false}</title>
 
     <link rel="Shortcut Icon" href="{$projectUrls.projectCSS}favicon.ico" type="image/x-icon" />
-    <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/flexslider.css" />
     <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/soortenregister.css" />
     <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/linnaeus.css" />
     <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/ionicons.min.css" />
@@ -30,7 +29,6 @@
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-sortelements.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/main.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/inline_templates.js"></script>
-	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.flexslider-min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/soortenregister.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/soortenregister.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/morris.js-0.4.3/morris.min.js"></script>

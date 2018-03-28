@@ -60,7 +60,7 @@ class configuration
 				'pathName' => 'app',
 				'fileRoot' => $this->_appFileRoot.'www/app/',
 				//'skinName' => 'original_skin'
-				'skinName' => 'linnaeus_2',
+				'skinName' => 'linnaeus_ng_responsive',
 				'skinNameWebservices' => 'webservices'
 			),
 			'defaultController' => 'linnaeus',

@@ -35,9 +35,7 @@ function l2SetMap(mapUrl,mapW,mapH,mapCoord,cellW,cellH, resized)
 		{
 			$('#mapTable').css('background','url('+mapUrl+')');
 			$('#mapTable').css('background-size','cover');
-		} 
-		else 
-		{
+		} else {
 			$('#mapTable').css({
 		        "filter": "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='"+mapUrl+"', sizingMethod='scale')",
 		        "-ms-filter": "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='"+mapUrl+"', sizingMethod='scale')"
