@@ -336,7 +336,7 @@ function doSubmit()
                 </tr>
                 <tr>
                     <td><input id=col_concept_url type=checkbox name=cols[concept_url]  /></td>
-                    <td><label for=col_concept_url>{t}Url to NSR page concept{/t}</label></td>
+                    <td><label for=col_concept_url>{t}URL to NSR page concept{/t}</label></td>
                 </tr>
 {/if}
                 <tr>
@@ -366,9 +366,12 @@ function doSubmit()
                 </tr>
                 <tr>
                     <td><input id=col_database_id type=checkbox name=cols[database_id]  /></td>
-                    <td><label for=col_database_id>database ID</label></td>
+                    <td><label for=col_database_id>{t}database ID{/t}</label></td>
                 </tr>
-
+                <tr>
+                    <td><input id=col_presence_status_publication type=checkbox name=cols[presence_status_publication]  /></td>
+                    <td><label for=col_presence_status_publication>{t}presence status publication{/t}</label></td>
+                </tr>
                 <tr>
                     <td><input id=col_ancestry type=checkbox name=cols[ancestors] onclick="
                         $( '.ancestry' ).prop( 'disabled' , !$(this).prop( 'checked' ) ).toggle( $(this).prop( 'checked' ) )
@@ -386,7 +389,6 @@ function doSubmit()
                     </div>
                     </td>
                 </tr>
-
             </table>
 		</div>
 

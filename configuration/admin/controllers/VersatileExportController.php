@@ -92,6 +92,7 @@ class VersatileExportController extends Controller
 		'rank'=>'rank',
 		'nsr_id'=>'nsr_id',
 		'presence_status'=>'presence_status',
+		'presence_status_publication'=>'presence_status_publication',
 		'habitat'=>'habitat',
 		'concept_url'=>'concept_url',
 		'database_id'=>'database_id',
@@ -267,6 +268,7 @@ class VersatileExportController extends Controller
 				".( $this->hasCol( 'rank' ) ? " ifnull(_lpr.label,_r.rank) as " . $this->columnHeaders['rank'] . ", " : "" )."
 				".( $this->hasCol( 'nsr_id' ) ? " replace(_b.nsr_id,'tn.nlsr.concept/','') as " . $this->columnHeaders['nsr_id'] . ", " : "" )."
 				".( $this->hasCol( 'presence_status' ) ? " _h.index_label as " . $this->columnHeaders['presence_status'] . ", " : "" )."
+				".( $this->hasCol( 'presence_status_publication' ) ? " _gl.label as " . $this->columnHeaders['presence_status_publication'] . ", " : "" )."
 				".( $this->hasCol( 'habitat' ) ? " _hab.label as " . $this->columnHeaders['habitat'] . ", " : "" )."
 				".( $this->hasCol( 'concept_url' ) ? " concat('".$this->concept_url."',replace(_b.nsr_id,'tn.nlsr.concept/','')) as " . $this->columnHeaders['concept_url'] . ", " : "" )."
 				".( $this->hasCol( 'database_id' ) ? " _q.taxon_id as " . $this->columnHeaders['database_id'] . ", " : "" )."
@@ -345,6 +347,10 @@ class VersatileExportController extends Controller
 			left join %PRE%presence_taxa _g
 				on _t.id=_g.taxon_id
 				and _t.project_id=_g.project_id
+
+			left join %PRE%literature2 _gl
+				on _g.reference_id=_gl.id
+				and _t.project_id=_gl.project_id
 
 			left join %PRE%presence_labels _h
 				on _g.presence_id = _h.presence_id
