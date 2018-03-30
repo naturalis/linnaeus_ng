@@ -1039,7 +1039,6 @@ parameters:
 			)."
 				and (_b.nametype='".PREDICATE_PREFERRED_NAME."' or _b.nametype='".PREDICATE_VALID_NAME."' or _b.nametype='".PREDICATE_ALTERNATIVE_NAME."')
 			
-			group by _a.taxon_id
 			order by _a.name
 			limit ".$max
 		);
