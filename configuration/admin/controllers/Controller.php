@@ -734,7 +734,8 @@ class Controller extends BaseClass
 		if ( !empty($taxon['taxon']) )
 		{
 			$taxon['taxon_no_infix']=$taxon['taxon'];
-			if (!$addNoMarkers) {
+			// Added check for parent_id, as otherwise we may end up in an eternal loop
+			if (!$addNoMarkers && !empty($taxon['parent_id'])) {
 				$taxon['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$taxon['taxon'],'base_rank_id'=>$taxon['base_rank_id'],'taxon_id'=>$taxon['id'],'parent_id'=>$taxon['parent_id'] ] );
 			}
 		}
@@ -2808,17 +2809,11 @@ class Controller extends BaseClass
 				return $marker . $uninomial;
 			}
 
-			/*
-			 *  @todo: Check (and remove) this piece of code. This fails in NSR with taxon's without a parent
-			 *  for instance in the NSR it goes wrong with these entries:
-			 *
-			 *  182598, 182599, 182686, 183197  (Daphnea Rostrata)
-			 *
 			if ( is_null($parent_id) && !is_null($taxon_id) )
 			{
 				$parent_id=$this->getTaxonById($this->getTaxonById($taxon_id)['parent_id'])['id'];
 			}
-			*/
+			
 
 			if ( !is_null($parent_id) )
 			{
