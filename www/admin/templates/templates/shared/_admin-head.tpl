@@ -36,7 +36,7 @@
 		</style>
 {/if}
 
-	<script type="text/javascript" src="{$baseUrl}admin/javascript/bundle.js"></script>
+	<script type="text/javascript" src="{$baseUrl}admin/javascript/vendor/bundle.js"></script>
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/jquery.extras.js"></script>
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/main.js"></script>
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/inline_templates.js"></script>

@@ -16,14 +16,13 @@
     <link rel="Shortcut Icon" href="{$projectUrls.projectCSS}favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/soortenregister.css" />
     <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/linnaeus.css" />
-    <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/ionicons.min.css" />
-    <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/jquery.fancybox.css" />
+    <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$baseUrl}/app/vendor/dist/css/ionicons.min.css" />
     <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/inline_templates.css" />
     {foreach $cssToLoad v}
     <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$v}" />
     {/foreach}
 
-	<script type="text/javascript" src="{$baseUrl}app/javascript/bundle.js"></script>
+	<script type="text/javascript" src="{$baseUrl}app/javascript/vendor/bundle.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/main.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/inline_templates.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/soortenregister.js"></script>

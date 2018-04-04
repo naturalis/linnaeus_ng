@@ -24,8 +24,8 @@
 {/foreach}
 {/if}
 	<link rel="stylesheet" type="text/css" href="{$baseUrl}app/style/css/orchids.css">
-	<link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/fancybox2/jquery.fancybox.css" />
-    <link type="text/css" rel="stylesheet" href="//code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" media="all">
+	<link rel="stylesheet" type="text/css" media="screen" href="{$baseUrl}/app/style/vendor.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="{$baseUrl}/app/vendor/dist/css/ionicons.min.css" />
 	<link rel="stylesheet" type="text/css" media="print" href="{$projectUrls.projectCSS}print.css" />
 
     <!--[if IE]>
@@ -39,11 +39,9 @@
     <![endif]-->
 
 
-	<script type="text/javascript" src="{$baseUrl}app/javascript/bundle.js"></script>
+	<script type="text/javascript" src="{$baseUrl}app/javascript/vendor/bundle.js"></script>
 
     <script type="text/javascript" src="{$baseUrl}app/javascript/inline_templates.js"></script>
-
-	<link rel="stylesheet" type="text/css" href="{$baseUrl}app/javascript/fancybox-3/jquery.fancybox.min.css">
 
 
 

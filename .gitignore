@@ -3,8 +3,6 @@ www/admin/templates/templates/shared/_admin-body-start--ORG.tpl
 www/admin/templates/templates/shared/_admin-head--ORG.tpl
 www/app/templates/templates/naturalis/matrixkey/webservice.tpl
 www/app/templates/templates/nbc_soortenregister/_bin
-www/admin/javascript/colorbox
-www/admin/javascript/jqTree
 configuration/app/configuration.php
 www/shared/cache
 configuration/app/controllers/IndexController--IMPROVED (work in progress).php
@@ -36,11 +34,9 @@ documentation/Opzetten-CD-image-LNG-project--v1.docx
 documentation/Opzetten-CD-image-LNG-project.docx
 www/admin/templates/cache
 www/admin/templates/templates_c
-www/app/javascript/colorbox
-www/app/javascript/jquery-1.4.2.min.js
-www/app/javascript/jquery-1.7.2.min.js
 www/admin/style/admin--ORG.css
 www/admin/style/localhost.css
+www/admin/style/vendor.css
 www/app/views/matrixkey/_get_unit_scores.php
 .idea
 .buildpath
@@ -70,11 +66,9 @@ www/app/templates/templates/nbc_soortenregister/search/search--ORG.tpl
 www/app/media/project/0001
 www/app/media/project/0002
 www/app/media/project/_snippets
-www/admin/javascript/tinymce/changelog.txt
-www/admin/javascript/tinymce/jscripts-3.3.8
+www/admin/vendor
 www/admin/media/project
-www/admin/javascript/tinymce/jscripts/tiny_mce
-www/admin/javascript/tinymce/jscripts/tiny_mce_3.5.8
+www/admin/javascript/vendor
 configuration/admin/configuration.php
 www/app/templates/templates/nbc_boktorren
 www/app/templates/templates/nbc_boktorren_proto
@@ -119,6 +113,9 @@ configuration/admin/custom-configuration.php
 www/app/templates/templates/linnaeus_ng/index/index--IMPROVED (work in progress).tpl
 cron/nsr-nba-export/nsr-nba-export.php
 external
-/node_modules
-/vendor/
-/composer.lock
+gulp/js/bundle.js
+bower_components
+node_modules
+vendor
+composer.lock
+package-lock.json

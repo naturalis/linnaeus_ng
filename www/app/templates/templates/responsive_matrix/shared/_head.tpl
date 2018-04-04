@@ -13,11 +13,11 @@
     <title>{$session.app.project.title|@strip_tags:false}</title>
 
     <link rel="stylesheet" type="text/css" href="{$baseUrl}app/style/css/style.css">
-    <link rel="stylesheet" type="text/css" href="{$baseUrl}app/style/css/ionicons.min.css">
+    <link rel="stylesheet" type="text/css" href="{$baseUrl}app/vendor/ionicons/dist/css/ionicons.min.css">
     <link rel="stylesheet" type="text/css" href="{$baseUrl}app/style/css/inline_templates.css">
-    <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}prettyPhoto/prettyPhoto.css" />
+    <link rel="stylesheet" type="text/css" href="{$baseUrl}app/style/css/vendor.css" />
 
-    <script type="text/javascript" src="{$baseUrl}app/javascript/bundle.js"></script>
+    <script type="text/javascript" src="{$baseUrl}app/javascript/vendor/bundle.js"></script>
     <script type="text/javascript" src="{$baseUrl}app/javascript/scrollfix.js"></script>
     <script type="text/javascript" src="{$baseUrl}app/javascript/script.js"></script>
     <script type="text/javascript" src="{$baseUrl}app/javascript/inline_templates.js"></script>

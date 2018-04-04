@@ -6,13 +6,13 @@
 	<link rel="image_src" href="{$projectUrls.systemMedia}dierenzoeker-logo.png" />
 
 	<meta name="description" property="og:description" content="Zie je een dier in je huis of tuin en weet je niet wat het is? Kijk goed en ontdek het in de Dierenzoeker! Beschikbaar als website en app."/>
-	<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />	<link rel="image_src" href="{$projectUrls.systemMedia}dierenzoeker-logo.png" />
+	<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+	<link rel="image_src" href="{$projectUrls.systemMedia}dierenzoeker-logo.png" />
 	<link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}basics.css" />
-	<link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}jquery-ui-1.10.0.custom.min.css" />
 	<link href="{$projectUrls.systemMedia}favicon.ico" type="image/x-icon" rel="icon" />
     <link href="{$projectUrls.systemMedia}favicon.ico" type="image/x-icon" rel="shortcut icon" />        
 	<link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/inline_templates.css" />
-	<script type="text/javascript" src="{$baseUrl}app/javascript/bundle.js"></script>
+	<script type="text/javascript" src="{$baseUrl}app/javascript/vendor/bundle.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/inline_templates.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/dierenzoeker.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/backstretch.js"></script>

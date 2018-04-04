@@ -7,13 +7,13 @@ var purl = require('../../node_modules/@allmarkedup/purl/purl.js');
 var raphael = require('raphael');
 var morris = require('morris-js-module');
 var fancybox = require('@fancyapps/fancybox');
+var tableSorter = require('tablesorter');
 /*
 
 Not needed for all app pages
 
 //var jQUi = require('jquery-ui');
 //var nestedSortable = require('nestedSortable');
-//var tableSorter = require('tablesorter');
 //var tinymce = require('tinymce');
 //var jQst = require('jquery-sortable');
 
