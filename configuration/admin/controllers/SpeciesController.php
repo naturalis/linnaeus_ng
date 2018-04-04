@@ -1,7 +1,8 @@
 <?php
 
 /*
-
+ *
+ *
 
 alter table pages_taxa add column redirect_to varchar(512) null after def_page;
 alter table pages_taxa add column check_query varchar(512) null after redirect_to;
@@ -95,7 +96,6 @@ update pages_taxa set redirect_to='?cat=external&id=%tid%&source=aHR0cDovL3Nvb3J
 
 
 */
-
 include_once ('Controller.php');
 include_once ('ModuleSettingsReaderController.php');
 include_once ('MediaController.php');
@@ -141,7 +141,6 @@ class SpeciesController extends Controller
         'col_loader_helper',
         'csv_parser_helper',
         'file_upload_helper',
-        //'image_thumber_helper',
         'hr_filesize_helper'
     );
     public $cacheFiles = array(
@@ -156,18 +155,14 @@ class SpeciesController extends Controller
         'taxon.css',
         'rank-list.css',
         'dialog/jquery.modaldialog.css',
-        'lookup.css',
-		'../javascript/jqTree/jqtree.css'
+        'lookup.css'
     );
     public $jsToLoad = array(
         'all' => array(
             'taxon.js',
 			'taxon_extra.js',
-            'prettyPhoto/jquery.prettyPhoto.js',
             'int-link.js',
-            'dialog/jquery.modaldialog.js',
-            'lookup.js',
-            'jqTree/tree.jquery.js',
+            'lookup.js'
         )
     );
     public $controllerPublicName = 'Species module';

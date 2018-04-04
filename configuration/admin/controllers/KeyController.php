@@ -31,9 +31,7 @@ class KeyController extends Controller
 			'keys-endpoint.js',
             'jit/jit.js',
             'jit/key-tree.js',
-            'prettyPhoto/jquery.prettyPhoto.js',
             'int-link.js',
-			'dialog/jquery.modaldialog.js',
 			'nsr_taxon_beheer.js',
         ),
         'IE' => array(

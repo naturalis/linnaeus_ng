@@ -36,15 +36,10 @@
 		</style>
 {/if}
 
-	<script type="text/javascript" src="{$baseUrl}admin/javascript/jquery-3.0.0.min.js"></script>
-	<script type="text/javascript" src="{$baseUrl}admin/javascript/jquery-ui/jquery-ui.min.js"></script>
-
-	<!-- script type="text/javascript" src="{$baseUrl}admin/javascript/jquery.tools.min.js"></script -->
+	<script type="text/javascript" src="{$baseUrl}admin/javascript/bundle.js"></script>
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/jquery.extras.js"></script>
-	<script type="text/javascript" src="{$baseUrl}admin/javascript/sprintf-0.7-beta1.js"></script>
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/main.js"></script>
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/inline_templates.js"></script>
-	<script type="text/javascript" src="{$baseUrl}admin/javascript/prettyPhoto/jquery.prettyPhoto.custom.js"></script>
 {if $javascriptsToLoad}
 {section name=i loop=$javascriptsToLoad.all}
 {if $javascriptsToLoad.all[i]|strpos:"http:"===false && $javascriptsToLoad.all[i]|strpos:"https:"===false}

@@ -12,8 +12,8 @@
 	<link href="{$projectUrls.systemMedia}favicon.ico" type="image/x-icon" rel="icon" />
     <link href="{$projectUrls.systemMedia}favicon.ico" type="image/x-icon" rel="shortcut icon" />        
 	<link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/inline_templates.css" />
+	<script type="text/javascript" src="{$baseUrl}app/javascript/bundle.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/inline_templates.js"></script>
-	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-3.0.0.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/dierenzoeker.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/backstretch.js"></script>
 
@@ -31,7 +31,6 @@
 {/if}
 
 	<link rel="stylesheet" type="text/css" href="{$baseUrl}app/javascript/fancybox-3/jquery.fancybox.min.css">
-    <script type="text/javascript" src="{$baseUrl}app/javascript/fancybox-3/jquery.fancybox.min.js"></script>
 
 </head>
 

@@ -17,9 +17,7 @@
     <link rel="stylesheet" type="text/css" href="{$baseUrl}app/style/css/inline_templates.css">
     <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}prettyPhoto/prettyPhoto.css" />
 
-    <script type="text/javascript" src="{$baseUrl}app/javascript/jquery-3.0.0.min.js"></script>
-    <script type="text/javascript" src="{$baseUrl}app/javascript/jquery.urlparser.2.1.1.js"></script>
-    <script type="text/javascript" src="{$baseUrl}app/javascript/sprintf-0.7-beta1.js"></script>
+    <script type="text/javascript" src="{$baseUrl}app/javascript/bundle.js"></script>
     <script type="text/javascript" src="{$baseUrl}app/javascript/scrollfix.js"></script>
     <script type="text/javascript" src="{$baseUrl}app/javascript/script.js"></script>
     <script type="text/javascript" src="{$baseUrl}app/javascript/inline_templates.js"></script>

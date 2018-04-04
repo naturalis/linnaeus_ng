@@ -28,8 +28,7 @@ class IndexController extends Controller
 	public $jsToLoad = array(
 	   'all'=>array(
 	       'lookup.js',
-    	   'int-link.js',
-    	   'dialog/jquery.modaldialog.js'
+    	   'int-link.js'
 	   )
 	);
 
