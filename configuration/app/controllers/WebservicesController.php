@@ -1000,6 +1000,11 @@ parameters:
 			
 			from %PRE%names _a
 
+			left join %PRE%trash_can as _del 
+				on _a.taxon_id = _del.lng_id 
+				and _a.project_id = _del.project_id 
+				and _del.item_type = 'taxon'
+
 			left join %PRE%labels_languages _d
 				on _a.language_id=_d.language_id
 				and _d.label_language_id=".$this->getCurrentLanguageId()."
@@ -1026,18 +1031,16 @@ parameters:
 				and _a.taxon_id=_r.lng_id
 				and _r.item_type = 'taxon'
 
-			where _a.project_id =".$this->getCurrentProjectId()."
+			where _a.project_id =".$this->getCurrentProjectId()." 
+				and _del.is_deleted is null 
 			". ($this->getMatchType()=='match_start' ? 
 					"and _a.name like '".$this->models->Taxa->escapeString($search)."%'" :
 					"and _a.name like '%".$this->models->Taxa->escapeString($search)."%'" 
 			)."
 				and (_b.nametype='".PREDICATE_PREFERRED_NAME."' or _b.nametype='".PREDICATE_VALID_NAME."' or _b.nametype='".PREDICATE_ALTERNATIVE_NAME."')
 			
-			group by _a.taxon_id
 			order by _a.name
-			limit ".$max."
-
-		"		
+			limit ".$max
 		);
 
 		foreach((array)$taxa as $key => $val)

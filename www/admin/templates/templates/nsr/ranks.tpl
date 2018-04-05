@@ -7,8 +7,10 @@
     </p>
 
     <p>
+        {if $projectRanks|@count==0}
         <span onclick="taxonAddCoLRanks()" class="a">{t}Select all the ranks used in Catalogue Of Life, marked in blue in the list below{/t}</span>.
         <br />
+        {/if}
         {t}After you have made the appropriate selection, click the save-button.  Once you have saved the selection, you can {/t}<a href="ranklabels.php">{t}change the ranks' names and provide translations{/t}</a>.<br />
     </p>
 
