@@ -25,13 +25,14 @@ class IntroductionController extends Controller
     public $controllerPublicName = 'Introduction';
 
 	public $cssToLoad = array(
-		'prettyPhoto/prettyPhoto.css',
+		'../vendor/prettyPhoto/css/prettyPhoto.css',
 		'lookup.css',
 		'dialog/jquery.modaldialog.css',
 	);
 
 	public $jsToLoad = array(
 		'all' => array(
+            '../vendor/tinymce/tinymce.min.js',
 			'freemodule.js',
 			'lookup.js',
 			'int-link.js'

@@ -35,7 +35,6 @@ class KeyController extends Controller
 			'all' => array(
 				'main.js',
 				'key.js',
-			    'prettyPhoto/jquery.prettyPhoto.js',
 				'dialog/jquery.modaldialog.js',
 				'lookup.js'
 			),

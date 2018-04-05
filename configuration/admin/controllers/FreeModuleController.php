@@ -25,7 +25,7 @@ class FreeModuleController extends Controller
     public $controllerPublicName = 'Free Modules';
 
     public $cssToLoad = array(
-		'prettyPhoto/prettyPhoto.css',
+		'../vendor/prettyPhoto/css/prettyPhoto.css',
 		'lookup.css',
 		'dialog/jquery.modaldialog.css'
 	);

@@ -11,20 +11,17 @@
 		<link href="{$baseUrl}admin/media/system/favicon.ico" rel="shortcut icon" type="image/x-icon">
 		<link href="{$baseUrl}admin/media/system/favicon.ico" rel="icon" type="image/x-icon">
 
-		<!-- link rel="stylesheet" type="text/css" href="editing_species_files/jquery-ui-1.css" -->
-
 		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/main.css">
 		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/admin-inputs.css">
 		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/admin-help.css">
 		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/admin.css">
-		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/prettyPhoto/prettyPhoto.css">
 		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/taxon.css">
 		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/rank-list.css">
 		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/dialog/jquery.modaldialog.css">
 		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/lookup.css">
 		<!-- link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/ui.css" -->
-		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/jquery-ui.min.css">
-		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/prettyPhoto/prettyPhoto.css" />
+		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/vendor/style.min.css" />
+		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/vendor/prettyPhoto/css/prettyPhoto.css" />
 		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/inline_templates.css">
         
 
@@ -36,7 +33,7 @@
 		</style>
 {/if}
 
-	<script type="text/javascript" src="{$baseUrl}admin/javascript/vendor/bundle.js"></script>
+	<script type="text/javascript" src="{$baseUrl}admin/vendor/bundle.js"></script>
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/jquery.extras.js"></script>
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/main.js"></script>
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/inline_templates.js"></script>

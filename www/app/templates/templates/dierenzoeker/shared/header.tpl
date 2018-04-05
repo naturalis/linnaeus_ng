@@ -12,7 +12,7 @@
 	<link href="{$projectUrls.systemMedia}favicon.ico" type="image/x-icon" rel="icon" />
     <link href="{$projectUrls.systemMedia}favicon.ico" type="image/x-icon" rel="shortcut icon" />        
 	<link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/inline_templates.css" />
-	<script type="text/javascript" src="{$baseUrl}app/javascript/vendor/bundle.js"></script>
+	<script type="text/javascript" src="{$baseUrl}app/vendor/bundle.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/inline_templates.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/dierenzoeker.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/backstretch.js"></script>
@@ -30,7 +30,7 @@
 {/foreach}
 {/if}
 
-	<link rel="stylesheet" type="text/css" href="{$baseUrl}app/javascript/fancybox-3/jquery.fancybox.min.css">
+	<link rel="stylesheet" type="text/css" href="{$baseUrl}app/vendor/fancybox/jquery.fancybox.min.css">
 
 </head>
 

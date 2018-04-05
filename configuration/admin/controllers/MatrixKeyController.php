@@ -36,14 +36,14 @@ class MatrixKeyController extends Controller
 
     public $cssToLoad=[
         'matrix.css',
-        'prettyPhoto/prettyPhoto.css'
+        '../vendor/prettyPhoto/css/prettyPhoto.css'
     ];
 
     public $jsToLoad=[
         'all' => [
             'matrix.js',
 			'keys-endpoint.js',
-            'prettyPhoto/jquery.prettyPhoto.js'
+            '../vendor/prettyPhoto/js/jquery.prettyPhoto.js'
         ]
     ];
 

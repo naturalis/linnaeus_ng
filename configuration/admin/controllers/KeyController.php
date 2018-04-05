@@ -43,7 +43,7 @@ class KeyController extends Controller
         'key.css',
         'rank-list.css',
         'key-tree.css',
-        'prettyPhoto/prettyPhoto.css',
+        '../vendor/prettyPhoto/css/prettyPhoto.css',
         'dialog/jquery.modaldialog.css',
 		'nsr_taxon_beheer.css',
 		'literature2.css'

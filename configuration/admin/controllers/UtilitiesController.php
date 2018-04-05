@@ -10,12 +10,11 @@ class UtilitiesController extends Controller
 
     public $controllerPublicName = 'Utilities';
 
-	public $cssToLoad = array('prettyPhoto/prettyPhoto.css');
+	public $cssToLoad = array('../vendor/prettyPhoto/css/prettyPhoto.css');
 
     public $jsToLoad = array(
         'all' => array(
-            'main.js',
-            'prettyPhoto/jquery.prettyPhoto.js'
+            'main.js'
         ),
         'IE' => array()
     );

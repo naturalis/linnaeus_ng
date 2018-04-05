@@ -4,9 +4,7 @@
 {/if}
 {assign var=spellchecker_languages value=$spellchecker_languages|cat:$languages[l].language|cat:'='|cat:$languages[l].iso2|cat:','}
 {/section}
-<!-- script type="text/javascript" src="{$baseUrl}admin/javascript/tinymce/jscripts/tiny_mce/tiny_mce.js" ></script -->
-<!--script type="text/javascript" src="{$baseUrl}admin/javascript/tinymce/jscripts/tiny_mce_3.5.8/tiny_mce.js" ></script-->
-<script type="text/javascript" src="{$baseUrl}admin/javascript/tinymce/jscripts/tiny_mce_3.5.10/tiny_mce.js" ></script>
+<script type="text/javascript" src="{$baseUrl}admin/vendor/tinymce/jquery.tinymce.min.js" ></script>
 <script type="text/javascript">
 var mediaPath = '{$session.admin.project.urls.project_media|@addslashes}';
 {literal}
@@ -146,12 +144,12 @@ function initTinyMce(litRefs,mediaRefs) {
 		entity_encoding : "raw",
 		mode : "textareas",
 		oninit : tMCEOnInit ,
-		theme : "advanced",
-		plugins : "media,fullscreen,spellchecker,advhr,preview,print,advimage,searchreplace,table,directionality,paste,-example",	
-		theme_advanced_buttons1 : "cut,copy,pastetext,pasteword,|,undo,redo,|,search,replace,|,bold,italic,underline,forecolor,formatselect,|,ltr,rtl,|,link,unlink,|,bullist,numlist,hr,|,indent,table,|,spellchecker,removeformat,charmap,|,code,visualaid,fullscreen,print",
-		theme_advanced_toolbar_location : "top",
-		theme_advanced_toolbar_align : "left",
-		theme_advanced_statusbar_location : "bottom",
+		theme : "modern",
+		plugins : "media,fullscreen,spellchecker,preview,print,searchreplace,table,directionality,paste,-example",
+		theme_modern_buttons1 : "cut,copy,pastetext,pasteword,|,undo,redo,|,search,replace,|,bold,italic,underline,forecolor,formatselect,|,ltr,rtl,|,link,unlink,|,bullist,numlist,hr,|,indent,table,|,spellchecker,removeformat,charmap,|,code,visualaid,fullscreen,print",
+		theme_modern_toolbar_location : "top",
+		theme_modern_toolbar_align : "left",
+		theme_modern_statusbar_location : "bottom",
 	{/literal}{if $session.admin.project.css_url!=''}  content_css : "{$session.admin.project.css_url}?rnd={$rnd}",
 	{/if}{literal}
 		spellchecker_languages : "{/literal}{$spellchecker_languages}{literal}",
@@ -162,21 +160,21 @@ function initTinyMce(litRefs,mediaRefs) {
 
 	if (inclLiteraryButtons && inclMediaButtons) {
 	 	//propertyList.theme_advanced_buttons2 = "litref,addlitref,|,media,addmedia,|,addinternallink";
-	 	propertyList.theme_advanced_buttons2 = "litref,linkMedia,addinternallink";
-	 	propertyList.theme_advanced_buttons3 = "";
+	 	propertyList.theme_modern_buttons2 = "litref,linkMedia,addinternallink";
+	 	propertyList.theme_modern_buttons3 = "";
 	} else
 	if (inclLiteraryButtons && !inclMediaButtons) {
 	 	//propertyList.theme_advanced_buttons2 = "litref,addlitref,|,addinternallink";
-	 	propertyList.theme_advanced_buttons2 = "litref,addinternallink";
-	 	propertyList.theme_advanced_buttons3 = "";
+	 	propertyList.theme_modern_buttons2 = "litref,addinternallink";
+	 	propertyList.theme_modern_buttons3 = "";
 	} else
 	if (!inclLiteraryButtons && inclMediaButtons) {
 	 	//propertyList.theme_advanced_buttons2 = "media,addmedia,|,addinternallink";
-	 	propertyList.theme_advanced_buttons2 = "linkMedia,addinternallink";
-	 	propertyList.theme_advanced_buttons3 = "";
+	 	propertyList.theme_modern_buttons2 = "linkMedia,addinternallink";
+	 	propertyList.theme_modern_buttons3 = "";
 	} else {
-	 	propertyList.theme_advanced_buttons2 = "addinternallink";
-	 	propertyList.theme_advanced_buttons3 = "";
+	 	propertyList.theme_modern_buttons2 = "addinternallink";
+	 	propertyList.theme_modern_buttons3 = "";
 	}
 
 

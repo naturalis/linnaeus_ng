@@ -45,7 +45,7 @@ class GlossaryController extends Controller
 
     public $cssToLoad = array(
 		'glossary.css',
-		'prettyPhoto/prettyPhoto.css',
+		'../vendor/prettyPhoto/css/prettyPhoto.css',
 		'lookup.css',
 		'dialog/jquery.modaldialog.css'
 	);

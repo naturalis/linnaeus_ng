@@ -24,8 +24,10 @@
 {/foreach}
 {/if}
 	<link rel="stylesheet" type="text/css" href="{$baseUrl}app/style/css/orchids.css">
-	<link rel="stylesheet" type="text/css" media="screen" href="{$baseUrl}/app/style/vendor.css" />
-	<link rel="stylesheet" type="text/css" media="screen" href="{$baseUrl}/app/vendor/dist/css/ionicons.min.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="{$baseUrl}/app/vendor/style.min.css" />
+	<link rel="stylesheet" type="text/css" media="screen" title="default" href="{$baseUrl}app/vendor/ionicons/dist/css/ionicons.min.css" />
+	<link rel="stylesheet" type="text/css" media="screen" title="default" href="{$baseUrl}app/vendor/prettyPhoto/css/prettyPhoto.css" />
+	<link rel="stylesheet" type="text/css" media="screen" title="default" href="{$baseUrl}app/vendor/fancybox/jquery.fancybox.css" />
 	<link rel="stylesheet" type="text/css" media="print" href="{$projectUrls.projectCSS}print.css" />
 
     <!--[if IE]>
@@ -39,8 +41,7 @@
     <![endif]-->
 
 
-	<script type="text/javascript" src="{$baseUrl}app/javascript/vendor/bundle.js"></script>
-
+	<script type="text/javascript" src="{$baseUrl}app/vendor/bundle.js"></script>
     <script type="text/javascript" src="{$baseUrl}app/javascript/inline_templates.js"></script>
 
 

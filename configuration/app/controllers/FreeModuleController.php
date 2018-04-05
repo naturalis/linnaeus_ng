@@ -20,7 +20,6 @@ class FreeModuleController extends Controller
     public $jsToLoad = array(
         'all' => array(
             'main.js',
-            'prettyPhoto/jquery.prettyPhoto.js',
             'lookup.js',
             'dialog/jquery.modaldialog.js'
         ),

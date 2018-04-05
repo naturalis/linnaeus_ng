@@ -24,11 +24,13 @@ class NsrTaxonController extends NsrController
     );
     public $cssToLoad = array(
         'lookup.css',
+        '../vendor/prettyPhoto/css/prettyPhoto.css',
 		'nsr_taxon_beheer.css'
     );
     public $jsToLoad = array(
         'all' => array(
             'lookup.js',
+            '../vendor/prettyPhoto/js/prettyPhoto.min.js',
 			'nsr_taxon_beheer.js'
         )
     );

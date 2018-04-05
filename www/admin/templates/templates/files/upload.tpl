@@ -13,8 +13,8 @@ td {
 }
 </style>
 
-<script src="../../javascript/dropzone/dropzone.js"></script>
-<link rel="stylesheet" href="../../javascript/dropzone/dropzone.css">
+<script src="{$baseUrl}admin/vendor/dropzone/dist/min/dropzone.min.js"></script>
+<link rel="stylesheet" href="{$baseUrl}admin/vendor/dropzone/dist/min/dropzone.min.css">
 <script>
 	Dropzone.autoDiscover = false;
 </script>

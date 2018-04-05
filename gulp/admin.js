@@ -1,9 +1,12 @@
-var $ = require('jquery');
+'use strict';
+
+window.$ = require('jquery');
+window.jQuery = require('jquery');
 var jQUi = require('jquery-ui');
 var sprintf = require('sprintf-js');
 var modal = require('modaldialog');
-var modernizr = require('../../node_modules/modernizr/modernizr.js');
-var prettyphoto = require('../../node_modules/prettyPhoto/js/jquery.prettyPhoto.js');
+var modernizr = require('../node_modules/modernizr/modernizr.js');
+var prettyphoto = require('../node_modules/prettyPhoto/js/jquery.prettyPhoto.js');
 /*
 Not needed for all admin pages
 

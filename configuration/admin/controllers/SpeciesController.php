@@ -151,7 +151,7 @@ class SpeciesController extends Controller
         'list' => 'species-treeList'
     );
     public $cssToLoad = array(
-        'prettyPhoto/prettyPhoto.css',
+        '../vendor/prettyPhoto/css/prettyPhoto.css',
         'taxon.css',
         'rank-list.css',
         'dialog/jquery.modaldialog.css',

@@ -38,7 +38,6 @@ class GlossaryController extends Controller
 		array(
 			'all' => array(
 				'main.js',
-				'prettyPhoto/jquery.prettyPhoto.js',
 				'lookup.js',
 				'dialog/jquery.modaldialog.js'
 			),
