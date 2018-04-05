@@ -29,6 +29,7 @@
     "ckeditor": "^4.9.1",
     "dropzone": "git+https://github.com/enyo/dropzone.git",
     "gulp-concat-css": "^3.1.0",
+    "gulp-modernizr": "^2.0.1",
     "gulp-sourcemaps": "^2.6.4",
     "ionicons": "^3.0.0",
     "jquery": "^3.3.1",
@@ -45,13 +46,5 @@
     "tinymce": "^4.7.10",
     "vinyl-buffer": "^1.0.1",
     "vinyl-source-stream": "^2.0.0"
-  },
-  "browserify": {
-    "transform": [
-      "browserify-shim"
-    ]
-  },
-  "browserify-shim": {
-    "jquery": "jQuery"
   }
 }

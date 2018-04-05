@@ -5,7 +5,13 @@ var buffer = require('vinyl-buffer');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglifyes');
 var gutil = require('gulp-util');
+var modernizr = require('gulp-modernizr');
 
+gulp.task('modernizr', function() {
+  return gulp.src('node_modules/modernizr/src/*.js')
+    .pipe(modernizr())
+    .pipe(gulp.dest('node_modules/modernizr/'))
+});
 gulp.task('admin-bundle', function () {
     // bundeling the essential admin javascript
     return browserify('./gulp/admin.js').bundle()
