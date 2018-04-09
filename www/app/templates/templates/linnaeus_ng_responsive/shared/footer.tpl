@@ -2,6 +2,7 @@
 </div>
 
     <div class="footerContainer" id=footercontainer>
+        {snippet}static_footer.html{/snippet}
     </div>
 
 <!-- div id="allLookupList" class="allLookupListInvisible"></div -->

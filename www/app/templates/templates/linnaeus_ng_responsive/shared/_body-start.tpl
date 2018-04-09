@@ -21,6 +21,7 @@
         </form>
         <div class="menu-search">
             <div class="menuHolder">
+                {snippet}static_menu.html{/snippet}
             </div>
         </div>
     </div>
