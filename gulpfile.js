@@ -12,7 +12,7 @@ gulp.task('modernizr', function() {
     .pipe(modernizr())
     .pipe(gulp.dest('node_modules/modernizr/'))
 });
-gulp.task('admin-bundle', function () {
+gulp.task('admin-bundle', ['modernizr'], function () {
     // bundeling the essential admin javascript
     return browserify('./gulp/admin.js').bundle()
         .pipe(source('bundle.js'))
@@ -49,7 +49,7 @@ gulp.task('admin-copy', function () {
     ],{ base: 'bower_components/Javascript InfoVis Toolkit'})
         .pipe(gulp.dest('./www/admin/vendor'));
 });
-gulp.task('app-bundle', function () {
+gulp.task('app-bundle', ['modernizr'], function () {
     // bundling essential app javascript
     return browserify('./gulp/app.js').bundle()
         .pipe(source('bundle.js'))
@@ -79,7 +79,6 @@ gulp.task('app-copy', function () {
 });
 gulp.task('default',
     [
-        'modernizr',
         'admin-bundle',
         'admin-css',
         'admin-copy',
