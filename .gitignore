@@ -118,4 +118,3 @@ bower_components
 node_modules
 vendor
 composer.lock
-package-lock.json

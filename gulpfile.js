@@ -79,6 +79,7 @@ gulp.task('app-copy', function () {
 });
 gulp.task('default',
     [
+        'modernizr',
         'admin-bundle',
         'admin-css',
         'admin-copy',
