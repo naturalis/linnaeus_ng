@@ -1,5 +1,6 @@
 {include file="../shared/header.tpl" title="{t}Advanced search{/t}"}
-<form id="searchForm" class="advanced-search__form" method="get" action="" onsubmit="return searchDoSearchForm()">	    	
+{* @todo: to be removed: onsubmit="return searchDoSearchForm()" *}
+<form id="searchForm" class="advanced-search__form" method="get" action="">
 	<input type="hidden" name="extended" value="1" />
 	<div class="page-generic-div">
 		<ul class="tabs">
