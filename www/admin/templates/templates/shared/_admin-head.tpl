@@ -34,6 +34,7 @@
 {/if}
 
 	<script type="text/javascript" src="{$baseUrl}admin/vendor/bundle.js"></script>
+	<script type="text/javascript" src="{$baseUrl}admin/vendor/tinymce/jquery.tinymce.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/jquery.extras.js"></script>
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/main.js"></script>
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/inline_templates.js"></script>
