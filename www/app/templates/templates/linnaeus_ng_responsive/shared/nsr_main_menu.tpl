@@ -4,7 +4,7 @@
 	{assign var=server value="/linnaeus_ng/app/views"}
 {/if}
 <a href="#" class="menuToggle">
-	<img src="{$baseUrl}app/style/img/menutoggle.png" alt="" />
+	<img src="{$baseUrl}/www/app/style/img/menutoggle.png" alt="" />
 	<span class="mobileTitle">Nederlands Soortenregister</span>
 </a>
 <ul class="menu">
