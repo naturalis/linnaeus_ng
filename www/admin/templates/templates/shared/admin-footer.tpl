@@ -21,8 +21,8 @@ $(document).ready(function()
 {
 	if(jQuery().prettyPhoto) {
 	 	$("a[rel^='prettyPhoto']").prettyPhoto({
-			animation_speed:50,
-	 		opacity: 0.70, 
+			animation_speed:'normal',
+	 		opacity: 0.70,
 			show_title: false,
 	 		overlay_gallery: false,
 	 		social_tools: false

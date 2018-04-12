@@ -1,4 +1,5 @@
 {include file="../shared/admin-header.tpl"}
+<script type="text/javascript" src="{$baseUrl}admin/vendor/tinymce/jquery.tinymce.min.js" ></script>
 {include file="_keypath.tpl"}
 
 <div id="page-main">

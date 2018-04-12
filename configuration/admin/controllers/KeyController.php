@@ -29,14 +29,14 @@ class KeyController extends Controller
         'all' => array(
             'key.js',
 			'keys-endpoint.js',
-            'jit/jit.js',
-            'jit/key-tree.js',
             'int-link.js',
 			'nsr_taxon_beheer.js',
-        ),
+        )
+        /*
         'IE' => array(
             'jit/Extras/excanvas.js'
         )
+        */
     );
 
     public $cssToLoad = array(
@@ -1617,8 +1617,7 @@ class KeyController extends Controller
         if (empty($language) || empty($id)) {
 
             return;
-        }
-        else {
+        } else {
 
             $ck = $this->models->ChoicesContentKeysteps->_get(
             array(

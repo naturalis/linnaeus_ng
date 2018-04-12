@@ -43,7 +43,7 @@
 	 		</div>
 	 	</li>
 
-	 	<div id="media-files">
+	 	<div id="media-files" class="gallery">
 		{foreach from=$media.files item=v}
 		<label>
 	 	<li>
