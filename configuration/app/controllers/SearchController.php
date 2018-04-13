@@ -36,7 +36,7 @@ class SearchController extends Controller
         parent::__construct();
 
 		$this->initialise();
-
+		
     }
 
     public function __destruct ()
@@ -54,6 +54,13 @@ class SearchController extends Controller
 
 	protected function validateSearchString($s)
 	{
+		return true;
+		
+		$this->initialise();
+		die("$s $this->_minSearchLength $this->_maxSearchLength");
+		
+		
+		
 		return
 			(strlen($s)>=$this->_minSearchLength) &&  // is it long enough?
 			(strlen($s)<=$this->_maxSearchLength);    // is it short enough?

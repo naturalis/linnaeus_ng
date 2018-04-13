@@ -544,7 +544,7 @@ final class Table extends AbstractModel
             $query .= $order ? " order by " . $order : '';
 
             $query .= $limit ? " limit " . $limit : '';
-
+ 
             $set = mysqli_query($this->databaseConnection, $query);
 
 			$this->logQueryResult($set,$query,'set,normal');

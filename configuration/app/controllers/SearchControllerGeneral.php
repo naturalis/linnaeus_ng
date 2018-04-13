@@ -176,7 +176,7 @@ class SearchControllerGeneral extends SearchController
 
     public function searchAction ()
     {
-		if ($this->rHasVal('search'))
+    	if ($this->rHasVal('search'))
 		{
 			$modified_search=$this->removeSearchNoise( $this->rGetVal('search') );
 			$this->moduleSession->setModuleSetting( array('setting'=>'search','value'=>$modified_search) );
@@ -200,7 +200,6 @@ class SearchControllerGeneral extends SearchController
 						);
 				} else {
 					$search='"'.trim($modified_search,'"').'"';
-
 					$results=
 						$this->doSearch(
 							array(
@@ -656,7 +655,7 @@ class SearchControllerGeneral extends SearchController
 				'order'=>'taxon'
 			)
 		);
-
+		
 		$taxa = $this->filterResultsWithTokenizedSearch(array($p,$taxa));
 		$taxa = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$taxa));
 		// REFAC2015 - choice of alphabetical sort or sort by most tokens should be a setting
@@ -671,6 +670,7 @@ class SearchControllerGeneral extends SearchController
 					array(
 						'taxon' =>
 							array(
+								'id' => $val['id'],
 								'taxon' => $val['label'],
 								'parent_id'=>$val['parent_id'],
 								'rank_id' => $val['rank_id'],
@@ -681,7 +681,6 @@ class SearchControllerGeneral extends SearchController
 				);
 			unset($taxa[$key]['rank_id'],$taxa[$key]['is_hybrid']);
 		}
-
 
 		if ($p[self::S_EXTENDED_SEARCH])
 		{
@@ -933,7 +932,7 @@ class SearchControllerGeneral extends SearchController
 				}
 			}
 		}
-
+		
 		return
 			array(
 				'label'=> $this->getModuleName(MODCODE_SPECIES),
