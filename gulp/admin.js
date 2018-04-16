@@ -2,7 +2,6 @@
 
 window.$ = require('jquery');
 window.jQuery = require('jquery');
-var jQUi = require('jquery-ui');
 var sprintf = require('sprintf-js');
 var modal = require('modaldialog');
 var modernizr = require('../node_modules/modernizr/modernizr.js');
