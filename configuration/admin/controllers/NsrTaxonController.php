@@ -30,7 +30,7 @@ class NsrTaxonController extends NsrController
     public $jsToLoad = array(
         'all' => array(
             'lookup.js',
-            '../vendor/prettyPhoto/js/prettyPhoto.min.js',
+            '../vendor/prettyPhoto/js/jquery.prettyPhoto.js',
 			'nsr_taxon_beheer.js'
         )
     );
