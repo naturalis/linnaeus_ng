@@ -21,13 +21,14 @@ gulp.task('admin-bundle', ['modernizr'], function () {
         .on('error', gutil.log)
         .pipe(gulp.dest('./www/admin/vendor/'));
 });
-gulp.task('admin-css', function () {
-    // bundeling the essential admin css
-    return gulp.src([
-        'node_modules/jquery-ui-dist/*.min.css'])
-        .pipe(concat('style.min.css'))
-        .pipe(gulp.dest('./www/admin/vendor/'));
-});
+// @todo: maybe do this some other time
+//gulp.task('admin-css', function () {
+//    // bundeling the essential admin css
+//    return gulp.src([
+//        'node_modules/jquery-ui-dist/*.min.css'])
+//        .pipe(concat('style.min.css'))
+//        .pipe(gulp.dest('./www/admin/vendor/'));
+//});
 gulp.task('admin-copy', function () {
     // copying essential admin javascript plugins
     /*
@@ -81,7 +82,6 @@ gulp.task('app-copy', function () {
 gulp.task('default',
     [
         'admin-bundle',
-        'admin-css',
         'admin-copy',
         'app-bundle',
         'app-copy'

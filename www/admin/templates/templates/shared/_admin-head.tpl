@@ -19,9 +19,7 @@
 		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/rank-list.css">
 		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/dialog/jquery.modaldialog.css">
 		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/lookup.css">
-		<!-- link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/ui.css" -->
-		<link type="stylesheet" src="{$baseUrl}admin/vendor/jquery-ui-dist/jquery-ui.min.css"></link>
-		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/vendor/style.min.css" />
+		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/vendor/jquery-ui-dist/jquery-ui.min.css">
 		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/vendor/prettyPhoto/css/prettyPhoto.css" />
 		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/inline_templates.css">
         
