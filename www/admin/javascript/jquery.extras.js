@@ -7,5 +7,9 @@
 	  return el.apply(this, arguments);
 	};
   });
-})(jQuery);	
+  $.fn.size = function()
+  {
+        return $(this).length;
+  };
+})(jQuery);
 
