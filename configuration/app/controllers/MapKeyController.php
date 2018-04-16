@@ -261,8 +261,8 @@ class MapKeyController extends Controller
 		if (!isset($taxonA) || !isset($taxonB))
 		{
 			$taxa = $this->l2GetTaxaWithOccurrences();
-			if (!isset($taxonA)) $taxonA = $this->getTaxonById(array_shift($taxa)['taxon_id']);
-			if (!isset($taxonB)) $taxonB = $this->getTaxonById(array_shift($taxa)['taxon_id']);
+			if (!isset($taxonA)) $taxonA = $this->getTaxonById(array_shift($taxa)['id']);
+			if (!isset($taxonB)) $taxonB = $this->getTaxonById(array_shift($taxa)['id']);
 		}
 
 		$overlap = $this->l2GetOverlap($taxonA['id'],$taxonB['id'],$mapId,$this->rHasVal('selectedDataTypes') ? $this->rGetVal('selectedDataTypes') : null);
