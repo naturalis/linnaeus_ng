@@ -34,8 +34,7 @@ class MapKeyController extends Controller
 				'mapkey_l2.js',
 				'http://maps.google.com/maps/api/js?sensor=false&libraries=drawing',
 				'lookup.js',
-				'dialog/jquery.modaldialog.js',
-				'modernizr.custom.48242.js'
+				'dialog/jquery.modaldialog.js'
 			)
 		);
 
