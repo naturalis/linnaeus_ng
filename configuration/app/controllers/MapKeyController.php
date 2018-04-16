@@ -552,7 +552,8 @@ class MapKeyController extends Controller
 
 	public function l2GetTaxaWithOccurrences()
 	{
-		$taxa = $this->l2GetTaxaOccurrenceCount();
+        $taxa = $this->l2GetTaxaOccurrenceCount($this->buildTaxonTree());
+
 		$this->customSortArray($taxa,array('key' => 'taxon','maintainKeys' => true));
 		return $taxa;
 	}
