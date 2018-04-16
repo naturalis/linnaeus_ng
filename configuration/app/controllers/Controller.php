@@ -1089,6 +1089,8 @@ class Controller extends BaseClass
     public function formatTaxon($p=null)
     {
 
+    //	print_r($p);
+    	
 		if (is_null($p))
 			return;
 

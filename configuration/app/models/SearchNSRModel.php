@@ -130,7 +130,7 @@ final class SearchNSRModel extends AbstractModel
 		
 		if ( is_null($project_id) ||  is_null($search) ||  is_null($language_id) )
 			return;
-						
+
 		$search=$this->escapeString($search);
 		
 		$query="
@@ -344,7 +344,7 @@ final class SearchNSRModel extends AbstractModel
 
 		$trait_joins=$this->getTraitJoins( [ "traits" => $traits, "project_id" => $project_id ] );
 		$traitgroup_joins=$this->getTraitGroupJoin( $trait_group );
-
+		
 		$query="
 			select
 				SQL_CALC_FOUND_ROWS
