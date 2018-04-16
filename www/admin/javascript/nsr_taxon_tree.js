@@ -255,10 +255,11 @@ function setAutoExpand(id)
 		{
 			//console.log(data);
 			var data=$.parseJSON(data);
-			for (index=1;index<data.length;++index)
-			{
-				addAutoExpandNode(data[index]);
-			}
+			if (data) {
+                for (index = 1; index < data.length; ++index) {
+                    addAutoExpandNode(data[index]);
+                }
+            }
 			buildtree(false);
 			//checkAutoExpand();
 		}

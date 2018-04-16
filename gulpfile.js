@@ -41,7 +41,7 @@ gulp.task('admin-copy', function () {
         'node_modules/prettyPhoto/**/*',
         'node_modules/ckeditor/**/*',
         'node_modules/tinymce/**/*',
-        'node_modules/jquery-ui-dist/*.min.js',
+        'node_modules/jquery-ui-dist/**/*',
         'node_modules/nestedSortable/jquery.mjs.nestedSortable.js'
     ], { base: 'node_modules' })
         .pipe(gulp.dest('./www/admin/vendor'));
