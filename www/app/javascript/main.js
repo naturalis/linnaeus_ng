@@ -24,6 +24,10 @@ String.prototype.htmlEntities = function () {
 
         $(this).attr('class', classArray.join(' '));
     };
+    $.fn.size = function()
+	{
+		return $(this).length;
+	};
 })(jQuery);
 
 function rndStr(length) {
