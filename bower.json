@@ -21,6 +21,7 @@
     "tests"
   ],
   "dependencies": {
-    "jit": "jit#2.0.2"
+    "jit": "jit#2.0.2",
+    "fancybox": "^3.3.5"
   }
 }
