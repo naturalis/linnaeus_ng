@@ -143,8 +143,10 @@ function initTinyMce(litRefs,mediaRefs) {
 	var propertyList = {
 		entity_encoding : "raw",
 		mode : "textareas",
-		oninit : tMCEOnInit ,
 		theme : "modern",
+		init_instance_callback : function(editor) {
+		    tMCEOnInit();
+        },
 		plugins : "media,fullscreen,spellchecker,preview,print,searchreplace,table,directionality,paste,-example",
 		theme_modern_buttons1 : "cut,copy,pastetext,pasteword,|,undo,redo,|,search,replace,|,bold,italic,underline,forecolor,formatselect,|,ltr,rtl,|,link,unlink,|,bullist,numlist,hr,|,indent,table,|,spellchecker,removeformat,charmap,|,code,visualaid,fullscreen,print",
 		theme_modern_toolbar_location : "top",
