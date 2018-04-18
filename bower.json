@@ -22,6 +22,7 @@
   ],
   "dependencies": {
     "jit": "jit#2.0.2",
-    "fancybox": "^3.3.5"
+    "fancybox": "^3.3.5",
+    "purl": "^2.3.2"
   }
 }

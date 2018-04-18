@@ -75,8 +75,8 @@ gulp.task('app-copy', function () {
     ], { base: 'node_modules' })
         .pipe(gulp.dest('./www/app/vendor'));
     gulp.src([
-        'node_modules/@fancyapps/fancybox/dist/**/*'
-    ], { base: 'node_modules/@fancyapps/fancybox/dist/' })
+        'bower_components/fancybox/dist/**/*'
+    ], { base: 'bower_components/fancybox/dist/' })
         .pipe(gulp.dest('./www/app/vendor/fancybox'));
 });
 gulp.task('default',
