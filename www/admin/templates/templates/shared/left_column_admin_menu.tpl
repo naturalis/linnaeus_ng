@@ -21,7 +21,9 @@
     </p>
     <p>
         <a href="tabs.php">{t}passport categories ("tabs"){/t}</a><br />
+        <!-- maybe later...
         <a href="sections.php">{t}page sections{/t}</a><br />
+        -->
         <a href="ranks.php">{t}taxonomic ranks{/t}</a><br />
     </p>
 </div>
