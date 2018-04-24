@@ -125,8 +125,8 @@ class SearchControllerGeneral extends SearchController
 
     public function __construct ()
     {
-        parent::__construct();
-		$this->initialize();
+    	parent::__construct();
+    	$this->initialize();
     }
 
 	private function initialize()
@@ -135,7 +135,7 @@ class SearchControllerGeneral extends SearchController
 		$this->_maxSearchLength=$this->moduleSettings->getModuleSetting(array('setting'=>'max_search_length','subst'=>50));
 
 		$this->_excerptPostMatchLength = $this->moduleSettings->getModuleSetting( 'excerpt_post-match_length',35);
-		$this->_excerptPreMatchLength = $this->moduleSettings->getModuleSetting( 'excerpt_pre-match_length ',35);
+		$this->_excerptPreMatchLength = $this->moduleSettings->getModuleSetting( 'excerpt_pre-match_length',35);
 		$this->_excerptPrePostMatchString = $this->moduleSettings->getModuleSetting( 'excerpt_pre_post_match_string', '...');
 	}
 
@@ -211,7 +211,7 @@ class SearchControllerGeneral extends SearchController
 						);
 
 				}
-
+			
 				$this->addMessage(sprintf('Searched for <span class="searched-term">%s</span>',$this->rGetVal('search')));
 				$this->moduleSession->setModuleSetting( array('setting'=>'results','value'=>$results) );
 			}
@@ -423,7 +423,7 @@ class SearchControllerGeneral extends SearchController
 		if (!isset($s) || !isset($s[self::S_TOKENIZED_TERMS]) ) {
             return $r;
         }
-
+        
 		foreach((array)$r as $rKey => $result)
 		{
 
