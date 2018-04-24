@@ -27,8 +27,11 @@ class ModuleSettingsController extends Controller
     public function __construct($p = null)
     {
         parent::__construct($p);
-
-		$this->setModuleController( $this->controllerBaseName );
+        // Allow override of module name, as this sometimes does not match (e.g. search = utiltiies)
+		if (!empty($p['controllerBaseName'])) {
+			$this->controllerBaseName = $p['controllerBaseName'];
+		}
+        $this->setModuleController( $this->controllerBaseName );
 		$this->setModuleId();
 		$this->setModuleSettingsValues();
 		$this->setGeneralSettingsValues();
@@ -41,7 +44,8 @@ class ModuleSettingsController extends Controller
 
     public function getModuleSetting( $p )
     {
-		if ( is_array( $p )) 
+		
+    	if ( is_array( $p )) 
 		{
 			$setting=isset($p['setting']) ? $p['setting'] : null;
 			$subst=isset($p['subst']) ? $p['subst'] : null;
@@ -51,7 +55,7 @@ class ModuleSettingsController extends Controller
 			$setting=$p;
 		}
 		
-		if ( empty($setting) ) return;
+		if ( empty($setting) ) return ;
 		
 		foreach((array)$this->getModuleSettingsValues() as $val)
 		{

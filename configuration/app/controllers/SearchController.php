@@ -25,8 +25,8 @@ class SearchController extends Controller
 	const C_TAXA_VERNACULARS=103;
 	const C_TAXA_ALL_NAMES=104;
 	const C_SPECIES_MEDIA=105;
-
-    public $usedModels = array(
+	
+	public $usedModels = array(
 
     );
 
@@ -34,10 +34,8 @@ class SearchController extends Controller
     {
 
         parent::__construct();
-
 		$this->initialise();
-		
-    }
+   }
 
     public function __destruct ()
     {
@@ -46,7 +44,7 @@ class SearchController extends Controller
 
 	private function initialise()
 	{
-		$this->moduleSettings=new ModuleSettingsController;
+		$this->moduleSettings=new ModuleSettingsController(['controllerBaseName' => 'utilities']);
 		$this->moduleSettings->setUseDefaultWhenNoValue( true );
 		$this->_minSearchLength = $this->moduleSettings->getModuleSetting( 'min_search_length',3);
 		$this->_maxSearchLength = $this->moduleSettings->getModuleSetting( 'max_search_length',50);
@@ -54,13 +52,6 @@ class SearchController extends Controller
 
 	protected function validateSearchString($s)
 	{
-		return true;
-		
-		$this->initialise();
-		die("$s $this->_minSearchLength $this->_maxSearchLength");
-		
-		
-		
 		return
 			(strlen($s)>=$this->_minSearchLength) &&  // is it long enough?
 			(strlen($s)<=$this->_maxSearchLength);    // is it short enough?
