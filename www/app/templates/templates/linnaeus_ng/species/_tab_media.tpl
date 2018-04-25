@@ -44,18 +44,17 @@
 							onclick="showMedia('{$smarty.capture.fullImgUrl}','{$v.original_name}');"
 							class="media-video-icon" />
 					{elseif $v.category=='audio'}
-                    
-						<object
-							id="media-{$k}"
-							alt="{$v.description}"
-							title="{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}"
-							type="application/x-shockwave-flash"
-							data="{$soundPlayerPath}{$soundPlayerName}"
-							width="130"
-							height="20">
-							<param name="movie" value="{$soundPlayerName}" />
-							<param name="FlashVars" value="mp3={$projectUrls.uploadedMedia}{$v.file_name}" />
-						</object>
+
+						<div style="display:none;" id="hidden-media-{$k}">
+							<audio controls>
+								<source src="{$projectUrls.uploadedMedia}{$v.file_name}" type="audio/mpeg">
+								Your browser does not support the audio element.
+							</audio>
+						</div>
+
+						<a data-fancybox="gallery" data-src="#hidden-media-{$k}" href="javascript:;" class="{if $v.category=='audio'}ion-volume-medium{else}ion-videocamera{/if} larger-ion-icon" data-caption="{$name}">
+							{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}
+						</a>
 					{/if}
 					</a>
 				{else}
@@ -71,10 +70,10 @@
                                 Your browser does not support the audio element.
                             </audio> 
                         </div>
-                        
+
                         <a data-fancybox="gallery" data-src="#hidden-media-{$k}" href="javascript:;" class="{if $v.category=='audio'}ion-volume-medium{else}ion-videocamera{/if} larger-ion-icon" data-caption="{$name}">
-                            {if $name}{$name}{else}{if $v.title}{$v.title}{else}{if $v.name}{$v.name}{/if}{/if}{/if}
-                        </a> 
+                            {if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}
+                        </a>
 					{else}
 						<a href="{$smarty.capture.fullImgUrl}" title="{$v.description}" data-fancybox="gallery" data-caption="{$name}">
 							<img src="{$v.rs_thumb_medium}" alt="{$v.description}" /><br>
