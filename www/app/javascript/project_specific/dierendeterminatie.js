@@ -993,7 +993,6 @@ function nbcInit() {
 }
 
 // alleen bijen
-=======
 function __(text)
 {
 	// _() is sloooooow!
