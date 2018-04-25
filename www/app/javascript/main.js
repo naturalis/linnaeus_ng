@@ -175,8 +175,9 @@ function showMedia(url,name) {
 
 	$.fancybox.open([
 		{
-			href : url,
-			title : name
+			src : url,
+			title : name,
+			type : 'image'
 		}
 	]);
 }
