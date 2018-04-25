@@ -369,8 +369,10 @@ function allGeneralGetLabels(language,action,postFunction,id,alturl)
 		success : function (data)
 		{
 			//console.log( data);
-			obj = $.parseJSON(data);
-			runFunction(postFunction,[obj,language]);
+			if (data.length) {
+                obj = $.parseJSON(data);
+                runFunction(postFunction, [obj, language]);
+            }
 			allHideLoadingDiv();
 		}
 	})
