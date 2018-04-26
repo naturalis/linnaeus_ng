@@ -511,33 +511,50 @@ class ProjectsController extends Controller
 
 
             if ($action == 'module_activate') {
-
-                $this->models->ModulesProjects->save(
-                array(
+                $rec = array(
                     'id' => null,
                     'module_id' => $moduleId,
                     'active' => 'y',
                     'project_id' => $this->getCurrentProjectId()
+                );
+
+                $this->models->ModulesProjects->save($rec);
+                $this->logChange(array(
+                    'note' => 'Active module',
+                    'after' => $rec
                 ));
 
             }
             elseif ($action == 'module_publish') {
 
-                $this->models->ModulesProjects->update(array(
-                    'active' => 'y'
-                ), array(
+                $rec = array(
                     'module_id' => $moduleId,
                     'project_id' => $this->getCurrentProjectId()
+                );
+                $this->models->ModulesProjects->update(array(
+                    'active' => 'y'
+                ), $rec);
+                $this->logChange(array(
+                    'note' => 'Publish module',
+                    'after' => $rec
                 ));
 
             }
             elseif ($action == 'module_unpublish') {
 
+                $rec = array(
+                    'module_id' => $moduleId,
+                    'project_id' => $this->getCurrentProjectId()
+                );
                 $this->models->ModulesProjects->update(array(
                     'active' => 'n'
                 ), array(
                     'module_id' => $moduleId,
                     'project_id' => $this->getCurrentProjectId()
+                ));
+                $this->logChange(array(
+                    'note' => 'Unpublish module',
+                    'after' => $rec
                 ));
 
             }
@@ -586,11 +603,17 @@ class ProjectsController extends Controller
 			        $pDel->deleteProjectContent($this->getCurrentProjectId());
 				}
 
-			    $this->models->ModulesProjects->delete(array(
+                $rec = array(
                     'module_id' => $moduleId,
                     'project_id' => $this->getCurrentProjectId()
-                ));
+                );
 
+			    $this->models->ModulesProjects->delete($rec);
+
+                $this->logChange(array(
+                    'before' => $rec,
+                    'note' => 'Delete module'
+                ));
             }
         }
     }
@@ -691,17 +714,33 @@ class ProjectsController extends Controller
 
             $make_default = (count((array) $lp) == 0);
 
-            $this->models->LanguagesProjects->save(
-            array(
-                'id' => null,
-                'language_id' => $languageId,
-                'project_id' => $this->getCurrentProjectId(),
-                'def_language' => $make_default ? 1 : 0,
-                'active' => 'n'
-            ));
+            $rec = array(
+                    'id' => null,
+                    'language_id' => $languageId,
+                    'project_id' => $this->getCurrentProjectId(),
+                    'def_language' => $make_default ? 1 : 0,
+                    'active' => 'n'
+            );
+            $this->models->LanguagesProjects->save($rec);
 
-            if ($this->models->LanguagesProjects->getNewId() == '')
+            $newId = $this->models->LanguagesProjects->getNewId();
+            if ($newId == '') {
                 $this->addError($this->translate('Language already assigned.'));
+                $this->logChange(
+                    array(
+                        'note' => 'Language already assigned.',
+                        'after' => $rec
+                    )
+                );
+            } else {
+                $a = $this->models->LanguagesProjects->_get(['id' => $newId]);
+                $this->logChange(
+                    array(
+                        'note' => 'Added project language',
+                        'after' => $a
+                    )
+                );
+            }
         }
         elseif ($action == 'default')
 		{
@@ -711,42 +750,68 @@ class ProjectsController extends Controller
                 'project_id' => $this->getCurrentProjectId()
             ));
 
-            $this->models->LanguagesProjects->update(array(
-                'def_language' => 1
-            ), array(
+            $rec = array(
                 'language_id' => $languageId,
                 'project_id' => $this->getCurrentProjectId()
-            ));
+            );
+            $this->models->LanguagesProjects->update(array(
+                'def_language' => 1
+            ), $rec);
+            $this->logChange(
+                array(
+                    'note' => 'Set new default language',
+                    'after' => $rec
+                )
+            );
         }
         elseif ($action == 'deactivate' || $action == 'reactivate')
 		{
-            $this->models->LanguagesProjects->update(array(
-                'active' => ($action == 'deactivate' ? 'n' : 'y')
-            ), array(
+		    $rec = array(
                 'language_id' => $languageId,
                 'project_id' => $this->getCurrentProjectId()
-            ));
+            );
+            $this->models->LanguagesProjects->update(array(
+                'active' => ($action == 'deactivate' ? 'n' : 'y')
+            ), $rec);
+            $this->logChange(
+                array(
+                    'note' => $action . ' project language',
+                    'after' => $rec
+                )
+            );
         }
         elseif ($action == 'delete')
 		{
-            $this->models->ContentTaxa->delete(array(
+            $rec = array(
                 'language_id' => $languageId,
                 'project_id' => $this->getCurrentProjectId()
-            ));
+            );
 
-            $this->models->LanguagesProjects->delete(array(
-                'language_id' => $languageId,
-                'project_id' => $this->getCurrentProjectId()
-            ));
+            $this->models->ContentTaxa->delete($rec);
+            $this->models->LanguagesProjects->delete($rec);
+
+            $this->logChange(
+                array(
+                    'before' => $rec,
+                    'note' => 'Project language deleted',
+                )
+            );
         }
         elseif ($action == 'translated' || $action == 'untranslated')
 		{
-            $this->models->LanguagesProjects->update(array(
-                'tranlation_status' => ($action == 'translated' ? 1 : 0)
-            ), array(
+            $rec = array(
                 'language_id' => $languageId,
                 'project_id' => $this->getCurrentProjectId()
-            ));
+            );
+            $this->models->LanguagesProjects->update(array(
+                'tranlation_status' => ($action == 'translated' ? 1 : 0)
+            ), $rec);
+            $this->logChange(
+                array(
+                    'note' => $action . ' project language',
+                    'after' => $rec
+                )
+            );
         }
     }
 
