@@ -69,7 +69,11 @@ class MatrixKeyController extends Controller
 		$this->moduleSettings->assignModuleSettings( $this->settings );
 
 		$this->_useCharacterGroups = $this->moduleSettings->getModuleSetting('use_character_groups')==1;
-		$this->_useVariations=$this->moduleSettings->getModuleSetting( [ 'module'=>'species','setting'=>'use_variations' ] )=='1';
+		$this->_useVariations=$this->moduleSettings->getModuleSetting(['module'=>'species','setting'=>'use_taxon_variations'])=='1';
+		// Check outdated setting just to be sure
+		if ($this->moduleSettings->getModuleSetting(['module'=>'species','setting'=>'use_variations'])) {
+			$this->_useVariations=$this->moduleSettings->getModuleSetting(['module'=>'species','setting'=>'use_variations'])=='1';
+		}
 
         $this->setDefaultMatrix();
 

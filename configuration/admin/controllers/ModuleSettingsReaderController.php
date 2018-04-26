@@ -71,7 +71,7 @@ class ModuleSettingsReaderController extends Controller
 			return $this->getExtraneousModuleSetting( $p );
 		}
 
-		if ( empty($setting) ) return;
+		if ( empty($setting) ) return false;
 
 		foreach((array)$this->getModuleSettingsValues() as $val)
 		{
