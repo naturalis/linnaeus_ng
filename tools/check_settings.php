@@ -80,9 +80,9 @@
 		
 		// Should include module, but suffices for current single purpose
 		private function renameSetting ($oldName, $newName) {
-			$q = 'update module_settings set setting = ? where setting = ? and module_id = ?';
+			$q = 'update module_settings set setting = ? where setting = ?';
 			$stmt = $this->mysqli->prepare($q);
-			$stmt->bind_param('ssi', $newName, $oldName, $moduleId);
+			$stmt->bind_param('ssi', $newName, $oldName);
 			$stmt->execute();
 			$stmt->close();
 		}
