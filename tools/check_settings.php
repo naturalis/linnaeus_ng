@@ -78,11 +78,12 @@
 			return !empty($r);
 		}
 		
-		// Should include module, but suffices for current single purpose
+		// Should include module, but deliberately skipped, as for its sole purpose this may
+		// casuse problems. The multi-access key has been renamed several times...
 		private function renameSetting ($oldName, $newName) {
 			$q = 'update module_settings set setting = ? where setting = ?';
 			$stmt = $this->mysqli->prepare($q);
-			$stmt->bind_param('ssi', $newName, $oldName);
+			$stmt->bind_param('ss', $newName, $oldName);
 			$stmt->execute();
 			$stmt->close();
 		}
