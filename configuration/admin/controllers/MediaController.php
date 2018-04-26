@@ -60,10 +60,12 @@ class MediaController extends Controller
             'default' => 'api_upload_lng',
             'info' => 'Name of RS API to upload to RS'
         ),
+    	/*
         'rs_search_api' => array(
             'default' => 'api_search_lng',
             'info' => 'Name of RS API to search RS'
         ),
+        */
         'rs_user_key' => array(
             'default' => '',
             'info' => 'RS API user key for current project (set dynamically when user is created)'
@@ -255,10 +257,12 @@ class MediaController extends Controller
             'setting' =>'rs_new_user_api',
             'module' => $this->controllerPublicName
         ));
+        /*
         $this->_rsSearchApi = $this->_moduleSettingsReader->getModuleSetting(array(
             'setting' =>'rs_search_api',
             'module' => $this->controllerPublicName
         ));
+        */
         $this->_rsUserName = $this->_moduleSettingsReader->getModuleSetting(array(
             'setting' =>'rs_user_name',
             'module' => $this->controllerPublicName
