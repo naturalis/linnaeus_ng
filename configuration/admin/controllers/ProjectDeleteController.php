@@ -144,10 +144,7 @@ class ProjectDeleteController extends Controller
      */
     private function initialize ()
     {
-        // Disable retaining query results, as this will cause memory errors for large tables
-        foreach ($this->models as $model) {
-            $model->setRetainQuery(false);
-        }
+        // nothing
     }
 
     /**
