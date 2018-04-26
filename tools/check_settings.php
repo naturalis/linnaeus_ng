@@ -1,12 +1,12 @@
 <?php
-	require_once dirname(__FILE__) . '/../vendor/autoload.php';
-	require_once dirname(__FILE__) . '/../configuration/admin/constants.php';
-	require_once dirname(__FILE__) . '/../configuration/admin/configuration.php';
+	require_once __DIR__ . '/../vendor/autoload.php';
+	require_once __DIR__ . '/../configuration/admin/constants.php';
+	require_once __DIR__ . '/../configuration/admin/configuration.php';
 	
 	use Symfony\Component\Yaml\Yaml;
 	
 	// Get settings fie;
-	$yaml = dirname(__FILE__) . '/../configuration/default_settings.yml';
+	$yaml = __DIR__ . '/../configuration/default_settings.yml';
 	
 	// Get to work!
 	$app = new CheckSettings();
@@ -115,7 +115,3 @@
 		}
 			
 	}
-	
-		
-	
-	
