@@ -2086,11 +2086,6 @@ class KeyController extends Controller
                 'project_id' => $this->getCurrentProjectId()
             )
         );
-        $this->logChange(array(
-            'before' => $before,
-            'after' => $after,
-            'note' => 'Updated Keys step choice'
-        ));
 
 		$changes += $this->models->ChoicesKeysteps->getAffectedRows();
 
@@ -2134,6 +2129,12 @@ class KeyController extends Controller
 			$changes+=$this->models->ChoicesContentKeysteps->getAffectedRows();
 
 		}
+
+        $this->logChange(array(
+            'before' => $before[0],
+            'after' => $after,
+            'note' => 'Updated Keys step choice'
+        ));
 
 		if ( $changes>0 ) {
 			$this->addMessage( $this->translate('Saved.') );
