@@ -38,6 +38,8 @@
 		}
 		
 		public function run () {
+			// Change setting use_variations to use_taxon_variations
+			$this->renameSetting('use_variations', 'use_taxon_variations');
 			// Looping over projects isn't necessary?
 			// foreach ($this->getProjectIds() as $this->projectId) {
 				foreach ($this->settings as $this->module => $moduleData) {
@@ -76,6 +78,15 @@
 			return !empty($r);
 		}
 		
+		// Should include module, but suffices for current single purpose
+		private function renameSetting ($oldName, $newName) {
+			$q = 'update module_settings set setting = ? where setting = ? and module_id = ?';
+			$stmt = $this->mysqli->prepare($q);
+			$stmt->bind_param('ssi', $newName, $oldName, $moduleId);
+			$stmt->execute();
+			$stmt->close();
+		}
+		
 		private function addSetting ($setting, $info, $default) {
 			$q = 
 				'insert into module_settings 
@@ -89,6 +100,9 @@
 			return $this->mysqli->insert_id;
 		}
 			
+		private function getSettingValue () {
+			
+		}
 		
 		private function getProjectIds () {
 			$r = $this->mysqli->query('select id from projects');
