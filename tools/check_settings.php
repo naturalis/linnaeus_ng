@@ -38,6 +38,8 @@
 		}
 		
 		public function run () {
+			// Delete redundant media setting
+			$this->deleteSetting('rs_search_api');
 			// Change setting use_variations to use_taxon_variations
 			$this->renameSetting('use_variations', 'use_taxon_variations');
 			// Looping over projects isn't necessary?
@@ -101,8 +103,19 @@
 			return $this->mysqli->insert_id;
 		}
 			
-		private function getSettingValue () {
-			
+		// Used for just one setting; add module to method when this is more broadly used!
+		private function deleteSetting ($setting) {
+			$q = 'select id from module_settings where setting = ?';
+			$stmt = $this->mysqli->prepare($q);
+			$stmt->bind_param('s', $setting);
+			$stmt->execute();
+			$stmt->bind_result($id);
+			$stmt->fetch();
+			$stmt->close();
+			if (!empty($id)) {
+				$this->mysqli->query('delete from module_settings where id = ' . $id);
+				$this->mysqli->query('delete from module_settings_values where setting_id = ' . $id);
+			}
 		}
 		
 		private function getProjectIds () {
