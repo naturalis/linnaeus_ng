@@ -422,7 +422,7 @@ class IntroductionController extends Controller
             }
 			else
 			{
-                $cfm = $this->models->ContentIntroduction->_get(
+                $before = $this->models->ContentIntroduction->_get(
 					array(
 						'id' => array(
 							'project_id' => $this->getCurrentProjectId(),
@@ -434,7 +434,7 @@ class IntroductionController extends Controller
 
                 $this->models->ContentIntroduction->save(
 					array(
-						'id' => isset($cfm[0]['id']) ? $cfm[0]['id'] : null,
+						'id' => isset($before[0]['id']) ? $before[0]['id'] : null,
 						'project_id' => $this->getCurrentProjectId(),
 						'language_id' => $language,
 						'page_id' => $id,
@@ -442,7 +442,19 @@ class IntroductionController extends Controller
 						'content' => trim($content)
 					)
 				);
-				
+
+                $after = $this->models->ContentIntroduction->_get(
+                    array(
+                        'id' => array(
+                            'project_id' => $this->getCurrentProjectId(),
+                            'language_id' => $language,
+                            'page_id' => $id
+                        )
+                    )
+                );
+
+                $this->logChange(array('before'=>$before,'after'=>$after,'note'=>'saved introduction '.$before['topic']));
+
 				$this->setPageGotContent($id,true);
 
             }
