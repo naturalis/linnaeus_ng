@@ -4,7 +4,7 @@
 
 	<h2>{t}Advanced search{/t}</h2>
 
-    <form method="get" action="" id="formSearchFacetsSpecies" name="formSearchFacetsSpecies">
+    <form method="get" id="formSearchFacetsSpecies" name="formSearchFacetsSpecies">
 
 	<div id="content" class="simple-search">
 
@@ -355,6 +355,7 @@ $(document).ready(function()
 	});
 
 	init=false;
+
 
 });
 </script>

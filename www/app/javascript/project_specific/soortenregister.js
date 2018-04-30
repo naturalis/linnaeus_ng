@@ -138,11 +138,25 @@ function showSuggestions()
 	if (listdata && listdata.length>0) $('#'+getSuggestionType()+'_suggestion').show();
 }
 
+function getURLParameters() {
+    var pageUrl = window.location.search.substring(1);
+    var urlVariables = pageUrl.split('&');
+    var params = {};
+    for (var i = 0; i<urlVariables.length; i++) {
+        var parPair = urlVariables[i].split('=');
+        if (parPair.length > 1) {
+        	params[parPair[0]] = parPair[1];
+		}
+	}
+	return params;
+}
+
 function setSuggestionId(ele)
 {
 
 	var searchStr=stripTags($(ele).attr("data-sci-name"));
 
+	var urlParameters = getURLParameters();
 
 	$('#'+cleanSuggestionId(getSuggestionType())+'_id').val($(ele).attr('ident'));
 	$('#'+cleanSuggestionId(getSuggestionType())).val(stripTags($(ele).html()));
@@ -150,18 +164,22 @@ function setSuggestionId(ele)
 
 	if ($('#formSearchFacetsSpecies').length)
 	{
-			$('#formSearchFacetsSpecies')
-					.append('<input type=hidden value="'+$('input[type=text][name=group]').val()+'" name=group>')
-					.submit();
-	}
-	else
-	if ($('#inlineformsearch').length)
-	{
+	    $.each(urlParameters, function(key, value){
+	    	if (['group','panels', 'traits'].indexOf(key)<0) {
+                $('#formSearchFacetsSpecies')
+                    .append('<input type=hidden value="'+value+'" name="'+key+'">');
+			}
+		});
+		$('#formSearchFacetsSpecies')
+			.append('<input type=hidden value="'+$('input[type=text][name=group]').val()+'" name=group>')
+			.submit();
+	} else if ($('#inlineformsearch').length) {
 			$('#name').val(searchStr);
 			$('#inlineformsearch')
 					.append('<input type=hidden value="'+searchStr+'" name=group>')
 					.submit();
 	}
+	return false;
 }
 
 var lineTpl='<li id="item-%IDX%" ident="%IDENT%" onclick="setSuggestionId(this);" onmouseover="activesuggestion=-1" data-sci-name="%SCIENTIFIC_NAME_DATA%">%LABEL%</li>';
@@ -204,6 +222,14 @@ function doSuggestions(p)
 	retrieveSuggestions();
 }
 
+var searchdelay = (function() {
+	var delayTimer = 0;
+	return function(callback, ms) {
+	    clearTimeout(delayTimer);
+	    delayTimer = setTimeout(callback, ms);
+	};
+})();
+
 function bindKeys()
 {	
 	$('div[id$=_suggestion]').each(function(e) {
@@ -213,51 +239,55 @@ function bindKeys()
 
 		$('#'+ele).keyup(function(e)
 		{
-			if (e.keyCode==27) // esc
-			{
-				hideSuggestions();
-				return;
-			}
+            if (e.keyCode == 27) // esc
+            {
+                hideSuggestions();
+                return;
+            }
 
-			if (e.keyCode!=undefined && e.keyCode!=13) {
-				// empty ID value of user 
-				$('#'+ele+'_id').val('');
-			} else {
-				var selected = $('#'+ele+'_suggestion ul li.selected');
-				if (selected.length==0) {
-                    var selected = $('#'+ele+'_suggestion ul li').first();
-				}
+            if (e.keyCode != undefined && e.keyCode != 13) {
+                // empty ID value of user
+                $('#' + ele + '_id').val('');
+            } else {
+                var selected = $('#' + ele + '_suggestion ul li.selected');
+                if (selected.length == 0) {
+                    var selected = $('#' + ele + '_suggestion ul li').first();
+                }
 
-			    setSuggestionId(selected);
+                setSuggestionId(selected);
                 e.preventDefault();
 
-			    return;
-			}
+                return;
+            }
 
-			if ($.inArray(e.keyCode,[37,38,39,40])==-1) {
-				// !(left,up,right,down)
-				doSuggestions({type:ele,match:match});
-			} else {
-			    if ($.inArray(e.keyCode,[38,40])>-1) {
+            if ($.inArray(e.keyCode, [37, 38, 39, 40]) == -1) {
+                // !(left,up,right,down)
+                searchdelay(function() {
+                    doSuggestions({type: ele, match: match});
+                },300);
+                e.preventDefault();
+                return false;
+            } else {
+                if ($.inArray(e.keyCode, [38, 40]) > -1) {
                     var current = $('#' + ele + '_suggestion ul li.selected');
                     if (e.keyCode == 38) {
-                        $('#'+ele+'_suggestion ul li').removeClass('selected');
+                        $('#' + ele + '_suggestion ul li').removeClass('selected');
                         $(current).prev().addClass('selected');
                     }
                     if (e.keyCode == 40) {
                         var next = $(current).next();
-                        if (current.length==0) {
+                        if (current.length == 0) {
                             $('#' + ele + '_suggestion ul li').first().addClass('selected');
                         }
-                        if (next.length>0) {
+                        if (next.length > 0) {
                             $('#' + ele + '_suggestion ul li').removeClass('selected');
                             $(next).addClass('selected');
                         }
                     }
                     e.preventDefault();
                     return false;
-				}
-			}
+                }
+            }
 		});
 	
 	});
