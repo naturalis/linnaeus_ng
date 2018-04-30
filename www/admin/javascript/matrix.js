@@ -234,9 +234,10 @@ function matrixSetTaxa(obj)
 	{
 		for(var i=0;i<obj.taxa.length;i++)
 		{
+			var name = "";
 			$('#taxa').append('<option ondblclick="matrixDeleteTaxon()" value="'+obj.taxa[i].id+'">'+
 				obj.taxa[i].taxon+
-				(obj.taxa[i].name.length>0 ? " ("+obj.taxa[i].name + ")" : "" )+
+				((obj.taxa[i].name != null && (obj.taxa[i].name.length>0)) ? " ("+obj.taxa[i].name + ")" : "" ) +
 				'</option>').val(obj.taxa[i].id);
 		}
 	}
