@@ -2,4 +2,4 @@
 echo -n "Updating GIT BRANCH: "
 echo $GIT_BRANCH
 pwd
-git pull
+git pull origin $GIT_BRANCH
