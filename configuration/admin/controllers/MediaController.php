@@ -129,7 +129,19 @@ class MediaController extends Controller
             'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
             'rtf' => 'text/rtf',
             'txt' => 'text/plain',
-            'csv' => 'text/comma-separated-values'
+            'csv' => array(
+                'text/comma-separated-values',
+            	'text/csv',
+            	'application/csv',
+				'application/x-csv',
+				'text/csv',
+				'text/comma-separated-values',
+				'text/x-comma-separated-values',
+				'text/tab-separated-values',
+				'text/plain',
+				'application/vnd.ms-excel',
+				'text/x-csv',
+            )
         )
     );
 
