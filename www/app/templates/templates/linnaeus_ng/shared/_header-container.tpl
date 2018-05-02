@@ -9,7 +9,7 @@
 	<div class="menu-search-bar__container">
 		<div class="search-bar__container">
 			<div class="search-bar">
-				<input type="text" name="search" id="search" class="search-box" autocomplete="off" placeholder="{t}Search...{/t}" value="{if $search.search}{$search.search}{/if}" onkeyup="if (event.keyCode==13) { doSearch(); }" required />
+				{include file="../shared/_search-box.tpl"}
 				<a href="javascript:void(0)" class="close-search close-search-js">
 					<i class="ion-close-round"></i>
 				</a>
