@@ -731,6 +731,7 @@ class Controller extends BaseClass
     public function getTaxonById( $id, $addNoMarkers=false )
     {
 		$taxon=$this->models->ControllerModel->getTaxon( [ 'project_id'=>$this->getCurrentProjectId(),'taxon_id'=>$id,'type_id_valid_name'=>$this->getNameTypeId(PREDICATE_VALID_NAME) ] );
+		
 		if ( !empty($taxon['taxon']) )
 		{
 			$taxon['taxon_no_infix']=$taxon['taxon'];

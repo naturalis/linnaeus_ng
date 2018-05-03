@@ -72,9 +72,10 @@ class SpeciesModel extends AbstractModel
         $getAll = isset($params['getAll']) ? $params['getAll'] : false;
         $listMax = isset($params['listMax']) ? $params['listMax'] : null;
         $regExp = isset($params['regExp']) ? $params['regExp'] : null;
-
+        $predicateValidNameId = isset($params['predicateValidNameId']) ? $params['predicateValidNameId'] : null;
+        
 		if ( is_null($projectId) ) return;// || is_null($taxonType) ) return;
-
+/*
         $query = "
 			select
 				SQL_CALC_FOUND_ROWS
@@ -100,7 +101,45 @@ class SpeciesModel extends AbstractModel
 			order by taxon
 
 			".(!empty($listMax) ? "limit ".$listMax : "");
-
+*/
+		$query = "
+			select
+				SQL_CALC_FOUND_ROWS
+				_a.id,
+ 				if(_n.authorship is null, _n.name, trim(replace(_n.name, _n.authorship, ''))) as taxon,
+ 				_n.authorship as author,
+				_n.authorship,
+                _a.rank_id,
+                _a.parent_id,
+                _a.is_hybrid
+		    
+            from
+				%PRE%taxa _a
+		    
+            left join %PRE%projects_ranks _b
+				on _a.rank_id=_b.id
+		    
+            left join %PRE%trash_can _tr
+				on _tr.lng_id = _a.id
+				and _tr.project_id = _a.project_id
+				and _tr.item_type = 'taxon'
+		    
+            left join %PRE%names _n
+				on _a.id=_n.taxon_id
+				and _a.project_id=_n.project_id
+				and _n.language_id=" . LANGUAGE_ID_SCIENTIFIC . "
+                and _n.type_id=" . $predicateValidNameId . "
+                    
+            where
+				_a.project_id = ".$projectId."
+				" . ( isset($taxonType) ? " and _b.lower_taxon = ".($taxonType == 'higher' ? 0 : 1) : "" ) . "
+				".($getAll ? "" : "and _a.taxon REGEXP '".$regExp."'")."
+				and _tr.is_deleted is null
+				    
+			order by taxon
+				    
+			".(!empty($listMax) ? "limit ".$listMax : "");
+		
         $taxa = $this->freeQuery($query);
 
 		$count = $this->freeQuery('select found_rows() as total');

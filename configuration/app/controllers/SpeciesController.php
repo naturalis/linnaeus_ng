@@ -1254,7 +1254,8 @@ class SpeciesController extends Controller
             'taxonType' => $lower ? 'lower' : 'higher', //$this->getTaxonType(),
             'getAll' => $getAll,
             'listMax' => $listMax,
-            'regExp' => ($matchStartOnly?'^':'').preg_quote($search, '/')
+            'regExp' => ($matchStartOnly?'^':'').preg_quote($search, '/'),
+            'predicateValidNameId' => $this->getNameTypeId(PREDICATE_VALID_NAME)
         ));
 
 		$ranks=$this->getProjectRanks();
@@ -1262,6 +1263,9 @@ class SpeciesController extends Controller
         foreach ((array) $taxa as $key => $val)
 		{
 			$taxa[$key]['label'] = $this->formatTaxon(array('taxon'=>$val,'rankpos'=>'post','ranks'=>$ranks));
+			if (!empty($val['authorship'])) {
+			    $taxa[$key]['label'] .= ' ' . $val['authorship'];
+			}
 			unset($taxa[$key]['taxon']);
 		}
 

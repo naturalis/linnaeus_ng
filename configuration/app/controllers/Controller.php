@@ -471,7 +471,8 @@ class Controller extends BaseClass
 		    'languageId'=> $this->getCurrentLanguageId(),
 		    'taxonId' => $id,
             'predicateValidNameId' => $this->getNameTypeId(PREDICATE_VALID_NAME),
-            'predicatePreferredNameId' => $this->getNameTypeId(PREDICATE_PREFERRED_NAME)		    
+            'predicatePreferredNameId' => $this->getNameTypeId(PREDICATE_PREFERRED_NAME),
+		    'scientificLanguageId' => LANGUAGE_ID_SCIENTIFIC,
 		));
     }
 

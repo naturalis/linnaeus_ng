@@ -81,7 +81,8 @@ final class ControllerModel extends AbstractModel
 		$taxonId = isset($params['taxonId']) ? $params['taxonId'] : false;
 		$predicateValidNameId = isset($params['predicateValidNameId']) ? $params['predicateValidNameId'] : null;
 		$predicatePreferredNameId = isset($params['predicatePreferredNameId']) ? $params['predicatePreferredNameId'] : null;
-
+		$scientificLanguageId = isset($params['scientificLanguageId']) ? $params['scientificLanguageId'] : null;
+		/*
         $query = "
 			select
 				_a.id,
@@ -144,6 +145,64 @@ final class ControllerModel extends AbstractModel
 				_a.id=". $taxonId ."
 				and _a.project_id=".$projectId."
 				".($trashCanExists ? " and ifnull(_trash.is_deleted,0)=0" : "");
+*/
+		
+		// We should query the names table, not taxa!
+		$query = "
+			select
+				_a.id,
+                if(_n.authorship is null, _n.name, trim(replace(_n.name, _n.authorship, ''))) as taxon,
+ 				_n.authorship as author,
+				_n.authorship,
+				_a.parent_id,
+				_a.rank_id,
+				_a.taxon_order,
+				_a.is_hybrid,
+				_a.list_level,
+				_a.is_empty,
+				_f.lower_taxon,
+				_kpref.name as commonname,
+				_f.rank_id as base_rank_id,
+				_r.rank,
+				ifnull(_q.label,_r.rank) as rank_label
+		    
+			from %PRE%taxa _a
+		    
+		".($trashCanExists ? "
+			left join %PRE%trash_can _trash
+				on _a.project_id = _trash.project_id
+				and _a.id =  _trash.lng_id
+				and _trash.item_type='taxon'
+			" : "")."
+			    
+			left join %PRE%projects_ranks _f
+				on _a.rank_id=_f.id
+				and _a.project_id = _f.project_id
+			    
+			left join %PRE%ranks _r
+				on _f.rank_id=_r.id
+			    
+			left join %PRE%labels_projects_ranks _q
+				on _f.id=_q.project_rank_id
+				and _f.project_id = _q.project_id
+				and _q.language_id=".$languageId."
+				    
+			left join %PRE%names _kpref
+				on _a.id=_kpref.taxon_id
+				and _a.project_id=_kpref.project_id
+				and _kpref.type_id=".$predicatePreferredNameId."
+				and _kpref.language_id=".$languageId."
+
+            left join %PRE%names _n
+				on _a.id=_n.taxon_id
+				and _a.project_id=_n.project_id
+				and _n.language_id=".$scientificLanguageId."
+                and _n.type_id=".$predicateValidNameId."
+				    
+			where
+				_a.id=". $taxonId ."
+				and _a.project_id=".$projectId."
+				".($trashCanExists ? " and ifnull(_trash.is_deleted,0)=0" : "");
 
         $d = $this->freeQuery($query);
         return isset($d) ? $d[0] : null;
@@ -194,9 +253,10 @@ final class ControllerModel extends AbstractModel
 				_a.is_empty,
 				_a.author
 			from %PRE%taxa _a
+
 			where
 				_a.project_id = ".$projectId;
-
+       
         return $this->freeQuery($query);
     }
 

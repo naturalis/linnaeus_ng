@@ -116,7 +116,7 @@ class SpeciesControllerNSR extends SpeciesController
 		}
 		else
 		{
-			$this->smarty->assign('message','Geen taxon ID gevonden.');
+			$this->smarty->assign('message','No taxon ID found.');
 			$this->printPage('../shared/generic-error');
 		}
     }
@@ -126,8 +126,12 @@ class SpeciesControllerNSR extends SpeciesController
         $this->setTaxonId($this->rGetId());
 
 		$taxon = $this->getTaxonById($this->getTaxonId());
-		$taxon['label']=$this->formatTaxon($taxon);
-
+		
+		$taxon['label'] = $this->formatTaxon($taxon);
+		if (!empty($taxon['authorship'])) {
+		    $taxon['label'] .= ' ' . $taxon['authorship'];
+		}
+		
         if ( !empty($taxon) )
 		{
 			$template = $this->rGetVal('headless',1) ? 'taxon_headless' : 'taxon' ;
