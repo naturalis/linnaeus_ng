@@ -44,6 +44,7 @@
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.shrinkText.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.prettyDialog.js"></script>
     <script type="text/javascript" src="{$baseUrl}app/javascript/inline_templates.js"></script>
+	<script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/soortenregister.js"></script>
 
 
 

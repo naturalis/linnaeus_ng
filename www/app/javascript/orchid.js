@@ -48,5 +48,19 @@ $(function() {
 
 	$('body').on('click', '.close-search-js', function() {
 		$('body').removeClass('search-open');
-	});
+	});  $('body').on('click', '.close-suggestion-list-js', function() {
+    $('#name_suggestion').hide();
+    $('body').removeClass('search-open');
+  });
+
+  $('body').on('keyup', '#inlineformsearch #inlineformsearchInput', function(e) {
+    if (e.keyCode==27 || $(this).val() == '') {
+      $('.simpleSuggestions').hide();
+    } else {
+      $('.simpleSuggestions').show();
+    }
+
+    $('.simpleSuggestions ul').append('<li>Nog een suggestie</li>');
+  });
+
 });
