@@ -1,5 +1,15 @@
-{include file="../shared/header.tpl"}
-
+{include file="../shared/header.tpl" title="{t}Taxonomic tree{/t}"}
+	<div class="page-generic-div">
+		<ul class="tabs" style="background-color: white;">
+			<li class="tab">
+				<a href="../search/search.php">{t}Advanced search{/t}</a>
+			</li>
+			<li class="tab-active">
+				<a href="#">{t}Taxonomic tree{/t}</a>
+			</li>
+		</ul>
+	</div>
+	
 <script>
 
 var activeNode=false;
@@ -178,10 +188,6 @@ li.child.no-expand {
 	<div id="content" class="taxon-detail">
 
 		<div id="taxonHeader" class="hasImage">
-			<div id="titles" class="full">
-				<h1 class="no-subtitle">Taxonomische boom</h1>
-				<h2></h2>
-			</div>
 			<div id="tree-container"></div>
 		</div>
 

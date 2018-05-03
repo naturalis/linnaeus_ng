@@ -7,6 +7,9 @@
 			<li class="tab-active">
 				<a href="#">{t}Advanced search{/t}</a>
 			</li>
+			<li>
+				<a href="../species/tree.php">{t}Taxonomic tree{/t}</a>
+			</li>
 		</ul>
 		<div class="search-input__container">
 			<input type="text" id="search" name="search" value="{$search.search|@escape}" />

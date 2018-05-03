@@ -87,7 +87,8 @@ class TreeController extends Controller
 		$this->smarty->assign('tree_taxon_count_style',$this->_tree_taxon_count_style);
 		$this->smarty->assign('tree_top',$this->getTreeTop());
 		$this->smarty->assign('initial_expansion',$this->_tree_initital_expand_levels);
-
+		$this->smarty->assign('controllerMenuOverride',true);
+		
 		$this->printPage('tree');
 	}
 
