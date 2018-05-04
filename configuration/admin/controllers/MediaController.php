@@ -289,9 +289,11 @@ class MediaController extends Controller
         }
 
         // Search url: &search=[term]* to be appended
+        /*
         $this->_rsSearchUrl = $this->_rsBaseUrl . $this->_rsSearchApi . '/?' .
             'key=' . $this->_rsUserKey . '&prettyfieldnames=true&collection=' .
             $this->_rsCollectionId;
+       */
        // Upload url: &field8=[title] to be appended
         $this->_rsUploadUrl = $this->_rsBaseUrl . $this->_rsUploadApi . '/?' .
             'key=' . $this->_rsUserKey . '&collection=' . $this->_rsCollectionId;
@@ -318,7 +320,7 @@ class MediaController extends Controller
             if (!empty($this->getCurrentProjectId()) && empty($s) &&
                 strpos($_SERVER['PHP_SELF'], 'setup_rs') === false) {
                 die('FATAL: ' . $p . ' not set.
-                    <a href="../media/setup_rs.php">Setup ResourceSpace</a> to continue.');
+                    <a href="../media/setup_rs.php">Set up ResourceSpace</a> to continue.');
             }
         }
 
