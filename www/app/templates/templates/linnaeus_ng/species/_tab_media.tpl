@@ -55,6 +55,17 @@
 						<a data-fancybox="gallery" data-src="#hidden-media-{$k}" href="javascript:;" class="{if $v.category=='audio'}ion-volume-medium{else}ion-videocamera{/if} larger-ion-icon" data-caption="{$name}">
 							{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}
 						</a>
+					{elseif $v.category=='video'}
+						<div style="display:none;" id="hidden-media-{$k}">
+							<video controls>
+								<source src="{$smarty.capture.fullImgUrl}" type="video/mp4">
+								Your browser does not support the html5 video element.
+							</video>
+						</div>
+
+						<a data-fancybox="gallery" data-src="#hidden-media-{$k}" href="javascript:;" class="{if $v.category=='audio'}ion-volume-medium{else}ion-videocamera{/if} larger-ion-icon" data-caption="{$name}">
+							{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}
+						</a>
 					{/if}
 					</a>
 				{else}
@@ -63,7 +74,7 @@
 						<img src="{$smarty.capture.fullImgUrl}" alt="{$v.description}" id="media-{$k}" class="image-full" />
 						</a><br/>
 						{$name}
-					{else if $v.category == 'audio' or $v.category == 'video'}
+					{elseif $v.category == 'audio'}
                         <div style="display:none;" id="hidden-media-{$k}">
                             <audio controls>
                                 <source src="{$smarty.capture.fullImgUrl}" type="audio/mpeg">
@@ -74,6 +85,17 @@
                         <a data-fancybox="gallery" data-src="#hidden-media-{$k}" href="javascript:;" class="{if $v.category=='audio'}ion-volume-medium{else}ion-videocamera{/if} larger-ion-icon" data-caption="{$name}">
                             {if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}
                         </a>
+					{elseif $v.category == 'video'}
+						<div style="display:none;" id="hidden-media-{$k}">
+							<video controls>
+								<source src="{$smarty.capture.fullImgUrl}" type="video/mp4">
+								Your browser does not support the html5 video element.
+							</video>
+						</div>
+
+						<a data-fancybox="gallery" data-src="#hidden-media-{$k}" href="javascript:;" class="ion-videocamera larger-ion-icon" data-caption="{$name}">
+							{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}
+						</a>
 					{else}
 						<a href="{$smarty.capture.fullImgUrl}" title="{$v.description}" data-fancybox="gallery" data-caption="{$name}">
 							<img src="{$v.rs_thumb_medium}" alt="{$v.description}" /><br>
