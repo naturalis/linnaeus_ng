@@ -1,4 +1,5 @@
 <div id="main-body">
+
 	{if $controllerBaseName !== 'module' and $controllerBaseName !== 'search'}
 		{if $categories or (!$controllerMenuOverride and $controllerMenuExists and $controllerBaseName)}
 			<div class="sidebar__container">

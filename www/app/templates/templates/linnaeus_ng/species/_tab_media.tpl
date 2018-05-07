@@ -43,6 +43,7 @@
 							src="{$projectUrls.systemMedia}video.png"
 							onclick="showMedia('{$smarty.capture.fullImgUrl}','{$v.original_name}');"
 							class="media-video-icon" />
+							
 					{elseif $v.category=='audio'}
 
 						<div style="display:none;" id="hidden-media-{$k}">
@@ -76,10 +77,10 @@
 						{$name}
 					{elseif $v.category == 'audio'}
                         <div style="display:none;" id="hidden-media-{$k}">
-                            <audio controls>
-                                <source src="{$smarty.capture.fullImgUrl}" type="audio/mpeg">
-                                Your browser does not support the audio element.
-                            </audio> 
+                            <{$v.category} controls>
+                                <source src="{$smarty.capture.fullImgUrl}" type="{$v.category}/{if $v.category='video'}mp4{else}mpeg{/if}">
+                                Your browser does not support the {$v.category} element.
+                            </{$v.category}> 
                         </div>
 
                         <a data-fancybox="gallery" data-src="#hidden-media-{$k}" href="javascript:;" class="{if $v.category=='audio'}ion-volume-medium{else}ion-videocamera{/if} larger-ion-icon" data-caption="{$name}">
@@ -97,7 +98,7 @@
 							{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}
 						</a>
 					{else}
-						<a href="{$smarty.capture.fullImgUrl}" title="{$v.description}" data-fancybox="gallery" data-caption="{$name}">
+						<a href="{$smarty.capture.fullImgUrl}" title="{$v.description}">
 							<img src="{$v.rs_thumb_medium}" alt="{$v.description}" /><br>
 							{$name}
 						</a>

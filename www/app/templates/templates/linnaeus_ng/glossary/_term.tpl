@@ -48,6 +48,7 @@
 									src="{$smarty.capture.fullImgUrl}"
 									class="image-full" />
 							</div>
+						
 						{elseif $v.category=='video'}
 							<img
 								id="media-{$k}"
@@ -56,6 +57,7 @@
 								src="{$projectUrls.systemMedia}video.png"
 								onclick="showMedia('{$smarty.capture.fullImgUrl}','{$v.original_name}');"
 								class="media-video-icon" />
+						
 						{elseif $v.category=='audio'}
 							<object
 								id="media-{$k}"
