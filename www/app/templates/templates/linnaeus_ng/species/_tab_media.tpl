@@ -53,7 +53,7 @@
 							</audio>
 						</div>
 
-						<a data-fancybox="gallery" data-src="#hidden-media-{$k}" href="javascript:;" class="{if $v.category=='audio'}ion-volume-medium{else}ion-videocamera{/if} larger-ion-icon" data-caption="{$name}">
+						<a data-fancybox="gallery" data-src="#hidden-media-{$k}" href="javascript:;" class="ion-volume-medium larger-ion-icon" data-caption="{$name}">
 							{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}
 						</a>
 					{elseif $v.category=='video'}
@@ -64,7 +64,7 @@
 							</video>
 						</div>
 
-						<a data-fancybox="gallery" data-src="#hidden-media-{$k}" href="javascript:;" class="{if $v.category=='audio'}ion-volume-medium{else}ion-videocamera{/if} larger-ion-icon" data-caption="{$name}">
+						<a data-fancybox="gallery" data-src="#hidden-media-{$k}" href="javascript:;" class="ion-videocamera larger-ion-icon" data-caption="{$name}">
 							{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}
 						</a>
 					{/if}
@@ -83,7 +83,7 @@
                             </{$v.category}> 
                         </div>
 
-                        <a data-fancybox="gallery" data-src="#hidden-media-{$k}" href="javascript:;" class="{if $v.category=='audio'}ion-volume-medium{else}ion-videocamera{/if} larger-ion-icon" data-caption="{$name}">
+                        <a data-fancybox="gallery" data-src="#hidden-media-{$k}" href="javascript:;" class="ion-volume-medium larger-ion-icon" data-caption="{$name}">
                             {if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}
                         </a>
 					{elseif $v.category == 'video'}
