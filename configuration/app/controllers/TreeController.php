@@ -9,6 +9,12 @@ class TreeController extends Controller
 		'name_types'
     );
 
+    public $jsToLoad = array(
+        'all' => array(
+            'main.js',
+        ),
+    );
+    
     public $modelNameOverride = 'TreeModel';
 
 	private $_idPreferredName=0;
