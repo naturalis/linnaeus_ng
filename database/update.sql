@@ -1,4 +1,5 @@
-ALTER DATABASE `linnaeusng` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER DATABASE `linnaeus_ng` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE linnaeus_ng;
 
 INSERT IGNORE INTO `traits_date_formats` VALUES
 (1,'year','Y','JJJJ','%Y',0,now(),now()),
