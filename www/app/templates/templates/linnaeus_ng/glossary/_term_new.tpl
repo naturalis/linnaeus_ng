@@ -30,8 +30,10 @@
 				
 						{if $v.caption != ''}
 							{capture name="caption"}{$v.caption}{/capture}
-						{else}
+						{else if $v.metadata.title != ''}
 							{capture name="caption"}{$v.metadata.title}{/capture}
+						{else}
+							{capture name="caption"}{$v.original_name}{/capture}
 						{/if}
 						
 						{if $v.category == 'image'}
