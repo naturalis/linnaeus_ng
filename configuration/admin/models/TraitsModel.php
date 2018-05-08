@@ -191,12 +191,14 @@ final class TraitsModel extends AbstractModel
 		$query="
 			select
 				_a.*,
+                _t.translation as description,
 				_e.sysname as date_format_name,
 				_e.format as date_format_format,
 				_e.format_hr as date_format_format_hr,
 				_g.sysname as type_sysname,
 				_g.verification_function_name as type_verification_function_name
-			from
+			
+            from
 				%PRE%traits_traits _a
 
 			left join 
@@ -211,6 +213,11 @@ final class TraitsModel extends AbstractModel
 			left join 
 				%PRE%traits_types _g
 				on _f.type_id=_g.id
+
+            left join 
+                %PRE%text_translations _t
+                on _a.description_tid = _t.text_id
+                and _a.project_id = _t.project_id
 
 			where
 				_a.project_id=" . $project_id . "

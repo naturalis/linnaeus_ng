@@ -38,6 +38,7 @@ li.values:hover {
         <span style="font-size:12px;font-style:normal">{$group.sysname}:</span>
         {$concept.taxon}
     </h2>
+    <p>{$group.description}</p>
     <p>
 	    {if $group.parent}(parent: <a href="taxon.php?id={$concept.id}&group={$group.parent.id}">{$group.parent.sysname}</a>)<br />{/if}
     </p>

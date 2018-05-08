@@ -367,6 +367,7 @@ taxonTraits.groupLabel=null;
 taxonTraits.trait=null;
 taxonTraits.traittype=null;
 taxonTraits.traitname=null;
+taxonTraits.description=null;
 taxonTraits.currentvalues=[];
 taxonTraits.currentselection=[];
 taxonTraits.oldvalue=null;
@@ -429,9 +430,19 @@ taxonTraits.setTraitName=function( name )
 	taxonTraits.traitname=name;
 }
 
+taxonTraits.setTraitDescription=function( description )
+{
+	taxonTraits.description = description;
+}
+
 taxonTraits.getTraitName=function()
 {
 	return taxonTraits.traitname;
+}
+
+taxonTraits.getTraitDescription = function()
+{
+	return '<p style="font-size: 12px;">' + taxonTraits.description + '</p>';
 }
 
 taxonTraits.setCanSelectMultiple=function( state )
@@ -646,6 +657,7 @@ taxonTraits.taxonTraitFormInit=function( data )
 		taxonTraits.setTrait( data.trait.id );
 		taxonTraits.setTraitType( data.trait.type_sysname );
 		taxonTraits.setTraitName( data.trait.sysname );
+		taxonTraits.setTraitDescription( data.trait.description );
 		taxonTraits.setCanSelectMultiple( data.trait.can_select_multiple==1 );
 		taxonTraits.setCanBeNull( data.trait.can_be_null==1 );
 		taxonTraits.setCanHaveRange( data.trait.can_have_range==1 );
@@ -786,18 +798,17 @@ taxonTraits.editTaxonTrait = function( d )
 	d.time=allGetTimestamp();
 	d.action='get_taxon_trait';
 
-	//console.dir( d );
-
 	$.ajax({
 		url: "ajax_taxon.php",
 		data: d,
 		success : function ( d )
 		{
 			taxonTraits.taxonTraitFormInit( $.parseJSON( d ) );
+
 			prettyDialog(
 			{
 				title : taxonTraits.getTraitName() ,
-				content : taxonTraits.taxonTraitForm() ,
+				content : taxonTraits.getTraitDescription() + taxonTraits.taxonTraitForm() ,
 				width: 600,
 				height: taxonTraits.getDialogHeight(),
 				buttons :
