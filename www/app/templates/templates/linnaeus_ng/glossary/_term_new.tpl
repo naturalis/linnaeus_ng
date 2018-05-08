@@ -28,10 +28,10 @@
 				{assign var=mediaCat value=$v.category}
 				<div class="media-cell media-type-{$v.category}" id="media-cell-{$k}">	
 				
-						{if $v.metadata.title != ''}
-							{capture name="caption"}{$v.metadata.title}{/capture}
-						{else}
+						{if $v.caption != ''}
 							{capture name="caption"}{$v.caption}{/capture}
+						{else}
+							{capture name="caption"}{$v.metadata.title}{/capture}
 						{/if}
 						
 						{if $v.category == 'image'}
