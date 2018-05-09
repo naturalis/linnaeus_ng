@@ -1,25 +1,28 @@
 Linnaeus Next Generation
 ========================
 
-Linnaeus is program developed by Naturalis to setup and manager 
+Linnaeus is a program/app developed by Naturalis to setup and manage 
 taxonomic databases. It is used for many public project such as 
-Nederlandse Soorten Register and Dutch Caribbean Species. But also for Dierenzoeker.
+[Nederlandse Soorten Register](http://www.nederlandsesoorten.nl/) 
+and [Dutch Caribbean Species](http://www.dutchcaribbeanspecies.org/), 
+but also for [Dierenzoeker](http://www.dierenzoeker.nl/) and
+many others listed at [linnaeus.naturalis.nl](http://linnaeus.naturalis.nl/).
 
 
 Contents
 --------
 
-The project contains all the files needed to setup a basic Linnaeus installation. 
-But is also dependent on server configuration projects:
+This project contains all the files needed to setup a basic Linnaeus installation. 
+But it is also dependent on server configuration projects:
 
- - [docker composer configuration](https://github.com/naturalis/docker-linnaeusng)
- - [ansible control script](https://github.com/naturalis/linnaeus_ng_control/blob/master/linnaeus.ansible/roles/naturalis-linnaeus_docker-control/tasks/main.yml)
- - [puppet](https://github.com/naturalis/puppet-linnaeusng)
+ - [docker composer configuration](https://github.com/naturalis/docker-linnaeusng) - to setup a dockerized version of linnaeus
+ - [ansible control script](https://github.com/naturalis/linnaeus_ng_control/blob/master/linnaeus.ansible/roles/naturalis-linnaeus_docker-control/tasks/main.yml) - to control remote dockerized installs
+ - [puppet](https://github.com/naturalis/puppet-linnaeusng) - to setup and monitor the linnaeus host system with a docker installation
 
 Linnaeus docker configuration
 -----------------------------
 
-Usually Linnaeus is already running on a remote virtual host (_the host_) and setup using
+Usually Linnaeus is already running on a remote virtual host (_the host_) and already setup using
 [puppet](https://github.com/naturalis/puppet-linnaeusng), normally any changes to the scripts or setup should be done through [ansible](https://github.com/naturalis/linnaeus_ng_control/). 
 A typical remote configuration looks like this.
 
@@ -35,7 +38,7 @@ cd /opt/docker-linnaeusng
 sudo docker-compose ps                                                                                                                          :(
 ```
 
-This should show:
+This should show a running instance consisting of two components:
 
 ```
            Name                          Command               State           Ports         
@@ -46,10 +49,11 @@ dockerlinnaeusng_linnaeus_1   /usr/local/bin/docker-entr ...   Up      0.0.0.0:8
 
 The setup contains a mysql database and a apache/php stack. To connect to the database
 from _the host_ you can use the configuration parameters from `/opt/docker-linnaeusng/.env`. 
-A typical .env contains fields like these:
+The .env file contains these fields:
 
 * `MYSQL_HOST=db` name of the docker database host
 * `MYSQL_USER=linnaeus_user` name of the linnaeus database user
+* `MYSQL_DATABASE=linnaeus_ng`
 * `MYSQL_PASSWORD=linnaeus_password` linnaeus database password
 * `MYSQL_ROOT_PASSWORD=the_root_password` the mysql root password
 * `MYSQL_EXTERNAL_PORT=3306` the exposed external mysql port
@@ -59,19 +63,24 @@ A typical .env contains fields like these:
 * `BASE_PATH=/data` base path where all data and scripts reside on the host machine
 * `DEV=0` switch to put the linnaeus installation in dev mode (for extra error reporting for instance)
 
+Foreman and puppet setup this file once and use randomized passwords for each installation.
+
 **Connecting to the database** 
 
-To connect to the database you can either use the mysql client on _the host_:
+To connect to the database you can either use the mysql client directly on _the host_ machine:
 
 `mysql --host=127.0.0.1 --user=root --password`
 
-Or through docker:
+You can also setup a ssh tunnel to connect to port 3306 using your favorite local mysql client, since it is exposed 
+on the host machine.
+
+Or you can access the database through docker:
 
 `sudo docker-compose exec db mysql --user=root`
 
 **Connecting to the linnaeus app** 
 
-To see the linnaeus installation from the docker machine. You can login to the linnaeus machine:
+To see and influence the linnaeus installation from the docker machine. You can login to the linnaeus docker machine:
 
 `sudo docker-compose exec linnaeus bash`
 
@@ -98,37 +107,90 @@ grepped. But you can also force a reinstall of a certain linnaeus installation b
 putting a different database dump in initdb.
 
 
-Starting the linnaeus installation step by step
+Managing linnaeus installations without ansible
 -----------------------------------------------
 
-- Install a virtual machine using puppet, vagrant, docker
-- Install a recent version of npm using `brew install npm` or `apt-get npm`
+- Install a virtual machine using puppet, vagrant, docker.
+- Install a recent version of npm using `brew install npm` (osX) or `apt-get npm` (linux).
 - For instance you can use [our own docker composer file](https://github.com/naturalis/docker-linnaeusng) to setup a basic stack
 - Clone this repository to your webserver root
 
-To get the third party javascript libaries working:
+**Third party javascripts**
+
+If you do not use the docker installation try to get the third party javascript libaries working:
 
 ```
 cd /path/to/linnaeus_ng
-npm install --global gulp
-npm install --global bower
-npm install
-bower install
-gulp
+/usr/bin/npm install --global bower
+/usr/bin/bower install --allow-root
+/usr/bin/npm install --global gulp 
+/usr/bin/npm install
+/usr/bin/gulp
 ```
 
-Gulp can fail in the first run, because some gulp packages need to be installed globally first. Gulp will generate the
-following files that are not in the git repository:
+This similar to the [gulp.sh script](https://github.com/naturalis/linnaeus_ng/blob/development/tools/scripts/gulp.sh).
+
+Gulp can fail in the first run, because some gulp packages need to be installed globally 
+first. Gulp will generate the following files that are not in the git repository:
 
 - ./www/app/vendor/bundle.js
 - ./www/app/vendor/*
 - ./www/admin/vendor/bundle.js
 - ./www/admin/vendor/*
 
+**Third party php**
 
-To get the composer and php requirements working:
+The linnaeus installation is also dependent on external php projects. Which are
+installed by composer. To get the composer and php requirements working:
 
-- download and install composer
-- cd /path/to/linnaeus_ng
-- composer install
+- [download and install composer](https://getcomposer.org/)
+- cd _/path/to/linnaeus_ng_
+- composer update
+
+This is also done by the [composer.sh](https://github.com/naturalis/linnaeus_ng/blob/development/tools/scripts/composer.sh) script.
+
+Managing Linnaeus through Docker
+--------------------------------
+
+If you do have docker running on your local setup or somewhere remote you can use these commands to do certain tasks. First
+move to your local docker-compose configuration.
+
+`cd /opt/docker-linnaeusng`
+
+This is the path where puppet puts the docker installation by default, on your own installation this could be anywhere.
+You should be at this location on your host machine, or else it will not work.
+
+**Checking out and pulling an updated version of linnaeus**
+
+`docker-compose exec -T linnaeus /var/www/html/tools/scripts/git.sh`
+
+git.sh uses the local environment variable GIT_BRANCH to checkout and pull the latest commit of this branch. If you want to install some experimental branch.
+
+```bash
+docker-compose exec linnaeus bash
+git fetch origin yourbranch:yourbranch
+git checkout yourbranch
+git pull origin yourbranch
+```
+
+**Installing or updating third party php libraries**
+
+`docker-compose exec -T linnaeus /var/www/html/tools/scripts/composer.sh`
+
+This runs [composer update](https://getcomposer.org/doc/03-cli.md#update).
+
+**Installing or updating third party javascript libraries and css**
+
+`docker-compose exec -T linnaeus /var/www/html/tools/scripts/gulp.sh`
+
+The script is doing exactly this:
+
+```
+cd /var/www/html
+/usr/bin/npm install --global bower
+/usr/bin/bower install --allow-root
+/usr/bin/npm install --global gulp 
+/usr/bin/npm install
+/usr/bin/gulp
+```
 
