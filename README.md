@@ -23,7 +23,8 @@ Linnaeus docker configuration
 -----------------------------
 
 Usually Linnaeus is already running on a remote virtual host (_the host_) and already setup using
-[puppet](https://github.com/naturalis/puppet-linnaeusng), normally any changes to the scripts or setup should be done through [ansible](https://github.com/naturalis/linnaeus_ng_control/). 
+[puppet](https://github.com/naturalis/puppet-linnaeusng), normally any changes to the scripts or setup should be done 
+through [ansible](https://github.com/naturalis/linnaeus_ng_control/). 
 A typical remote configuration looks like this.
 
 **Docker**
@@ -121,17 +122,18 @@ If you do not use the docker installation try to get the third party javascript 
 
 ```
 cd /path/to/linnaeus_ng
-/usr/bin/npm install --global bower
-/usr/bin/bower install --allow-root
-/usr/bin/npm install --global gulp 
-/usr/bin/npm install
-/usr/bin/gulp
+npm install --global bower
+bower install --allow-root
+npm install --global gulp 
+npm install
+gulp
 ```
 
 This similar to the [gulp.sh script](https://github.com/naturalis/linnaeus_ng/blob/development/tools/scripts/gulp.sh).
 
 Gulp can fail in the first run, because some gulp packages need to be installed globally 
-first. Gulp will generate the following files that are not in the git repository:
+first, follow the hints given in the errors. Gulp will generate the following files that are 
+not (and should not be) in the git repository:
 
 - ./www/app/vendor/bundle.js
 - ./www/app/vendor/*
