@@ -230,12 +230,12 @@ class NsrTaxonController extends NsrController
 			$this->smarty->assign('statuses',$this->getStatuses());
 			$this->smarty->assign('habitats',$this->getHabitats());
 			$this->smarty->assign('actors',$this->getActors());
-			$this->smarty->assign('traitgroups',$this->getTraitgroups());
-			$this->smarty->assign('rank_id_species',$rankIdSpecies);
+            $this->smarty->assign('traitgroups',$this->getTraitgroups());
+            $this->smarty->assign('rank_id_species',$rankIdSpecies);
 			$this->smarty->assign('rank_id_subspecies',$rankIdSubSpecies);
 			$this->smarty->assign('main_language_name_language_id',$this->getDefaultProjectLanguage());
 		}
-
+		
 		$this->checkMessage();
 		$this->printPage();
     }
@@ -2948,17 +2948,18 @@ class NsrTaxonController extends NsrController
 
 	private function getTraitgroups($p=null)
 	{
-		$parent=isset($p['parent']) ? $p['parent'] : null;
+	    
+	    $parent=isset($p['parent']) ? $p['parent'] : null;
 		$level=isset($p['level']) ? $p['level'] : 0;
 		$stopLevel=isset($p['stop_level']) ? $p['stop_level'] : null;
-
+		
 		$g=$this->models->NsrTaxonModel->getTraitgroups(array(
 			"language_id"=>$this->getDefaultProjectLanguage(),
 			"taxon_id"=>$this->getConceptId(),
 			"project_id"=>$this->getCurrentProjectId(),
 			"parent_id"=>$parent
 		));
-
+		
 		foreach((array)$g as $key=>$val)
 		{
 			$g[$key]['level']=$level;

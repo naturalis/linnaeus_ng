@@ -1000,7 +1000,7 @@ final class NsrTaxonModel extends AbstractModel
 				and _b.parent_id = ".$this->escapeString($parent_id)."
 				and _b.id != ".$this->escapeString($taxon_id)."
 		";
-
+		
 		return $this->freeQuery( $query );
 	}
 
@@ -1069,7 +1069,7 @@ final class NsrTaxonModel extends AbstractModel
 			group by _a.id
 			order by _a.show_order, _a.sysname
 		";
-
+		
 		return $this->freeQuery( $query );
 	}
 
