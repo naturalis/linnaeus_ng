@@ -391,6 +391,23 @@ function doSubmit()
                 </tr>
             </table>
 		</div>
+		
+		{if $traits}
+		<div class="fieldsubset">
+		<h4>{t}Traits{/t}</h4>
+        <table>
+        {foreach $traits group}
+        	<tr><td colspan=2>{$group.name}</td></tr>
+        	{foreach $group.traits trait}
+        	<tr>
+        		<td><input id=trait_{$group.id}_{$trait.id} type=checkbox name=traits[{$group.id}][] value={$trait.id}></td>
+        		<td><label for=trait_{$group.id}_{$trait.id}>{$trait.name}</label></td>
+        	</tr>
+        	{/foreach}
+        {/foreach}
+		</table>
+		</div>
+		{/if}
 
 		<h4>{t}Synonyms{/t}</h4>
         <table><tr>

@@ -5,7 +5,7 @@ include_once ('Controller.php');
 class TraitsController extends Controller
 {
 
-	public $_defaultMaxLengthStringValue=4000;
+    public $_defaultMaxLengthStringValue=4000;
 	public $_defaultMaxLengthIntegerValue=12;
 	public $_defaultMaxLengthFloatValue=17;
 
