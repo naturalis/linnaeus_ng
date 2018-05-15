@@ -310,7 +310,7 @@ class VersatileExportController extends Controller
 				".( $this->hasCol( 'rank' ) ? " ifnull(_lpr.label,_r.rank) as " . $this->columnHeaders['rank'] . ", " : "" )."
 				".( $this->hasCol( 'nsr_id' ) ? " replace(_b.nsr_id,'tn.nlsr.concept/','') as " . $this->columnHeaders['nsr_id'] . ", " : "" )."
 				".( $this->hasCol( 'presence_status' ) ? " _h.index_label as " . $this->columnHeaders['presence_status'] . ", " : "" )."
-				".( $this->hasCol( 'presence_status_publication' ) ? " _gl.label as " . $this->columnHeaders['presence_status_publication'] . ", " : "" )."
+				".( $this->hasCol( 'presence_status_publication' ) ? " concat(_gl.author,' ',_gl.`date`,' ',_gl.label) as " . $this->columnHeaders['presence_status_publication'] . ", " : "" )."
 				".( $this->hasCol( 'habitat' ) ? " _hab.label as " . $this->columnHeaders['habitat'] . ", " : "" )."
 				".( $this->hasCol( 'concept_url' ) ? " concat('".$this->concept_url."',replace(_b.nsr_id,'tn.nlsr.concept/','')) as " . $this->columnHeaders['concept_url'] . ", " : "" )."
 				".( $this->hasCol( 'database_id' ) ? " _q.taxon_id as " . $this->columnHeaders['database_id'] . ", " : "" )."
