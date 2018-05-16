@@ -159,7 +159,7 @@ class TraitsTaxonController extends TraitsController
 		$this->printPage('ajax_interface');
     }
 
-    private function getTaxonValues( $p )
+    public function getTaxonValues( $p )
 	{
 		$taxon=isset($p['taxon']) ? $p['taxon'] : null;
 		$trait=isset($p['trait']) ? $p['trait'] : null;

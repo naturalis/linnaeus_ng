@@ -15,7 +15,6 @@
 {/function}
 
 {include file="../shared/admin-header.tpl"}
-
 {include file="../shared/left_column_tree.tpl"}
 {include file="../shared/left_column_admin_menu.tpl"}
 
@@ -216,9 +215,12 @@
         {if $show_nsr_specific_stuff}
         <a href="images.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}images{/t}</a><br />
         {/if}
-        {foreach from=$traitgroups item=v}{if $v.taxon_count>0}
-        <a href="../traits/taxon.php?id={$concept.id}&group={$v.id}" class="edit" style="margin:0;">{$v.sysname}</a><br />
-        {/if}{/foreach}
+        
+        {foreach from=$traitgroups item=v}
+        	{if $v.taxon_count>0}
+        		<a href="../traits/taxon.php?id={$concept.id}&group={$v.id}" class="edit" style="margin:0;">{$v.sysname}</a><br />
+        	{/if}
+        {/foreach}
 
         <a href="/linnaeus_ng/app/views/species/nsr_taxon.php?id={$concept.id}&epi={$session.admin.project.id}" class="edit" style="margin:0" target="nsr">{t}view taxon in front-end (new window){/t}</a><br />
         {if !$concept.is_deleted}
