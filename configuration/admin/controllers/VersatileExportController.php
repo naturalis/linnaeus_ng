@@ -2,6 +2,7 @@
 
 include_once ('Controller.php');
 include_once ('ModuleSettingsReaderController.php');
+include_once ('TraitsTaxonController.php');
 
 // run as .../export_versatile.php?printquery to print actual query as well
 
@@ -11,7 +12,7 @@ class VersatileExportController extends Controller
     public $usedModels = array(
 		'presence',
 		'names',
-		'name_types'
+		'name_types',
     );
 
     public $modelNameOverride='VersatileExportModel';
@@ -72,6 +73,9 @@ class VersatileExportController extends Controller
 	private $limit=9999999;
 	private $show_nsr_specific_stuff;
 	private $spoof_settings;
+	private $traitGroups;
+	private $selectedTraits = [];
+	
 
 	/*
 		when the number of names is larger than synonymStrategyThrehold, the
@@ -88,7 +92,7 @@ class VersatileExportController extends Controller
 
 	private $columnHeaders=[
 		'sci_name'=>'scientific_name',
-		'dutch_name'=>'dutch_name',
+		'dutch_name'=>'common_name',
 		'rank'=>'rank',
 		'nsr_id'=>'nsr_id',
 		'presence_status'=>'presence_status',
@@ -127,7 +131,8 @@ class VersatileExportController extends Controller
 		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
         $this->checkAuthorisation();
 		$this->setNameTypeIds();
-
+		$this->getTraits();
+		
 		$this->moduleSettings=new ModuleSettingsReaderController;
 		$this->concept_url=$this->moduleSettings->getGeneralSetting( 'concept_base_url' );
 		$this->show_nsr_specific_stuff=$this->moduleSettings->getGeneralSetting( 'show_nsr_specific_stuff' , 0)==1;
@@ -146,14 +151,14 @@ class VersatileExportController extends Controller
             $this->columnHeaders[$key]=$this->translate($val);
 		}
     }
-
+    
     public function exportAction()
     {
         $this->setPageName( $this->translate('Multi-purpose export') );
-
-		if ($this->rHasVal('action','export'))
+        
+        if ($this->rHasVal('action','export'))
 		{
-			$this->setBranchTopSession( array( $this->rGetVal('branch_top_id'), $this->rGetVal('branch_top_label') ) );
+		    $this->setBranchTopSession( array( $this->rGetVal('branch_top_id'), $this->rGetVal('branch_top_label') ) );
 			$this->setBranchTopId( $this->rGetVal('branch_top_id') );
 			$this->setPresenceStatusLabels( $this->rGetVal('presence_labels') );
 			$this->setAllRanks( $this->rGetVal('all_ranks') );
@@ -164,6 +169,7 @@ class VersatileExportController extends Controller
 			$this->setNameParts( $this->rGetVal('name_parts') );
 			$this->setAncestors( $this->rGetVal('ancestors') );
 			$this->setDoSynonyms( $this->rGetVal('synonyms') );
+			$this->setSelectedTraits( $this->rGetVal('traits') );
 			$this->setSelectedSynonymTypes( $this->rGetVal('nametypes') );
 			$this->setOrderBy( $this->rGetVal('order_by') );
 			$this->setFieldSep( $this->rGetVal('field_sep') );
@@ -177,23 +183,39 @@ class VersatileExportController extends Controller
 			$this->setPrintEOFMarker( $this->rGetVal('print_eof_marker') );
 			$this->setOutputTarget( $this->rGetVal('output_target') );
 			$this->setPrintQuery( $this->rHasVar('printquery') ); // undoc'd feat. start as export_versatile.php?printquery to add full queries to output
-
+            
 			$this->setNameTypeIds();
 
 			$this->doMainQuery();
 			$this->doAncestry();
 			$this->doSynonymsQuery();
+			$this->doTraits();
 			$this->doOutput();
 		}
 
 		$this->smarty->assign( 'presence_labels', $this->getPresenceStatuses() );
 		$this->smarty->assign( 'ranks', $this->getRanks() );
+		$this->smarty->assign('traits', $this->traitGroups);
 		$this->smarty->assign( 'branch_top', $this->getBranchTopSession() );
 		$this->smarty->assign( 'nametypes', $this->_nameTypeIds );
 		$this->smarty->assign('is_nsr', $this->show_nsr_specific_stuff);
 
         $this->printPage();
 
+    }
+    
+    private function setSelectedTraits ($selected = false) 
+    {
+        if (!empty($selected) && !empty($this->traitGroups)) {
+            foreach ($selected as $group => $traits) {
+                $groupName = $this->traitGroups[$group]['name'];
+                $groupTraits = array_column($this->traitGroups[$group]['traits'], 'name', 'id');
+                foreach ($traits as $trait) {
+                    $this->selectedTraits[$group . '-' . $trait] = 
+                        strtolower(str_replace(' ', '_', $groupName . ':' . $groupTraits[$trait]));
+                }
+            }
+        }
     }
 
 	private function getPresenceStatuses()
@@ -203,6 +225,26 @@ class VersatileExportController extends Controller
 		));
 	}
 
+	private function getTraits ()
+	{
+	    $t = new TraitsTaxonController;
+	    $groups = $t->getTraitgroups();
+	    if (!empty($groups)) {
+	        foreach ($groups as $group) {
+	            $this->traitGroups[$group['id']] = $t->getTraitgroup($group['id']);
+	        }
+	        $this->customSortArray($this->traitGroups, ['key' => 'name', 'maintainKeys' => true]);
+	        foreach ($this->traitGroups as $i => $d) {
+	            $traits = $d['traits'];
+	            $this->customSortArray($traits, ['key' => 'name']);
+	            $this->traitGroups[$i]['traits'] = $traits;
+	        }
+	        return $this->traitGroups;
+	    }
+	    unset($t);
+	    return null;
+	}
+	
 	private function getRanks()
 	{
 		return $this->models->VersatileExportModel->getRanks(array(
@@ -268,7 +310,7 @@ class VersatileExportController extends Controller
 				".( $this->hasCol( 'rank' ) ? " ifnull(_lpr.label,_r.rank) as " . $this->columnHeaders['rank'] . ", " : "" )."
 				".( $this->hasCol( 'nsr_id' ) ? " replace(_b.nsr_id,'tn.nlsr.concept/','') as " . $this->columnHeaders['nsr_id'] . ", " : "" )."
 				".( $this->hasCol( 'presence_status' ) ? " _h.index_label as " . $this->columnHeaders['presence_status'] . ", " : "" )."
-				".( $this->hasCol( 'presence_status_publication' ) ? " _gl.label as " . $this->columnHeaders['presence_status_publication'] . ", " : "" )."
+				".( $this->hasCol( 'presence_status_publication' ) ? " concat(_gl.author,' ',_gl.`date`,' ',_gl.label) as " . $this->columnHeaders['presence_status_publication'] . ", " : "" )."
 				".( $this->hasCol( 'habitat' ) ? " _hab.label as " . $this->columnHeaders['habitat'] . ", " : "" )."
 				".( $this->hasCol( 'concept_url' ) ? " concat('".$this->concept_url."',replace(_b.nsr_id,'tn.nlsr.concept/','')) as " . $this->columnHeaders['concept_url'] . ", " : "" )."
 				".( $this->hasCol( 'database_id' ) ? " _q.taxon_id as " . $this->columnHeaders['database_id'] . ", " : "" )."
@@ -287,7 +329,7 @@ class VersatileExportController extends Controller
 				on _q.taxon_id=_z.taxon_id
 				and _q.project_id=_z.project_id
 				and _z.type_id= ".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
-				and _z.language_id=".LANGUAGE_ID_DUTCH."
+				and _z.language_id=".$this->getDefaultProjectLanguage()."
 
 			left join %PRE%names _names
 				on _q.taxon_id=_names.taxon_id
@@ -446,7 +488,34 @@ class VersatileExportController extends Controller
 			}
 		}
 	}
+	
+	private function doTraits ()
+	{
+	    if (!$this->getDoTraits()) {
+	        return;
+	    }
+	    
+	    $t = new TraitsTaxonController;
 
+	    foreach ((array)$this->names as $key => $val) {
+	        foreach ($this->selectedTraits as $id => $name) {
+	            list($groupId, $traitId) = explode('-', $id);
+	            $traits = [];
+    	        $taxonTraits = $t->getTaxonValues([
+    	            'taxon' => $val['_taxon_id'],
+    	            'trait' => $traitId,
+    	            'group' => $groupId
+    	        ]);
+    	        if (!empty($taxonTraits)) {
+    	            foreach ($taxonTraits[0]['values'] as $value) {
+    	                $traits[] = $value['value_start'] . (!empty($value['value_end']) ? '-' . $value['value_end'] : '');
+    	            }
+    	        }
+    	        $this->names[$key][$name] = implode('|', $traits);
+ 	        }
+	    }
+	}
+	
 	private function doSynonymsQuery()
 	{
 		if ( !$this->getDoSynonyms() )
@@ -915,9 +984,14 @@ class VersatileExportController extends Controller
 
 	private function getDoSynonyms()
 	{
-		return $this->doSynonyms;
+	    return $this->doSynonyms;
 	}
-
+	
+	private function getDoTraits()
+	{
+	    return !empty($this->selectedTraits);
+	}
+	
 	private function setDoHybridMarker( $state )
 	{
 		$this->doHybridMarker=isset($state) && $state=='on';
