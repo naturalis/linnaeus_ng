@@ -92,7 +92,7 @@ class VersatileExportController extends Controller
 
 	private $columnHeaders=[
 		'sci_name'=>'scientific_name',
-		'dutch_name'=>'dutch_name',
+		'dutch_name'=>'common_name',
 		'rank'=>'rank',
 		'nsr_id'=>'nsr_id',
 		'presence_status'=>'presence_status',
@@ -329,7 +329,7 @@ class VersatileExportController extends Controller
 				on _q.taxon_id=_z.taxon_id
 				and _q.project_id=_z.project_id
 				and _z.type_id= ".$this->_nameTypeIds[PREDICATE_PREFERRED_NAME]['id']."
-				and _z.language_id=".LANGUAGE_ID_DUTCH."
+				and _z.language_id=".$this->getDefaultProjectLanguage()."
 
 			left join %PRE%names _names
 				on _q.taxon_id=_names.taxon_id
