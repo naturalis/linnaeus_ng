@@ -23,8 +23,8 @@
 
 
 
-	include_once("/var/www/linnaeusng/configuration/admin/constants.php");
-	include_once("/var/www/linnaeusng/configuration/admin/configuration.php");
+	include_once(__DIR__ . "/../../configuration/admin/constants.php");
+	include_once(__DIR__ . "/../../configuration/admin/configuration.php");
 
 	$c=new configuration;
 	$conn=$c->getDatabaseSettings();
