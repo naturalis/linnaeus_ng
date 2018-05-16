@@ -13,7 +13,7 @@
     <title>{$session.app.project.title|@strip_tags:false}</title>
 
     <link rel="stylesheet" type="text/css" href="{$baseUrl}app/style/css/style.css">
-    <link rel="stylesheet" type="text/css" href="{$baseUrl}app/vendor/ionicons/dist/css/ionicons.min.css">
+    <link rel="stylesheet" type="text/css" href="{$baseUrl}app/vendor/ionicons/css/ionicons.min.css">
     <link rel="stylesheet" type="text/css" href="{$baseUrl}app/style/css/inline_templates.css">
     <link rel="stylesheet" type="text/css" href="{$baseUrl}app/vendor/vendor.css" />
 
