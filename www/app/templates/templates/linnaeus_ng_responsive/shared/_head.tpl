@@ -16,7 +16,7 @@
     <link rel="Shortcut Icon" href="{$projectUrls.projectCSS}favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/soortenregister.css" />
     <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}../css/linnaeus.css" />
-    <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$baseUrl}app/vendor/ionicons/dist/css/ionicons.min.css" />
+    <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$baseUrl}app/vendor/ionicons/css/ionicons.min.css" />
 	<link rel="stylesheet" type="text/css" media="screen" title="default" href="{$baseUrl}app/vendor/prettyPhoto/css/prettyPhoto.css" />
 	<link rel="stylesheet" type="text/css" media="screen" title="default" href="{$baseUrl}app/vendor/fancybox/jquery.fancybox.css" />
 	{if $cssToLoad}
