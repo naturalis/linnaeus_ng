@@ -90,7 +90,7 @@
 		{foreach from=$languages item=v}
 		<tr{if $data.row_class} class="{$data.row_class}"{/if}>
         	<th class="language-labels">
-            	<label for="{$data.name}">{$v.language} {t}{$data.label}{/t}</label>:
+            	<label for="{$data.name}-{$v.language_id}">{$v.language} {t}{$data.label}{/t}</label>:
 			</th>
             <td class="language-labels">
             	{if $data.class=='textarea'}
