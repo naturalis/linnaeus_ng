@@ -1,11 +1,18 @@
 <?php
 
-	$outdir = "/var/opt/nba-brondata-nsr/"; // root@various-linnaeusng-027:/var/opt# git clone git@git-brondata-nsr:naturalis/nba-brondata-nsr.git
+	//$outdir = "/var/opt/nba-brondata-nsr/"; // root@various-linnaeusng-027:/var/opt# git clone git@git-brondata-nsr:naturalis/nba-brondata-nsr.git
+    $outdir = "../../tmp"; // root@various-linnaeusng-027:/var/opt# git clone git@git-brondata-nsr:naturalis/nba-brondata-nsr.git
 	$outfilebasename = "nsr-export";
 	$filelist = "filelist";
 	$compressor = "compress.sh";
 	$tag = date('Y.m.d--H.i.s');
 	 
+
+	if (!file_exists($outdir)) {
+        if (!mkdir($outdir) && !is_dir($outdir)) {
+            throw new \RuntimeException(sprintf('Directory "%s" was not created', $outdir));
+        }
+    }
 
 	$files = glob( $outdir . $outfilebasename .'*');
 	foreach($files as $file)
