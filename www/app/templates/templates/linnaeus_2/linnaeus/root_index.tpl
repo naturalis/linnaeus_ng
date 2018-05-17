@@ -29,7 +29,7 @@
 		<div class="header">
 			<div class="logoContainer">
 				<a href="#">
-					<img width="128" height="190" alt="" src="{$baseUrl}app/media/system/skins/nbc_default/naturalis-logo.svg" onerror="this.onerror=null; this.src='{$baseUrl}app/media/system/skins/nbc_default/naturalis-logo.png'">
+					<img width="128" height="190" alt="" src="{$baseUrl}app/media/system/skins/linnaeus_ng/naturalis-logo.svg" onerror="this.onerror=null; this.src='{$baseUrl}app/media/system/skins/linnaeus_ng/naturalis-logo.png'">
 				</a>
 			</div>
 			<div class="headerImage">
