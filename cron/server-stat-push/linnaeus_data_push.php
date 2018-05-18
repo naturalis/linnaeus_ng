@@ -131,7 +131,7 @@
 
 		private function getConfig ()
 		{
-            require_once dirname(__FILE__) . '/../../configuration/admin/configuration.php';
+            require_once __DIR__ . '/../../configuration/admin/configuration.php';
             $this->config = new configuration();
 		}
 

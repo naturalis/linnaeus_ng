@@ -19,7 +19,7 @@
 
 	$c=new Controller;
 	$file='../configuration/app/rewrite/rewrite-'.$c->getProjectFSCode($pId).'.php';
-	
+
 	// silent fail on no file with rewrite actions
 	if (!file_exists($file))
 		return;

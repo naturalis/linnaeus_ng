@@ -148,10 +148,11 @@ final class ControllerModel extends AbstractModel
 */
 		
 		// We should query the names table, not taxa!
+        // @todo: RUUD you should check this, this is bad! (SCHERMER/VERMAAT)
 		$query = "
 			select
 				_a.id,
-                if(_n.authorship is null, _n.name, trim(replace(_n.name, _n.authorship, ''))) as taxon,
+              ifnull(if(_n.authorship is null, _n.name, trim(replace(_n.name, _n.authorship, ''))),_a.taxon) as taxon,
  				_n.authorship as author,
 				_n.authorship,
 				_a.parent_id,

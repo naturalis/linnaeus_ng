@@ -64,9 +64,7 @@ class ModuleSettingsReaderController extends Controller
 			$setting=isset($p['setting']) ? $p['setting'] : null;
 			$subst=isset($p['subst']) ? $p['subst'] : null;
 			$module=isset($p['module']) ? $p['module'] : null;
-		}
-		else
-		{
+		} else {
 			$setting=$p;
 		}
 
