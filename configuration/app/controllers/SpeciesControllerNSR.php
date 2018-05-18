@@ -1484,6 +1484,13 @@ class SpeciesControllerNSR extends SpeciesController
 			if ( $ref->full_url_valid )
 			{
 				$external_content->content_raw=@file_get_contents( $ref->full_url );
+
+				
+if (!file_get_contents($ref->full_url)) {
+    $error = error_get_last();
+    print_r($error);
+}
+				
 				$external_content->content_json_decoded=@json_decode( $external_content->content_raw );
 				//q($ref->full_url);
 				//q($external_content,1);
