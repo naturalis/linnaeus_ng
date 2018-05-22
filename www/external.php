@@ -4,7 +4,7 @@
 		generic endpoint for LNG-data delivered outside of the LNG-codebase
 		call this file with paremeter 'set=name':
 		
-		http://localhost/linnaeus_ng/external.php?set=csr_stats
+		http://localhost/linnaeus_ng/external.php?set=name
 	
 		and it will look for and include a file 'external/name.php'
 		
