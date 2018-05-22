@@ -63,10 +63,10 @@ class SpeciesControllerNSR extends SpeciesController
 		$this->NSRFunctions=new NSRFunctionsController;
 		$this->moduleSettings=new ModuleSettingsReaderController;
 
-		$this->_taxon_base_url_images_main = $this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_main','module'=>'species','subst'=>'http://images.naturalis.nl/original/') );
-		$this->_taxon_base_url_images_thumb = $this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_thumb','module'=>'species','subst'=>'http://images.naturalis.nl/160x100/') );
-		$this->_taxon_base_url_images_overview = $this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_overview','module'=>'species','subst'=>'http://images.naturalis.nl/original/') );
-		$this->_taxon_base_url_images_thumb_s = $this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_thumb_s','module'=>'species','subst'=>'http://images.naturalis.nl/120x75/') );
+		$this->_taxon_base_url_images_main = $this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_main','module'=>'species','subst'=>'//images.naturalis.nl/original/') );
+		$this->_taxon_base_url_images_thumb = $this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_thumb','module'=>'species','subst'=>'//images.naturalis.nl/160x100/') );
+		$this->_taxon_base_url_images_overview = $this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_overview','module'=>'species','subst'=>'//images.naturalis.nl/original/') );
+		$this->_taxon_base_url_images_thumb_s = $this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_thumb_s','module'=>'species','subst'=>'//images.naturalis.nl/120x75/') );
 
 
 		$this->smarty->assign( 'taxon_base_url_images_main',$this->_taxon_base_url_images_main );
@@ -689,7 +689,13 @@ class SpeciesControllerNSR extends SpeciesController
 					
 					if (!empty($reference->query))
 					{
-						$output=@json_decode( @file_get_contents( $full_url, false, $ctx ), true );
+					    $output = $this->getCurlResult([
+                            'url' => $full_url,
+                            'timeout' => $this->_ext_tab_timeout,
+                            'verify' => false,
+                            'assoc' => true
+                        ]);
+						//$output=@json_decode( @file_get_contents( $full_url, false, $ctx ), true );
 						$path=explode( "->", $reference->query );
 						foreach((array)$path as $bit)
 						{
@@ -705,7 +711,13 @@ class SpeciesControllerNSR extends SpeciesController
 					}
 					else
 					{
-						$output=@json_decode( @file_get_contents( $full_url, false, $ctx ) );
+                        $output = $this->getCurlResult([
+                            'url' => $full_url,
+                            'timeout' => $this->_ext_tab_timeout,
+                            'verify' => false,
+                            'assoc' => true
+                        ]);
+						//$output=@json_decode( @file_get_contents( $full_url, false, $ctx ) );
 					}
 
 					$is_empty=empty( $output );
@@ -718,20 +730,17 @@ class SpeciesControllerNSR extends SpeciesController
 
 				if ( $this->helpers->CheckUrl->exists() && $remote_check )
 				{
-					$ctx=stream_context_create( [ 'http'=> [ 'timeout' => $this->_ext_tab_timeout ] ] );
-					$f=@file_get_contents( $check_url, false, $ctx );
+					//$ctx=stream_context_create( [ 'http'=> [ 'timeout' => $this->_ext_tab_timeout ] ] );
+					//$f=@file_get_contents( $check_url, false, $ctx );
+                    $output = $this->getCurlResult([
+                        'url' => $check_url,
+                        'timeout' => $this->_ext_tab_timeout,
+                        'verify' => false,
+                        'assoc' => true
+                    ]);
 
-					if ( $this->helpers->CheckUrl->getHeader('content-type')=='application/json' )
-					{
-						$is_empty=empty( @json_decode( $f ) );
-					}
-					else
-					{
-						$is_empty=empty( trim($f) );
-					}
-				}
-				else
-				{
+                    $is_empty=empty( trim($output) );
+				} else {
 					$is_empty=true;
 				}
 			}
@@ -1483,8 +1492,15 @@ class SpeciesControllerNSR extends SpeciesController
 			
 			if ( $ref->full_url_valid )
 			{
-				$external_content->content_raw=@file_get_contents( $ref->full_url );
-				$external_content->content_json_decoded=@json_decode( $external_content->content_raw );
+				//$external_content->content_raw=@file_get_contents( $ref->full_url );
+                //$external_content->content_json_decoded=@json_decode( $external_content->content_raw );
+
+                $external_content->content_json_decoded = $this->getCurlResult([
+                    'url' => $ref->full_url,
+                    'timeout' => $this->_ext_tab_timeout,
+                    'verify' => false,
+                    'assoc' => false
+                ]);
 				//q($ref->full_url);
 				//q($external_content,1);
 			}
@@ -2009,7 +2025,16 @@ class SpeciesControllerNSR extends SpeciesController
 
 				if ($data)
 				{
-					$dummy=file_get_contents($data['service_url']);
+                    $dummy=file_get_contents($data['service_url']);
+                    /*
+                     *
+                     * $dummy = $this->getCurlResult([
+                     *  'url' => $data['service_url'],
+                     *  'timeout' => $this->_ext_tab_timeout,
+                     *  'verify' => false,
+                     *  'assoc' => true
+                     *  ]);
+                     */
 
 					if ($dummy)
 					{
