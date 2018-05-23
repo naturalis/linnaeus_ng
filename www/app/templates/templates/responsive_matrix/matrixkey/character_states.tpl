@@ -181,7 +181,7 @@ $(document).ready(function()
     $('#state-value').focus();
     $('#state-value').select();
     
-    $(".state-image").load(function()
+    $(".state-image").on('load', function()
     {
         // dimensions as shown
         var h=this.height,w=this.width;
@@ -194,8 +194,8 @@ $(document).ready(function()
 
         if (actualHeight<img.height || actualWidth<img.width)
         {
-            //$("#full-size-link-"+$(this).attr("key")).toggle(true);
+            $("#full-size-link-"+$(this).attr("key")).toggle(true);
         }
-    })
+    });
 });
 </script>
