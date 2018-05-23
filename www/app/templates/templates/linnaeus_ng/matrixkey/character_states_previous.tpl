@@ -170,7 +170,7 @@ $(document).ready(function()
     $('#state-value').focus();
     $('#state-value').select();
     
-    $(".state-image").load(function()
+    $(".state-image").on('load', function()
     {
         // dimensions as shown
         var h=this.height,w=this.width;
