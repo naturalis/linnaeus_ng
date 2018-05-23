@@ -1,5 +1,4 @@
 <?php
-
 	/*
 		generic endpoint for LNG-data delivered outside of the LNG-codebase
 		call this file with paremeter 'set=name':
