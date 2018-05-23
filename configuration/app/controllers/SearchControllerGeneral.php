@@ -78,13 +78,13 @@ include_once ('SearchController.php');
 class SearchControllerGeneral extends SearchController
 {
 
-	private $_minSearchLength = 3;
-	private $_maxSearchLength = 50;
-	private $_searchStringGroupDelimiter = '"';
-	private $_excerptPreMatchLength;
-	private $_excerptPostMatchLength;
-	private $_excerptPrePostMatchString = '...';
-	private $_moduleNames;
+	protected $_minSearchLength = 3;
+	protected $_maxSearchLength = 50;
+	protected $_searchStringGroupDelimiter = '"';
+	protected $_excerptPreMatchLength;
+	protected $_excerptPostMatchLength;
+	protected $_excerptPrePostMatchString = '...';
+	protected $_moduleNames;
 
 	public $usedModels = array(
 		'choices_keysteps',
