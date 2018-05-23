@@ -4,7 +4,7 @@
 		generic endpoint for LNG-data delivered outside of the LNG-codebase
 		call this file with paremeter 'set=name':
 		
-		http://localhost/linnaeus_ng/external.php?set=csr_stats
+		http://localhost/linnaeus_ng/external.php?set=name
 	
 		and it will look for and include a file 'external/name.php'
 		
@@ -14,10 +14,10 @@
 		- setDatabaseSettings(): receives dB host, user, pass etc in the same
 		  format as te output of Configuration::getDatabaseSettings()
 		- setParameters(): receives all REQUEST-parameters
-		- httpHeaders(): for outputting extra headers (like 
-		  header('Content-Type: application/json');)
+		- httpHeaders(): for outputting extra headers, for instance 
+		  header('Content-Type: application/json'))
 		- main(): main program
-		- getOutput(): delievered output of the service, to be printed "as is" 
+		- getOutput(): returns output of the service, should be printable "as is" 
 
 		these are the only four possible interfaces with this file, but they 
 		don't _need_ to exist.
