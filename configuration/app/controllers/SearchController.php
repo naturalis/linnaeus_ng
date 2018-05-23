@@ -4,8 +4,8 @@ include_once ('ModuleSettingsController.php');
 
 class SearchController extends Controller
 {
-	private $_minSearchLength = 3;
-	private $_maxSearchLength = 50;
+	protected $_minSearchLength = 3;
+	protected $_maxSearchLength = 50;
 
 	const S_TOKENIZED_TERMS=0;
 	const S_FULLTEXT_STRING=1;

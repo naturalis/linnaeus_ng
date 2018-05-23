@@ -748,7 +748,9 @@ class VersatileExportController extends Controller
 			foreach($row as $key=>$cell)
 			{
 				if (is_int($key)) continue;
-
+				
+				$cell = trim(preg_replace('#\R+#', '   ', $cell));
+				
 				if ($this->getSuppressUnderscoredFields() && substr($key,0,1)=='_') continue;
 
 				if ( !$this->getNoQuotes() ) echo $this->getQuoteChar();
