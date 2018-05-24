@@ -58,11 +58,12 @@
            
             <div id="dataSourceContainer"> 
                 <script>
-                $(document).ready(function()
+               $(document).ready(function()
                 {   
                     $.get( '../introduction/topic.php?id={$introduction_links[$settings->introduction_topic_inline_info].page_id}&format=plain' ), function(data) {
-                     $('#dataSourceContainer').html( data ); 
-                     $('.footerLogos').html( data ); 
+						$('#dataSourceContainer').html( data ); 
+                    	$('.footerLogos').html( data ); 
+                    }
                 });
                 </script>
             </div>
