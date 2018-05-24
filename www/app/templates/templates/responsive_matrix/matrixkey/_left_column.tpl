@@ -57,14 +57,15 @@
         {if $introduction_links[$settings->introduction_topic_inline_info]}
            
             <div id="dataSourceContainer"> 
-                <script>
-               $(document).ready(function()
+               <script>
+     			$(document).ready(function()
                 {   
-                    $.get( '../introduction/topic.php?id={$introduction_links[$settings->introduction_topic_inline_info].page_id}&format=plain' ), function(data) {
-						$('#dataSourceContainer').html( data ); 
-                    	$('.footerLogos').html( data ); 
-                    }
-                });
+                    $.get('../introduction/topic.php?id={$introduction_links[$settings->introduction_topic_inline_info].page_id}&format=plain')
+                    	.done(function(data) {
+							$('#dataSourceContainer').html( data ); 
+                    		$('.footerLogos').html( data ); 
+                    	})
+                	});
                 </script>
             </div>
         {/if}
