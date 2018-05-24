@@ -77,7 +77,7 @@
             <div class="facetCategories colofon">
                 <a href="#" onclick="
                 $.get( '../introduction/topic.php?id={$introduction_links[$settings->introduction_topic_versions].page_id}&format=plain' )
-                .success(function(data) { colofonOverlay( data ,'Versiegeschiedenis'); } ) ;
+                .done(function(data) { colofonOverlay( data ,'Versiegeschiedenis'); } ) ;
                 ">{t}Versiegeschiedenis{/t}</a>
             </div>
         {/if} -->
