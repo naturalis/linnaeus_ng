@@ -575,18 +575,19 @@ class MatrixKeyController extends Controller
 
 	private function induceThumbNailFromImage( &$item )
 	{
-		if(
+	    if(
 			!empty($this->settings->img_to_thumb_regexp_pattern) &&
 			!isset($item['url_thumb']) &&
-			isset($item['url_image'])
+	        isset($item['url_image'])
 		)
 		{
-			$item['url_thumb']=
+		    $item['url_thumb'] = str_replace(['http:', 'https:'], '',
 				@preg_replace(
 					$this->settings->img_to_thumb_regexp_pattern,
 					$this->settings->img_to_thumb_regexp_replacement,
 					$item['url_image']
-				);
+				)
+		    );
 		}
 	}
 
@@ -672,7 +673,7 @@ class MatrixKeyController extends Controller
 		{
 			usort($all, array($this,'sortDataSet'));
 		}
-
+		
 		return $all;
 
 	}

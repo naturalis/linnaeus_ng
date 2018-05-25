@@ -1694,7 +1694,7 @@ function formatResult( data )
 	if (data.info && data.info.url_thumb)
 	{
 		thumb=data.info.url_thumb;
-		if (thumb && !thumb.match(/^(http:\/\/|https:\/\/)/i)) thumb=settings.imageRootProject+thumb;
+		if (thumb && !thumb.match(/\/\//i)) thumb=settings.imageRootProject+thumb;
 	}
 	else
 	{
