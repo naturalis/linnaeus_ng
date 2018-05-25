@@ -631,7 +631,7 @@ function formatResult( data )
 		if (data.info && (data.info.url_thumbnail || data.info.url_thumb))
 		{
 			thumb=data.info.url_thumbnail ? data.info.url_thumbnail : data.info.url_thumb;
-			if (thumb && !thumb.match(/\/\//i)) thumb=matrixsettings.imageRootProject+thumb;
+			if (thumb && !thumb.match(/^(http:\/\/|https:\/\/)/i)) thumb=matrixsettings.imageRootProject+thumb;
 		}
 		else
 		{
