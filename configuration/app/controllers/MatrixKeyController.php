@@ -581,13 +581,12 @@ class MatrixKeyController extends Controller
 	        isset($item['url_image'])
 		)
 		{
-		    $item['url_thumb'] = str_replace(['http:', 'https:'], '',
+		    $item['url_thumb'] = 
 				@preg_replace(
 					$this->settings->img_to_thumb_regexp_pattern,
 					$this->settings->img_to_thumb_regexp_replacement,
 					$item['url_image']
-				)
-		    );
+				);
 		}
 	}
 
