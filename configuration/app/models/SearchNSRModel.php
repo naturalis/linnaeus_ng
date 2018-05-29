@@ -594,7 +594,273 @@ final class SearchNSRModel extends AbstractModel
 
 		return $this->freeQuery( [ "query"=>$query, "fieldAsIndex"=>"name" ] );
 	}
+    
+	public function doPictureSearch( $params )
+	{
+	    $language_id = isset($params['language_id']) ? $params['language_id'] : null;
+	    $group_id = isset($params['group_id']) ? $params['group_id'] : null;
+	    $name = isset($params['name']) ? $params['name'] : null;
+	    $photographer = isset($params['photographer']) ? $params['photographer'] : null;
+	    $validator = isset($params['validator']) ? $params['validator'] : null;
+	    $project_id = isset($params['project_id']) ? $params['project_id'] : null;
+	    $group_id = isset($params['group_id']) ? $params['group_id'] : null;
+	    $name_id = isset($params['name_id']) ? $params['name_id'] : null;
+	    $sort = isset($params['sort']) ? $params['sort'] : null;
+	    $limit = isset($params['limit']) ? $params['limit'] : null;
+	    $offset = isset($params['offset']) ? $params['offset'] : null;
+	    
+	    if ( is_null($project_id) || is_null($language_id) )
+	        return;
+	        
+	        if ( !empty($photographer) )
+	        {
+	            //$photographer="_c.meta_data='".$this->escapeString($photographer)."'";
+	            //$photographer="_c.meta_data like '%".$this->escapeString($photographer)."%'";
+	            
+	            $photographer="
+				(
+					_c.meta_data like '%".$this->escapeString($photographer)."%'
+					or
+					concat(
+						trim(substring(_c.meta_data, locate(',',_c.meta_data)+1)),' ',
+						trim(substring(_c.meta_data, 1, locate(',',_c.meta_data)-1))
+					) like '%".$this->escapeString($photographer)."%'
+				)";
+	        }
+	        
+	        if ( !empty($validator) )
+	        {
+	            //$validator="_meta6.meta_data='".$this->escapeString($validator)."'";
+	            //$validator="_meta6.meta_data like '%".$this->escapeString($validator)."%'";
+	            
+	            $validator="
+				(
+					_meta6.meta_data like '%".$this->escapeString($validator)."%'
+					or
+					concat(
+						trim(substring(_meta6.meta_data, locate(',',_meta6.meta_data)+1)),' ',
+						trim(substring(_meta6.meta_data, 1, locate(',',_meta6.meta_data)-1))
+					) like '%".$this->escapeString($validator)."%'
+				)";
+	        }
+	        
+	        $sort="_meta4.meta_date desc, _meta1.meta_date desc";
+	        
+	        if ( isset($sort) && $sort=='photographer' )
+	        {
+	            $sort="_c.meta_data asc";
+	        }
+	        
+	        if ( !empty($photographer) || !empty($validator) )
+	        {
+	            $sort="_meta4.meta_date desc, _k.taxon, _meta1.meta_date desc";
+	        }
+	        
+	        if ( !empty($photographer) || !empty($validator) )
+	        {
+	            $sort="_meta4.meta_date desc, _k.taxon, _meta1.meta_date desc";
+	        }
+	        
+	        $query="
+			select
+				SQL_CALC_FOUND_ROWS
+				_m.id,
+				_m.taxon_id,
+				_m.file_name as image,
+				_m.file_name as thumb,
+				_f.rank_id as base_rank_id,
+				_k.taxon,
+				_k.taxon as validName,
+				NULL as name,
+				NULL as nomen,
+	            
+				case
+					when
+						date_format(_meta1.meta_date,'%e %M %Y') is not null
+						and DAYOFMONTH(_meta1.meta_date)!='0'
+					then
+						date_format(_meta1.meta_date,'%e %M %Y')
+					when
+						date_format(_meta1.meta_date,'%M %Y') is not null
+					then
+						date_format(_meta1.meta_date,'%M %Y')
+					when
+						date_format(_meta1.meta_date,'%Y') is not null
+						and YEAR(_meta1.meta_date)!='0000'
+					then
+						date_format(_meta1.meta_date,'%Y')
+					when
+						YEAR(_meta1.meta_date)='0000'
+					then
+						null
+					else
+						_meta1.meta_date
+				end as meta_datum,
+	            
+				NULL as meta_short_desc,
+				NULL as meta_geografie,
+	            
+				case
+					when
+						date_format(_meta4.meta_date,'%e %M %Y') is not null
+						and DAYOFMONTH(_meta4.meta_date)!=0
+					then
+						date_format(_meta4.meta_date,'%e %M %Y')
+					when
+						date_format(_meta4.meta_date,'%M %Y') is not null
+					then
+						date_format(_meta4.meta_date,'%M %Y')
+					when
+						date_format(_meta4.meta_date,'%Y') is not null
+						and YEAR(_meta4.meta_date)!='0000'
+					then
+						date_format(_meta4.meta_date,'%Y')
+					when
+						YEAR(_meta4.meta_date)='0000'
+					then
+						null
+					else
+						_meta4.meta_date
+				end as meta_datum_plaatsing,
+	            
+				NULL as meta_copyrights,
+				NULL as meta_validator,
+				NULL as meta_adres_maker,
+				NULL as photographer,
+				NULL as meta_license
+	            
+			from  %PRE%media_taxon _m
+	            
+			left join %PRE%taxa _k
+				on _m.taxon_id=_k.id
+				and _m.project_id=_k.project_id
+	            
+			left join %PRE%projects_ranks _f
+				on _k.rank_id=_f.id
+				and _k.project_id=_f.project_id
+	            
+			left join %PRE%trash_can _trash
+				on _k.project_id = _trash.project_id
+				and _k.id =  _trash.lng_id
+				and _trash.item_type='taxon'
+	            
+			left join %PRE%media_meta _meta1
+				on _m.id=_meta1.media_id
+				and _m.project_id=_meta1.project_id
+				and _meta1.sys_label='beeldbankDatumVervaardiging'
+	            
+			left join %PRE%media_meta _meta4
+				on _m.id=_meta4.media_id
+				and _m.project_id=_meta4.project_id
+				and _meta4.sys_label='beeldbankDatumAanmaak'
 
+            ".(!empty($validator) ?
+                "left join %PRE%media_meta _meta6
+                on _m.id=_meta6.media_id
+                and _m.project_id=_meta6.project_id
+                and _meta6.sys_label='beeldbankValidator'
+				" : "" )."
+	            
+			left join %PRE%media_meta _meta9
+				on _m.id=_meta9.media_id
+				and _m.project_id=_meta9.project_id
+				and _meta9.sys_label='verspreidingsKaart'
+	            
+			".(!empty($group_id) ?
+			    "right join %PRE%taxon_quick_parentage _q
+					on _m.taxon_id=_q.taxon_id
+					and _m.project_id=_q.project_id
+				" : "" )."
+				    
+			".(!empty($name) ?
+                "left join %PRE%names _j
+				on _m.taxon_id=_j.taxon_id
+				and _m.project_id=_j.project_id
+				and _j.type_id=".$this->_nameTypeIds[PREDICATE_VALID_NAME]['id']."
+				and _j.language_id=".LANGUAGE_ID_SCIENTIFIC : "" )."
+				    
+			".(!empty($photographer) ?
+                "left join %PRE%media_meta _c
+				on _m.project_id=_c.project_id
+				and _m.id = _c.media_id
+				and _c.sys_label = 'beeldbankFotograaf'
+				" : "" )."
+					    
+			where _m.project_id = ".$project_id."
+			    
+				and ifnull(_meta9.meta_data,0)!=1
+				and ifnull(_trash.is_deleted,0)=0
+			    
+				".(isset($photographer)  ? "and ".$photographer : "")."
+				".(isset($validator)  ? "and ".$validator : "")."
+				".(!empty($group_id) ? "and  ( MATCH(_q.parentage) AGAINST ('". $this->generateTaxonParentageId( $group_id )."' in boolean mode) or _m.taxon_id = " .$group_id. ") "  : "")."
+				".(!empty($name_id) ? "and _m.taxon_id = ". (int)$name_id : "")."
+				".(!empty($name) ? "and _j.name like '". $this->escapeString($name)."%'"  : "")."
+				    
+			".(isset($sort) ? "order by ".$sort : "")."
+			".(isset($limit) ? "limit ".$limit : "")."
+			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
+			;
+	        
+            $data=$this->freeQuery( $query );
+	        
+ 	        //SQL_CALC_FOUND_ROWS
+	        $count=$this->freeQuery( "select found_rows() as total" );
+	        
+	        foreach ($data as $k => $v) {
+	            $data[$k] = array_merge($v, $this->getMediaMetadata($v['taxon_id'], $v['id'], $project_id));
+	        }
+	        
+	        return array('data'=>$data,'count'=>$count[0]['total']);
+	        
+	}
+	
+	private function getMediaMetadata ($taxonId, $mediaId, $projectId) {
+	    
+	    $metaLabels = [
+	        'beeldbankOmschrijving' => 'meta_short_desc',
+	        'beeldbankLokatie' => 'meta_geografie',
+	        'beeldbankFotograaf' => 'photographer',
+	        'beeldbankAdresMaker' => 'meta_adres_maker',
+	        'beeldbankLicentie' => 'meta_license',
+	        'beeldbankValidator' => 'meta_validator',
+	        'beeldbankCopyright' => 'meta_copyrights',
+	    ];
+	    $output = [];
+	    
+	    // Meta data
+	    $query = 'select sys_label, meta_data from %PRE%media_meta where project_id = ' . $projectId . ' 
+            and media_id = ' . $mediaId;
+	    $metadata = $this->freeQuery($query);
+	    
+        foreach ($metadata as $meta) {
+            if (!empty($meta['meta_data'])) {
+                $output[$metaLabels[$meta['sys_label']]] = $meta['meta_data'];
+	        }
+	    }
+	    
+	    // Names
+	    $query = "
+            select 
+                name,
+				trim(replace(name,ifnull(authorship,''),'')) as nomen
+            from %PRE%names 
+            where 
+                project_id = " . $projectId . '
+                and taxon_id = ' . $taxonId . ' 
+                and language_id = ' . LANGUAGE_ID_SCIENTIFIC . '
+	            and type_id = ' . $this->_nameTypeIds[PREDICATE_VALID_NAME]['id'];
+	    $names = $this->freeQuery($query);
+	    
+	    if (!empty($names)) {
+	        $output = array_merge($output, $names[0]);
+	    }
+	    
+        return $output;
+	}
+	
+	/*
+					
 	public function doPictureSearch( $params )
     {
 		$language_id = isset($params['language_id']) ? $params['language_id'] : null;
@@ -827,6 +1093,8 @@ final class SearchNSRModel extends AbstractModel
 			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
 		;
 		
+		die($query);
+		
 		$data=$this->freeQuery( $query );
 		//SQL_CALC_FOUND_ROWS
 		$count=$this->freeQuery( "select found_rows() as total" );
@@ -834,6 +1102,7 @@ final class SearchNSRModel extends AbstractModel
 		return array('data'=>$data,'count'=>$count[0]['total']);
 
 	}
+	*/
 
 	public function getSuggestionsGroup( $params )
     {

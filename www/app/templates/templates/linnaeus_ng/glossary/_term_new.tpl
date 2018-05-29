@@ -1,32 +1,3 @@
-<!-- move this to css once accepted as video overlay! -->
-<style>
-.video-container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    border-radius: 5px;
-    background-attachment: scroll;
-    overflow: hidden;
-}
-.video-container video {
-    min-width: 100%;
-    min-height: 100%;
-    position: relative;
-    z-index: 1;
-}
-.video-container .video-overlay {
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    z-index: 2;
-    background: url('{$projectUrls.systemMedia}video-overlay.png') center center no-repeat;
-    background-size: 30% auto;
-    opacity: 0.5;
-}
-</style>
-
 <div id="page-main">
 	<div class="glossary-filter">
 		{include file="_alphabet.tpl"}
@@ -91,7 +62,7 @@
 							</div>		
 							<div class="video-container"> 
 							<a data-fancybox="gallery" data-src="#hidden-media-{$k}" href="javascript:;" data-caption="{$name}" class="media-video-icon">
-								 <div class="video-overlay"></div>
+								 <div class="video-overlay" style="background: url('{$projectUrls.systemMedia}video-overlay.png') center center no-repeat; background-size: 30% auto;"></div>
 								 <video><source src="{$smarty.capture.fullImgUrl}" type="video/mp4"></video>
 							</a>
 							</div>
