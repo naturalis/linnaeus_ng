@@ -801,8 +801,8 @@ final class SearchNSRModel extends AbstractModel
 			".(isset($limit) ? "limit ".$limit : "")."
 			".(isset($offset) & isset($limit) ? "offset ".$offset : "")
 			;
-	        
-            $data=$this->freeQuery( $query );
+
+	        $data=$this->freeQuery( $query );
 	        
  	        //SQL_CALC_FOUND_ROWS
 	        $count=$this->freeQuery( "select found_rows() as total" );

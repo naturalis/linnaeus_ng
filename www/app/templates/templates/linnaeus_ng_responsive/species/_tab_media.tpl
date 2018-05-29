@@ -93,10 +93,10 @@ $(document).ready(function()
 			var image=images[i];
 			buffer.push(
 				template
-					.replace( /%image%/g, image.image ? image.image : '' )
+					.replace( /%image%/g, image.image ? encodeURI(image.image) : '' )
 					.replace( /%meta_data%/g, image.meta_data ? image.meta_data.replace(/[\n\r]/g,"").replace("'","&apos;").htmlEntities() : '' )
 					.replace( /%photographer%/g, image.photographer ? image.photographer : '' )
-					.replace( /%thumb%/g, image.thumb ? image.thumb : '' )
+					.replace( /%thumb%/g, image.thumb ? encodeURI(image.thumb) : '' )
 					.replace( /%id%/g, image.taxon_id ? image.taxon_id : '' )
 					.replace( /%name%/g, image.name ? image.name : '')
 					.replace( /%taxon%/g, image.taxon ? image.taxon : '' )
