@@ -1,4 +1,4 @@
-{assign var=widthInCells value=3}
+{assign var=widthInCells value=5}
 <div class="media-grid__container">
 	<div id="media-grid">
 		{assign var=mediaCat value=false}
@@ -43,9 +43,9 @@
 								Your browser does not support the html5 video element.
 							</video>
 						</div>
-						<div class="video-container" style="width: {if $v.width < 450}{$v.width}{else}450{/if}px;"> 
-							<a data-fancybox="gallery" data-src="#hidden-media-{$k}" href="javascript:;" data-caption="{$name}" style="width: {if $v.width < 450}{$v.width}{else}450{/if}px;">
-								 <div class="video-overlay" style="background: url('{$projectUrls.systemMedia}video-overlay.png') center 45% no-repeat; background-size: 30% auto;"></div>
+						<div class="video-container"> 
+							<a data-fancybox="gallery" data-src="#hidden-media-{$k}" href="javascript:;" data-caption="{$name}" class="media-video-icon">
+								 <div class="video-overlay" style="background: url('{$projectUrls.systemMedia}video-overlay.png') center center no-repeat; background-size: 30% auto;"></div>
 								 <video><source src="{$smarty.capture.fullImgUrl}" type="video/mp4"></video>
 							</a>
 						</div>
