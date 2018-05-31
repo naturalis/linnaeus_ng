@@ -1881,7 +1881,10 @@ class Controller extends BaseClass
         $this->smarty = new Smarty();
 
         /* DEBUG */
-        $this->smarty->force_compile = true;
+        // $this->smarty->force_compile = true;
+        
+        // Disable caching for admin pages, it serves no purpose and slows things down!
+        $this->smarty->caching = 0;
 
         $cbn = $this->getControllerBaseName();
 

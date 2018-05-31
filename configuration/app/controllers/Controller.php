@@ -2018,7 +2018,7 @@ class Controller extends BaseClass
         $this->smarty = new Smarty();
 
         /* DEBUG */
-        $this->smarty->force_compile = false;
+        //$this->smarty->force_compile = true;
 
         $this->smarty->template_dir = $this->_smartySettings['dir_template'] . $this->getSkinName() . '/' . $this->getControllerBaseName() . '/';
         $this->smarty->compile_dir = $this->_smartySettings['dir_compile'];
