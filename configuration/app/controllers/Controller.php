@@ -1387,8 +1387,9 @@ class Controller extends BaseClass
     public function printPage ($templateName = null)
     {
         $this->preparePage();
-
-        $this->smarty->display(strtolower((!empty($templateName) ? $templateName : $this->getViewName()) . '.tpl'));
+        
+        $this->smarty->display(strtolower((!empty($templateName) ? $templateName : $this->getViewName()) . '.tpl'), 
+            $this->setSmartyCacheId());
 
         $this->previewOverlay();
     }
@@ -1402,11 +1403,12 @@ class Controller extends BaseClass
     {
         $this->preparePage();
 
-        return $this->smarty->fetch(strtolower((!empty($templateName) ? $templateName : $this->getViewName()) . '.tpl'));
+        return $this->smarty->fetch(strtolower((!empty($templateName) ? $templateName : $this->getViewName()) . '.tpl'),
+            $this->setSmartyCacheId());
 
         //$this->previewOverlay(); // not implemented in (the rarely used) fetch
     }
-
+    
 	public function smartyGetSnippet($params, $content, &$smarty, &$repeat)
 	{
 		if ( is_null($content) ) return;
@@ -2016,7 +2018,7 @@ class Controller extends BaseClass
         $this->smarty = new Smarty();
 
         /* DEBUG */
-        $this->smarty->force_compile = true;
+        $this->smarty->force_compile = false;
 
         $this->smarty->template_dir = $this->_smartySettings['dir_template'] . $this->getSkinName() . '/' . $this->getControllerBaseName() . '/';
         $this->smarty->compile_dir = $this->_smartySettings['dir_compile'];
@@ -2995,6 +2997,15 @@ class Controller extends BaseClass
 			'columns'=>'id,nametype',
 			'fieldAsIndex'=>'nametype'
 		));
+	}
+	
+	private function setSmartyCacheId ()
+	{
+	    if (!empty($this->requestData)) {
+	        array_multisort($this->requestData);
+	        return md5(json_encode($this->requestData));
+	    }
+	    return null;
 	}
 
 	protected function getNameTypeId( $predicate )
