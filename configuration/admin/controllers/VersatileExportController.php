@@ -18,6 +18,10 @@ class VersatileExportController extends Controller
     public $modelNameOverride='VersatileExportModel';
     public $controllerPublicName = 'Export';
     
+    public $usedHelpers = array(
+        'zip_file'
+    );
+    
     public $cssToLoad = array(
         'lookup.css',
         'nsr_taxon_beheer.css'
@@ -75,9 +79,9 @@ class VersatileExportController extends Controller
     private $traitGroups;
     private $selectedTraits = [];
     
-    private $limit = 50;
+    private $limit = 10;
     private $offset = 0;
-    
+     
     /*
      when the number of names is larger than synonymStrategyThrehold, the
      program will fetch all synonyms in one query, and filter and assign them
@@ -87,7 +91,12 @@ class VersatileExportController extends Controller
      */
     private $synonymStrategyThrehold=2000;
     
-    private $csv_file_name="%s-export--%s.csv";
+    private $fh_names; // file pointer
+    private $names_file_name="%s-export--%s.csv";
+    
+    private $fh_synonyms;
+    private $synonyms_file_name="%s-export-synonyms--%s.csv";
+    
     
     private $EOFMarker='(end of file)';
     
@@ -187,11 +196,16 @@ class VersatileExportController extends Controller
             
             $this->setNameTypeIds();
             
-            $this->doMainQuery();
-            $this->doAncestry();
-            $this->doSynonymsQuery();
-            $this->doTraits();
-            $this->doOutput();
+            $this->doOutputStart();
+            do {
+                $this->doMainQuery();
+                $this->doAncestry();
+                $this->doTraits();
+                $this->doSynonymsQuery();
+                $this->doOutput();
+                $this->offset += $this->limit;
+            } while (!empty($this->names));
+            $this->doOutputEnd();
         }
         
         $this->smarty->assign( 'presence_labels', $this->getPresenceStatuses() );
@@ -418,11 +432,7 @@ class VersatileExportController extends Controller
 					    
 			order by " .$this->getOrderBy() . "
 			    
-            offset  " . $this->offset . "
-                
-			limit " . $this->limit . "
-			    
-			";
+			limit " . $this->offset . ',' . $this->limit;
 			
 			$this->names=$this->models->VersatileExportModel->doMainQuery( array("query"=>$this->query) );
 			
@@ -531,6 +541,9 @@ class VersatileExportController extends Controller
              and _names.id = _c.lng_id
              and _c.item_type = 'name'
              */
+            
+            // Ruud: restart synonyms for each $names output cycle
+            $this->synonyms = [];
             
             $this->query="
 			SELECT
@@ -649,6 +662,9 @@ class VersatileExportController extends Controller
     
     private function doOutputStart ()
     {
+        $this->createFileHandlers();
+        die('done');
+        
         if ( $this->getOutputTarget()=='download' ) $this->printHeaders();
         if ( $this->getOutputTarget()=='download' ) $this->printUtf8BOM();
         
@@ -657,49 +673,38 @@ class VersatileExportController extends Controller
             header('Content-Type: text/html; charset=utf-8');
             echo "<pre>",$this->getNewLine();
         }
+        
+        $this->doQueryParametersOutput();
+    }
+    
+    private function doSynonymsOutputStart ()
+    {
+        $this->printUtf8BOM();
+        $this->doQueryParametersOutput();
     }
     
     private function doOutputEnd ()
     {
-        if ( $this->getOutputTarget()=='download' ) $this->printHeaders();
-        if ( $this->getOutputTarget()=='download' ) $this->printUtf8BOM();
+        $this->doEOFMarkerOutput();
+ 
+        if ( $this->getOutputTarget()=='screen' ) echo "</pre>",$this->getNewLine();
         
-        if ( $this->getOutputTarget()=='screen' )
-        {
-            header('Content-Type: text/html; charset=utf-8');
-            echo "<pre>",$this->getNewLine();
-        }
+        die();
     }
     
     
     private function doOutput()
     {
-        
-        if ( $this->getOutputTarget()=='download' ) $this->printHeaders();
-        if ( $this->getOutputTarget()=='download' ) $this->printUtf8BOM();
-        
-        if ( $this->getOutputTarget()=='screen' )
-        {
-            header('Content-Type: text/html; charset=utf-8');
-            echo "<pre>",$this->getNewLine();
-        }
-        
         if ( isset($this->spoof_settings->do_spoof_export) && $this->spoof_settings->do_spoof_export )
         {
             $this->doSpoofOutput();
         }
         else
         {
-            $this->doQueryParametersOutput();
             $this->doNamesOutput();
             $this->doSynonymsOutput();
             $this->doQueriesOutput();
-            $this->doEOFMarkerOutput();
         }
-        
-        if ( $this->getOutputTarget()=='screen' ) echo "</pre>",$this->getNewLine();
-        
-        die();
     }
     
     private function doSpoofOutput()
@@ -720,8 +725,6 @@ class VersatileExportController extends Controller
             echo $this->spoof_settings->texts->download_synonyms;
             $this->printNewLine();
         }
-        
-        $this->doEOFMarkerOutput();
     }
     
     private function printHeaders()
@@ -731,13 +734,26 @@ class VersatileExportController extends Controller
         header('Pragma: no-cache');
     }
     
+    private function createFileHandlers ()
+    {
+        $this->names_file_name = sys_get_temp_dir() . '/' .
+            sprintf($this->names_file_name, $this->getProjectTitle( true ), date('Ymd-His'));
+        $this->fhNames = fopen($this->names_file_name, 'w');
+        
+        if ($this->getDoSynonyms()) {
+            $this->synonyms_file_name = sys_get_temp_dir() . '/' .
+                sprintf($this->synonyms_file_name, $this->getProjectTitle( true ), date('Ymd-His'));
+            $this->fhSynonyms = fopen($this->synonyms_file_name, 'w');
+        }
+    }
+    
     private function printUtf8BOM()
     {
         if ( !$this->getAddUtf8BOM() )
             return;
             
-            //http://stackoverflow.com/questions/5601904/encoding-a-string-as-utf-8-with-bom-in-php
-            echo chr(239).chr(187).chr(191);
+        //http://stackoverflow.com/questions/5601904/encoding-a-string-as-utf-8-with-bom-in-php
+        echo chr(239).chr(187).chr(191);
     }
     
     private function printHeaderLine( $lines )
@@ -850,20 +866,27 @@ class VersatileExportController extends Controller
     
     private function doNamesOutput()
     {
-        $this->printHeaderLine( $this->names );
-        $this->printNewLine();
-        $this->printBodyLines( $this->names );
+        // Ruud: print header line only at start (when offset = 0)
+        if ($this->offset == 0) {
+            $this->printHeaderLine($this->names);
+            $this->printNewLine();
+        }
+        $this->printBodyLines($this->names);
     }
     
     private function doSynonymsOutput()
     {
-        if ( !$this->getDoSynonyms() )
+        // Ruud: exclude synonyms from screen output
+        if (!$this->getDoSynonyms() || $this->getOutputTarget() == 'screen') {
             return;
-            
+        }
+        // Ruud: create separate file for synonyms
+        if ($this->offset == 0) {
+            $this->doSynonymsOutputStart();
+            $this->printHeaderLine($this->synonyms);
             $this->printNewLine();
-            $this->printHeaderLine( $this->synonyms );
-            $this->printNewLine();
-            $this->printBodyLines( $this->synonyms );
+        }
+        $this->printBodyLines($this->synonyms);
     }
     
     private function doQueriesOutput()
@@ -871,17 +894,17 @@ class VersatileExportController extends Controller
         if ( !$this->getPrintQuery() )
             return;
             
+        $this->printNewLine();
+        $this->printNewLine();
+        
+        foreach((array)$this->queries as $key=>$val)
+        {
+            echo "query:",$key,str_repeat('-',60);
             $this->printNewLine();
+            echo $val;
             $this->printNewLine();
-            
-            foreach((array)$this->queries as $key=>$val)
-            {
-                echo "query:",$key,str_repeat('-',60);
-                $this->printNewLine();
-                echo $val;
-                $this->printNewLine();
-            }
-            $this->printNewLine();
+        }
+        $this->printNewLine();
     }
     
     private function setBranchTopId( $branch_top_id )
