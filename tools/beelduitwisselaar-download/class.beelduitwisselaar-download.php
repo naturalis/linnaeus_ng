@@ -25,7 +25,7 @@
 		private $fetchFromDateOverride=null;
 		private $metaDataLanguage=24; // default dutch
 
-		private $scpShellCommand="scp -i %s %s %s@%s:\"'%s%s'\"";
+		private $scpShellCommand="scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i %s %s %s@%s:\"'%s%s'\"";
 		private $scpRemoteUser='imageupload';
 		private $scpRemoteUserPrivKeyFile;
 		private $scpRemoteAddress='134.213.60.149';
@@ -353,7 +353,7 @@
 		{
 			$this->feedback( "fetching from " . $this->webserviceUrl );
 			
-			$raw = @file_get_contents( $this->webserviceUrl );
+			$raw = $this->getCurl( $this->webserviceUrl );
 			
 			if ( !empty($raw) )
 			{
@@ -496,8 +496,9 @@
 					
 					if ( $this->doDownloadImages )
 					{
-						$bin = @file_get_contents( str_replace( " ", "%20", $val->url ) );
-						
+					    $url = str_replace( " ", "%20", $val->url );
+
+                        $bin = $this->getCurl( $url );
 						if ( empty( $bin ) )
 						{
 							$this->newImages[$key]->_status="unable to download image";
@@ -950,5 +951,33 @@
 			
 			$this->feedback( "finished" . "\n" );
 		}
-		
+
+        private function getCurl($url, $post =null, $verify = false, $timeout = 60)
+        {
+            if (!$url) {
+                return '';
+            }
+
+            $ch=curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HEADER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,$verify);
+            if ($post) {
+
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+            }
+            if ($timeout) {
+                curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+            }
+
+            $result=curl_exec($ch);
+            curl_close($ch);
+
+            // Return raw output if result is no (valid) json
+            return $result;
+        }
+
 	}
