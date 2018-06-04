@@ -6,7 +6,7 @@
     $b = new beeldbankDownloader;
 
     $b->setPrintParameters( false );
-    $b->setFetchFromDateOverride( '2018-05-06 23:59:59' );
+    //$b->setFetchFromDateOverride( '2018-05-06 23:59:59' );
     //$b->setDoMoveImages( false );
     //$b->setDoDownloadImages( false );
     //$b->setDoWriteToDatabase( false );
