@@ -638,7 +638,7 @@ parameters:
 		);
 
 		$this->setJSON(json_encode($result));
-		header('Content-Type: application/json');			
+		header('Content-Type: application/json');
 		$this->printOutput();
 	}
 
@@ -1564,7 +1564,7 @@ function returns data as JSON. for JSONP, add a parameter 'callback=<name>' with
 		$this->printOutput(true);
 	}
 
-	private function printOutput($suppressJSONP=false)
+	private function printOutput($suppressJSONP=false, $caching = 0)
 	{
 		/*
 		JSON looks like this:
@@ -1578,7 +1578,8 @@ function returns data as JSON. for JSONP, add a parameter 'callback=<name>' with
 			$this->_JSON = $this->getJSONPCallback() . '(' . $this->_JSON .');';
 		}
 
-		$this->smarty->assign('json',$this->_JSON);
+		$this->smarty->caching = $caching;
+		$this->smarty->assign('json',$this->_JSON, true);
 
 		header('Content-Type: application/json');			
 		$this->printPage('template');
