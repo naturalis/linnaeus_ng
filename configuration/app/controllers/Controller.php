@@ -2029,6 +2029,10 @@ class Controller extends BaseClass
 		$this->smarty->registerPlugin("block","t", array($this,"smartyTranslate"));
 		$this->smarty->registerPlugin("block","snippet", array($this,"smartyGetSnippet"));
 		$this->smarty->error_reporting = E_ALL & ~E_NOTICE;
+		
+		// Ruud: test!
+		$this->smarty->caching = 0;
+		
     }
 
     /**
