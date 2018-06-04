@@ -36,7 +36,7 @@ class beeldbankDownloader
     private $scpOriginAddress;
     private $scpOriginBasePath;
 
-    private $urlNsrImageSearch = "http://www.nederlandsesoorten.nl/linnaeus_ng/app/views/search/nsr_search_pictures.php?0=0&page=%s";
+    private $urlNsrImageSearch = "https://www.nederlandsesoorten.nl/linnaeus_ng/app/views/search/nsr_search_pictures.php?0=0&page=%s";
 
     private $number_in_feed = 0;
     private $number_downloaded = 0;
@@ -286,14 +286,14 @@ class beeldbankDownloader
             $this->feedback(sprintf("fetch from timestamp: %s (manual override)", $this->fetchFromDate));
         } else {
             if ($result = $this->mysqli->query(sprintf("
-					select 
-						subtime(max(created),'0 1:0:0') as fetch_from,
-						max(created) as latest_created 
-					from 
-						" . $this->connector->prefix . "beelduitwisselaar_batches 
-					where 
-						project_id = %s
-				", $this->mysqli->escape_string($this->connector->project_id)))) {
+                    select 
+                        subtime(max(created),'0 1:0:0') as fetch_from,
+                        max(created) as latest_created 
+                    from 
+                        " . $this->connector->prefix . "beelduitwisselaar_batches 
+                    where 
+                        project_id = %s
+                ", $this->mysqli->escape_string($this->connector->project_id)))) {
                 while ($row = $result->fetch_array()) {
                     if (isset($row['latest_created'])) {
                         $this->fetchFromDate = $row['fetch_from'];
@@ -375,18 +375,18 @@ class beeldbankDownloader
     {
         $this->existingTaxon = null;
         $result = $this->mysqli->query("
-				select
-					_b.id,_b.taxon
-				from 
-					" . $this->connector->prefix . "nsr_ids _a
-				right join " . $this->connector->prefix . "taxa _b
-					on _a.project_id=_b.project_id
-					and _a.lng_id=_b.id
-				where 
-					_a.nsr_id like '%" . $this->mysqli->escape_string(str_pad($taxon_id, 12, '0', STR_PAD_LEFT)) . "' 
-					and _a.project_id = " . $this->mysqli->escape_string($this->connector->project_id) . "
-					and _a.item_type = 'taxon'
-			");
+                select
+                    _b.id,_b.taxon
+                from 
+                    " . $this->connector->prefix . "nsr_ids _a
+                right join " . $this->connector->prefix . "taxa _b
+                    on _a.project_id=_b.project_id
+                    and _a.lng_id=_b.id
+                where 
+                    _a.nsr_id like '%" . $this->mysqli->escape_string(str_pad($taxon_id, 12, '0', STR_PAD_LEFT)) . "' 
+                    and _a.project_id = " . $this->mysqli->escape_string($this->connector->project_id) . "
+                    and _a.item_type = 'taxon'
+            ");
 
         $row = $result->fetch_assoc();
         $result->close();
@@ -493,13 +493,6 @@ class beeldbankDownloader
         foreach ((array)$this->newImages as $key => $val) {
             if (empty($val->_status) && !empty($val->_taxon) && !empty($val->_tmp_file)) {
                 if ($this->doMoveImages) {
-                    printf($this->scpShellCommand,
-                        $this->scpRemoteUserPrivKeyFile,
-                        $val->_tmp_file,
-                        $this->scpRemoteUser,
-                        $this->scpRemoteAddress,
-                        $this->scpRemoteBasePath . $this->scpRemoteFolder,
-                        $val->filename);
 
                     // will overwrite! but we've handled that already.
                     $out = shell_exec(sprintf($this->scpShellCommand,
@@ -545,10 +538,10 @@ class beeldbankDownloader
 
         $query =
             sprintf("
-					insert into " . $this->connector->prefix . "media_meta
-						(project_id,language_id,media_id,sys_label,meta_data,meta_date,created)
-					values
-						(%s," . $this->metaDataLanguage . ",%s,%s,%s,%s,now())",
+                    insert into " . $this->connector->prefix . "media_meta
+                        (project_id,language_id,media_id,sys_label,meta_data,meta_date,created)
+                    values
+                        (%s," . $this->metaDataLanguage . ",%s,%s,%s,%s,now())",
                 $this->mysqli->escape_string($this->connector->project_id),
                 $this->mysqli->escape_string($media_id),
                 "'" . $this->mysqli->escape_string($sys_label) . "'",
@@ -570,10 +563,10 @@ class beeldbankDownloader
                 if ($this->doWriteToDatabase) {
                     $query =
                         sprintf("
-								insert into " . $this->connector->prefix . "media_taxon
-									(project_id,taxon_id,file_name,thumb_name,original_name,mime_type,file_size,overview_image,created)
-								values
-									(%s,%s,%s,'',%s,%s,%s,0,now())",
+                                insert into " . $this->connector->prefix . "media_taxon
+                                    (project_id,taxon_id,file_name,thumb_name,original_name,mime_type,file_size,overview_image,created)
+                                values
+                                    (%s,%s,%s,'',%s,%s,%s,0,now())",
                             $this->mysqli->escape_string($this->connector->project_id),
                             $this->mysqli->escape_string($val->_taxon['id']),
                             "'" . $this->mysqli->escape_string($this->scpRemoteFolder . $val->filename) . "'",
@@ -581,7 +574,6 @@ class beeldbankDownloader
                             "'" . $this->mysqli->escape_string($val->_mime) . "'",
                             $this->mysqli->escape_string($val->_saved_bytes)
                         );
-                    print $query . "\n";
 
                     $this->feedback(sprintf("saving record for %s", $this->scpRemoteFolder . $val->filename));
 
@@ -595,10 +587,10 @@ class beeldbankDownloader
                     if (!empty($val->description)) {
                         $query =
                             sprintf("
-									insert into " . $this->connector->prefix . "media_descriptions_taxon
-										(project_id,language_id,media_id,description,created)
-									values
-										(%s," . $this->metaDataLanguage . ",%s,%s,now())",
+                                    insert into " . $this->connector->prefix . "media_descriptions_taxon
+                                        (project_id,language_id,media_id,description,created)
+                                    values
+                                        (%s," . $this->metaDataLanguage . ",%s,%s,now())",
                                 $this->mysqli->escape_string($this->connector->project_id),
                                 $this->newImages[$key]->_id,
                                 "'" . $this->mysqli->escape_string($val->description) . "'"
@@ -739,10 +731,10 @@ class beeldbankDownloader
                 if ($this->doWriteToDatabase) {
                     $query =
                         sprintf("
-								insert into " . $this->connector->prefix . "activity_log
-									(project_id,user,controller,view,note,data_after,created,last_change)
-								values
-									(%s,%s,%s,%s,%s,%s,now(),now())",
+                                insert into " . $this->connector->prefix . "activity_log
+                                    (project_id,user,controller,view,note,data_after,created,last_change)
+                                values
+                                    (%s,%s,%s,%s,%s,%s,now(),now())",
                             $this->mysqli->escape_string($this->connector->project_id),
                             "'server [automated process]'",
                             "'" . dirname(__FILE__) . "'",
@@ -764,10 +756,10 @@ class beeldbankDownloader
         if ($this->doWriteToDatabase) {
             $query =
                 sprintf("
-						insert into " . $this->connector->prefix . "beelduitwisselaar_batches
-							(project_id,created,number_in_feed,number_downloaded,number_moved,number_saved,batch_identifier)
-						values
-							(%s,now(),%s,%s,%s,%s,'%s')",
+                        insert into " . $this->connector->prefix . "beelduitwisselaar_batches
+                            (project_id,created,number_in_feed,number_downloaded,number_moved,number_saved,batch_identifier)
+                        values
+                            (%s,now(),%s,%s,%s,%s,'%s')",
                     $this->mysqli->escape_string($this->connector->project_id),
                     $this->mysqli->escape_string($this->number_in_feed),
                     $this->mysqli->escape_string($this->number_downloaded),
