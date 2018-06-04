@@ -1883,16 +1883,18 @@ class Controller extends BaseClass
         /* DEBUG */
         // $this->smarty->force_compile = true;
         
-        // Disable caching for admin pages, it serves no purpose and slows things down!
-        $this->smarty->caching = 0;
 
         $cbn = $this->getControllerBaseName();
+
+        //$this->smarty->caching = $this->_smartySettings['caching'];
+        //
+        // Disable caching for admin pages, it serves no purpose and slows things down!
+        $this->smarty->caching = 0;
 
         $this->smarty->template_dir = $this->_smartySettings['dir_template'] . '/' . (isset($cbn) ? $cbn . '/' : '');
         $this->smarty->compile_dir = $this->_smartySettings['dir_compile'];
         $this->smarty->cache_dir = $this->_smartySettings['dir_cache'];
         $this->smarty->config_dir = $this->_smartySettings['dir_config'];
-        $this->smarty->caching = $this->_smartySettings['caching'];
         $this->smarty->compile_check = $this->_smartySettings['compile_check'];
 		$this->smarty->registerPlugin("block","t", array($this,"smartyTranslate"));
 		$this->smarty->error_reporting = E_ALL & ~E_NOTICE;

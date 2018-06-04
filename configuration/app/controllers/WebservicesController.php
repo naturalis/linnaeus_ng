@@ -12,9 +12,9 @@ class WebservicesController extends Controller
 	private $_project=null;
 	private $_matchType=null;
 	private $_taxonUrl='/linnaeus_ng/app/views/species/nsr_taxon.php?epi=1&id=%s';
-	private $_thumbBaseUrl='http://images.naturalis.nl/160x100/';
-	private $_190x100BaseUrl='http://images.naturalis.nl/190x100/';
-	private $_nsrOriginalImageBaseUrl='http://images.naturalis.nl/original/';
+	private $_thumbBaseUrl='https://images.naturalis.nl/160x100/';
+	private $_190x100BaseUrl='https://images.naturalis.nl/190x100/';
+	private $_nsrOriginalImageBaseUrl='https://images.naturalis.nl/original/';
 	private $_domainNamePatch="www.nederlandsesoorten.nl"; // HTTP_HOST is unreliable (reverse proxy); must become setting REFAC2015
 	private $_JSONPCallback=false;
 	private $_JSON=null;
@@ -232,7 +232,7 @@ parameters:
 		$description = strip_tags($description);
 		*/
 		
-		$url='http://'.$_SERVER['HTTP_HOST'].$this->makeNsrLink();
+		$url='https://'.$_SERVER['HTTP_HOST'].$this->makeNsrLink();
 
 		$query="
 			select
@@ -622,7 +622,7 @@ parameters:
 		$result['project']=$p['title'];
 		$result['exported']=date('c');
 
-		$result['url_recent_images']='http://'.$this->_domainNamePatch.'/linnaeus_ng/app/views/search/nsr_recent_pictures.php';
+		$result['url_recent_images']='https://'.$this->_domainNamePatch.'/linnaeus_ng/app/views/search/nsr_recent_pictures.php';
 	
 		$result['image']=$media[0];
 		$result['image']['url_taxon']=$this->makeNsrLink();
@@ -638,7 +638,7 @@ parameters:
 		);
 
 		$this->setJSON(json_encode($result));
-		header('Content-Type: application/json');			
+		header('Content-Type: application/json');
 		$this->printOutput();
 	}
 
@@ -1096,7 +1096,7 @@ parameters:
 		$result['project']=$p['title'];
 		$result['exported']=date('c');
 
-		$result['url_recent_images']='http://'.$this->_domainNamePatch.'/linnaeus_ng/app/views/search/nsr_recent_pictures.php';
+		$result['url_recent_images']='https://'.$this->_domainNamePatch.'/linnaeus_ng/app/views/search/nsr_recent_pictures.php';
 
         $media=$this->models->MediaTaxon->freeQuery("
 			select
@@ -1564,7 +1564,7 @@ function returns data as JSON. for JSONP, add a parameter 'callback=<name>' with
 		$this->printOutput(true);
 	}
 
-	private function printOutput($suppressJSONP=false)
+	private function printOutput($suppressJSONP=false, $caching = 0)
 	{
 		/*
 		JSON looks like this:
@@ -1578,7 +1578,8 @@ function returns data as JSON. for JSONP, add a parameter 'callback=<name>' with
 			$this->_JSON = $this->getJSONPCallback() . '(' . $this->_JSON .');';
 		}
 
-		$this->smarty->assign('json',$this->_JSON);
+		$this->smarty->caching = $caching;
+		$this->smarty->assign('json',$this->_JSON, true);
 
 		header('Content-Type: application/json');			
 		$this->printPage('template');
