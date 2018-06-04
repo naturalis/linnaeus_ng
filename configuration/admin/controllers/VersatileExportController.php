@@ -91,13 +91,15 @@ class VersatileExportController extends Controller
      */
     private $synonymStrategyThrehold=2000;
     
-    private $fh_names; // file pointer
+    private $fhNames;
     private $names_file_name="%s-export--%s.csv";
+    private $names_file_path;
     
-    private $fh_synonyms;
+    private $fhSynonyms;
     private $synonyms_file_name="%s-export-synonyms--%s.csv";
+    private $synonyms_file_path;
     
-    
+    private $fh;
     private $EOFMarker='(end of file)';
     
     private $columnHeaders=[
@@ -662,16 +664,16 @@ class VersatileExportController extends Controller
     
     private function doOutputStart ()
     {
-        $this->createFileHandlers();
-        die('done');
+        $this->openFileHandlers();
+        $this->setFileHandler($this->fhNames);
         
-        if ( $this->getOutputTarget()=='download' ) $this->printHeaders();
+//        if ( $this->getOutputTarget()=='download' ) $this->printHeaders();
         if ( $this->getOutputTarget()=='download' ) $this->printUtf8BOM();
         
         if ( $this->getOutputTarget()=='screen' )
         {
             header('Content-Type: text/html; charset=utf-8');
-            echo "<pre>",$this->getNewLine();
+            $this->print("<pre>",$this->getNewLine());
         }
         
         $this->doQueryParametersOutput();
@@ -687,7 +689,9 @@ class VersatileExportController extends Controller
     {
         $this->doEOFMarkerOutput();
  
-        if ( $this->getOutputTarget()=='screen' ) echo "</pre>",$this->getNewLine();
+        if ( $this->getOutputTarget()=='screen' ) $this->print("</pre>",$this->getNewLine());
+        
+        $this->deleteFileHandlers();
         
         die();
     }
@@ -713,7 +717,7 @@ class VersatileExportController extends Controller
         $this->printHeaderLine( $this->names );
         $this->printNewLine();
         $this->printNewLine();
-        echo $this->spoof_settings->texts->download_body;
+        $this->print($this->spoof_settings->texts->download_body);
         $this->printNewLine();
         
         if ( $this->getDoSynonyms() )
@@ -722,29 +726,50 @@ class VersatileExportController extends Controller
             $this->printHeaderLine( $this->synonyms );
             $this->printNewLine();
             $this->printNewLine();
-            echo $this->spoof_settings->texts->download_synonyms;
+            $this->print($this->spoof_settings->texts->download_synonyms);
             $this->printNewLine();
+        }
+    }
+    
+   // Used to switch between two file handlers
+    private function setFileHandler ($fh)
+    {
+        $this->fh = $fh;
+    }
+    
+    private function print ($string)
+    {
+        if ($this->getOutputTarget() == 'screen') {
+            echo $string;
+        } else {
+            fwrite($this->fh, $string);
         }
     }
     
     private function printHeaders()
     {
         header('Content-Type: application/csv');
-        header('Content-Disposition: attachment; filename='.sprintf($this->csv_file_name,$this->getProjectTitle( true ),date('Ymd-His')));
+        header('Content-Disposition: attachment; filename='.sprintf($this->names_file_name,$this->getProjectTitle( true ),date('Ymd-His')));
         header('Pragma: no-cache');
     }
     
-    private function createFileHandlers ()
+    private function openFileHandlers ()
     {
-        $this->names_file_name = sys_get_temp_dir() . '/' .
+        $this->names_file_path = sys_get_temp_dir() . '/' .
             sprintf($this->names_file_name, $this->getProjectTitle( true ), date('Ymd-His'));
-        $this->fhNames = fopen($this->names_file_name, 'w');
+        $this->fhNames = fopen($this->names_file_path, 'w');
         
         if ($this->getDoSynonyms()) {
-            $this->synonyms_file_name = sys_get_temp_dir() . '/' .
+            $this->synonyms_file_path = sys_get_temp_dir() . '/' .
                 sprintf($this->synonyms_file_name, $this->getProjectTitle( true ), date('Ymd-His'));
-            $this->fhSynonyms = fopen($this->synonyms_file_name, 'w');
+            $this->fhSynonyms = fopen($this->synonyms_file_path, 'w');
         }
+    }
+    
+    private function closeFileHandlers ()
+    {
+        fclose($this->fhNames);
+        fclose($this->fhSynonyms);
     }
     
     private function printUtf8BOM()
@@ -753,10 +778,10 @@ class VersatileExportController extends Controller
             return;
             
         //http://stackoverflow.com/questions/5601904/encoding-a-string-as-utf-8-with-bom-in-php
-        echo chr(239).chr(187).chr(191);
+        $this->print(chr(239).chr(187).chr(191));
     }
     
-    private function printHeaderLine( $lines )
+    private function printHeaderLine ($lines)
     {
         $header_line=array();
         
@@ -773,13 +798,13 @@ class VersatileExportController extends Controller
         {
             if ( $this->getSuppressUnderscoredFields() && substr($rkey,0,1)=='_' ) continue;
             
-            if ( !$this->getNoQuotes() ) echo $this->getQuoteChar();
+            if ( !$this->getNoQuotes() ) $this->print($this->getQuoteChar());
             
-            echo ( $this->getReplaceUnderscoresInHeaders() ? str_replace( '_', ' ', $rkey) : $rkey );
+            $this->print($this->getReplaceUnderscoresInHeaders() ? str_replace( '_', ' ', $rkey) : $rkey );
             
-            if ( !$this->getNoQuotes() ) echo $this->getQuoteChar();
+            if ( !$this->getNoQuotes() ) $this->print($this->getQuoteChar());
             
-            echo $this->getFieldSep();
+            $this->print($this->getFieldSep());
         }
         
     }
@@ -797,75 +822,62 @@ class VersatileExportController extends Controller
                 
                 if ($this->getSuppressUnderscoredFields() && substr($key,0,1)=='_') continue;
                 
-                if ( !$this->getNoQuotes() ) echo $this->getQuoteChar();
+                if ( !$this->getNoQuotes() ) $this->print($this->getQuoteChar());
                 
-                echo ( $this->getUtf8ToUtf16() ? mb_convert_encoding($cell,'utf-16','utf-8') : $cell );
+                $this->print($this->getUtf8ToUtf16() ? mb_convert_encoding($cell,'utf-16','utf-8') : $cell );
                 
-                if ( !$this->getNoQuotes() ) echo $this->getQuoteChar();
+                if ( !$this->getNoQuotes() ) $this->print($this->getQuoteChar());
                 
-                echo $this->getFieldSep();
+                $this->print($this->getFieldSep());
                 
             }
             
-            echo $this->getNewLine();
+            $this->print($this->getNewLine());
         }
         
     }
     
     private function printNewLine( )
     {
-        echo $this->getNewLine();
+        $this->print($this->getNewLine());
     }
     
-    private function doQueryParametersOutput()
-    {
-        if ( !$this->getDoPrintQueryParameters() )
+    private function doQueryParametersOutput () {
+        if (!$this->getDoPrintQueryParameters())
             return;
-            
-            $d = $this->getTaxonById( $this->getBranchTopId() );
-            echo
-            $this->translate( "top" ),
-            $this->getFieldSep(),
-            ( !$this->getNoQuotes() ? $this->getQuoteChar() : "" ),
-            $d['taxon'],
-            ( !$this->getNoQuotes() ? $this->getQuoteChar() : "" );
-            $this->printNewLine();
-            
-            $d=array();
-            foreach($this->getRanks() as $val)
-                if(in_array($val["id"],(array)$this->getSelectedRanks( )))
-                    $d[]=$val["rank"];
-                    echo
-                    $this->translate( "rangen" ),
-                    $this->getFieldSep(),
-                    ( !$this->getNoQuotes() ? $this->getQuoteChar() : "" ),
-                    $this->getAllRanks() ? $this->translate( "(alle)" ) : $this->translate($this->operators[$this->getRankOperator()]['label'])," ",implode(", ",$d),
-                    ( !$this->getNoQuotes() ? $this->getQuoteChar() : "" );
-                    $this->printNewLine();
-                    
-                    echo
-                    $this->translate( "statussen" ),
-                    $this->getFieldSep(),
-                    ( !$this->getNoQuotes() ? $this->getQuoteChar() : "" );
-                    
-                    $p = $this->getPresenceStatusLabels();
-                    if ( !empty( $p ) )
-                    {
-                        echo "(",implode(",",$this->getPresenceStatusLabels(  )),")";
-                    }
-                    else
-                    {
-                        echo $this->translate( "(alle)" );
-                    }
-                    echo ( !$this->getNoQuotes() ? $this->getQuoteChar() : "" );
-                    
-                    $this->printNewLine();
-                    
-                    $this->printNewLine();
+        
+        $d = $this->getTaxonById($this->getBranchTopId());
+        $this->print($this->translate("top"), $this->getFieldSep(), (!$this->getNoQuotes() ? $this->getQuoteChar() : ""), $d['taxon'], (!$this->getNoQuotes() ? $this->getQuoteChar() : ""));
+        $this->printNewLine();
+        
+        $d = array();
+        foreach ($this->getRanks() as $val) {
+            if (in_array($val["id"], (array) $this->getSelectedRanks())) {
+                $d[] = $val["rank"];
+            }
+        }
+        $this->print($this->translate("rangen"), $this->getFieldSep(), (!$this->getNoQuotes() ? $this->getQuoteChar() : ""), $this->getAllRanks() ? $this->translate("(alle)") : $this->translate(
+            $this->operators[$this->getRankOperator()]['label']), " ", implode(", ", $d), (!$this->getNoQuotes() ? $this->getQuoteChar() : ""));
+        $this->printNewLine();
+        
+        $this->print($this->translate("statussen"), $this->getFieldSep(), (!$this->getNoQuotes() ? $this->getQuoteChar() : ""));
+        
+        $p = $this->getPresenceStatusLabels();
+        if (!empty($p)) {
+            $this->print("(", implode(",", $this->getPresenceStatusLabels()), ")");
+        } else {
+            $this->print($this->translate("(alle)"));
+        }
+        $this->print(!$this->getNoQuotes() ? $this->getQuoteChar() : "");
+        
+        $this->printNewLine();
+        
+        $this->printNewLine();
     }
     
     private function doNamesOutput()
     {
+        $this->setFp();
         // Ruud: print header line only at start (when offset = 0)
         if ($this->offset == 0) {
             $this->printHeaderLine($this->names);
@@ -899,9 +911,9 @@ class VersatileExportController extends Controller
         
         foreach((array)$this->queries as $key=>$val)
         {
-            echo "query:",$key,str_repeat('-',60);
+            $this->print("query:",$key,str_repeat('-',60));
             $this->printNewLine();
-            echo $val;
+            $this->print($val);
             $this->printNewLine();
         }
         $this->printNewLine();
@@ -1141,7 +1153,7 @@ class VersatileExportController extends Controller
     {
         if ($this->getPrintEOFMarker())
         {
-            echo $this->EOFMarker;
+            $this->print($this->EOFMarker);
         }
     }
     
