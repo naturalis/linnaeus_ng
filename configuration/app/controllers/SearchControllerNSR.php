@@ -612,8 +612,9 @@ class SearchControllerNSR extends SearchController
 
 		foreach((array)$data as $key=>$val)
 		{
-			
-			$data[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name' => $val['taxon'], 'base_rank_id' => $val['base_rank_id'], 'taxon_id' => $val['taxon_id'] ] );
+		    $data[$key]['image'] = implode("/", array_map("rawurlencode", explode("/", $val['image'])));
+		    $data[$key]['thumb'] = implode("/", array_map("rawurlencode", explode("/", $val['thumb'])));
+		    $data[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name' => $val['taxon'], 'base_rank_id' => $val['base_rank_id'], 'taxon_id' => $val['taxon_id'] ] );
 			$data[$key]['validName']=$this->addHybridMarkerAndInfixes( [ 'name' => $val['validName'], 'base_rank_id' => $val['base_rank_id'], 'taxon_id' => $val['taxon_id'] ] );
 			$data[$key][0] = $this->NSRFunctions->formatPictureResults( [$val] );
 
@@ -651,7 +652,8 @@ class SearchControllerNSR extends SearchController
 				}
 			}
 		}
-
+//print_r($data); die();
+		
 		return
 			array(
 				'count'=>$count,
