@@ -755,12 +755,15 @@ class VersatileExportController extends Controller
     
     private function openFileHandlers ()
     {
-        $this->names_file_path = sys_get_temp_dir() . '/' .
+        $basePath = $this->getProjectsMediaStorageDir();
+        //$basePath = sys_get_temp_dir() . '/';
+        
+        $this->names_file_path = $basePath .
             sprintf($this->names_file_name, $this->getProjectTitle( true ), date('Ymd-His'));
         $this->fhNames = fopen($this->names_file_path, 'w');
         
         if ($this->getDoSynonyms()) {
-            $this->synonyms_file_path = sys_get_temp_dir() . '/' .
+            $this->synonyms_file_path = $basePath .
                 sprintf($this->synonyms_file_name, $this->getProjectTitle( true ), date('Ymd-His'));
             $this->fhSynonyms = fopen($this->synonyms_file_path, 'w');
         }
@@ -877,7 +880,7 @@ class VersatileExportController extends Controller
     
     private function doNamesOutput()
     {
-        $this->setFp();
+        $this->setFileHandler($this->fhNames);
         // Ruud: print header line only at start (when offset = 0)
         if ($this->offset == 0) {
             $this->printHeaderLine($this->names);
@@ -892,6 +895,7 @@ class VersatileExportController extends Controller
         if (!$this->getDoSynonyms() || $this->getOutputTarget() == 'screen') {
             return;
         }
+        $this->setFileHandler($this->fhSynonyms);
         // Ruud: create separate file for synonyms
         if ($this->offset == 0) {
             $this->doSynonymsOutputStart();
