@@ -61,7 +61,6 @@ class NSRFunctionsController extends Controller
 					$val['meta_geografie'], ', '
 				);
 			$data[$key]['meta_data']=$this->helpers->Functions->nuclearImplode('</span>: <span class="value">','</span><br /><span class="pic-meta-label">',$metaData,true);
-			
 		}
 		
 		return  $data;
