@@ -420,7 +420,6 @@ class UsersController extends Controller
                 unset($roles[$i]);
             }
 	    }
-//print_r($this->UserRights->getUserRoleId()); die();
 	    return $roles;
 	}
 

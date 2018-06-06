@@ -63,10 +63,10 @@ class SpeciesControllerNSR extends SpeciesController
         $this->NSRFunctions=new NSRFunctionsController;
         $this->moduleSettings=new ModuleSettingsReaderController;
 
-        $this->_taxon_base_url_images_main = $this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_main','module'=>'species','subst'=>'//images.naturalis.nl/original/') );
-        $this->_taxon_base_url_images_thumb = $this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_thumb','module'=>'species','subst'=>'//images.naturalis.nl/160x100/') );
-        $this->_taxon_base_url_images_overview = $this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_overview','module'=>'species','subst'=>'//images.naturalis.nl/original/') );
-        $this->_taxon_base_url_images_thumb_s = $this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_thumb_s','module'=>'species','subst'=>'//images.naturalis.nl/120x75/') );
+        $this->_taxon_base_url_images_main = $this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_main','module'=>'species','subst'=>'https://images.naturalis.nl/original/') );
+        $this->_taxon_base_url_images_thumb = $this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_thumb','module'=>'species','subst'=>'https://images.naturalis.nl/160x100/') );
+        $this->_taxon_base_url_images_overview = $this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_overview','module'=>'species','subst'=>'https://images.naturalis.nl/original/') );
+        $this->_taxon_base_url_images_thumb_s = $this->moduleSettings->getModuleSetting( array('setting'=>'base_url_images_thumb_s','module'=>'species','subst'=>'https://images.naturalis.nl/120x75/') );
 
 
         $this->smarty->assign( 'taxon_base_url_images_main',$this->_taxon_base_url_images_main );

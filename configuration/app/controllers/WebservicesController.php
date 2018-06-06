@@ -12,9 +12,9 @@ class WebservicesController extends Controller
 	private $_project=null;
 	private $_matchType=null;
 	private $_taxonUrl='/linnaeus_ng/app/views/species/nsr_taxon.php?epi=1&id=%s';
-	private $_thumbBaseUrl='http://images.naturalis.nl/160x100/';
-	private $_190x100BaseUrl='http://images.naturalis.nl/190x100/';
-	private $_nsrOriginalImageBaseUrl='http://images.naturalis.nl/original/';
+	private $_thumbBaseUrl='https://images.naturalis.nl/160x100/';
+	private $_190x100BaseUrl='https://images.naturalis.nl/190x100/';
+	private $_nsrOriginalImageBaseUrl='https://images.naturalis.nl/original/';
 	private $_domainNamePatch="www.nederlandsesoorten.nl"; // HTTP_HOST is unreliable (reverse proxy); must become setting REFAC2015
 	private $_JSONPCallback=false;
 	private $_JSON=null;
