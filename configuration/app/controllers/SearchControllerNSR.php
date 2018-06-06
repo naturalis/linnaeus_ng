@@ -652,7 +652,6 @@ class SearchControllerNSR extends SearchController
 				}
 			}
 		}
-//print_r($data); die();
 		
 		return
 			array(

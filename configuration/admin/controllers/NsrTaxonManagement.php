@@ -342,8 +342,6 @@ class NsrTaxonManagement extends NsrController
             'includeLanguageLabels' => true
         ));
 
-//die(print_r($pr));
-
         $this->smarty->assign('projectRanks', $pr);
 
         $this->smarty->assign('languages', $this->getProjectLanguages());

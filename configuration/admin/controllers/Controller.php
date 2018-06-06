@@ -131,7 +131,8 @@ class Controller extends BaseClass
         $this->setLanguages();
         $this->checkLastVisitedPage();
         $this->setSmartySettings();
-		$this->setRankIdConstants();
+        $this->setLanguageIdConstants();
+        $this->setRankIdConstants();
 		$this->setNameTypeIds();
         $this->setRequestData();
         $this->doLanguageChange();
@@ -3047,4 +3048,26 @@ class Controller extends BaseClass
 		$this->server_name=trim(@shell_exec( "hostname" ));
 	}
 
+	protected function setLanguageIdConstants()
+	{
+	    $lookup = [
+	        'dut' => ['LANGUAGE_ID_DUTCH', 2],
+	        'eng' => ['LANGUAGE_ID_ENGLISH' , 26],
+	        'sci' => ['LANGUAGE_ID_SCIENTIFIC', 123],
+	    ];
+	    
+	    $l = $this->models->Languages->_get(array('where' => 'iso3 in ("sci", "dut", "eng")'));
+	    $iso3s = array_column($l, 'iso3');
+	    
+	    foreach ($lookup as $iso3 => $code) {
+	        $id = in_array($iso3, $iso3s) ? $l[array_search($iso3, $iso3s)]['id'] : $code[1];
+	        define($code[0], $id);
+	    }
+	    
+	    // Admin only
+	    if (!defined('LANGUAGECODE_DUTCH')) define('LANGUAGECODE_DUTCH',LANGUAGE_ID_DUTCH);
+	    if (!defined('LANGUAGECODE_ENGLISH')) define('LANGUAGECODE_ENGLISH',LANGUAGE_ID_ENGLISH);
+	    
+	}
+	
 }

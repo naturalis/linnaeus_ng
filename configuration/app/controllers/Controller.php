@@ -214,8 +214,8 @@ class Controller extends BaseClass
         $this->loadModels();
         $this->loadControllerConfig();
         $this->loadSmartyConfig();
-        $this->checkWriteableDirectories();
-		$this->setRankIdConstants();
+        $this->setLanguageIdConstants();
+        $this->setRankIdConstants();
         $this->setRequestData();
 		$this->checkForProjectId();
         $this->checkGlobalAuthorization();
@@ -785,7 +785,7 @@ class Controller extends BaseClass
             ''
         ), $_SESSION['app']['project']['sys_name']));
     }
-
+    
     public function setProjectLanguages()
     {
         $lp = $this->models->LanguagesProjects->_get(array(
@@ -1089,9 +1089,6 @@ class Controller extends BaseClass
 
     public function formatTaxon($p=null)
     {
-
-    //	print_r($p);
-    	
 		if (is_null($p))
 			return;
 
@@ -3155,6 +3152,24 @@ class Controller extends BaseClass
         // Return raw output if result is no (valid) json
         return !is_null($output) ? $output : $result;
     }
+    
+    protected function setLanguageIdConstants()
+    {
+        $lookup = [
+            'dut' => ['LANGUAGE_ID_DUTCH', 2],
+            'eng' => ['LANGUAGE_ID_ENGLISH' , 26],
+            'sci' => ['LANGUAGE_ID_SCIENTIFIC', 123],
+        ];
+        
+        $l = $this->models->Languages->_get(array('where' => 'iso3 in ("sci", "dut", "eng")'));
+        $iso3s = array_column($l, 'iso3');
+        
+        foreach ($lookup as $iso3 => $code) {
+            $id = in_array($iso3, $iso3s) ? $l[array_search($iso3, $iso3s)]['id'] : $code[1];
+            define($code[0], $id);
+        }
+     }
+    
 	/*
 	protected function assignMobileDeviceInfo()
 	{
