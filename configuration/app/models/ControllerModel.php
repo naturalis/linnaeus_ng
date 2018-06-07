@@ -480,12 +480,12 @@ final class ControllerModel extends AbstractModel
 				and _b.module_id = " . $module_id;
 
         $d=$this->freeQuery($query);
-
+        
         // Fallback to default setting
         if (empty($d) && $use_default) {
             
             $query = "
-                select value
+                select default_value as value
                 from %PRE%module_settings
                 where setting = '" . $setting . "' and module_id = " . $module_id;
             

@@ -374,7 +374,7 @@ final class ControllerModel extends AbstractModel
 	    if (empty($d) && $use_default) {
 	        
 	        $query = "
-                select value 
+                select default_value as value
                 from %PRE%module_settings 
                 where setting = '" . $setting . "' and module_id = -1";
 	        
