@@ -17,7 +17,10 @@
 <script async src="https://www.googletagmanager.com/gtag/js?id={$googleAnalyticsCode}"></script>
 <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag()
+    {
+        dataLayer.push(arguments);
+    }
     gtag('js', new Date());
 
     gtag('config', '{$googleAnalyticsCode}', { 'anonymize_ip': true });
