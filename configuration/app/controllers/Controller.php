@@ -3061,7 +3061,8 @@ class Controller extends BaseClass
 		$d=$this->models->ControllerModel->getSetting(array(
 			'project_id' => $this->getCurrentProjectId(),
 			'module_id' => GENERAL_SETTINGS_ID,
-			'setting' => 'google_analytics_code'
+			'setting' => 'google_analytics_code',
+		    'use_default' => true,
 		));
 
 		if ($d)

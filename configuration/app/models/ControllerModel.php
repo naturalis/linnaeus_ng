@@ -37,7 +37,8 @@ final class ControllerModel extends AbstractModel
 	    $module_id = isset($params['module_id']) ? $params['module_id'] :  null;
 	    $setting = isset($params['setting']) ? $params['setting'] :  null;
         $substitute = isset($params['substitute']) ? $params['substitute'] : null;
-
+        $use_default = isset($params['use_default']) ? $params['use_default'] : false;
+        
         if ( is_null($project_id) || is_null($module_id) || is_null($setting) )
 		{
 			return null;
@@ -58,15 +59,23 @@ final class ControllerModel extends AbstractModel
 		";
 
 		$d=$this->freeQuery($query);
+		
+		// Fallback to default setting
+		if (empty($d) && $use_default) {
+		    
+		    $query = "
+                select value
+                from %PRE%module_settings
+                where setting = '" . $setting . "' and module_id = " . $module_id;
+		    
+		    $d = $this->freeQuery($query);
+		    
+		}
 
-		if (isset($d[0]) && !is_null($d[0]['value']) )
-		{
+		if (isset($d[0]) && !is_null($d[0]['value']) ) {
 			return $d[0]['value'];
 		}
-		else
-		{
-			return $substitute;
-		}
+		return $substitute;
 	}
 
     public function getTaxonById ($params)
