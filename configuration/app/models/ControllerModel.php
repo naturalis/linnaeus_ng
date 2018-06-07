@@ -456,7 +456,8 @@ final class ControllerModel extends AbstractModel
         $project_id = isset($params['project_id']) ? $params['project_id'] : null;
         $module_id = isset($params['module_id']) ? $params['module_id'] : null;
         $setting = isset($params['setting']) ? $params['setting'] : null;
-
+        $use_default = isset($params['use_default']) ? $params['use_default'] : false;
+        
         if (is_null($project_id) || is_null($module_id) || is_null($setting)) return;
 
 		$query = "
@@ -480,7 +481,19 @@ final class ControllerModel extends AbstractModel
 
         $d=$this->freeQuery($query);
 
-		return $d ? $d[0]['value'] : null;
+        // Fallback to default setting
+        if (empty($d) && $use_default) {
+            
+            $query = "
+                select value
+                from %PRE%module_settings
+                where setting = '" . $setting . "' and module_id = " . $module_id;
+            
+            $d = $this->freeQuery($query);
+            
+        }
+        
+        return $d ? $d[0]['value'] : null;
 	}
 
     public function getHotwords( $p )
