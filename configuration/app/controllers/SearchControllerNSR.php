@@ -204,7 +204,7 @@ class SearchControllerNSR extends SearchController
 				array(
 					'mime'=>'text/csv',
 					'charset'=>'utf-8',
-					'filename'=>'NSR-export-'.date('Ymd-his').$this->csvExportSettings['file-extension'])
+					'filename'=>'Export-'.date('Ymd-his').$this->csvExportSettings['file-extension'])
 					);
 		} else {
 			$this->smarty->assign('search',$search);
