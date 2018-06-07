@@ -34,7 +34,9 @@ $(document).ready(function()
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-21555206-1"></script>
 <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag() {
+        dataLayer.push(arguments);
+    }
     gtag('js', new Date());
 
     gtag('config', 'UA-21555206-1', { 'anonymize_ip': true });
