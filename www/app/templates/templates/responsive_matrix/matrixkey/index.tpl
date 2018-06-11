@@ -127,7 +127,7 @@ $(document).ready(function()
 </div>
 
 <div class="inline-templates" id="imageHtmlUrlTpl">
-    <a rel="prettyPhoto[gallery]" href="%IMAGE-URL%" pTitle="%PHOTO-LABEL%" title="">
+    <a href="%IMAGE-URL%" pTitle="%PHOTO-LABEL%" title="">
 	%IMAGE%
     </a>
 </div>
