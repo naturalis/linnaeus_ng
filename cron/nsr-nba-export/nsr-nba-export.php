@@ -57,19 +57,21 @@
 	file_put_contents( $outdir . $filelist, implode( PHP_EOL, $b->getFilelist() ) );
 
 	echo "compressing\n";
-	echo shell_exec( "cd " . $outdir ."; sh ./" . $compressor );
+	$filename = 'nsr-' . date('Y-m-d') . '.tar.gz';
+	echo shell_exec( 'cd ' . $outdir . '; tar zcf ' . $filename . ' *.xml');
+    echo shell_exec('/usr/local/bin/mc cp ' . $outdir . $filename . ' s3-nba-brondata/brondata-nsr/');
 
-	echo "adding\n";
-	echo shell_exec( "cd " . $outdir ."; git add -A" );
+//	echo "adding\n";
+//	echo shell_exec( "cd " . $outdir ."; git add -A" );
 
-	echo "committing\n";
-	echo shell_exec( "cd " . $outdir ."; git commit -m \"new dataset " . $tag ."\"" );
+//	echo "committing\n";
+//	echo shell_exec( "cd " . $outdir ."; git commit -m \"new dataset " . $tag ."\"" );
 //	echo shell_exec( "cd " . $outdir ."; ssh-agent bash -c 'ssh-add /root/.ssh/githubkey_nba_data; git push git@github.com:naturalis/nba-brondata-nsr.git'" );
 //	echo shell_exec( "cd " . $outdir ."; ssh-agent bash -c 'ssh-add /root/.ssh/githubkey_nba_data; git push origin " . $tag . " git@github.com:naturalis/nba-brondata-nsr.git'" );
-	echo shell_exec( "cd " . $outdir ."; git push git@git-brondata-nsr:naturalis/nba-brondata-nsr.git" );
+//	echo shell_exec( "cd " . $outdir ."; git push git@git-brondata-nsr:naturalis/nba-brondata-nsr.git" );
 
-	echo "tagging ".$tag."\n";
-	echo shell_exec( "cd " . $outdir ."; git tag " . $tag );
-	echo shell_exec( "cd " . $outdir ."; git push --tags git@git-brondata-nsr:naturalis/nba-brondata-nsr.git" );
-	echo "committing\n";
+//	echo "tagging ".$tag."\n";
+//	echo shell_exec( "cd " . $outdir ."; git tag " . $tag );
+//	echo shell_exec( "cd " . $outdir ."; git push --tags git@git-brondata-nsr:naturalis/nba-brondata-nsr.git" );
+//	echo "committing\n";
 
