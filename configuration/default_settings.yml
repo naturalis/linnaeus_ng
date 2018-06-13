@@ -1,0 +1,344 @@
+General:
+    default_id: -1
+    settings:
+        admin_message_fade_out_delay:
+            info: 'Delay in ms before the admin messages fade out. Warnings and errors never fade out.'
+            default_setting: ''
+        allowed_file_management_extensions:
+            info: 'Allowed extensions when uploading through file management (JSON-encoded array).'
+            default_setting: ''
+        concept_base_url:
+            info: 'Base URL for concepts (requires the project generates NSR-style pseudo PURLs).'
+            default_setting: ''
+        db_lc_time_names:
+            info: 'MySQL locale for date and time names.'
+            default_setting: nl_NL
+        email_settings:
+            info: 'JSON-encoded email settings (for password reset)'
+            default_setting: '{"host":"smtp.gmail.com","smtp_auth":1,"username":"noreply@naturalis.nl","password":"********","encryption":"ssl","port":465, "sender_mail" : "noreply@naturalis.nl", "sender_name" : "Linnaeus NG" }'
+        enable_file_management:
+            info: 'Enable local file management (for uploading local files)'
+            default_setting: 'FALSE'
+        front_end_use_basic_auth:
+            info: 'Switches on user/password authorization for the site''s front-end. Uses standard authorization dialog from the browser, but authorizes against the same username/password as the administration login. Any active user can enter.'
+            default_setting: ''
+        google_analytics_code:
+            info: 'Google analytics code ("UA-12345678-1"). Can be a single code, or a JSON-encoded array with the form [ { "code" : "UA-12345678-1" },{ "code" : "UA-98765432-2" } ]'
+            default_setting: 'UA-21555206-6'
+        image_root_skin:
+            info: 'Root of the image files that come with the skin'
+            default_setting: ''
+        picture_license_default:
+            info: 'Default license shown for pictures for which no license has been specified in the meta-data.'
+            default_setting: ''
+        show_advanced_search_in_public_menu:
+            info: 'Show advanced search link in public menu'
+            default_setting: 1
+        show_automatic_hybrid_markers:
+            info: 'Show or hide automatic × marker for taxa of hybrid ranks'
+            default_setting: 1
+        show_automatic_infixes:
+            info: 'Show or hide automatic infixes "var.", "subsp." and "f." for taxa of appropriate ranks'
+            default_setting: 1
+        show_hidden_modules_in_select_list:
+            info: 'toggle for showing ''show_in_menu=false''modules in project selection list (for debugging purposes)'
+            default_setting: ''
+        show_nsr_specific_stuff:
+            info: 'Show or hide(*) various NSR-specific function'
+            default_setting: 0
+        site_header_subtitle:
+            info: 'Slogan printed underneath the main project title (in some skins).'
+            default_setting: ''
+        skin:
+            info: 'styling of graphical interface of application front-end.'
+            default_setting: linnaeus_ng
+        start_page:
+            info: 'Specific URL (relative) to redirect to when a user first opens the application (front-end).'
+            default_setting: /linnaeus_ng/app/views/linnaeus/
+        support_email:
+            info: 'Support email address'
+            default_setting: linnaeus@naturalis.nl
+        suppress_restore_state:
+            info: 'Suppress the restoring of a module''s earlier state from the same session when re-accessing the module (front-end only).'
+            default_setting: 0
+        taxon_main_image_base_url:
+            info: 'taxon_main_image_base_url (needs to be re-examined)'
+            default_setting: ''
+        tree_show_upper_taxon:
+            info: 'Show the most upper taxon in the taxonomic tree; if set to false, the top of the tree will display the name of the project instead.'
+            default_setting: ''
+        url_to_picture_license_info:
+            info: 'URL to the page explaining the various picture licensing options (be aware, the same setting also exists, and should also be mainained, in the ''species'' module).'
+            default_setting: ''
+        wiki_base_url:
+            info: 'Base URL to the help Wiki. Can be parametrized with %module% (translated to controllerPublicName) and %page% (translated to pageName)'
+            default_setting: 'http://linnaeus.naturalis.nl/wiki/%module%#hn_%page%'
+
+Introduction:
+    default_id: 1
+    settings:
+        no_media:
+            info: 'Don''t use media module in the Introduction.'
+            default_setting: 1
+        welcome_topic_id:
+            info: 'ID of the page with the old migrated welcome-page'
+            default_setting: ''
+
+Glossary:
+    default_id: 2
+    settings:
+        no_media:
+            info: 'Don''t use media module in the Glossary.'
+            default_setting: 1
+
+Species:
+    default_id: 4
+    settings:
+        base_url_images_main:
+            info: 'Bbase URL of main image in NSR-style search results.'
+            default_setting: ''
+        base_url_images_overview:
+            info: 'Base URL of overview images in NSR-style search results.'
+            default_setting: ''
+        base_url_images_thumb:
+            info: 'Base URL of thumb images in NSR-style search results.'
+            default_setting: ''
+        base_url_images_thumb_s:
+            info: 'Base URL of smaller thumb images in NSR-style search results.'
+            default_setting: ''
+        ext_tab_timeout:
+            info: 'Time in seconds allowed for retrieval of external tab data before it is considered empty.'
+            default_setting: '5'
+        higher_taxa_rank_prefix:
+            info: 'Always prefix the taxon name with the rank for higher species'
+            default_setting: 1
+        include_overview_in_media:
+            info: 'Include the overview image in the general media page of a taxon as well.'
+            default_setting: ''
+        lookup_list_species_max_results:
+            info: 'Max. results in species lookup list (front-end)'
+            default_setting: ''
+        obsolete_passport_tabs:
+            info: 'Legacy tab titles that should be flagged as obsolete in the passport editor (use JSON-string: {"Old":"New","Totally obsolete":null})'
+            default_setting: ''
+        suppress_parent_child_relation_checks:
+            info: 'Suppress all checks on parent/child relations in when creating a taxon, except parent_base_rank < child_base_rank'
+            default_setting: 0
+        taxon_fetch_ez_data:
+            info: 'taxon_fetch_ez_data (should be re-examined)'
+            default_setting: ''
+        use_taxon_variations:
+            info: 'Allow the use of taxon variations (currently in use in the matrix key only)'
+            default_setting: ''
+        404_content:
+            info: '{"title":"Page not found","body":"The requested page could not be found."}"'
+            default_setting: ''
+        show_inherited_literature:
+            info: 'Also show links to literature about taxa higher up in the classification on the literature tab.'
+            default_setting: ''
+        tree_taxon_count_style:
+            info: 'Possible values: species_only (show only species count), species_established (species count & established count), none (removes count altogether)'
+            default_setting: ''
+        tree_initital_expand_levels:
+            info: 'Initial taxon tree auto expansion for n levels'
+            default_setting: ''
+        use_embedded_templates:
+            info: 'Allow embedded templates in passports'
+            default_setting: ''
+        use_page_blocks:
+            info: use_page_blocks
+            default_setting: ''
+
+Single-access key:
+    default_id: 6
+    settings:
+        keytype:
+            info: 'l2 or lng (not sure what the difference is anymore)'
+            default_setting: ''
+        no_media:
+            info: 'Don''t use media module in the Single-access key.'
+            default_setting: 0
+
+Multi-access key:
+    default_id: 7
+    settings:
+        allow_empty_species:
+            info: 'Allow empty species (species with no content in the species module) to appear in the matrix (L2 legacy keys only) [0,1]'
+            default_setting: 1
+        always_show_details:
+            info: 'Icon for species characters normally only appears when resultset <= items_per_page. set this to 1 to always display the icon, regardless of the size of the resultset. [0,1]'
+            default_setting: 1
+        always_sort_by_initial:
+            info: 'Sort result set on ''initial_sort_column'' after matching percentages have been calculated (default behaviour is sorting by match percentage) [1,0]'
+            default_setting: 0
+        browse_style:
+            info: 'Style of browsing through result sets [expand, paginate, show_all]'
+            default_setting: expand
+        calc_char_h_val:
+            info: 'Do or don''t calculate the H-value for characters (disabling increases performance) [0,1]'
+            default_setting: 1
+        enable_treat_unknowns_as_matches:
+            info: 'Eenables the function ''treat unknowns as matches'' which scores a taxon for which no state has been defined within a certain character as a match for that character (a sort of "rather safe than sorry"-setting). [0,1]'
+            default_setting: 0
+        generic_image_names:
+            info: 'Names of images used for missing taxon images. Can be a single image name, or a JSON-encoded array with the form {"portrait":"no_image_P.jpg","landscape":"on_image_L.jpg"}<br />Images should be present in the skin''s image directory (no full URLs)'
+            default_setting: 1
+        hide_images_when_none_available:
+            info: 'If none of the items in the resultset have an image, none are displayed. Set this to 0 to force the displaying of the generic "no image" image.'
+            default_setting: 1
+        image_orientation:
+            info: 'Orientation of taxon images in search results of matrix key [landscape, portrait]'
+            default_setting: portrait
+        image_root_skin:
+            info: 'Relative image root of the skin-images.'
+            default_setting: ../../media/system/skins/responsive_matrix/
+        img_to_thumb_regexp_pattern:
+            info: 'Reg exp replace pattern to match the URL of a species normal image (from the nsr_extras table) against for automatic creation of a thumbnail URL. Works in unison with ''img_to_thumb_regexp_replacement''. Take *great* care that the reg exp is valid and properly escaped, as there is currently no check on its validity, and a broken reg exp will cause errors. the default applies specifically to NSR-related keys.'
+            default_setting: '/http:\/\/images.naturalis.nl\/original\//'
+        img_to_thumb_regexp_replacement:
+            info: 'Replacement string for the reg exp in ''img_to_thumb_regexp_pattern'' (see there). can be empty!'
+            default_setting: 'http://images.naturalis.nl/comping/'
+        info_link_target:
+            info: 'Target of the info-link when retrieved from the database or specified by ''species_module_link'' or ''species_module_link_force''. has no effect if ''species_info_url'' is defined, as that setting takes precedence and causes taxon-info to be displayed in a pop-up. leave blank for _blank (ha).'
+            default_setting: ''
+        initial_sort_column:
+            info: 'Column to initially sort the data set on (without settting, program sorts on scientific name)'
+            default_setting: ''
+        introduction_topic_colophon_citation:
+            info: 'Topic name of the page from the introduction module to be used as colophon and citation-info.'
+            default_setting: 'Matrix colophon & citation'
+        introduction_topic_inline_info:
+            info: 'Topic name of the page from the introduction module containing additional info, to be displayed inline beneath the legend.'
+            default_setting: 'Matrix additional info'
+        introduction_topic_versions:
+            info: 'Topic name of the page from the introduction module to be used as version history.'
+            default_setting: 'Matrix version history'
+        items_per_line:
+            info: 'Number of resulting species per line [number]'
+            default_setting: '4'
+        items_per_page:
+            info: 'Number of resulting species per page (no effect when browse_style = ''show_all'') [number]'
+            default_setting: '16'
+        matrixtype:
+            info: 'nbc (EIS-style) or lng (old L2-style). when the old style disappears, this will become obsolete.'
+            default_setting: ''
+        matrix_main_title_header:
+            info: 'General title added above the matrix'' actual name.'
+            default_setting: 1
+        no_media:
+            info: 'Don''t use media module in the Matrix.'
+            default_setting: 1
+        no_taxon_images:
+            info: 'Make no attempt to show images for taxa'
+            default_setting: 1
+        popup_species_link_text:
+            info: 'Text for the remote link that appears in the pop-up that shows the info retrieved with species_info_url. Only relevant when species_info_url is defined and if there''s a species-specific info-URL in the nsr_extras as well. Note: strictly speaking, this is not the right place for something purely textually, as setting-values are not considered to be language-dependent. Oh well.'
+            default_setting: 'Meer details'
+        score_threshold:
+            info: 'Threshold of match percentage during identifying above which species displayed. setting to 100 only shows full matches, i.e. species that have all selected states. [0...100]'
+            default_setting: '100'
+        show_scores:
+            info: 'Show the matching percentage in the results (only useful when score_threshold is below 100). [0,1]'
+            default_setting: 0
+        similar_species_show_distinct_details_only:
+            info: 'When displaying similar species or search results, normally all details are displayed, rather than only the distinct details of each species. set this setting to 1 to switch to distinct-only.'
+            default_setting: 1
+        species_info_url:
+            info: 'External URL for further info on a species. overrides the species-specific URL from the nsr_extras table as link under the info-icon (though in some skins that URL is also displayed in the details pop-up). expects a webservice URL that returns a JSON-object that at least has an element ''page'' with an element ''body''. URL can be parametrised with %TAXON% (scientific name, key) and, optionally, %PID% (project ID). example: http://www.nederlandssoortenregister.nl/linnaeus_ng/app/views/webservices/taxon_page?pid=1&taxon=%TAXON%&cat=163'
+            default_setting: ''
+        species_module_link:
+            info: 'Link to use for the info-link when none is available for the taxon in the database. can be parametrised with %s for substitution of the taxon ID. note: ''species_info_url'' gets precedence.'
+            default_setting: '../species/nsr_taxon.php?id=%s'
+        species_module_link_force:
+            info: 'Link to use for the info-link, even when there is one available in the database. can be parametrised with %s for substitution of the taxon ID. note: ''species_info_url'' gets precedence.'
+            default_setting: '../species/nsr_taxon.php?id=%s'
+        suppress_details:
+            info: 'Suppresses retrieval and displaying of all character states for each item in de dataset. siginificantly reduces the footprint of the initial data-load. [0,1]'
+            default_setting: 0
+        suppress_image_enlarge:
+            info: 'Suppress the large image popup'
+            default_setting: 1
+        use_character_groups:
+            info: 'Allow characters to be organised in groups. [0,1]'
+            default_setting: 1
+        use_emerging_characters:
+            info: 'Disable characters as long as their states do not apply to all remaining species/taxa. [0,1]'
+            default_setting: 1
+        use_overview_image:
+            info: 'Use overview image from the species module as main species image.'
+            default_setting: ''
+        use_taxon_variations:
+            info: ''
+            default_setting: ''
+
+Search:
+    default_id: 12
+    settings:
+        excerpt_post-match_length:
+            info: 'Length of the displayed text excerpt following a search result.'
+            default_setting: '35'
+        excerpt_pre-match_length:
+            info: 'Length of the displayed text excerpt preceding a search result.'
+            default_setting: '35'
+        excerpt_pre_post_match_string:
+            info: 'Text string to embed preceding and following text with'
+            default_setting: ...
+        max_search_length:
+            info: 'Maximum length of search string'
+            default_setting: '50'
+        min_search_length:
+            info: 'Minimum length of search string'
+            default_setting: '3'
+        search_filter_dna_barcodes:
+            info: 'Show DNA-barcodes-filter in advanced search'
+            default_setting: 0
+        search_filter_multimedia:
+            info: 'Show multimedia-filter in advanced search'
+            default_setting: 0
+        search_filter_presence:
+            info: 'Show presence-filter in advanced search'
+            default_setting: 0
+        show_all_preferred_names_in_results:
+            info: 'Show all preferred names in search result (advanced search only)'
+            default_setting: 0
+        show_presence_in_results:
+            info: 'Show presensce status in search result (advanced search only)'
+            default_setting: 0
+        show_taxon_rank_in_results:
+            info: 'Show taxon rank in search result (simple search only)'
+            default_setting: 1
+        url_help_search_presence:
+            info: 'URL of the user help for the search category "presence" (NSR specific).'
+            default_setting: ''
+
+Literature:
+    default_id: 13
+    settings:
+        literature2_import_match_threshold:
+            info: 'Default matching threshold for literature bulk import (percentage).'
+            default_setting: 75
+
+Media:
+    default_id: 19
+    settings:
+        rs_base_url:
+            info: 'Base url to ResourceSpace server'
+            default_setting: 'https://resourcespace.naturalis.nl/plugins/'
+        rs_collection_id:
+            info: 'RS collection ID for current project (set dynamically when user is created)'
+            default_setting: ''
+        rs_new_user_api:
+            info: 'Name of RS API to create new RS user'
+            default_setting: api_new_user_lng
+        rs_password:
+            info: 'RS password (set dynamically when user is created)'
+            default_setting: ''
+        rs_upload_api:
+            info: 'Name of RS API to upload to RS'
+            default_setting: api_upload_lng
+        rs_user_key:
+            info: 'RS API user key for current project (set dynamically when user is created)'
+            default_setting: ''
+        rs_user_name:
+            info: 'RS user name (project name @ server name)'
+            default_setting: ''

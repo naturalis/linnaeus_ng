@@ -182,7 +182,7 @@ function setSuggestionId(ele)
 	return false;
 }
 
-var lineTpl='<li id="item-%IDX%" ident="%IDENT%" onclick="setSuggestionId(this);" onmouseover="activesuggestion=-1" data-sci-name="%SCIENTIFIC_NAME_DATA%">%LABEL%</li>';
+var lineTpl='<li id="item-%IDX%" ident="%IDENT%" onclick="return setSuggestionId(this);" onmouseover="activesuggestion=-1" data-sci-name="%SCIENTIFIC_NAME_DATA%">%LABEL%</li>';
 
 function buildSuggestions()
 {
