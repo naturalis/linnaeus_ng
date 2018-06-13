@@ -4,7 +4,6 @@
     $outdir = "/var/www/html/tmp/"; // root@various-linnaeusng-027:/var/opt# git clone git@git-brondata-nsr:naturalis/nba-brondata-nsr.git
 	$outfilebasename = "nsr-export";
 	$filelist = "filelist";
-	$compressor = "compress.sh";
 	$tag = date('Y.m.d--H.i.s');
 	 
 
@@ -59,7 +58,7 @@
 	echo "compressing\n";
 	$filename = 'nsr-' . date('Y-m-d') . '.tar.gz';
 	echo shell_exec( 'cd ' . $outdir . '; tar zcf ' . $filename . ' *.xml');
-    echo shell_exec('/usr/local/bin/mc cp ' . $outdir . $filename . ' s3-nba-brondata/brondata-nsr/');
+//  echo shell_exec('/usr/local/bin/mc cp ' . $outdir . $filename . ' s3-nba-brondata/brondata-nsr/');
 
 //	echo "adding\n";
 //	echo shell_exec( "cd " . $outdir ."; git add -A" );
