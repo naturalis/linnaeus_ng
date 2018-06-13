@@ -11,7 +11,7 @@
 
     {foreach from=$groups v k}
     <ul id="sortable{$k+1}" class="sortable-drag-list connectedSortable">
-        <li id="group-{$v.id}" class="ui-state-disabled">{$v.label} <span onclick="matrixDeleteGroup({$v.id})" title="{t}delete group{/t}" style="margin-left:5px;color:red;cursor:pointer">x</span></li>
+        <li id="group-{$v.id}" class="group-label">{$v.label} <span onclick="matrixDeleteGroup({$v.id})" title="{t}delete group{/t}" style="margin-left:5px;color:red;cursor:pointer; z-index:999;">x</span></li>
         {foreach from=$v.chars c e}
             <li id="char-{$c.id}" class="ui-state-default">{$c.short_label}</li>
         {/foreach}
@@ -50,7 +50,7 @@ $(document).ready(function()
 	$("[id^=sortable]").sortable({
 		opacity: 0.6, 
 		cursor: 'move',
-		items: "li:not(.ui-state-disabled)",
+		items: "li:not(.ui-state-disabled, .group-label)",
 		connectWith: ".connectedSortable"
 	}).disableSelection();
 
