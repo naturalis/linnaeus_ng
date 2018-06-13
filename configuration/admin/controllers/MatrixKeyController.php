@@ -335,7 +335,7 @@ class MatrixKeyController extends Controller
         $this->checkAuthorisation();
 
         if (!$this->_useCharacterGroups)
-            redirect('edit.php');
+            $this->redirect('edit.php');
 
         if ($this->getCurrentMatrixId() == null)
             $this->redirect('matrices.php');
