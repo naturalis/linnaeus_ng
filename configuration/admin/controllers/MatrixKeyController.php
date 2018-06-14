@@ -335,7 +335,7 @@ class MatrixKeyController extends Controller
         $this->checkAuthorisation();
 
         if (!$this->_useCharacterGroups)
-            redirect('edit.php');
+            $this->redirect('edit.php');
 
         if ($this->getCurrentMatrixId() == null)
             $this->redirect('matrices.php');
@@ -375,8 +375,9 @@ class MatrixKeyController extends Controller
 		{
 			$this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
 			$this->checkAuthorisation();
-
-			$c = $this->getCharacterGroups(['label'=>$this->rGetVal('new')]);
+            
+			$label = $this->rGetVal('new');
+			$c = $this->getCharacterGroups(['label'=>$label]);
 
 			if (!empty($c))
 			{
@@ -384,8 +385,7 @@ class MatrixKeyController extends Controller
 			}
 			else
 			{
-				$this->saveCharacterGroup([
-				]);
+			    $this->saveCharacterGroup(['label'=>$label]);
 			}
 
 			$this->deleteGUIMenuOrder();

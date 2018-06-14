@@ -1,6 +1,7 @@
 <div id="main-body">
 
-	{if $controllerBaseName !== 'module' and $controllerBaseName !== 'search'}
+<!-- Ruud: removed condition if $controllerBaseName !== 'module' /-->
+	{if $controllerBaseName !== 'search'}
 		{if $categories or (!$controllerMenuOverride and $controllerMenuExists and $controllerBaseName)}
 			<div class="sidebar__container">
 				{if $categories}

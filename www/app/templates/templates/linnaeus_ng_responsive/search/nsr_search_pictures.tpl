@@ -32,7 +32,7 @@
                       <option value="photographer"{if $search.sort=='photographer'} selected="selected"{/if}>{t}Fotograaf{/t}</option>
                     </select> -->
         		</div>
-            
+ 
 			<h4><span id="resultcount-header">{$results.count}</span></h4>
    			<div id="images-container">
 				{foreach from=$results.data item=v}

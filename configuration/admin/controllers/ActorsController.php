@@ -211,12 +211,12 @@ class ActorsController extends NsrController
     private function updateActor()
 	{
 		$fields = array(
-		    'name' => $this->translate('Naam'),
-		    'name_alt' => $this->translate('Alternatieve naam'),
-		    'gender' => $this->translate('Geslacht'),
-		    'is_company' => '"' . $this->translate('Persoon of instelling') . '"',
-		    'homepage' => $this->translate('Homepage'),
-		    'employee_of_id' => '"' . $this->translate('Werkzaam bij') . '"'
+		    'name' => $this->translate('Name'),
+		    'name_alt' => $this->translate('Alternative naam'),
+		    'gender' => $this->translate('Gender'),
+		    'is_company' => '"' . $this->translate('Person or organisation') . '"',
+		    'homepage' => $this->translate('Home page'),
+		    'employee_of_id' => '"' . $this->translate('Employee of') . '"'
 		);
 
 		foreach($fields as $field => $label) {

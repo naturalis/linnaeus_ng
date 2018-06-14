@@ -1721,7 +1721,20 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
   position: relative;
   background-size: cover;
   background-position: center;
-  overflow: hidden; }
+  overflow: hidden;
+}
+
+@media screen and (max-width: 994px) {
+  #taxonImage {
+    height: 200px;
+    display: block;
+    position: relative;
+    background-size: cover;
+    background-position: top;
+    overflow: hidden;
+  }
+}
+
   #taxonImage img {
     display: block;
     width: 100%;

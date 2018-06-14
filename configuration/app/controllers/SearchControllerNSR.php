@@ -193,24 +193,23 @@ class SearchControllerNSR extends SearchController
     public function searchExtendedAction()
     {
 		$search=$this->rGetAll();
-
+		$this->smarty->assign('url_taxon_detail',"http://". $this->httpHost.'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
+		
 		if ($this->rHasVal('action','export')) {
 			$search['limit']=1000;
 			$template='export_search_extended';
 			$this->smarty->assign('csvExportSettings',$this->csvExportSettings);
-			$this->smarty->assign('url_taxon_detail',"http://". $this->httpHost.'/nsr/concept/');
 
 			$this->downloadHeaders(
 				array(
 					'mime'=>'text/csv',
 					'charset'=>'utf-8',
-					'filename'=>'NSR-export-'.date('Ymd-his').$this->csvExportSettings['file-extension'])
+					'filename'=>'Export-'.date('Ymd-his').$this->csvExportSettings['file-extension'])
 					);
 		} else {
 			$this->smarty->assign('search',$search);
 			$this->smarty->assign('querystring',$this->reconstructQueryString(array('search'=>$search,'ignore'=>array('page'))));
 			$this->smarty->assign('presence_statuses',$this->getPresenceStatuses());
-			$this->smarty->assign('url_taxon_detail',"http://". $this->httpHost.'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
 			$template=null;
 		}
 
@@ -504,8 +503,8 @@ class SearchControllerNSR extends SearchController
 			$data[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['taxon_id'],'parent_id'=>$val['parent_id'] ] );
 			$data[$key]['taxon_download']=html_entity_decode(strip_tags($data[$key]['taxon']));
 			$data[$key]['overview_image']=$this->getTaxonOverviewImage($val['taxon_id']);
-			if ( $this->_show_all_preferred_names_in_results )
-			{
+			
+			if ( $this->_show_all_preferred_names_in_results ) {
 				$data[$key]['common_names']=
 					$this->models->Names->_get( [ 'id' => [
 						'project_id'=>$this->getCurrentProjectId(),
@@ -612,8 +611,9 @@ class SearchControllerNSR extends SearchController
 
 		foreach((array)$data as $key=>$val)
 		{
-			
-			$data[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name' => $val['taxon'], 'base_rank_id' => $val['base_rank_id'], 'taxon_id' => $val['taxon_id'] ] );
+		    $data[$key]['image'] = implode("/", array_map("rawurlencode", explode("/", $val['image'])));
+		    $data[$key]['thumb'] = implode("/", array_map("rawurlencode", explode("/", $val['thumb'])));
+		    $data[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name' => $val['taxon'], 'base_rank_id' => $val['base_rank_id'], 'taxon_id' => $val['taxon_id'] ] );
 			$data[$key]['validName']=$this->addHybridMarkerAndInfixes( [ 'name' => $val['validName'], 'base_rank_id' => $val['base_rank_id'], 'taxon_id' => $val['taxon_id'] ] );
 			$data[$key][0] = $this->NSRFunctions->formatPictureResults( [$val] );
 
@@ -651,7 +651,7 @@ class SearchControllerNSR extends SearchController
 				}
 			}
 		}
-
+		
 		return
 			array(
 				'count'=>$count,

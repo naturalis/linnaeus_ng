@@ -8,12 +8,17 @@
 
 	if (!defined('TIMEOUT_COL_RETRIEVAL')) define('TIMEOUT_COL_RETRIEVAL',600); // secs.
 
+	/*
 	if (!defined('LANGUAGE_ID_DUTCH')) define('LANGUAGE_ID_DUTCH',24);
 	if (!defined('LANGUAGE_ID_ENGLISH')) define('LANGUAGE_ID_ENGLISH',26);
 	if (!defined('LANGUAGE_ID_SCIENTIFIC')) define('LANGUAGE_ID_SCIENTIFIC',123);
 	if (!defined('LANGUAGECODE_DUTCH')) define('LANGUAGECODE_DUTCH',LANGUAGE_ID_DUTCH);
-	if (!defined('LANGUAGECODE_ENGLISH')) define('LANGUAGECODE_ENGLISH',LANGUAGE_ID_ENGLISH);
-
+    */
+	
+	// Circumvent problem with configuration...
+	if (!defined('LANGUAGECODE_ENGLISH')) define('LANGUAGECODE_ENGLISH',26);
+	if (!defined('LANGUAGECODE_DUTCH')) define('LANGUAGECODE_DUTCH',24);
+	
 	if (!defined('MODCODE_INTRODUCTION')) define('MODCODE_INTRODUCTION',1);
 	if (!defined('MODCODE_GLOSSARY')) define('MODCODE_GLOSSARY',2);
 	if (!defined('MODCODE_LITERATURE')) define('MODCODE_LITERATURE',3);

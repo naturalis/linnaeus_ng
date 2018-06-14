@@ -17,7 +17,7 @@ gulp.task('admin-bundle', ['modernizr'], function () {
     return browserify('./gulp/admin.js').bundle()
         .pipe(source('bundle.js'))
         .pipe(buffer())
-        //.pipe(uglify())
+        .pipe(uglify())
         .on('error', gutil.log)
         .pipe(gulp.dest('./www/admin/vendor/'));
 });
@@ -56,7 +56,7 @@ gulp.task('app-bundle', ['modernizr'], function () {
     return browserify('./gulp/app.js').bundle()
         .pipe(source('bundle.js'))
         .pipe(buffer())
-        //.pipe(uglify())
+        .pipe(uglify())
         .on('error', gutil.log)
         .pipe(gulp.dest('./www/app/vendor/'));
 });

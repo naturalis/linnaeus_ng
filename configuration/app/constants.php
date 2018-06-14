@@ -16,11 +16,12 @@
 	if (!defined('MODCODE_INDEX')) define('MODCODE_INDEX',11);
 	if (!defined('MODCODE_UTILITIES')) define('MODCODE_UTILITIES',12);
 
+	/*
 	if (!defined('LANGUAGE_ID_DUTCH')) define('LANGUAGE_ID_DUTCH',24);
 	if (!defined('LANGUAGE_ID_ENGLISH')) define('LANGUAGE_ID_ENGLISH',26);
 	if (!defined('LANGUAGE_ID_SCIENTIFIC')) define('LANGUAGE_ID_SCIENTIFIC',123);
 
-	/*
+
 	if (!defined('GENUS_RANK_ID')) define('GENUS_RANK_ID',63);
 	if (!defined('SUBGENUS_RANK_ID')) define('SUBGENUS_RANK_ID',64);
 	if (!defined('SPECIES_RANK_ID')) define('SPECIES_RANK_ID',74);

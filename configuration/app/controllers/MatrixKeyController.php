@@ -99,7 +99,7 @@ class MatrixKeyController extends Controller
     public $cssToLoad = array('matrix.css');
 
     public $jsToLoad = array(
-        'all' => array('main.js','matrix.js'),
+        'all' => array('scrollfix.js', 'script.js', 'main.js', 'matrix.js'),
         'IE' => array()
     );
 
