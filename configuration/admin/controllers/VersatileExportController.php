@@ -79,7 +79,7 @@ class VersatileExportController extends Controller
     private $traitGroups;
     private $selectedTraits = [];
     
-    private $limit = 10;
+    private $limit = 500;
     private $offset = 0;
      
     /*
@@ -92,11 +92,11 @@ class VersatileExportController extends Controller
     private $synonymStrategyThrehold=2000;
     
     private $fhNames;
-    private $names_file_name="%s-export--%s.csv";
+    private $names_file_name = "%s-export--%s.csv";
     private $names_file_path;
     
     private $fhSynonyms;
-    private $synonyms_file_name="%s-export-synonyms--%s.csv";
+    private $synonyms_file_name = "%s-export-synonyms--%s.csv";
     private $synonyms_file_path;
     
     private $fh;
@@ -206,8 +206,8 @@ class VersatileExportController extends Controller
                 $this->doSynonymsQuery();
                 $this->doOutput();
                 $this->offset += $this->limit;
-            } while (!empty($this->names));
-            $this->doOutputEnd();
+           } while (!empty($this->names));
+        $this->doOutputEnd();
         }
         
         $this->smarty->assign( 'presence_labels', $this->getPresenceStatuses() );
@@ -435,7 +435,7 @@ class VersatileExportController extends Controller
 			order by " .$this->getOrderBy() . "
 			    
 			limit " . $this->offset . ',' . $this->limit;
-			
+
 			$this->names=$this->models->VersatileExportModel->doMainQuery( array("query"=>$this->query) );
 			
 			if ( $this->getPrintQuery() )
@@ -691,9 +691,9 @@ class VersatileExportController extends Controller
  
         if ( $this->getOutputTarget()=='screen' ) $this->print("</pre>",$this->getNewLine());
         
-        $this->deleteFileHandlers();
+        $this->closeFileHandlers();
         
-        die();
+        $this->redirect();
     }
     
     
@@ -741,7 +741,7 @@ class VersatileExportController extends Controller
     {
         if ($this->getOutputTarget() == 'screen') {
             echo $string;
-        } else {
+        } else if (!empty($this->fh)) {
             fwrite($this->fh, $string);
         }
     }
@@ -771,8 +771,11 @@ class VersatileExportController extends Controller
     
     private function closeFileHandlers ()
     {
-        fclose($this->fhNames);
-        fclose($this->fhSynonyms);
+        foreach ([$this->fhNames, $this->fhSynonyms] as $fh) {
+            if (!empty($fh)) {
+                fclose($fh);
+            }
+        }
     }
     
     private function printUtf8BOM()
