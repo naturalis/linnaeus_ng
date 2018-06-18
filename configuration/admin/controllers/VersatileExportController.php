@@ -65,6 +65,10 @@ class VersatileExportController extends Controller
     private $concept_url;
     private $names=array();
     private $synonyms=array();
+    private $tc;
+    private $traits = [];
+    private $traitGroups;
+    private $selectedTraits = [];
     private $parentRegister=array();
     private $operators=
     [
@@ -76,8 +80,6 @@ class VersatileExportController extends Controller
     private $orderBy="_f.rank_id asc,_r.id, _t.taxon";  // rank, rank id, taxon
     private $show_nsr_specific_stuff;
     private $spoof_settings;
-    private $traitGroups;
-    private $selectedTraits = [];
     
     private $limit = 500;
     private $offset = 0;
@@ -129,6 +131,7 @@ class VersatileExportController extends Controller
     
     public function __construct ()
     {
+        set_time_limit(300);
         parent::__construct();
         $this->initialize();
     }
@@ -244,11 +247,11 @@ class VersatileExportController extends Controller
     
     private function getTraits ()
     {
-        $t = new TraitsTaxonController;
-        $groups = $t->getTraitgroups();
+        $this->tc = new TraitsTaxonController;
+        $groups = $this->tc->getTraitgroups();
         if (!empty($groups)) {
             foreach ($groups as $group) {
-                $this->traitGroups[$group['id']] = $t->getTraitgroup($group['id']);
+                $this->traitGroups[$group['id']] = $this->tc->getTraitgroup($group['id']);
             }
             $this->customSortArray($this->traitGroups, ['key' => 'name', 'maintainKeys' => true]);
             foreach ($this->traitGroups as $i => $d) {
@@ -258,8 +261,7 @@ class VersatileExportController extends Controller
             }
             return $this->traitGroups;
         }
-        unset($t);
-        return null;
+        return false;
     }
     
     private function getRanks()
@@ -510,13 +512,15 @@ class VersatileExportController extends Controller
             return;
         }
         
-        $t = new TraitsTaxonController;
+        if (empty($this->tc)) {
+            $this->tc = new TraitsTaxonController;
+        }
         
         foreach ((array)$this->names as $key => $val) {
             foreach ($this->selectedTraits as $id => $name) {
                 list($groupId, $traitId) = explode('-', $id);
                 $traits = [];
-                $taxonTraits = $t->getTaxonValues([
+                $taxonTraits = $this->tc->getTaxonValues([
                     'taxon' => $val['_taxon_id'],
                     'trait' => $traitId,
                     'group' => $groupId
