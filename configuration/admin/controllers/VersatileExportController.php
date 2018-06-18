@@ -73,7 +73,7 @@ class VersatileExportController extends Controller
 	private $limit=9999999;
 	private $show_nsr_specific_stuff;
 	private $spoof_settings;
-	private $traitGroups;
+	private $traitGroups = [];
 	private $selectedTraits = [];
 	
 
@@ -239,10 +239,9 @@ class VersatileExportController extends Controller
 	            $this->customSortArray($traits, ['key' => 'name']);
 	            $this->traitGroups[$i]['traits'] = $traits;
 	        }
-	        return $this->traitGroups;
 	    }
 	    unset($t);
-	    return null;
+	    return $this->traitGroups;
 	}
 	
 	private function getRanks()
@@ -514,6 +513,8 @@ class VersatileExportController extends Controller
     	        $this->names[$key][$name] = implode('|', $traits);
  	        }
 	    }
+	    
+	    unset($t);
 	}
 	
 	private function doSynonymsQuery()
