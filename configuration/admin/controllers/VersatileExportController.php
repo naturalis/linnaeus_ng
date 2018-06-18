@@ -152,6 +152,9 @@ class VersatileExportController extends Controller
         $this->concept_url=$this->moduleSettings->getGeneralSetting( 'concept_base_url' );
         $this->show_nsr_specific_stuff=$this->moduleSettings->getGeneralSetting( 'show_nsr_specific_stuff' , 0)==1;
         
+        $this->names_file_name = sprintf($this->names_file_name, $this->getProjectTitle(true), date('Ymd-His'));
+        $this->synonyms_file_name = sprintf($this->synonyms_file_name, $this->getProjectTitle(true), date('Ymd-His'));
+        
         if ( method_exists( $this->customConfig , 'getVersatileExportSpoof' ) )
         {
             $this->spoof_settings=$this->customConfig->getVersatileExportSpoof();
@@ -209,8 +212,8 @@ class VersatileExportController extends Controller
                 $this->doSynonymsQuery();
                 $this->doOutput();
                 $this->offset += $this->limit;
-           } while (!empty($this->names));
-        $this->doOutputEnd();
+            } while (!empty($this->names));
+            $this->doOutputEnd();
         }
         
         $this->smarty->assign( 'presence_labels', $this->getPresenceStatuses() );
@@ -668,14 +671,14 @@ class VersatileExportController extends Controller
     
     private function doOutputStart ()
     {
-        $this->openFileHandlers();
-        $this->setFileHandler($this->fhNames);
+       
+        if ($this->getOutputTarget()=='download') {
+            $this->openFileHandlers();
+            $this->setFileHandler($this->fhNames);
+            $this->printUtf8BOM();
+        }
         
-//        if ( $this->getOutputTarget()=='download' ) $this->printHeaders();
-        if ( $this->getOutputTarget()=='download' ) $this->printUtf8BOM();
-        
-        if ( $this->getOutputTarget()=='screen' )
-        {
+        if ($this->getOutputTarget()=='screen')  {
             header('Content-Type: text/html; charset=utf-8');
             $this->print("<pre>",$this->getNewLine());
         }
@@ -693,11 +696,15 @@ class VersatileExportController extends Controller
     {
         $this->doEOFMarkerOutput();
  
-        if ( $this->getOutputTarget()=='screen' ) $this->print("</pre>",$this->getNewLine());
+        if ($this->getOutputTarget() == 'download') {
+            $this->closeFileHandlers();
+            $this->createZipFile();
+        }
         
-        $this->closeFileHandlers();
-        
-        $this->redirect();
+        if ($this->getOutputTarget() == 'screen') {
+            $this->print("</pre>",$this->getNewLine());
+            die();
+        }
     }
     
     
@@ -753,7 +760,7 @@ class VersatileExportController extends Controller
     private function printHeaders()
     {
         header('Content-Type: application/csv');
-        header('Content-Disposition: attachment; filename='.sprintf($this->names_file_name,$this->getProjectTitle( true ),date('Ymd-His')));
+        header('Content-Disposition: attachment; filename=' . $this->names_file_name);
         header('Pragma: no-cache');
     }
     
@@ -762,13 +769,11 @@ class VersatileExportController extends Controller
         $basePath = $this->getProjectsMediaStorageDir();
         //$basePath = sys_get_temp_dir() . '/';
         
-        $this->names_file_path = $basePath .
-            sprintf($this->names_file_name, $this->getProjectTitle( true ), date('Ymd-His'));
+        $this->names_file_path = $basePath . $this->names_file_name;
         $this->fhNames = fopen($this->names_file_path, 'w');
         
         if ($this->getDoSynonyms()) {
-            $this->synonyms_file_path = $basePath .
-                sprintf($this->synonyms_file_name, $this->getProjectTitle( true ), date('Ymd-His'));
+            $this->synonyms_file_path = $basePath . $this->synonyms_file_name;
             $this->fhSynonyms = fopen($this->synonyms_file_path, 'w');
         }
     }
@@ -1239,5 +1244,20 @@ class VersatileExportController extends Controller
     {
         return isset($_SESSION['admin']['user']['export']['selected_branch_top']) ? $_SESSION['admin']['user']['export']['selected_branch_top'] : null;
     }
+    
+    private function createZipFile ()
+    {
+        $this->helpers->ZipFile->createArchive(str_replace('.csv', '', $this->names_file_name));
+        
+        $this->helpers->ZipFile->addFile($this->names_file_path, $this->names_file_name);
+        unset($this->names_file_path);
+        
+        if ($this->getDoSynonyms()) {
+            $this->helpers->ZipFile->addFile($this->synonyms_file_path, $this->synonyms_file_name);
+            unset($this->synonyms_file_path);
+        }
+        
+        $this->helpers->ZipFile->downloadArchive();
+     }
     
 }
