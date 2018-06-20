@@ -1249,11 +1249,11 @@ class VersatileExportController extends Controller
         $this->helpers->ZipFile->createArchive(str_replace('.csv', '', $this->names_file_name));
         
         $this->helpers->ZipFile->addFile($this->names_file_path, $this->names_file_name);
-        unset($this->names_file_path);
+        unlink($this->names_file_path);
         
         if ($this->getDoSynonyms()) {
             $this->helpers->ZipFile->addFile($this->synonyms_file_path, $this->synonyms_file_name);
-            unset($this->synonyms_file_path);
+            unlink($this->synonyms_file_path);
         }
         
         $this->helpers->ZipFile->downloadArchive();
