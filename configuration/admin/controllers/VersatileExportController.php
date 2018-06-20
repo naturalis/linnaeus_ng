@@ -699,6 +699,7 @@ class VersatileExportController extends Controller
         if ($this->getOutputTarget() == 'download') {
             $this->closeFileHandlers();
             $this->createZipFile();
+            $this->deleteTmpFiles();
         }
         
         if ($this->getOutputTarget() == 'screen') {
@@ -1249,14 +1250,22 @@ class VersatileExportController extends Controller
         $this->helpers->ZipFile->createArchive(str_replace('.csv', '', $this->names_file_name));
         
         $this->helpers->ZipFile->addFile($this->names_file_path, $this->names_file_name);
-        unlink($this->names_file_path);
+        
         
         if ($this->getDoSynonyms()) {
             $this->helpers->ZipFile->addFile($this->synonyms_file_path, $this->synonyms_file_name);
-            unlink($this->synonyms_file_path);
         }
         
         $this->helpers->ZipFile->downloadArchive();
+     }
+     
+     private function deleteTmpFiles ()
+     {
+         unlink($this->names_file_path);
+         
+         if ($this->getDoSynonyms()) {
+              unlink($this->synonyms_file_path);
+         }
      }
     
 }
