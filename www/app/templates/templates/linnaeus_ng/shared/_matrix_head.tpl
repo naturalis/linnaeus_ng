@@ -26,5 +26,4 @@
 {foreach $javascriptsToLoad.IE v}
     <!--[if IE]><script type="text/javascript" src="{$baseUrl}app/javascript/{$v}"></script><![endif]-->
 {/foreach}
-
 </head>

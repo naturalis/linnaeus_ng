@@ -53,7 +53,9 @@
 							} else {
 								$this->errors[] = $this->module . ': "' . $setting . "\" could NOT be added!";
 							}
-						}
+						} else {
+                            print $setting .  " already set\n" ;
+                        }
 					}
 				}
 			// }
