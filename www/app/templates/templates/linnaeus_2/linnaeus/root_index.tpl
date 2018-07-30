@@ -7,13 +7,13 @@
 	<title>{$texts.page_title}</title>
 	<link href="admin/media/system/favicon.ico" rel="shortcut icon" type="image/x-icon" />
 	<link href="admin/media/system/favicon.ico" rel="icon" type="image/x-icon" />
-  <link rel="stylesheet" type="text/css" href="{$baseUrl}app/style/css/ionicons.min.css">
+    <link rel="stylesheet" type="text/css" href="{$baseUrl}app/style/css/ionicons.min.css">
 	<link rel="stylesheet" type="text/css" href="{$baseUrl}app/style/css/homepage.css">
 	<link rel="stylesheet" type="text/css" href="app/style/css/ionicons.min.css">
 	<link rel="stylesheet" type="text/css" href="app/style/css/homepage.css">
 
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-	<script type="text/javascript" src="admin/javascript/main.js"></script>	
+	<script type="text/javascript" src="{$baseUrl}app/vendor/bundle.js"></script>
+	<script type="text/javascript" src="admin/javascript/main.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/homepage.js"></script>
 	<script type="text/javascript" src="app/javascript/homepage.js"></script>
 </head>
