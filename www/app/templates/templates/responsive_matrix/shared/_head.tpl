@@ -15,7 +15,6 @@
     <link rel="stylesheet" type="text/css" href="{$baseUrl}app/style/css/style.css">
     <link rel="stylesheet" type="text/css" href="{$baseUrl}app/vendor/ionicons/css/ionicons.min.css">
     <link rel="stylesheet" type="text/css" href="{$baseUrl}app/style/css/inline_templates.css">
-    <link rel="stylesheet" type="text/css" href="{$baseUrl}app/vendor/vendor.css" />
     <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$baseUrl}app/vendor/prettyPhoto/css/prettyPhoto.css" />
     <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$baseUrl}app/vendor/fancybox/jquery.fancybox.css" />
 
