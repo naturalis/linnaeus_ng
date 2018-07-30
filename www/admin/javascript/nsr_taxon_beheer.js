@@ -738,7 +738,8 @@ function doNsrDropList(p)
 	data = {
 		action: variable,
 		search: value,
-		time: allGetTimestamp()
+		time: allGetTimestamp(),
+		base_rank_id: (typeof taxonrank !== "undefined" && taxonrank) ? taxonrank : null
 	}
 
 	try {

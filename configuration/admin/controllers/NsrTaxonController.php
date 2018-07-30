@@ -586,7 +586,11 @@ class NsrTaxonController extends NsrController
 			$this->rHasVal('action', 'parent_taxon_id')
 		)
 		{
-            $return=$this->getSpeciesLookupList($this->rGetAll());
+		    $p = $this->rGetAll();
+		    if ($this->rHasVal('action', 'parent_taxon_id') && $this->rHasVal('base_rank_id')) {
+		        $p['rank_above'] = $this->rGetVal('base_rank_id');
+		    }
+		    $return=$this->getSpeciesLookupList($p);
         }
 		else
 		if (
@@ -991,7 +995,8 @@ class NsrTaxonController extends NsrController
 
     private function getSpeciesLookupList($p)
     {
-		$p['formatted']=0;
+        $p['formatted']=0;
+        
 		$taxa=$this->getSpeciesList($p);
 
 		$maxResults=isset($p['max_results']) && (int)$p['max_results']>0 ? (int)$p['max_results'] : $this->_lookupListMaxResults;
