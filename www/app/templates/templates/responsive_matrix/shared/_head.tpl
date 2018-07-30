@@ -21,7 +21,6 @@
 
     <script type="text/javascript" src="{$baseUrl}app/vendor/bundle.js"></script>
     <script type="text/javascript" src="{$baseUrl}app/javascript/scrollfix.js"></script>
-    <script type="text/javascript" src="{$baseUrl}app/javascript/script.js"></script>
     <script type="text/javascript" src="{$baseUrl}app/javascript/inline_templates.js"></script>
 {foreach $javascriptsToLoad.all v}
     <script type="text/javascript" src="{if $v|strpos:"http:"===false && $v|strpos:"https:"===false}{$baseUrl}app/javascript/{/if}{$v}"></script>
@@ -29,5 +28,4 @@
 {foreach $javascriptsToLoad.IE v}
     <!--[if IE]><script type="text/javascript" src="{$baseUrl}app/javascript/{$v}"></script><![endif]-->
 {/foreach}
-
 </head>
