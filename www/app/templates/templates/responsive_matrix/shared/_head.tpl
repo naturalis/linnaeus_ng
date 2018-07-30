@@ -18,6 +18,7 @@
     <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$baseUrl}app/vendor/prettyPhoto/css/prettyPhoto.css" />
     <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$baseUrl}app/vendor/fancybox/jquery.fancybox.css" />
 
+    <script type="text/javascript" src="{$baseUrl}app/vendor/raphael/raphael.min.js"></script>
     <script type="text/javascript" src="{$baseUrl}app/vendor/bundle.js"></script>
     <script type="text/javascript" src="{$baseUrl}app/javascript/scrollfix.js"></script>
     <script type="text/javascript" src="{$baseUrl}app/javascript/inline_templates.js"></script>

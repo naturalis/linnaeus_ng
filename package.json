@@ -42,6 +42,7 @@
     "modaldialog": "^0.2.8",
     "modernizr": "^3.6.0",
     "morris-js-module": "^1.2.1",
+    "morris.js06": "^0.6.2",
     "nestedSortable": "git+https://github.com/ilikenwf/nestedSortable.git",
     "prettyPhoto": "git+https://github.com/fredriks/prettyphoto.git",
     "sprintf-js": "git+https://github.com/alexei/sprintf.js.git",
