@@ -40,7 +40,8 @@ textarea {
 </style>
 
 <div id="page-main">
-    <p>
+	<h2><span style="font-size:12px;font-style:normal">{t}media{/t}:</span> {$taxon.taxon}</h2>   
+	 <p>
         <a href="../media/upload.php?item_id={$item_id}&amp;module_id={$module_id}">{t}upload media{/t}</a><br />
         <a href="../media/select.php?item_id={$item_id}&amp;module_id={$module_id}">{t}attach media{/t}</a><br />
     </p>
@@ -149,7 +150,7 @@ textarea {
 
     </form>
 
-    <p><a href="taxon.php?id={$item_id}">{t}back{/t}</a></p>
+    <p><a href="taxon.php?id={$item_id}&amp;noautoexpand=1">{t}back{/t}</a></p>
 
 </div>
 

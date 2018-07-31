@@ -270,7 +270,7 @@
 </form>
 <p>
 	{if $parent.id}
-	<a href="taxon.php?id={$parent.id}">{t}back{/t}</a>
+	<a href="taxon.php?id={$parent.id}&amp;noautoexpand=1">{t}back{/t}</a>
     {else}
 	<a href="index.php">{t}back{/t}</a>
     {/if}

@@ -119,7 +119,7 @@ function del_ref( id )
 </form>
 
     <p>
-        <a href="taxon.php?id={$concept.id}">{t}back{/t}</a>
+        <a href="taxon.php?id={$concept.id}&amp;noautoexpand=1">{t}back{/t}</a>
     </p>
 
 </div>
