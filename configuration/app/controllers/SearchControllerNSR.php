@@ -214,7 +214,7 @@ class SearchControllerNSR extends SearchController
 		}
 
 		$this->traitGroupsToInclude=$this->getTraitGroups();
-
+		
 		if (count((array)$this->traitGroupsToInclude)>0) {
 			$search['traits']=$this->rHasVal('traits') ? json_decode(urldecode($search['traits']),true) : null;
 			$search['trait_group']=$this->rHasVal('trait_group') ? $search['trait_group'] : null;
@@ -223,8 +223,12 @@ class SearchControllerNSR extends SearchController
 			foreach((array)$this->traitGroupsToInclude as $val)
 			{
 				$traits=$traits+$this->getTraits($val['id']);
-				if ($val['group_id']==$search['trait_group']) $search['trait_group_name']=$val['group_name'];
+				if ($val['group_id']==$search['trait_group']) {
+				    $search['trait_group_name']=$val['group_name'];
+				}
 			}
+			
+			ksort($traits);
 
 			$this->smarty->assign('trait_group_name', isset($search['trait_group_name']) ? $search['trait_group_name'] : null );
 			$this->smarty->assign('operators',$this->_operators);
@@ -931,13 +935,13 @@ class SearchControllerNSR extends SearchController
 		foreach((array)$r as $key=>$trait)
 		{
 			$trait['values']=$this->getTraitgroupTraitValues($trait['id']);
-			$data[$trait['trait_group_id']]['name']=$trait['group_name'];
-			$data[$trait['trait_group_id']]['description']=$trait['group_description'];
-			$data[$trait['trait_group_id']]['all_link_text']=$trait['group_all_link_text'];
-			$data[$trait['trait_group_id']]['show_show_all_link']=$trait['group_show_show_all_link'];
-			$data[$trait['trait_group_id']]['help_link_url']=$trait['group_help_link_url'];
-			$data[$trait['trait_group_id']]['group_id']=$trait['group_id'];
-			$data[$trait['trait_group_id']]['data'][]=$trait;
+			$data[$trait['group_order']]['name']=$trait['group_name'];
+			$data[$trait['group_order']]['description']=$trait['group_description'];
+			$data[$trait['group_order']]['all_link_text']=$trait['group_all_link_text'];
+			$data[$trait['group_order']]['show_show_all_link']=$trait['group_show_show_all_link'];
+			$data[$trait['group_order']]['help_link_url']=$trait['group_help_link_url'];
+			$data[$trait['group_order']]['group_id']=$trait['group_id'];
+			$data[$trait['group_order']]['data'][]=$trait;
 		}
 
 		return $data;

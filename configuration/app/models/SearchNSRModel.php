@@ -1560,7 +1560,8 @@ final class SearchNSRModel extends AbstractModel
 				_grp_d.translation as group_all_link_text,
 				_grp.id as group_id,
 				_grp.show_show_all_link as group_show_show_all_link,
-				_grp.help_link_url as group_help_link_url
+				_grp.help_link_url as group_help_link_url,
+                _grp.show_order as group_order
 
 			from
 				%PRE%traits_traits _a
