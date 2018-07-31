@@ -123,6 +123,20 @@ function appendValues()
 	}
 }
 
+function setTraits()
+{
+	if ($('#all_traits').prop('checked')) {
+		$('#trait-selector input[type=checkbox]').each(function() { 
+			$(this).prop('checked', true); 
+		});
+	} else {
+		$('#trait-selector input[type=checkbox]').each(function() { 
+			$(this).prop('checked', false); 
+		});
+	}
+	$('#trait-selector').toggle($(!this).prop('checked'));
+}
+
 function doSubmit()
 {
 	// check
@@ -396,6 +410,16 @@ function doSubmit()
 		<div class="fieldsubset">
 		<h4>{t}Traits{/t}</h4>
         <table>
+        <tr>
+                <td colspan="2">
+                	<label>
+                    	<input
+                        	onchange="setTraits()"
+                            type="checkbox"
+                            id="all_traits" />{t}Export all traits{/t}</label>
+                </td>
+			</tr>
+        <tbody id="trait-selector">
         {foreach $traits group}
         	<tr><td colspan=2>{$group.name}</td></tr>
         	{foreach $group.traits trait}
@@ -405,6 +429,7 @@ function doSubmit()
         	</tr>
         	{/foreach}
         {/foreach}
+        </tbody>
 		</table>
 		</div>
 		{/if}
