@@ -257,13 +257,15 @@ class SpeciesControllerNSR extends SpeciesController
             }
 
             $classification=(isset($content['classification']) ? $content['classification'] : isset($classification) ? $classification : null);
-            
             $content= isset($content['content']) ? $content['content'] : null;
             
             if ($categories['start']['tabname'] != 'CTAB_MEDIA') {
                 $content = $this->matchHotwords($content);
             }
             
+            // LINNA-1291 : Remove body tags from content
+            $content=preg_replace("/<\/?body[^>]*>/", '', $content);
+
             if ( $this->_use_embedded_templates )
             {
                 $content=

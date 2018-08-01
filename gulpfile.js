@@ -71,7 +71,8 @@ gulp.task('app-copy', function () {
     gulp.src([
         'node_modules/prettyPhoto/**/*',
         'node_modules/ionicons/css/*',
-        'node_modules/ionicons/fonts/*'
+        'node_modules/ionicons/fonts/*',
+        'node_modules/raphael/**/*'
     ], { base: 'node_modules' })
         .pipe(gulp.dest('./www/app/vendor'));
     gulp.src([
