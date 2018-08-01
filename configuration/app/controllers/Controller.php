@@ -236,7 +236,7 @@ class Controller extends BaseClass
 		$this->setShowAutomaticInfixes();
 		$this->setGoogleAnalyticsCode();
 		$this->setGeneralHeaderSubtitle();
-		//$this->assignMobileDeviceInfo();
+		$this->assignMobileDeviceInfo();
     }
 
     /**
