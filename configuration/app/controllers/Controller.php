@@ -3171,7 +3171,6 @@ class Controller extends BaseClass
         }
      }
     
-	/*
 	protected function assignMobileDeviceInfo()
 	{
 		$this->smarty->assign('deviceInfo',[
@@ -3182,7 +3181,6 @@ class Controller extends BaseClass
 			'isiOS'=>$this->helpers->MobileDetect->isiOS()
 		]);
 	}
-	*/
 }
  
  
