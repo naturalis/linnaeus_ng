@@ -998,6 +998,7 @@ p {
 
 .treebranchContainer {
   background-color: #fff;
+  overflow : hidden;
   padding: 22px 30px 23px 30px; }
   @media screen and (max-width: 994px) {
       .treebranchContainer.filterPictures {
