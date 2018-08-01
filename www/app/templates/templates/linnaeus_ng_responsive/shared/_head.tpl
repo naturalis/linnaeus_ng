@@ -24,6 +24,7 @@
 			<link rel="stylesheet" type="text/css" media="screen" href="{$v}" />
 		{/foreach}
 	{/if}
+	<script type="text/javascript" src="{$baseUrl}app/vendor/raphael/raphael.min.js"></script>
     <script type="text/javascript" src="{$baseUrl}app/vendor/bundle.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/main.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/inline_templates.js"></script>

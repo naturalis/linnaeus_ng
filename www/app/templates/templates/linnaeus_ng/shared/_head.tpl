@@ -40,6 +40,7 @@
     <![endif]-->
 
 
+	<script type="text/javascript" src="{$baseUrl}app/vendor/raphael/raphael.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/vendor/bundle.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.shrinkText.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.prettyDialog.js"></script>
