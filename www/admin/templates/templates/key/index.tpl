@@ -15,7 +15,7 @@
     <ul class="admin-list">
         <li><a href="step_show.php">{t}Show key (from startpoint){/t}</a></li>
         <li><a href="section.php">{t}Edit key sections{/t}</a></li>
-        <li><a href="map.php">{t}Key map{/t}</a></li>
+        <!--<li><a href="map.php">{t}Key map{/t}</a></li>-->
         <li><a href="renumber.php">{t}Renumber steps{/t}</a></li>
         <li><a href="cleanup.php">{t}Clean up empty steps, orphaned choices and ghostly targets{/t}</a></li>
     </ul>
