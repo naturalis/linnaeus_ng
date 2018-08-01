@@ -147,8 +147,9 @@ function initTinyMce(litRefs,mediaRefs) {
 		init_instance_callback : function(editor) {
 		    tMCEOnInit();
         },
-		plugins : "media,fullscreen,spellchecker,preview,print,searchreplace,table,directionality,paste,-example",
-		theme_modern_buttons1 : "cut,copy,pastetext,pasteword,|,undo,redo,|,search,replace,|,bold,italic,underline,forecolor,formatselect,|,ltr,rtl,|,link,unlink,|,bullist,numlist,hr,|,indent,table,|,spellchecker,removeformat,charmap,|,code,visualaid,fullscreen,print",
+        plugins: 'print preview fullpage searchreplace autolink directionality visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists textcolor wordcount imagetools contextmenu colorpicker textpattern help code',
+        menubar: false,
+        toolbar: 'formatselect | bold italic strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | removeformat | code',
 		theme_modern_toolbar_location : "top",
 		theme_modern_toolbar_align : "left",
 		theme_modern_statusbar_location : "bottom",
