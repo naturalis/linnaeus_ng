@@ -14,7 +14,7 @@
 					<ul class="footer-menu__list">
 						<li>
 							<a href="http://linnaeus.naturalis.nl/" target="_blank">
-								Linnaeus NG 2.0
+								Linnaeus
 							</a>
 						</li>
 						<li>

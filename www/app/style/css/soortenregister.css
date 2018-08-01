@@ -1735,7 +1735,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
     overflow: hidden;
   }
   #taxonHeader #headerImage {
-    height: 200px;
+    height: 200px !important;
   }
 }
 
