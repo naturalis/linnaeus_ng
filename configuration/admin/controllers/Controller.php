@@ -904,12 +904,12 @@ class Controller extends BaseClass
     {
         $includeLanguageLabels = isset($p['includeLanguageLabels']) ? $p['includeLanguageLabels'] : false;
         $pId = isset($p['pId']) ? $p['pId'] :  $this->getCurrentProjectId();
-
+        
 		$pr = $this->models->ControllerModel->getProjectRanks(array(
 			'project_id'=>$pId,
 			'language_id'=>$this->getDefaultProjectLanguage()
 		));
-
+		
 		if ($includeLanguageLabels)
 		{
 
@@ -933,7 +933,7 @@ class Controller extends BaseClass
 				}
 			}
 		}
-
+		
         return $pr;
     }
 

@@ -86,11 +86,10 @@
             </select> *
 		</td>
 	</tr>
-
     <tr>
     	<th>{t}rank{/t}:</th>
         <td>
-			{if $name.type_id!=$validnameid}
+ 			{if $name.type_id!=$validnameid}
                 <select id="name_rank_id">
                 <option value="" {if $name.rank_id==''} selected="selected"{/if}>{t}n.a.{/t}</option>
                 {foreach from=$ranks item=v}
@@ -98,7 +97,7 @@
                 {/foreach}
                 </select>
             {else}
-                {foreach from=$ranks item=v}{if $v.id==$name.rank_id}{$v.label}{/if}{/foreach}
+                {foreach from=$ranks item=v}{if $v.id==$concept.rank_id}{$v.label}{/if}{/foreach}
             {/if}
         </td>
     </tr>
