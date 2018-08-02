@@ -23,7 +23,9 @@ function openeditor(caller)
 	var editor=CKEDITOR.replace('editor'+id,
 	{
 		toolbar:'Basic',
-		height: 300 /*,
+		height: 300,
+        removeButtons: 'subscript,superscript'
+		/*,
 		entities_processNumerical: true
 		*/
 	});

@@ -48,11 +48,11 @@ $(document).ready(function()
 	{
 		$_me = $(this);
 
-		arr_arguments = $_me.attr("onclick").split("'");
+        $_me
+            .removeAttr('onclick')
+				.attr('onClick', 'showVideo("' + arr_arguments[1] + '","' + arr_arguments[3] +'");');
 
-		$_me
-			.removeAttr('onclick')
-			.attr('onClick', 'showVideo("' + arr_arguments[1] + '","' + arr_arguments[3] +'");');
+		arr_arguments = $_me.attr("onclick").split("'");
 	});
 
 
