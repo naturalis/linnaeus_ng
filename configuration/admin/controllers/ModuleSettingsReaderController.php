@@ -124,6 +124,10 @@ class ModuleSettingsReaderController extends Controller
 			{
 				return $val['value'];
 			}
+            if ($val['setting']==$setting && is_null($val['value']) && !is_null($val['default_value']))
+            {
+                return $val['default_value'];
+            }
 		}
 
 		if ( isset($subst) )

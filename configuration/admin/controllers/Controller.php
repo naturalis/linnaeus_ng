@@ -395,7 +395,9 @@ class Controller extends BaseClass
      */
     public function getCurrentProjectId()
     {
-        return isset($_SESSION['admin']['project']['id']) ? $_SESSION['admin']['project']['id'] : null;
+        // This default here was null, now it is -1, but this would cause trouble with general settings
+        // if this fix causes other problems, please refactor
+        return isset($_SESSION['admin']['project']['id']) ? $_SESSION['admin']['project']['id'] : -1;
     }
 
     public function getCurrentProjectData()
