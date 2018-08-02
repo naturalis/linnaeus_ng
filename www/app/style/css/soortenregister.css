@@ -1813,7 +1813,9 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
           transform: translateX(-50%); }
   @media screen and (max-width: 500px) {
     #header {
-      height: 200px; } }
+      height: 200px;
+    }
+  }
   #header .logo {
     width: 100px;
     bottom: 30px;
@@ -1821,7 +1823,9 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
     position: absolute; }
     @media screen and (max-width: 994px) {
       #header .logo {
-        left: 30px; } }
+        left: 30px;
+      }
+    }
   #header .siteTitle {
     width: 312px;
     position: absolute;
@@ -2124,4 +2128,9 @@ strong {
 .whiteBox {
   max-width: 100%;
   max-width: 735px; /* for IE only, but <!--[if !IE]> no longer detects IE >= v10 */
+}
+@media screen and (max-width: 994px) {
+    .fancybox-caption {
+      font-size : 8px ! important;
+    }
 }
