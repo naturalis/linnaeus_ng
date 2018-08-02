@@ -130,8 +130,6 @@ class UserRights
 		$c=isset( $this->controller );
 		$m=isset( $this->moduleid );
 		
-	//	die("$p $u $c $m");
-		
 		$this->setStatus( 'no access: unspecified error' );
 		
 		if ( !$u )
