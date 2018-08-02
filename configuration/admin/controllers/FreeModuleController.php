@@ -47,7 +47,8 @@ class FreeModuleController extends Controller
     public function __construct ()
     {
         parent::__construct();
-		$this->UserRights->setModuleType( $this->UserRights->getModuleTypeCustom() );
+		$this->UserRights->setModuleType($this->UserRights->getModuleTypeCustom());
+		$this->UserRights->setFreeModuleId($this->getCurrentModuleId());
 		$this->controllerPublicName = $this->getActiveModuleName();
 		$this->setMediaController();
     }

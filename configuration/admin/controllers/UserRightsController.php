@@ -130,6 +130,8 @@ class UserRights
 		$c=isset( $this->controller );
 		$m=isset( $this->moduleid );
 		
+	//	die("$p $u $c $m");
+		
 		$this->setStatus( 'no access: unspecified error' );
 		
 		if ( !$u )
@@ -428,6 +430,12 @@ class UserRights
 	public function getNoModule()
 	{
 		return $this->nomodule;
+	}
+	
+	public function setFreeModuleId ($id) {
+	    if (is_int($id) && $this->moduletype == $this->getModuleTypeCustom()) {
+	        $this->moduleid = $id;
+	    }
 	}
 
     private function setAuthorizeState( $state )
