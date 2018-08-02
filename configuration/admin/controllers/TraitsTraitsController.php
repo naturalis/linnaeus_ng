@@ -115,7 +115,7 @@ class TraitsTraitsController extends TraitsController
     {
 		$this->UserRights->setActionType( $this->UserRights->getActionCreate() );
 		$this->checkAuthorisation();
-
+		
 		if ($this->rHasVal('action','save'))
 		{
 			$this->saveTraitgroup($this->rGetAll());
@@ -366,7 +366,7 @@ class TraitsTraitsController extends TraitsController
 	
 	private function saveTraitgroup($p)
 	{
-		$id=isset($p['id']) ? $p['id'] : null;
+	    $id=isset($p['id']) ? $p['id'] : null;
 		$parent_id=!empty($p['parent_id']) ? (int)$p['parent_id'] : 'null';
 		$sysname=isset($p['sysname']) ? $p['sysname'] : null;
 		$names=isset($p['names']) ? $p['names'] : null;
@@ -376,7 +376,7 @@ class TraitsTraitsController extends TraitsController
 		$show_show_all_link=isset($p['show_show_all_link']) && in_array($p['show_show_all_link'],array('0','1'))? $p['show_show_all_link'] : null;
 		$help_link_url=!empty($p['help_link_url']) ? $p['help_link_url'] : 'null';
 
-		if ( is_null($sysname) ) return false;
+		if ( is_null($sysname) || !array_filter($names)) return false;
 		
 		if (!empty($id))
 		{

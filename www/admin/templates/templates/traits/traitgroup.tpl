@@ -64,8 +64,8 @@
         	<td style="padding-top:10px;"><i>{$v.language}</i></td>
 		</tr>
         <tr>
-        	<th>name:</th>
-            <td><input id="names-{$k}" name="names[{$v.language_id}]" type="text" value="{$group.names[{$v.language_id}]}" placeholder="max. 64 characters"></td>
+        	<th><label for="names-{$k}">name</label>:</th>
+            <td><input id="names-{$k}" name="names[{$v.language_id}]" type="text" value="{$group.names[{$v.language_id}]}" placeholder="max. 64 characters" mandatory="mandatory"> *</td>
 		</tr>
         <tr>
         	<th>description:</th>
