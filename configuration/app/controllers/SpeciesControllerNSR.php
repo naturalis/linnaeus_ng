@@ -264,7 +264,9 @@ class SpeciesControllerNSR extends SpeciesController
             }
             
             // LINNA-1291 : Remove body tags from content
-            $content=preg_replace("/<\/?body[^>]*>/", '', $content);
+            if (is_string($content)) {
+                $content=preg_replace("/<\/?body[^>]*>/", '', $content);
+            }
 
             if ( $this->_use_embedded_templates )
             {
