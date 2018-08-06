@@ -429,6 +429,12 @@ class UserRights
 	{
 		return $this->nomodule;
 	}
+	
+	public function setFreeModuleId ($id) {
+	    if (is_int($id) && $this->moduletype == $this->getModuleTypeCustom()) {
+	        $this->moduleid = $id;
+	    }
+	}
 
 	public function setFreeModuleId( $id )
     {
