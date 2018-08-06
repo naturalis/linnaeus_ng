@@ -430,6 +430,14 @@ class UserRights
 		return $this->nomodule;
 	}
 
+	public function setFreeModuleId( $id )
+    {
+        if ( is_int($id) && $this->moduletype==$this->getModuleTypeCustom() )
+        {
+            $this->moduleid = $id;
+        }
+    }
+
     private function setAuthorizeState( $state )
 	{
 		$this->authorizestate=$state;
