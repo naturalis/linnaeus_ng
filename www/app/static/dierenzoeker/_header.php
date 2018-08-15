@@ -23,7 +23,6 @@
                     <ul class="menu">
                         <li><a href="../../views/matrixkey/identify.php" class="no-text" id="home-btn">Home</a></li>
                         <li><a href="tv.php" class="no-text" id="tv-btn">Dierenzoeker op TV</a></li>
-                        <li><a href="onderwijs.php" class="no-text" id="onderwijs-btn">Onderwijs</a></li>                        
                     </ul>                             
                     <a href='http://www.naturalis.nl' class="no-text" target="_blank" style='border:0px solid black;display:block;position:absolute;left:890px;top:2px;width:70px;height:90px;'>Naturalis</a>
                     <a href='http://www.hetklokhuis.nl' class="no-text" target="_blank" style='border:0px solid black;display:block;position:absolute;left:818px;top:2px;width:67px;height:62px;'>Klokhuis</a>
