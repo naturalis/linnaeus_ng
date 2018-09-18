@@ -9,6 +9,7 @@
     {foreach $googleAnalyticsCode v k}
     ga('create', '{$v->code}', 'auto'{if $k>0}, 'clientTracker{$k}'{/if});
     ga('set', 'anonymizeIp', true);
+	ga('set', 'forceSSL', true);
     ga('{if $k>0}clientTracker{$k}.{/if}send', 'pageview');
     {/foreach}
 
