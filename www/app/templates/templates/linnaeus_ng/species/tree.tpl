@@ -75,7 +75,7 @@ function growbranches(data)
 					'' 
 				)+
 				(data.node.child_count && data.node.child_count.total>0 && !activeNode ?
-					'<span class="child-count">'+data.node.child_count.total+' soorten in totaal / '+data.node.child_count.established+' gevestigde soorten</span>' :
+					'<span class="child-count">'+data.node.child_count.total+' {t}soorten in totaal{/t} / '+data.node.child_count.established+' {t}gevestigde soorten{/t}</span>' :
 					'' 
 				)+
 				(data.node.child_count && data.node.child_count.total>0 && activeNode ?
