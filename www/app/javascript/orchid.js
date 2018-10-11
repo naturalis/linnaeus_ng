@@ -38,8 +38,9 @@ $(function() {
 		$('#search').focus();
 	});
 
-	$('body').on('click', '.menu-toggle-js', function() {
+	$('body').on('click', ".menu-toggle-js", function() {
 		$('body').toggleClass('menu-open-push');
+		//alert();
 	});
 
 	$('body').on('click', '.menu-toggle-over-js', function() {
