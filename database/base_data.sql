@@ -2131,9 +2131,9 @@ UNLOCK TABLES;
 LOCK TABLES `roles` WRITE;
 /*!40000 ALTER TABLE `roles` DISABLE KEYS */;
 INSERT INTO `roles` VALUES
-(1,'System administrator','System administrator; creates new projects and lead experts',now(),now()),
-(2,'Lead expert','Project administrator',now(),now()),
-(3,'Editor','Project editor',now(),now());
+(1,'System administrator','System administrator; creates new projects and lead experts',1,now()),
+(2,'Lead expert','Project administrator',0,now()),
+(3,'Editor','Project editor',0,now());
 /*!40000 ALTER TABLE `roles` ENABLE KEYS */;
 UNLOCK TABLES;
 
