@@ -54,6 +54,8 @@
 	if (!defined('PREDICATE_MISSPELLED_NAME')) define('PREDICATE_MISSPELLED_NAME','isMisspelledNameOf');
 	if (!defined('PREDICATE_INVALID_NAME')) define('PREDICATE_INVALID_NAME','isInvalidNameOf');
 	if (!defined('PREDICATE_ALTERNATIVE_NAME')) define('PREDICATE_ALTERNATIVE_NAME','isAlternativeNameOf');
-
+	if (!defined('PREDICATE_NOMEN_NUDEM')) define('PREDICATE_NOMEN_NUDEM','isNomenNudemOf');
+	if (!defined('PREDICATE_MISIDENTIFICATION')) define('PREDICATE_MISIDENTIFICATION','isMisidentificationOf');
+	
 	if (!defined('MATRIX_STYLE_DEFAULT')) define('MATRIX_STYLE_DEFAULT','default');
 	if (!defined('MATRIX_STYLE_NBC')) define('MATRIX_STYLE_NBC','nbc');

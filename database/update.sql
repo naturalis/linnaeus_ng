@@ -1,6 +1,13 @@
 ALTER DATABASE `linnaeus_ng` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE linnaeus_ng;
 
+insert ignore into name_types (
+    select null, id as project_id, 'isMisidentificationOf', now(), now() from projects
+);
+insert ignore into name_types (
+    select null, id as project_id, 'isNomenNudemOf', now(), now() from projects
+);
+
 INSERT IGNORE INTO `traits_date_formats` VALUES
 (1,'year','Y','JJJJ','%Y',0,now(),now()),
 (2,'fulldate','d-m-Y','DD-MM-JJJJ','%Y-%m-%d',1,now(),now());

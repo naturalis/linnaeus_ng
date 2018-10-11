@@ -81,7 +81,7 @@ class VersatileExportController extends Controller
     private $show_nsr_specific_stuff;
     private $spoof_settings;
     
-    private $limit = 500;
+    private $limit = 20000;
     private $offset = 0;
      
     /*
