@@ -605,7 +605,7 @@ class UserRights
 			$batchSize=1000;
 			$i=0;
 			$d=true;
-
+			
 			while (!is_null($d))
 			{
 				$d=$this->model->freeQuery( "
@@ -618,7 +618,7 @@ class UserRights
 						and MATCH(parentage) AGAINST ('" . Controller::generateTaxonParentageId( $item ) . "' in boolean mode)
 					limit " . $batchSize . " offset " . ($batchSize * $i++) ."
 				" );
-
+				
 				foreach((array)$d as $val)
 				{
 					array_push( $this->subjacentitems, $val['taxon_id'] );

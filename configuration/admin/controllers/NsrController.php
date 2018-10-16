@@ -237,7 +237,7 @@ class NsrController extends Controller
 
 	public function saveTaxonParentage( $id=null )
 	{
-		if ( is_null($id) )
+	    if ( is_null($id) )
 		{
 			return $this->TaxonParentageController->generateParentageAll();
 		}

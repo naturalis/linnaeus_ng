@@ -66,13 +66,17 @@ class TaxonParentageController extends Controller
 	public function generateParentage( $id )
 	{
 		$this->tmp=0;
+		
 		// circumventing unexplained errors (mysqli spontaneously getting lost)
 		//$this->models->TaxonQuickParentage->delete( [ 'project_id' => $this->getCurrentProjectId(), 'taxon_id'=>$id ] );
+
 		mysqli_query(
 			$this->models->TaxonQuickParentage->databaseConnection,
 			"delete from " . $this->models->TaxonQuickParentage->tableName. "
-				where project_id = " . $this->getCurrentProjectId() . " and taxon_id = " .$id
+				where project_id = " . $this->getCurrentProjectId() . 
+ 		      " and MATCH(parentage) AGAINST ('" . self::generateTaxonParentageId($id) . "' in boolean mode)"
 		);
+		
 		$this->getProgeny($id,0,array());
 		return $this->tmp;
 	}
@@ -106,7 +110,7 @@ class TaxonParentageController extends Controller
 	private function getProgeny($parent,$level,$family)
 	{
 		$family[]=Controller::generateTaxonParentageId($parent);
-
+		
 		$result = $this->models->Taxa->_get( [
 			'id' => [
 				'project_id' => $this->getCurrentProjectId(),
@@ -114,7 +118,7 @@ class TaxonParentageController extends Controller
 			],
 			'columns' => 'id,parent_id,taxon,'.$level.' as level'
 		] );
-
+		
 		foreach((array)$result as $row)
 		{
 			$row['parentage']=$family;
@@ -125,7 +129,7 @@ class TaxonParentageController extends Controller
 				'taxon_id' => $row['id'],
 				'parentage' => implode(' ',$row['parentage'])
 			] );
-
+			
 			$this->tmp++;
 
 			$this->getProgeny($row['id'],$level+1,$family);
