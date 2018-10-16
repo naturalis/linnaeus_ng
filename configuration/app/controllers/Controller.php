@@ -3167,7 +3167,7 @@ class Controller extends BaseClass
         
         foreach ($lookup as $iso3 => $code) {
             $id = in_array($iso3, $iso3s) ? $l[array_search($iso3, $iso3s)]['id'] : $code[1];
-            define($code[0], $id);
+            if (!defined($code[0])) define($code[0], $id);
         }
      }
     

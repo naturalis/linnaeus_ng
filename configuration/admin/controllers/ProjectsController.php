@@ -134,7 +134,8 @@ class ProjectsController extends Controller
 	*/
     public function modulesAction ()
     {
-		$this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
+
+        $this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
         $this->checkAuthorisation();
 
         $this->setPageName($this->translate('Project modules'));
@@ -152,13 +153,25 @@ class ProjectsController extends Controller
 
             if (count((array) $fmp) < $this->freeModulesMax && !$this->isFormResubmit())
 			{
-                $this->models->FreeModulesProjects->save(
+                
+			    
+			    
+			    
+			    $this->models->FreeModulesProjects->save(
                 array(
                     'id' => null,
                     'module' => $this->rGetVal('module_new'),
                     'project_id' => $this->getCurrentProjectId(),
                     'active' => 'n'
                 ));
+                // LINNA-1192: we must add the module to user_module_access
+                // get non-sysadmin users and their access rights
+                
+                
+                
+                // get 
+                
+                
             } else {
                 $this->addError(sprintf($this->translate('There is a maximum of %s self-defined modules.'), $this->freeModulesMax));
             }

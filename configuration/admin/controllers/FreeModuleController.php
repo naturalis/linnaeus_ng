@@ -48,7 +48,7 @@ class FreeModuleController extends Controller
     {
         parent::__construct();
 		$this->UserRights->setModuleType($this->UserRights->getModuleTypeCustom());
-		$this->UserRights->setFreeModuleId($this->getCurrentModuleId());
+		$this->UserRights->setFreeModuleId($this->getFreeModuleId());
 		$this->controllerPublicName = $this->getActiveModuleName();
 		$this->setMediaController();
     }
@@ -707,7 +707,7 @@ class FreeModuleController extends Controller
 	    return isset($activeModule['id']) ? $activeModule['id'] : false;
 
 	}
-
+	
 	private function isUserAuthorizedForFreeModule($id=null)
 	{
 
@@ -730,15 +730,10 @@ class FreeModuleController extends Controller
 	}
 
 
-	private function getFreeModule($id=null)
+	private function getFreeModule ($id=null)
 	{
 
-		$id =
-			isset($id) ?
-				$id :
-				!is_null($this->rGetVal('freeId')) ?
-					$this->rGetVal('freeId') :
-					$this->getCurrentModuleId();
+		$id = isset($id) ? $id : $this->getFreeModuleId();
 
 		$fmp = $this->models->FreeModulesProjects->_get(
 			array(
@@ -751,6 +746,13 @@ class FreeModuleController extends Controller
 
         if ($fmp) return $fmp[0];
 
+	}
+	
+	private function getFreeModuleId () 
+	{
+	    return !is_null($this->rGetVal('freeId')) ?
+	       $this->rGetVal('freeId') :
+	       $this->getCurrentModuleId();
 	}
 
 	private function createPage()

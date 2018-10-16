@@ -120,12 +120,13 @@ class UserRights
 		$this->setUserModuleAccess();
 		$this->setNoModule( false );
 		$this->setUserItems();
+		
 		//$this->setUserSubjacentItems(); // moved to canManageItem() for performance reasons
     }
 
     public function canAccessModule()
     {
-		$p=isset( $this->projectid );
+        $p=isset( $this->projectid );
 		$u=isset( $this->userid );
 		$c=isset( $this->controller );
 		$m=isset( $this->moduleid );
@@ -429,6 +430,16 @@ class UserRights
 	{
 		return $this->nomodule;
 	}
+	
+	public function setFreeModuleId ($id) {
+	    if (is_numeric($id) && $this->moduletype == $this->getModuleTypeCustom())
+	    {
+	        $this->moduleid = $id;
+	        $this->setUserModuleAccess();
+	        $this->setUserItems();
+	        
+	    }
+	}
 
    private function setAuthorizeState( $state )
 	{
@@ -558,7 +569,7 @@ class UserRights
 
 	private function setUserModuleAccess()
 	{
-		if ( is_null($this->moduleid) || is_null($this->moduletype) )
+	    if ( is_null($this->moduleid) || is_null($this->moduletype) )
 			return;
 
 		$d=$this->model->freeQuery( "
