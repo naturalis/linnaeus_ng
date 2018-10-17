@@ -242,7 +242,8 @@ class SearchControllerGeneral extends SearchController
 			)
 		);
 
-		$this->smarty->assign('modules',$this->getProjectModules(array('ignore'=>MODCODE_MATRIXKEY)));
+		$this->smarty->assign('modules',
+		     $this->getProjectModules(['active' => 'y', 'ignore'=>MODCODE_MATRIXKEY]));
 		$this->smarty->assign('minSearchLength',$this->_minSearchLength);
 		$this->smarty->assign('search',
 			array(
