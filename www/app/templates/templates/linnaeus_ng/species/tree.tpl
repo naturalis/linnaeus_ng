@@ -188,18 +188,21 @@ li.child.no-expand {
 	<div id="content" class="taxon-detail">
 
 		<div id="taxonHeader" class="hasImage">
-			<div id="tree-container"></div>
+			<div id="tree-container">{if !$isPublished}{t}No data available.{/t}{/if}</div>
 		</div>
 
 	</div>
 
 </div>
 
+{if $isPublished}
 <script type="text/JavaScript">
 $(document).ready(function()
 {
 	restoretree();
 });
 </script>
+{else}
 
+{/if}
 

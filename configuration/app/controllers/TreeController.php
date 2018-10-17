@@ -73,27 +73,34 @@ class TreeController extends Controller
 		header('Cache-Control: post-check=0, pre-check=0', false);
 		header('Pragma: no-cache');
 		*/
-
-		$tree=$this->restoreTree();
-
-		if (is_null($tree))
-		{
-			$this->smarty->assign('nodes',json_encode($this->getTreeNode(array('node'=>false,'count'=>'species'))));
-		}
-		else
-		{
-			$this->smarty->assign('tree',json_encode($tree));
-		}
-
-		if ($this->rHasVar('expand'))
-		{
-			$this->smarty->assign('expand',(int)$this->rGetVal('expand'));
-		}
-
-		$this->smarty->assign('tree_taxon_count_style',$this->_tree_taxon_count_style);
-		$this->smarty->assign('tree_top',$this->getTreeTop());
-		$this->smarty->assign('initial_expansion',$this->_tree_initital_expand_levels);
-		$this->smarty->assign('controllerMenuOverride',true);
+	    $published = $this->isProjectModulePublished('nsr');
+	    
+	    if ($published) {
+	        
+       		$tree=$this->restoreTree();
+    		
+    		if (is_null($tree))
+    		{
+    			$this->smarty->assign('nodes',json_encode($this->getTreeNode(array('node'=>false,'count'=>'species'))));
+    		}
+    		else
+    		{
+    			$this->smarty->assign('tree',json_encode($tree));
+    		}
+    
+    		if ($this->rHasVar('expand'))
+    		{
+    			$this->smarty->assign('expand',(int)$this->rGetVal('expand'));
+    		}
+    
+    		$this->smarty->assign('tree_taxon_count_style',$this->_tree_taxon_count_style);
+    		$this->smarty->assign('tree_top',$this->getTreeTop());
+    		$this->smarty->assign('initial_expansion',$this->_tree_initital_expand_levels);
+ 		
+	    }
+		
+	    $this->smarty->assign('controllerMenuOverride', true);
+	    $this->smarty->assign('isPublished', $published);
 		
 		$this->printPage('tree');
 	}

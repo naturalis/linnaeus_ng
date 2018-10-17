@@ -1485,6 +1485,28 @@ class Controller extends BaseClass
 		);
 
     }
+    
+    /**
+     * Checks if module is published/active
+     * 
+     * Check is necessary to see if data is module is published. If not, data should be hidden.
+     * 
+     * @param string $m Module controller or name
+     * @return boolean
+     */
+    public function isProjectModulePublished ($m)
+    {
+        foreach ($this->getProjectModules(['active' => 'y']) as $modules) {
+            foreach ($modules as $module) {
+                if ((isset($module['controller']) && $module['controller'] == strtolower($m)) || 
+                    strtolower($module['module']) == strtolower($m)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
 
     /**
      * Perfoms a usort, using user defined sort by-field, sort direction and case-sensitivity
