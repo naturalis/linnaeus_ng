@@ -54,9 +54,9 @@ class SearchControllerNSR extends SearchController
 
     public $usedHelpers = array();
 
-	public $cssToLoad = array('search.css');
+	public $cssToLoad = ['search.css', 'traits.css'];
 
-	public $jsToLoad = array();
+	public $jsToLoad = ['all' => ['traits.js', 'main.js']];
 
 	private $cTabs=[
 		'CTAB_NAMES'=>['id'=>-1,'title'=>'Naamgeving'],
@@ -216,20 +216,21 @@ class SearchControllerNSR extends SearchController
 		$this->traitGroupsToInclude=$this->getTraitGroups();
 		
 		if (count((array)$this->traitGroupsToInclude)>0) {
-			$search['traits']=$this->rHasVal('traits') ? json_decode(urldecode($search['traits']),true) : null;
+
+		    $search['traits']=$this->rHasVal('traits') ? json_decode(urldecode($search['traits']),true) : null;
 			$search['trait_group']=$this->rHasVal('trait_group') ? $search['trait_group'] : null;
 
 			$traits=array();
 			foreach((array)$this->traitGroupsToInclude as $val)
-			{
-				$traits=$traits+$this->getTraits($val['id']);
+			{			    
+			    $traits=$traits+$this->getTraits($val['id']);
 				if ($val['group_id']==$search['trait_group']) {
 				    $search['trait_group_name']=$val['group_name'];
 				}
 			}
 			
 			ksort($traits);
-
+			
 			$this->smarty->assign('trait_group_name', isset($search['trait_group_name']) ? $search['trait_group_name'] : null );
 			$this->smarty->assign('operators',$this->_operators);
 			$this->smarty->assign('traits',$traits);

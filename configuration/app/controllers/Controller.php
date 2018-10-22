@@ -1793,6 +1793,7 @@ class Controller extends BaseClass
 		$this->smarty->assign('show_advanced_search_in_public_menu', $this->getSetting('show_advanced_search_in_public_menu',1)==1 );
 		$this->smarty->assign('googleAnalyticsCode', $this->getGoogleAnalyticsCode());
 		$this->smarty->assign('generalHeaderSubtitle', $this->getGeneralHeaderSubtitle());
+		$this->smarty->assign('hasTraits', $this->isProjectModulePublished('traits'));
     }
 
     public function loadControllerConfig ($controllerBaseName = null)

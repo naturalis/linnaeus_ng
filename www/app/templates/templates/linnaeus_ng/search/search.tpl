@@ -4,6 +4,11 @@
 	<input type="hidden" name="extended" value="1" />
 	<div class="page-generic-div">
 		<ul class="tabs">
+			{if $hasTraits}
+			<li class="tab">
+				<a href="../search/nsr_search_extended.php">{t}Filter species{/t}</a>
+			</li>
+			{/if}
 			<li class="tab-active">
 				<a href="#">{t}Advanced search{/t}</a>
 			</li>
