@@ -10,7 +10,7 @@
         
         {*
         <div class="formrow">
-           <label accesskey="g" for="author">{t}Auteur{/t}</label>
+           <label accesskey="g" for="author">{t}Author{/t}</label>
            <input type="text" size="60" class="field" id="author" name="author" autocomplete="off" value="{$search.author}">
            <div id="author_suggestion" match="like" class="auto_complete" style="display:none;"></div>
         </div>
@@ -29,7 +29,7 @@
         <ul id="traits{$k1}-options" class="selectableParametersPanel">
           {if $t.help_link_url}
             <li>
-              <a href="{$t.help_link_url}" target="_blank"  title="{t}klik voor help over dit onderdeel{/t}" class="help">{t}Meer informatie{/t}</a>
+              <a href="{$t.help_link_url}" target="_blank"  title="{t}click for help{/t}" class="help">{t}Additional information{/t}</a>
               </li>
           {/if}
           
@@ -64,7 +64,7 @@
         {if $t.show_show_all_link}
           <li>
             <a href="#" onclick="setTraitGroup({$t.group_id});submitSearchParams();return;">
-            {if $t.all_link_text}{$t.all_link_text}{else}{t _s1=$t.name}Alle taxa met %s tonen{/t}{/if}
+            {if $t.all_link_text}{$t.all_link_text}{else}{t _s1=$t.name}Show all taxa with %s{/t}{/if}
             </a>
           </li>
         {/if}
@@ -75,10 +75,10 @@
 
 
         <div class="formrow selected-parameters" style="display:none">
-           <label class="clickable">{t}Geselecteerde kenmerken{/t}</label>
+           <label class="clickable">{t}Selected traits{/t}</label>
            <span id="remove-all" style="display:none">
               <a href="#" class="removeAllParams" onclick="removeAllSearchParameters();submitSearchParams();return;">{t}remove all{/t}</a>
-              <!-- a href="nsr_search_extended.php">{t}alles verwijderen{/t}</a -->
+              <!-- a href="nsr_search_extended.php">{t}remove all{/t}</a -->
            </span>
            <ul id="search-parameters">
            </ul>

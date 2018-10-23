@@ -45,6 +45,8 @@
 </style>
                 
 <div id="main-body">
+
+	{include file="_searchtabs.tpl" activeTab="extendedSearch" responsiveTabs="mobile"}
 	<div class="sidebar__container">
 		{include file="_extendedSearchFilters.tpl"}
 		{include file="_toolbox.tpl"}
@@ -52,6 +54,7 @@
 	
 	<div id="page-container">
 
+<!--
 	<div class="page-generic-div" {$responsiveTabs}>
 		<ul class="tabs" style="background-color: white;">
 			<li class="tab-active">
@@ -69,12 +72,14 @@
 	    <input type="text" size="60" class="field focusfirst" id="{$responsiveTabs}group" name="group" autocomplete="off" placeholder="{t}Filter by species group...{/t}" value="{$search.group}">
 	    <div id="{$responsiveTabs}group_suggestion" match="like" class="auto_complete" style="display:none;"></div>
 	</div>
+-->
 
 	<div id="dialogRidge">
+	
 	<div id="content" class="simple-search">
-
+		{include file="_searchtabs.tpl" activeTab="extendedSearch" responsiveTabs="desktop"}
+	
 		<div id="results" class="searchResultContainer"> 
-		
 		<!--
 			<div class="searchHeader">
 	      <h2>

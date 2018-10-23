@@ -1304,7 +1304,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
 
 .searchBoxContainer {
   background-color: #fff;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
   width: 100%; }
   .searchBoxContainer.mobile {
     display: none; }
@@ -1331,7 +1331,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
   .searchBoxContainer .active {
     background-color: #009ee0; }
     .searchBoxContainer .active a {
-      color: #fff; }
+      color: #fff }
   .searchBoxContainer a {
     padding: 17px 15px;
     color: #000;
@@ -2140,3 +2140,25 @@ strong {
     }
 }
 
+/* Ruud: overrule hover and border */
+#content a, #content a:hover {
+	color: #e3004a;
+    text-decoration: none;
+	border: 0;
+}
+
+#page-container #content ul {
+	padding: 0;
+}
+
+.tabs {
+	line-height: 16px;
+}
+
+.tab a.active {
+    color: #fff !important;
+}
+
+.tabs a {
+    color: #009ee0 !important;
+}
