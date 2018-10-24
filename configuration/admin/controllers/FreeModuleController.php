@@ -1084,6 +1084,10 @@ class FreeModuleController extends Controller
 
     private function detachAllMedia ()
     {
+        if (empty($this->_mc)) {
+            return false;
+        }
+        
         $media = $this->_mc->getItemMediaFiles();
 
         if (!empty($media)) {
