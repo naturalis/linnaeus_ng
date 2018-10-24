@@ -12,7 +12,7 @@ class ZipFile
 
     public function createArchive( $filename=null )
     {
-		$this->_tmpfile=tempnam("tmp", "zip");
+		$this->_tmpfile=@tempnam("tmp", "zip");
 		$this->_zip = new ZipArchive();
 		$this->_zip->open($this->_tmpfile, ZipArchive::OVERWRITE);
 		if ( !is_null($filename) ) $this->setFileName($filename);
