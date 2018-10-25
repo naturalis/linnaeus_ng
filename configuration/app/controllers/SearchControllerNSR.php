@@ -56,7 +56,8 @@ class SearchControllerNSR extends SearchController
 
 	public $cssToLoad = ['search.css', 'traits.css'];
 
-	public $jsToLoad = ['all' => ['traits.js', 'main.js']];
+	public $jsToLoad = ['all' => ['main.js']];
+	//['all' => ['traits.js', 'main.js']];
 
 	private $cTabs=[
 		'CTAB_NAMES'=>['id'=>-1,'title'=>'Naamgeving'],
