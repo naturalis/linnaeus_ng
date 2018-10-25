@@ -1,4 +1,4 @@
-{include file="../shared/header.tpl" title="{t}Advanced search{/t}"}
+{include file="../shared/header.tpl" title="{t}Full search{/t}"}
 {* @todo: to be removed: onsubmit="return searchDoSearchForm()" *}
 <form id="searchForm" class="advanced-search__form" method="get" action="">
 	<input type="hidden" name="extended" value="1" />
@@ -10,7 +10,7 @@
 			</li>
 			{/if}
 			<li class="tab-active">
-				<a href="#">{t}Advanced search{/t}</a>
+				<a href="#">{t}Full search{/t}</a>
 			</li>
 			<li>
 				<a href="../species/tree.php">{t}Taxonomic tree{/t}</a>

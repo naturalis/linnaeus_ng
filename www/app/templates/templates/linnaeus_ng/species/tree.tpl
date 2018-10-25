@@ -7,7 +7,7 @@
 			</li>
 			{/if}
 			<li class="tab">
-				<a href="../search/search.php">{t}Advanced search{/t}</a>
+				<a href="../search/search.php">{t}Full search{/t}</a>
 			</li>
 			<li class="tab-active">
 				<a href="#">{t}Taxonomic tree{/t}</a>
