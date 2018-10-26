@@ -232,7 +232,12 @@ class IntroductionController extends Controller
             $media = $this->_mc->getItemMediaFiles();
 
             if ($media) {
+                
+                print_r( $media[0]);
                 $page['image']['file_name'] = $media[0]['rs_original'];
+                $page['image']['width'] = $media[0]['width'];
+                $page['image']['height'] = $media[0]['height'];
+                $page['image']['title'] = $media[0]['title'];
             }
 
 			return $page;
