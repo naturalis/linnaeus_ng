@@ -27,5 +27,6 @@
     $b->setScpOriginAddress( $origHost['host'] );
     $b->setScpOriginBasePath( $origHost['path'] );
 
-    $b->setMetaDataLanguage( 24 );  // dutch
+    // Default to Dutch for NSR; added to config for CSR!
+    $b->setMetaDataLanguage( !empty($lang) ? $lang : 24 ); 
     $b->run();
