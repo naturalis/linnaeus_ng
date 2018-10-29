@@ -1473,11 +1473,7 @@ class Controller extends BaseClass
 			'maintainKeys' => true
 		));
 
-		$freeModules = $this->models->FreeModulesProjects->_get(array(
-			'id' => array(
-				'project_id' => $d['project_id']
-			)
-		));
+		$freeModules = $this->models->FreeModulesProjects->_get($p);
 
 		return array(
 			'modules' => $modules,

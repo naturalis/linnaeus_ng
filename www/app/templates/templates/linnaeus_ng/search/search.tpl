@@ -4,14 +4,14 @@
 	<input type="hidden" name="extended" value="1" />
 	<div class="page-generic-div">
 		<ul class="tabs">
+			<li class="tab-active">
+				<a href="#">{t}Full search{/t}</a>
+			</li>
 			{if $hasTraits}
 			<li class="tab">
 				<a href="../search/nsr_search_extended.php">{t}Filter species{/t}</a>
 			</li>
 			{/if}
-			<li class="tab-active">
-				<a href="#">{t}Full search{/t}</a>
-			</li>
 			<li>
 				<a href="../species/tree.php">{t}Taxonomic tree{/t}</a>
 			</li>

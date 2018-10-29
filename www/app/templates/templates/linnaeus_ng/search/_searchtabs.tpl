@@ -1,10 +1,10 @@
 <div class="searchBoxContainer {$responsiveTabs}">
 	<ul class="tabs">
 		<li class="tab">
-			<a class="active " href="../search/nsr_search_extended.php">{t}Filter species{/t}</a>
+			<a href="../search/search.php">{t}Full search{/t}</a>
 		</li>
 		<li class="tab">
-			<a href="../search/search.php">{t}Full search{/t}</a>
+			<a class="active " href="../search/nsr_search_extended.php">{t}Filter species{/t}</a>
 		</li>
 		<li class="tab">
 			<a href="../species/tree.php">{t}Taxonomic tree{/t}</a>

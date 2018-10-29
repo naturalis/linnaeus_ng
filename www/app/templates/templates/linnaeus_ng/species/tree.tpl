@@ -1,14 +1,14 @@
 {include file="../shared/header.tpl" title="{t}Taxonomic tree{/t}"}
 	<div class="page-generic-div">
 		<ul class="tabs" style="background-color: white;">
+			<li class="tab">
+				<a href="../search/search.php">{t}Full search{/t}</a>
+			</li>
 			{if $hasTraits}
 			<li class="tab">
 				<a href="../search/nsr_search_extended.php">{t}Filter species{/t}</a>
 			</li>
 			{/if}
-			<li class="tab">
-				<a href="../search/search.php">{t}Full search{/t}</a>
-			</li>
 			<li class="tab-active">
 				<a href="#">{t}Taxonomic tree{/t}</a>
 			</li>
