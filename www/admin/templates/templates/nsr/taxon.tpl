@@ -212,6 +212,7 @@
         <a href="paspoort.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}passport{/t}</a><br />
         <a href="media.php?id={$concept.id}&noautoexpand=1" class="edit" style="margin:0">{t}media{/t}</a><br />
         <a href="literature.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}literature{/t}</a><br />
+        <a href="actors.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}experts{/t}</a><br />
         {if $show_nsr_specific_stuff}
         <a href="images.php?id={$concept.id}{if $noautoexpand}&noautoexpand=1{/if}" class="edit" style="margin:0">{t}images{/t}</a><br />
         {/if}

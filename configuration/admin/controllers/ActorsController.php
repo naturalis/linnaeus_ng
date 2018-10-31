@@ -16,7 +16,8 @@ class ActorsController extends NsrController
         'nsr_ids',
 		'presence_taxa',
 		'content_taxa',
-		'literature2_authors'
+		'literature2_authors',
+        'actors_taxa'
     );
 
     public $controllerPublicName = 'Actors';
@@ -126,7 +127,7 @@ class ActorsController extends NsrController
 			$this->setPageName($this->translate('Edit actor'));
 			$actor=$this->getActor();
 			$this->smarty->assign('actor',$actor);
-			$this->smarty->assign('links',$this->getActorLinks( $actor ));
+			$this->smarty->assign('links',$this->getActorLinks($actor));
 		}
 		else
 		{
@@ -231,6 +232,16 @@ class ActorsController extends NsrController
 			}
 
 		}
+		
+		foreach ((array)$this->rGetVal('new_taxa') as $taxon_id) {
+		    $this->models->ActorsModel->saveTaxonActor(array(
+	            "project_id" => $this->getCurrentProjectId(),
+	            "taxon_id" => $taxon_id,
+	            "actor_id" => $this->getActorId()
+	        ));
+	    }
+		    
+		
 	}
 
     /**
@@ -286,9 +297,14 @@ class ActorsController extends NsrController
 
 		$this->models->Literature2Authors->delete(
 		    array('actor_id'=>$id,'project_id'=>$this->getCurrentProjectId())
-		);
+		    );
 		$this->addMessage("Actor detached from ".$this->models->Literature2Authors->getAffectedRows()." literature references.");
-
+		
+		$this->models->ActorsTaxa->delete(
+		    array('actor_id'=>$id,'project_id'=>$this->getCurrentProjectId())
+		);
+		$this->addMessage("Actor detached from ".$this->models->ActorsTaxa->getAffectedRows()." taxa.");
+		
 		$this->models->Rdf->delete(
 		    array('object_id'=>$id,'object_type'=>'actor')
 		);
@@ -474,12 +490,18 @@ class ActorsController extends NsrController
 		    'name' => $name,
 		    'nameAlt' => $name_alt
 		));
+		
+		$taxa = $this->models->ActorsModel->getActorTaxa([
+		    'project_id' => $this->getCurrentProjectId(),
+		    'actor_id' => $id,
+		]);
 
 		$result = array(
 				'names' => $names,
 				'presences'=>$presences,
 				'passports'=>$passports,
 				'literature'=>$literature,
+		        'taxa' => $taxa
 		);
 
 		return $result;

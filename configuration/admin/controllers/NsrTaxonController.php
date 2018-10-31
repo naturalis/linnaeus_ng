@@ -594,8 +594,9 @@ class NsrTaxonController extends NsrController
         }
 		else
 		if (
-			$this->rHasVal('action', 'expert_lookup') ||
-			$this->rHasVal('action', 'name_expert_id') ||
+		    $this->rHasVal('action', 'expert_lookup') ||
+		    $this->rHasVal('action', 'taxon_actor_id') ||
+		    $this->rHasVal('action', 'name_expert_id') ||
 			$this->rHasVal('action', 'name_organisation_id') ||
 			$this->rHasVal('action', 'main_language_name_expert_id') ||
 			$this->rHasVal('action', 'main_language_name_organisation_id') ||
@@ -1029,6 +1030,13 @@ class NsrTaxonController extends NsrController
 			"match_start_only"=>$matchStartOnly,
 			"search"=>$search
 		));
+		
+		// Ruud 31-10: append organisation to expert name if available
+		foreach ($data as $i => $v) {
+		    if (!empty($v['company_of_name'])) {
+		        $data[$i]['label'] .= ' (' . $data[$i]['company_of_name'] . ')';
+		    }
+		}
 
 		return
 			$this->makeLookupList(array(

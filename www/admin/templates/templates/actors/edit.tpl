@@ -1,5 +1,59 @@
 {include file="../shared/admin-header.tpl"}
 
+<script>
+
+var new_taxa=Array();
+
+function add_taxon()
+{
+	var new_id=$('#taxon_id').val();
+	var new_label=$('#taxon').val();
+
+	for (var i=0;i<new_taxa.length;i++)
+	{
+		if (new_taxa[i].id==new_id) return;
+	}
+
+	new_taxa.push( { id:new_id, label:new_label } )
+}
+
+function remove_taxon( id )
+{
+	for (var i=0;i<new_taxa.length;i++)
+	{
+		if (new_taxa[i].id==id)
+		{
+			new_taxa.splice(i,1);
+			return;
+		}
+	}
+}
+
+function print_taxa()
+{
+	$('#new_taxa').html('');
+	for (var i=0;i<new_taxa.length;i++)
+	{
+		$('#new_taxa').append(
+			'<li>' + new_taxa[i].label + '<a href="#" onclick="remove_taxon('+new_taxa[i].id+');print_taxa();return false;" style="padding:0 5px 0 5px"> x </a></li>' );
+	}
+}
+
+function saveActorForm()
+{
+	var form=$('#theForm');
+
+	for (var i=0;i<new_taxa.length;i++)
+	{
+		form.append('<input type=hidden name=new_taxa[] value="'+new_taxa[i].id+'" />');
+	}
+
+	form.submit();
+}
+
+</script>
+
+
 <div id="page-main">
 <p>
 <h2>{$actor.name}</h2>
@@ -42,16 +96,33 @@
 			</select>
 		</td>
 	</tr>
+	
+	<!--
 	<tr id="employee_of">
 		<th>NSR ID:</th>
 		<td>{if $actor.id}{$actor.nsr_id}{else}(will be generated automatically){/if}</td>
 	</tr>
+	-->
+	
+	<tr>
+    	<th>
+        	{t}link to taxa{/t}:
+        </th>
+    	<td>
+            <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'{t}Taxon{/t}', { closeDialogAfterSelect: false } );return false;" rel="taxon_id">{t}add{/t}</a>
+            <input type="hidden" id="taxon_id" value="" onchange="add_taxon();print_taxa();" />
+            <input type="hidden" id="taxon" value="" />
+            <ul id="new_taxa">
+            </ul>
+		</td>
+	</tr>
+	
 {if ($actor.id && $CRUDstates.can_update) || (!$actor.id && $CRUDstates.can_create)}
-	<tr><th><input type="submit" value="save" /></th><td></td></tr>
+	<tr><th><input type="button" value="save" onclick="saveActorForm();" /></th><td></td></tr>
 {/if}
 {if $actor.id && $CRUDstates.can_delete}
 	<tr><td colspan="2" style="height:5px;"></td></tr>
-	<tr><th><a href="#" onclick="doDelete('Are you sure you want to delete &quot;{$actor.name|@escape}&quot;?\n{$links.presences|@count} statuses, {$links.names|@count} names and {$links.passports|@count} tabs are linked to this person.');return false;">delete actor</a></th><td></td></tr>
+	<tr><th><a href="#" onclick="doDelete('Are you sure you want to delete &quot;{$actor.name|@escape}&quot;?\n{$links.presences|@count} statuses, {$links.names|@count} names, {$links.passports|@count} tabs, {$links.literature|@count} references and  {$links.taxa|@count} taxa are linked to this person.');return false;">delete actor</a></th><td></td></tr>
 {/if}
 </table>
 
@@ -113,6 +184,20 @@
 	</div>
 	<br />
 	{/if}
+	
+	{if $links.taxa|@count > 0}
+    <div>
+	<a href="#" onclick="$('#links-taxa').toggle();return false;">{t}Linked taxa{/t} ({$links.taxa|@count})</a>
+	<div id="links-taxa" style="display:none">
+		<ul class="small">
+			{foreach from=$links.taxa item=v}
+			<li><a href="../nsr/literature.php?id={$v.id}">{$v.taxon} [{$v.rank}]</a></li>
+			{/foreach}
+		</ul>
+	</div>
+    </div>
+	{/if}
+	
 
 </div>
 </p>
