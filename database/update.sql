@@ -70,4 +70,15 @@ insert ignore into literature2_publication_types_labels values (null, @project_i
 select (@id := id), (@project_id := project_id) from literature2_publication_types where sys_label = 'Website';
 insert ignore into literature2_publication_types_labels values (null, @project_id, @id, 26, 'Web site', now(), now());
 
+CREATE TABLE IF NOT EXISTS `actors_taxa` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `project_id` int(11) NOT NULL,
+  `taxon_id` int(11) NOT NULL,
+  `actor_id` int(11) NOT NULL,
+  `sort_order` int(11) NOT NULL DEFAULT '0',
+  `created` datetime NOT NULL,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `project_id` (`project_id`,`taxon_id`,`actor_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
