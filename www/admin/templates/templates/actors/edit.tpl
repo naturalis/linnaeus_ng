@@ -191,11 +191,11 @@ function saveActorForm()
 	<div id="links-taxa" style="display:none">
 		<ul class="small">
 			{foreach from=$links.taxa item=v}
-			<li><a href="../nsr/literature.php?id={$v.id}">{$v.taxon} [{$v.rank}]</a></li>
+			<li><a href="../nsr/taxon.php?id={$v.id}">{$v.taxon} [{$v.rank}]</a></li>
 			{/foreach}
 		</ul>
 	</div>
-    </div>
+    </div>s
 	{/if}
 	
 
