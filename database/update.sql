@@ -1,8 +1,6 @@
 ALTER DATABASE `linnaeus_ng` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE linnaeus_ng;
 
-DROP TABLE IF  EXISTS `actors_taxa`;
-
 insert ignore into name_types (
     select null, id as project_id, 'isMisidentificationOf', now(), now() from projects
 );
