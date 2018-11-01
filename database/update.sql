@@ -1,6 +1,8 @@
 ALTER DATABASE `linnaeus_ng` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE linnaeus_ng;
 
+DROP TABLE IF  EXISTS `actors_taxa`;
+
 insert ignore into name_types (
     select null, id as project_id, 'isMisidentificationOf', now(), now() from projects
 );
@@ -70,15 +72,17 @@ insert ignore into literature2_publication_types_labels values (null, @project_i
 select (@id := id), (@project_id := project_id) from literature2_publication_types where sys_label = 'Website';
 insert ignore into literature2_publication_types_labels values (null, @project_id, @id, 26, 'Web site', now(), now());
 
-CREATE TABLE IF NOT EXISTS `actors_taxa` (
+
+CREATE TABLE `actors_taxa` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
   `taxon_id` int(11) NOT NULL,
   `actor_id` int(11) NOT NULL,
+  `organisation_id` int(11) DEFAULT NULL,
   `sort_order` int(11) NOT NULL DEFAULT '0',
   `created` datetime NOT NULL,
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `project_id` (`project_id`,`taxon_id`,`actor_id`)
+  UNIQUE KEY `project_id` (`project_id`,`taxon_id`,`actor_id`,`organisation_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
