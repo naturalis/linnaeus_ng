@@ -85,7 +85,9 @@ class ActorsController extends NsrController
      */
     public function editAction()
 	{
-		if ($this->rHasId() && $this->rHasVal('action','delete')) {
+	    $this->checkAuthorisation();
+	    
+	    if ($this->rHasId() && $this->rHasVal('action','delete')) {
 
 			$this->UserRights->setActionType( $this->UserRights->getActionDelete() );
 			$this->checkAuthorisation();
