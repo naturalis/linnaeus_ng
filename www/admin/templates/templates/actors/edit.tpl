@@ -195,7 +195,7 @@ function saveActorForm()
 			{/foreach}
 		</ul>
 	</div>
-    </div>s
+    </div>
 	{/if}
 	
 
