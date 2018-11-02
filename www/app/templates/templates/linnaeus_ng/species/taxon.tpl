@@ -24,6 +24,8 @@
 				{include file="../species/_tab_taxon_list.tpl"}
 			{elseif $activeCategory.tabname=='CTAB_CLASSIFICATION'}
 				{include file="../species/_tab_classificatie.tpl"}
+			{elseif $activeCategory.tabname=='CTAB_EXPERTS'}
+				{include file="../species/_tab_experts.tpl"}
 			{elseif $activeCategory.tabname=='CTAB_DICH_KEY_LINKS'}
 				{include file="../species/_tab_dich_key_links.tpl"}
 			{elseif $ext_template}

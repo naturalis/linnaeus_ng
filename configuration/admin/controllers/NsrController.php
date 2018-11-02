@@ -35,8 +35,9 @@ class NsrController extends Controller
 		'CTAB_LITERATURE'=>['id'=>-5,'title'=>'Literature'],
 		'CTAB_DNA_BARCODES'=>['id'=>-6,'title'=>'DNA barcodes','remarks'=>'suppressing will also remove DNA-barcodes from the extended search options'],
 		'CTAB_DICH_KEY_LINKS'=>['id'=>-7,'title'=>'Key links'],
-//		'CTAB_NOMENCLATURE'=>['id'=>-8,'title'=>'Nomenclature'],
-		'CTAB_PRESENCE_STATUS'=>['id'=>-9,'title'=>'Presence status','remarks'=>'suppressing will also remove presence status from the extended search options'],
+		//		'CTAB_NOMENCLATURE'=>['id'=>-8,'title'=>'Nomenclature'],
+	    'CTAB_EXPERTS'=>['id'=>-10,'title'=>'Experts'],
+	    'CTAB_PRESENCE_STATUS'=>['id'=>-9,'title'=>'Presence status','remarks'=>'suppressing will also remove presence status from the extended search options'],
 	];
 
     public function __construct()

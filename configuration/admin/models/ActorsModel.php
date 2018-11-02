@@ -335,7 +335,7 @@ final class ActorsModel extends AbstractModel
                 t3.taxon_id = $taxon_id            
 			
             order by
-				t3.sort_order";
+				t3.sort_order, t1.name";
         
         return $this->freeQuery($query);
     }
