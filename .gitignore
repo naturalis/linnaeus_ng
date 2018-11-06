@@ -114,7 +114,6 @@ www/app/templates/templates/linnaeus_ng/index/index--IMPROVED (work in progress)
 cron/nsr-nba-export/nsr-nba-export.php
 tools/beelduitwisselaar-download/imageupload.key
 tools/beelduitwisselaar-download/config.php
-external
 gulp/js/bundle.js
 bower_components
 node_modules
