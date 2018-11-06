@@ -192,30 +192,42 @@ class IndexController extends Controller
 			    'display_language_id' => $this->getCurrentLanguageId(),
 			    'valid_name_id' => $this->getNameTypeId(PREDICATE_VALID_NAME)
             ));
-
+		    
 			foreach((array)$list as $key=>$val)
 			{
 				//if ($val['nametype']==PREDICATE_VALID_NAME)
-					$list[$key]['label']=
+					$list[$key]['label'] =
 						$this->formatTaxon(
 							array(
-								'taxon'=>array('taxon'=>$val['name'],'rank_id'=>$val['rank_id'],'parent_id'=>$val['parent_id']),
-								'rankpos'=>'post',
-								'ranks'=>$ranks
+							    'taxon'=> [
+							        'taxon' => $val['name'],
+							        'rank_id' => $val['rank_id'],
+							        'parent_id' => $val['parent_id'], 
+							        'id' => $val['taxon_id'], 
+							        'authorship' => $val['authorship']
+							    ],
+								'rankpos' => 'post',
+								'ranks' => $ranks
 						));
 
 				if (!empty($val['ref_taxon']))
-					$list[$key]['ref_taxon']=
+					$list[$key]['ref_taxon'] =
 						$this->formatTaxon(
 							array(
-								'taxon'=>array('taxon'=>$val['ref_taxon'],'rank_id'=>$val['rank_id'],'parent_id'=>$val['parent_id']),
-								'rankpos'=>'post',
-								'ranks'=>$ranks
+							    'taxon'=> [
+							        'taxon' => $val['ref_taxon'],
+							        'rank_id' => $val['rank_id'],
+							        'parent_id' => $val['parent_id'], 
+							        'id' => $val['taxon_id'], 
+							        'authorship' => $val['ref_taxon_authorship']
+							    ],
+								'rankpos' => 'post',
+								'ranks' => $ranks
 						));
 			}
 
 		}
-
+		
 		return $list;
 
     }
