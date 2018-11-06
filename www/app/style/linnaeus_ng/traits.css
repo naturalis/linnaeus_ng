@@ -736,18 +736,18 @@ table {
 
 .menu {
   width: 100%;
-  max-width: 994px;
+  max-width: 800px;
   margin: 0 auto;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   border-left: 1px solid #2d2d2d; }
-  @media screen and (min-width: 994px) {
+  @media screen and (min-width: 800px) {
     .menu {
       display: flex!important;
     } }
-  @media screen and (max-width: 994px) {
+  @media screen and (max-width: 800px) {
     .menu {
       display: none; } }
   .menu a {
@@ -761,7 +761,7 @@ table {
     background-repeat: no-repeat;
     background-size: 18px 18px;
     background-position: center top 15px; }
-    @media screen and (max-width: 994px) {
+    @media screen and (max-width: 800px) {
       .menu .home {
         background-image: none; } }
     .menu .home a {
@@ -810,7 +810,7 @@ table {
         height: 20px; } }
   .menuToggle .mobileTitle {
     display: none; }
-    @media screen and (max-width: 994px) {
+    @media screen and (max-width: 800px) {
       .menuToggle .mobileTitle {
         display: block;
         position: absolute;
@@ -823,7 +823,7 @@ table {
         text-overflow: ellipsis;
         white-space: nowrap; } }
 
-@media screen and (max-width: 994px) {
+@media screen and (max-width: 800px) {
   .menuToggle {
     display: block;
     height: 50px;
@@ -887,7 +887,7 @@ a {
 
 #dialogRidge {
   width: 100%;
-  max-width: 994px;
+  max-width: 800px;
   margin: 0 auto;
   padding-top: 30px;
   padding-bottom: 100px;
@@ -897,7 +897,7 @@ a {
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex; }
-  @media screen and (max-width: 994px) {
+  @media screen and (max-width: 800px) {
     #dialogRidge {
       -webkit-box-orient: vertical;
       -webkit-box-direction: normal;
@@ -921,7 +921,7 @@ a {
 #left ~ #content {
   margin-left: 30px;
 }
-  @media screen and (max-width: 994px) {
+  @media screen and (max-width: 800px) {
     #content, #left ~ #content {
       margin-left: 0; } }
 
@@ -946,7 +946,7 @@ p {
 #left {
   min-width: 230px;
   width: 230px; }
-  @media screen and (max-width: 994px) {
+  @media screen and (max-width: 800px) {
     #left {
       width: 100%; } }
   #left #inlineformsearch {
@@ -978,14 +978,14 @@ p {
       vertical-align: top;
       width: auto;
       display: inline-block; }
-  @media screen and (max-width: 994px) {
+  @media screen and (max-width: 800px) {
     #left .treeSimpleSearch {
       display: none; } }
 
 .treebranchContainer.responsive {
   display: none;
 }
-@media screen and (max-width: 994px) {
+@media screen and (max-width: 800px) {
   .treebranchContainer.desktop {
     display: none;
   }
@@ -1004,7 +1004,7 @@ p {
   background-color: #fff;
   overflow : hidden;
   padding: 22px 30px 23px 30px; }
-  @media screen and (max-width: 994px) {
+  @media screen and (max-width: 800px) {
       .treebranchContainer.filterPictures {
         display: block; } }
   .treebranchContainer #name-tree {
@@ -1069,7 +1069,7 @@ p {
   #tree-container ul {
     margin-left: 30px;
     list-style-type: none; }
-    @media screen and (max-width: 994px) {
+    @media screen and (max-width: 800px) {
       #tree-container ul {
         border-left: 1px solid #eeede9;
         padding-left: 1px;
@@ -1103,7 +1103,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
 
 .main-display-name.mobile {
   display: none; }
-  @media screen and (max-width: 994px) {
+  @media screen and (max-width: 800px) {
     .main-display-name.mobile {
       display: block; } }
 
@@ -1134,11 +1134,11 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
 
 .treeSimpleSearch + #facets{
   margin-top: 30px; }
-  @media screen and (max-width: 994px) {
+  @media screen and (max-width: 800px) {
     .treeSimpleSearch + #facets {
       margin-top: 0; } }
 
-  @media screen and (max-width: 994px) {
+  @media screen and (max-width: 800px) {
 	#facets {
       margin-top: 0; } }
 
@@ -1180,7 +1180,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
     width: 33.33%; }
     #images-container .imageInGrid3:nth-child(3n+3) {
       clear: both; }
-    @media screen and (max-width: 994px) {
+    @media screen and (max-width: 800px) {
       #images-container .imageInGrid3 {
         width: 50%; }
         #images-container .imageInGrid3:nth-child(3n+3) {
@@ -1308,10 +1308,10 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
   width: 100%; }
   .searchBoxContainer.mobile {
     display: none; }
-    @media screen and (max-width: 994px) {
+    @media screen and (max-width: 800px) {
       .searchBoxContainer.mobile {
         display: block; } }
-  @media screen and (max-width: 994px) {
+  @media screen and (max-width: 800px) {
     .searchBoxContainer.desktop {
       display: none; } }
   .searchBoxContainer .tabs {
@@ -1339,11 +1339,11 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
     box-sizing: border-box;
     width: 100%;
     text-decoration: none; }
-    @media screen and (max-width: 994px) {
+    @media screen and (max-width: 800px) {
       .searchBoxContainer a span {
         font-size: 18px;
         display: block; } }
-    @media screen and (max-width: 994px) {
+    @media screen and (max-width: 800px) {
       .searchBoxContainer a span {
         font-size: 14px; } }
   .searchBoxContainer #desktopgroup_suggestion, .searchBoxContainer #mobilegroup_suggestion {
@@ -1432,7 +1432,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
 .searchPictures {
   padding: 30px;
   background-color: #fff; }
-  @media screen and (max-width: 994px) {
+  @media screen and (max-width: 800px) {
     .searchPictures {
       margin-top: 30px; } }
 
@@ -1448,7 +1448,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
   .searchResultContainer #resultcount-header {
     display: block;
     min-height: 18px; }
-  @media screen and (max-width: 994px) {
+  @media screen and (max-width: 800px) {
     .searchResultContainer {
       margin-top: 30px; } }
 
@@ -1670,7 +1670,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
 #formSearchFacetsSpecies + #toolbox {
   margin-top: 30px; }
 
-@media screen and (max-width: 994px) {
+@media screen and (max-width: 800px) {
   #toolbox {
     display: none; } }
 
@@ -1730,7 +1730,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
   overflow: hidden;
 }
 
-@media screen and (max-width: 994px) {
+@media screen and (max-width: 800px) {
   #taxonImage {
     height: 200px;
     display: block;
@@ -1754,7 +1754,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
             transform: translateY(-50%);
     z-index: -1; }
 /*
-    @media screen and (max-width: 994px) {
+    @media screen and (max-width: 800px) {
       #taxonImage img {
         min-height: 100%;
         width: auto;
@@ -1781,7 +1781,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
 }
 #taxonHeader #headerImage {
   width: 100%;
-  max-width: 994px;
+  max-width: 800px;
   margin: 0 auto;
   height: 400px;
   position: absolute;
@@ -1812,7 +1812,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
   left: 50%;
   width: 100%;
   z-index: 100;
-  max-width: 994px;
+  max-width: 800px;
   -webkit-transform: translateX(-50%);
       -ms-transform: translateX(-50%);
           transform: translateX(-50%); }
@@ -1826,7 +1826,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
     bottom: 30px;
     left: 0;
     position: absolute; }
-    @media screen and (max-width: 994px) {
+    @media screen and (max-width: 800px) {
       #header .logo {
         left: 30px;
       }
@@ -1836,7 +1836,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
     position: absolute;
     top: 15px;
     left: 0; }
-    @media screen and (max-width: 994px) {
+    @media screen and (max-width: 800px) {
       #header .siteTitle {
         left: 30px; } }
     @media screen and (max-width: 500px) {
@@ -1893,14 +1893,14 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
 .footerContainer {
   background-color: #000;
   padding: 30px 0; }
-  @media screen and (max-width: 994px) {
+  @media screen and (max-width: 800px) {
     .footerContainer {
       padding: 0; } }
 
 .footer {
   padding: 0;
   width: 100%;
-  max-width: 994px;
+  max-width: 800px;
   color: #fff;
   margin: 0 auto;
   box-sizing: border-box; }
@@ -1908,7 +1908,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
   width: 90px;
   display: block;
 }
-  @media screen and (max-width: 994px) {
+  @media screen and (max-width: 800px) {
     .footer {
       padding: 0 15px; }
       .footer .dash {
@@ -1918,7 +1918,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
     text-decoration: none;
     color: #fff;
     margin-bottom: 15px; }
-    @media screen and (max-width: 994px) {
+    @media screen and (max-width: 800px) {
       .footer .toggleFooterLinks {
         font-size: 14px;
         display: block;
@@ -1932,7 +1932,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
     margin-top: 15px;
     margin-bottom: 15px;
     display: inline-block; }
-    @media screen and (max-width: 994px) {
+    @media screen and (max-width: 800px) {
       .footer ul {
         margin-top: 0;
         margin-bottom: 0;
@@ -1947,7 +1947,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
     margin-bottom: 15px; }
     .footer li:last-child {
       margin-bottom: 0; }
-    @media screen and (max-width: 994px) {
+    @media screen and (max-width: 800px) {
       .footer li {
         width: 100%;
         margin-bottom: 0; }
@@ -1958,14 +1958,14 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
           border-bottom: 1px solid #2d2d2d; } }
   .footer .blue {
     color: #009ee0; }
-  @media screen and (max-width: 994px) {
+  @media screen and (max-width: 800px) {
     .footer .upLink {
       padding-left: 0;
       padding-right: 0; } }
   .footer .up {
     margin-top: 15px;
     float: right; }
-    @media screen and (max-width: 994px) {
+    @media screen and (max-width: 800px) {
       .footer .up {
         margin-top: 0;
         float: none;
@@ -1979,7 +1979,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
     right: 0;
     width: 73px;
     height: auto; }
-    @media screen and (max-width: 994px) {
+    @media screen and (max-width: 800px) {
       .footer .eol_logo {
         display: none; } }
   .footer .naturalis_logo {
@@ -1988,7 +1988,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
     right: -15px;
     width: 90px;
     height: auto; }
-    @media screen and (max-width: 994px) {
+    @media screen and (max-width: 800px) {
       .footer .naturalis_logo {
         display: none; } }
   .footer .eis_logo {
@@ -1998,7 +1998,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
     right: -7px;
     width: 82px;
     height: auto; }
-    @media screen and (max-width: 994px) {
+    @media screen and (max-width: 800px) {
       .footer .eis_logo {
         display: none; } }
   .footer .footerLinks {
@@ -2009,7 +2009,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
       box-sizing: border-box; }
       .footer .footerLinks li:nth-child(3n+3) {
         clear: both; }
-  @media screen and (max-width: 994px) {
+  @media screen and (max-width: 800px) {
     .footer .cooperation {
       border-bottom: 1px solid #2d2d2d; } }
   .footer .sitemapLinks ul {
@@ -2022,14 +2022,14 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
         margin-right: 0; }
     .footer .sitemapLinks ul a {
       color: #009ee0; }
-  @media screen and (max-width: 994px) {
+  @media screen and (max-width: 800px) {
     .footer .sitemapLinks.desktop {
       display: none; } }
   .footer .sitemapLinks.mobile {
     display: none; }
     .footer .sitemapLinks.mobile ul {
       padding-left: 0; }
-    @media screen and (max-width: 994px) {
+    @media screen and (max-width: 800px) {
       .footer .sitemapLinks.mobile {
         padding: 0;
         display: block; } }
@@ -2041,11 +2041,11 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
       margin-left: 3px; }
     .footer .colofon .copyright {
       line-height: 1.3; }
-      @media screen and (max-width: 994px) {
+      @media screen and (max-width: 800px) {
         .footer .colofon .copyright {
           padding: 15px 30px;
           display: block; } }
-    @media screen and (max-width: 994px) {
+    @media screen and (max-width: 800px) {
       .footer .colofon {
         float: none;
         display: block;
@@ -2060,10 +2060,10 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
           width: 100%; } }
   .footer .colofonContainer {
     margin-top: 15px; }
-    @media screen and (max-width: 994px) {
+    @media screen and (max-width: 800px) {
       .footer .colofonContainer {
         margin-top: 0; } }
-  @media screen and (max-width: 994px) {
+  @media screen and (max-width: 800px) {
     .footer .colofonLinks {
       padding: 0; } }
 
@@ -2073,7 +2073,7 @@ h1.main-display-name.mobile, h1.main-display-name.desktop {
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex; }
-  @media screen and (max-width: 994px) {
+  @media screen and (max-width: 800px) {
     .footerLinkContainer {
       -webkit-box-orient: vertical;
       -webkit-box-direction: normal;
@@ -2134,7 +2134,7 @@ strong {
   max-width: 100%;
   max-width: 735px; /* for IE only, but <!--[if !IE]> no longer detects IE >= v10 */
 }
-@media screen and (max-width: 994px) {
+@media screen and (max-width: 800px) {
     .fancybox-caption {
       font-size : 8px ! important;
     }
