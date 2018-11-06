@@ -31,9 +31,10 @@
                     
                     <div class="facetCategories clearSelectionBtn{if $activeChars|@count==0} ghosted{/if}">
                         <a id="clearSelectionLink" href="#" onclick="resetMatrix();return false;">
-                            {t}Opnieuw beginnen{/t}<i class="ion-refresh"></i>
+                            {t}Kenmerken wissen{/t}<i class="ion-refresh"></i>
                         </a>
                     </div>
+                    
                     {if $master_matrix_id}
                     <div class="facetCategories" style="margin-bottom:6px">
                         <a href="?mtrx={$master_matrix_id}">{t}Terug naar de hoofdsleutel{/t}</a>

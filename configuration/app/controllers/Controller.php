@@ -1477,7 +1477,7 @@ class Controller extends BaseClass
 
 		return array(
 			'modules' => $modules,
-			'freeModules' => $freeModules
+		    'freeModules' => !empty($freeModules) ? $freeModules : []
 		);
 
     }

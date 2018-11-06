@@ -13,10 +13,21 @@
         </div>
     </div>
     
+    <style>
+ 		@media screen and (max-width: 980px) { 
+			.backLink .backText { 
+ 				display: none; 
+ 			} 
+ 		}  
+   </style>
+     
     <div class="topBarContainer responsive">
         <div class="topBar">
             {if $master_matrix.id}
-                <a href="?mtrx={$master_matrix.id}" class="backLink"><i class="ion-ios-arrow-back backIcon"></i></a>
+                <a href="?mtrx={$master_matrix.id}" class="backLink" style="text-align: left; width: auto;">
+                	<i class="ion-ios-arrow-back backIcon" style="padding-right: 10px;"></i>
+                	<span class="backText">{t}Terug naar hoofdsleutel{/t}</span>
+                </a>
             {else}
                 <a href="/linnaeus_ng/" class="backLink"><i class="ion-ios-arrow-back backIcon"></i></a>
             {/if}
