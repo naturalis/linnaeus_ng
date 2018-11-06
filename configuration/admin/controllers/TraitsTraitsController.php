@@ -274,6 +274,34 @@ class TraitsTraitsController extends TraitsController
 		$this->smarty->assign( 'trait', $trait );
 		$this->printPage();
     }
+    
+    // Rename system value
+    public function traitgroupTraitValueAction ()
+    {
+        $this->UserRights->setActionType( $this->UserRights->getActionCreate() );
+        
+        $this->checkAuthorisation();
+        
+        if (!$this->rHasId()) {
+            $this->redirect('index.php');
+        }
+        
+        $this->setPageName($this->translate('Rename trait value'));
+        
+        if ($this->rHasVal('action','save'))  {
+             $this->saveTraitgroupTraitValue(['id' => $this->rGetId(), 'sysname' => $this->rGetVal('sysname')]);
+        }
+        
+        $trait_value = $this->models->TraitsValues->_get(['id' => $this->rGetId()]);
+        $trait = $this->getTraitgroupTrait(['trait' => $trait_value['trait_id']]);
+        $group = $this->getTraitgroup( $trait['trait_group_id'] );
+        
+        $this->smarty->assign( 'trait_value', $trait_value );
+        $this->smarty->assign( 'group', $group );
+        $this->smarty->assign( 'trait', $trait );
+        $this->printPage();
+    }
+    
 	
     public function settingsAction()
     {
@@ -675,6 +703,23 @@ class TraitsTraitsController extends TraitsController
 		));
 
 		return true;
+	}
+	
+	private function saveTraitgroupTraitValue ($p)
+	{
+	    $id = isset($p['id']) ? $p['id'] : null;
+	    $sysname = isset($p['sysname']) ? trim($p['sysname']) : null;
+	    
+	    if (is_null($id) || is_null($sysname)) {
+	        return false;
+	    }
+	    
+	    $this->models->TraitsValues->update(
+	        ['string_value' => $sysname], 
+	        ['id' => $id, 'project_id' => $this->getCurrentProjectId()]
+	    );
+	    
+	    //echo $this->models->TraitsValues->q(); die();
 	}
 	
 	private function saveTraitgroupTraitValues($p)

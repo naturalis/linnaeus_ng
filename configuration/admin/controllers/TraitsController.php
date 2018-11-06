@@ -224,7 +224,7 @@ class TraitsController extends Controller
 		return $r;
 
 	}
-
+	
 	public function getTextTranslations($p)
 	{
 		$text_id=isset($p['text_id']) ? $p['text_id'] : null;
