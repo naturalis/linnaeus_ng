@@ -193,6 +193,7 @@ class LinnaeusController extends Controller
 		 * Documentation!
 		 * 
 		 * If the app refuses to start with the error 
+		 * 
 		 * PHP Fatal error:  Uncaught  --> Smarty: Unable to load template 'file:root_index.tpl' <-- \n  
 		 * thrown in /var/www/html/vendor/smarty/smarty/libs/sysplugins/smarty_internal_template.php on line 195
 		 * 
