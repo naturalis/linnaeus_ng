@@ -39,6 +39,12 @@ $("#theForm").submit(function(){
         return false;
     }
 });
+
+$(document).ready(function()
+{
+	$('#page-block-messages').fadeOut(2000);
+});
+
 </script>
 
 {include file="../shared/admin-messages.tpl"}
