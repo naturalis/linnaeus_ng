@@ -624,12 +624,12 @@ $(function(){
 			$('#'+panel).show();
 		}
 	});
-
+/*
   $('body').on('click', '.search-toggle-js', function() {
     $('body').toggleClass('search-open');
     $('.menuContainer').find('input').select().focus();
   });
-
+*/
   
   $('body').on('click', '.close-suggestion-list-js', function() {
     $('#name_suggestion').hide();
