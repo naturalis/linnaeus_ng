@@ -826,7 +826,7 @@ class SpeciesControllerNSR extends SpeciesController
                 return -1;
             return 0;
         });
-
+        
         return $all_categories;
 
     }
@@ -841,6 +841,9 @@ class SpeciesControllerNSR extends SpeciesController
         // get all available categories (tabs)
         $categories=$this->getCategories($p);
 
+      //  var_dump($categories);
+        
+        
         $taxon_categories=array();
         $start_category=null;
         $cat=null;
@@ -849,16 +852,15 @@ class SpeciesControllerNSR extends SpeciesController
         {
             $cat=$requestedTab;
         }
-
+        
         // weed out the ones we don't want to display
         foreach((array)$categories as $key=>$val)
         {
             //if ( $val['suppress'] ) continue;
             //if ( $val['always_hide'] ) continue;
-
             if ($val['type']=='auto')
             {
-                $val['is_empty']=$this->isAutoTabEmpty( ['tab'=>$val['tabname'], 'taxon_id'=>$taxon['id'] ] );
+                 $val['is_empty']=$this->isAutoTabEmpty( ['tab'=>$val['tabname'], 'taxon_id'=>$taxon['id'] ] );
             }
 
             // parametrize external reference URLs
@@ -891,7 +893,7 @@ class SpeciesControllerNSR extends SpeciesController
 
             $taxon_categories[]=$val;
         }
-
+        
         // have the first non-automatic/external tab display the overview image
         foreach((array)$taxon_categories as $key=>$val)
         {
@@ -902,6 +904,8 @@ class SpeciesControllerNSR extends SpeciesController
             }
         }
 
+        
+        
         // determine with which category to open
         foreach((array)$taxon_categories as $key=>$val)
         {
@@ -939,6 +943,10 @@ class SpeciesControllerNSR extends SpeciesController
                 if ($start_category['tabname']!=$requestedTab) $start_category=null;
             }
         }
+        
+         
+        
+        
 
         return [ 'start'=>$start_category, 'categories'=>$taxon_categories ];
 
@@ -1666,7 +1674,7 @@ class SpeciesControllerNSR extends SpeciesController
     {
         $taxon_id=isset($p['taxon_id']) ? $p['taxon_id'] : null;
         $tab=isset($p['tab']) ? $p['tab'] : null;
-
+        
         if ( is_null($taxon_id) ) return false;
 
         switch ( $tab )
@@ -1683,7 +1691,11 @@ class SpeciesControllerNSR extends SpeciesController
                 }
                 else
                 {
-                    return count((array)$this->getTaxonMedia(array('id'=>$taxon_id)))<=0;
+                    $mp['id'] = $taxon_id;
+                    if ($this->_inclOverviewImage) {
+                        $mp['inclOverviewImage'] = true;
+                    }
+                    return count((array)$this->getTaxonMedia($mp))<=0;
                 }
                 break;
             case 'CTAB_CLASSIFICATION':
