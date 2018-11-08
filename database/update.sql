@@ -71,7 +71,7 @@ select (@id := id), (@project_id := project_id) from literature2_publication_typ
 insert ignore into literature2_publication_types_labels values (null, @project_id, @id, 26, 'Web site', now(), now());
 
 
-CREATE TABLE `actors_taxa` (
+CREATE TABLE if not exists `actors_taxa` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
   `taxon_id` int(11) NOT NULL,
