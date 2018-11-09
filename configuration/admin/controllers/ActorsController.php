@@ -369,7 +369,6 @@ class ActorsController extends NsrController
 
 		if ($alphabet)
 		{
-
 			$actor=$alphabet[0];
 
 			// catching up...
@@ -378,7 +377,8 @@ class ActorsController extends NsrController
 				$nsrIds = $this->createNsrIds(array('id'=>$actor['id'],'type'=> 'actor', 'subtype'=> ( $alphabet[0]['is_company']==1 ? 'organization' : 'person' )));
 				$actor['nsr_id'] = $nsrIds['nsr_id'];
 			}
-
+			
+			$actor['taxa'] = $this->getActorTaxa($actor['id']);
 			return $actor;
 		}
 
@@ -426,6 +426,14 @@ class ActorsController extends NsrController
 				'isFullSet'=>count($data)<$maxResults
 			));
 
+    }
+    
+    private function getActorTaxa ($id)
+    {
+        return $this->models->ActorsModel->getActorTaxa([
+            'project_id' => $this->getCurrentProjectId(),
+            'actor_id' => $id,
+        ]);
     }
 
     /**
@@ -493,17 +501,12 @@ class ActorsController extends NsrController
 		    'nameAlt' => $name_alt
 		));
 		
-		$taxa = $this->models->ActorsModel->getActorTaxa([
-		    'project_id' => $this->getCurrentProjectId(),
-		    'actor_id' => $id,
-		]);
-
 		$result = array(
-				'names' => $names,
-				'presences'=>$presences,
-				'passports'=>$passports,
-				'literature'=>$literature,
-		        'taxa' => $taxa
+			'names' => $names,
+			'presences'=>$presences,
+			'passports'=>$passports,
+			'literature'=>$literature,
+		    'taxa' => $this->getActorTaxa($id)
 		);
 
 		return $result;

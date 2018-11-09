@@ -1353,6 +1353,11 @@ class Literature2Controller extends NsrController
                 'projectId' => $this->getCurrentProjectId(),
     		    'literatureId' => $id
     		));
+			
+			$l[0]['taxa'] =
+                $this->getReferencedTaxa($this->referenceBefore['id']);
+			$l[0]['traits'] =
+                $this->getReferencedTraits($this->referenceBefore['id']);
 
 			return $l[0];
 		}
@@ -1539,8 +1544,45 @@ class Literature2Controller extends NsrController
 		return $data;
 
 	}
+	
+	private function getReferencedTaxa ($id)
+	{
+	    $taxa = $this->models->Literature2Model->getReferencedTaxa(array(
+	        'project_id' => $this->getCurrentProjectId(),
+	        'literature_id' => $id
+	    ));
+	    
+	    foreach((array)$taxa as $key=>$val)
+	    {
+	        $taxa[$key]['taxon']=
+	        $this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['id'],'parent_id'=>$val['parent_id'] ] );
+	    }
+	    
+	    return $taxa;
+	}
+	
+	private function getReferencedTraits ($id) 
+	{
+	    $d = $this->models->Literature2Model->getReferenceLinksTraits(array(
+	        'projectId' => $this->getCurrentProjectId(),
+	        'literatureId' => $id
+	    ));
+	    
+	    $traits=array();
+	    foreach((array)$d as $val)
+	    {
+	        $traits[$val['sysname']][]=
+	        array(
+	            'group_id'=>$val['trait_group_id'],
+	            'taxon_id'=>$val['taxon_id'],
+	            'taxon'=>$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['taxon_id'],'parent_id'=>$val['parent_id'] ] )
+	        );
+	    }
+	    
+	    return $traits;
+	}
 
-    private function getReferenceLinks($id=null)
+    private function getReferenceLinks ($id=null)
     {
 		if (empty($id))
 			$id=$this->getReferenceId();
@@ -1575,38 +1617,11 @@ class Literature2Controller extends NsrController
 			$presences[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['taxon_id'],'parent_id'=>$val['parent_id'] ] );
 		}
 
-
-
 		// TAXA
-		$taxa = $this->models->Literature2Model->getReferencedTaxa(array(
-            'project_id' => $this->getCurrentProjectId(),
-    		'literature_id' => $id
-		));
-
-		foreach((array)$taxa as $key=>$val)
-		{
-			$taxa[$key]['taxon']=
-				$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['taxon_id'],'parent_id'=>$val['parent_id'] ] );
-		}
-
+		$taxa = $this->getReferencedTaxa($id);
 
 		// TRAITS
-		$d = $this->models->Literature2Model->getReferenceLinksTraits(array(
-            'projectId' => $this->getCurrentProjectId(),
-    		'literatureId' => $id
-		));
-
-		$traits=array();
-		foreach((array)$d as $val)
-		{
-			$traits[$val['sysname']][]=
-				array(
-					'group_id'=>$val['trait_group_id'],
-					'taxon_id'=>$val['taxon_id'],
-					'taxon'=>$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['taxon_id'],'parent_id'=>$val['parent_id'] ] )
-				);
-		}
-
+		$traits = $this->getReferencedTraits($id);
 
 		// RDF > PASSPORTS
 		$passports = $this->models->Literature2Model->getReferenceLinksPassports(array(
@@ -2168,11 +2183,11 @@ class Literature2Controller extends NsrController
 		}
 	}
 
-	private function setReferenceBefore()
+	private function setReferenceBefore ()
 	{
-		$this->referenceBefore=$this->getReference();
+		$this->referenceBefore = $this->getReference();
 	}
-
+	
 	private function getReferenceBefore( $f=null )
 	{
 		if ( $f && isset($this->referenceBefore[$f]) )
