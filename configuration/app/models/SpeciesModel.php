@@ -1502,6 +1502,46 @@ class SpeciesModel extends AbstractModel
         return $literature;
     }
 
+    public function getTaxonActors ( $params )
+    {
+        $project_id = isset($params['project_id']) ? $params['project_id'] : null;
+        $taxon_id = isset($params['taxon_id']) ? $params['taxon_id'] : null;
+        
+        if ( is_null($project_id) || is_null($taxon_id) ) return;
+        
+        $query = "
+            select
+                t3.id as actors_taxa_id,
+                t1.id as actor_id,
+                t1.name as label,
+                t1.name_alt,
+                t1.homepage,
+                t1.gender,
+                t1.employee_of_id,
+                t1.is_company,
+                t2.name as company_of_name,
+                t2.name_alt as company_of_name_alt,
+                t2.homepage as company_of_homepage
+                
+            from
+                %PRE%actors as t1
+                
+            left join
+                %PRE%actors as t2 on t1.employee_of_id = t2.id
+                
+            left join
+                %PRE%actors_taxa as t3 on t3.actor_id = t1.id
+                
+            where
+                t3.project_id = $project_id and
+                t3.taxon_id = $taxon_id
+                
+            order by
+				t3.sort_order, t1.name";
+        
+        return $this->freeQuery($query);
+    }
+    
     public function getTaxonKeyLinks( $params )
     {
         $project_id = isset($params['project_id']) ? $params['project_id'] : null;

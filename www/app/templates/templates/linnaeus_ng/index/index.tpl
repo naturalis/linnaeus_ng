@@ -56,8 +56,7 @@
 				<p>
 					<!--<a class="internal-link index-entry" href="../species/taxon.php?id={$v.taxon_id}">{$v.name}</a> {if $v.rank_label}[{$v.rank_label}]{/if}-->
 					<a class="internal-link index-entry" href="../species/taxon.php?id={$v.taxon_id}">{$v.label}</a>
-		            {$v.authorship}
-					{if $v.nametype!='isValidNameOf' && $v.ref_taxon!=''}<span class="synonym-addition"> ({$v.ref_taxon})</span>{/if}{if $v.source =='synonym'}{t}[syn.]{/t}{/if}
+					{if $v.nametype!='isValidNameOf' && $v.ref_taxon!=''}<span class="synonym-addition">  &ndash; {$v.nametype_translated} {if $v.ref_taxon!=''}{t}of{/t} {$v.ref_taxon}{/if}</span>{/if}
 				</p>
 				{/foreach}
 		    {else if $type=='common'}
@@ -72,8 +71,7 @@
 				{foreach name=taxonloop from=$list key=k item=v}
 				<p>
 					<a class="internal-link index-entry" href="../species/taxon.php?id={$v.taxon_id}">{$v.label}</a>
-		            {$v.authorship}
-					{if $v.nametype!='isValidNameOf'} &ndash; {t}synonym{/t}{if $v.ref_taxon!=''} {t}of{/t}
+					{if $v.nametype!='isValidNameOf'} &ndash; {$v.nametype_translated}{if $v.ref_taxon!=''} {t}of{/t}
 					<a class="internal-link" href="../species/taxon.php?id={$v.taxon_id}">{$v.ref_taxon}</a>{/if}{/if}
 				</p>
 				{/foreach}

@@ -176,7 +176,7 @@ class SearchControllerGeneral extends SearchController
 
     public function searchAction ()
     {
-    	if ($this->rHasVal('search'))
+   	if ($this->rHasVal('search'))
 		{
 			$modified_search=$this->removeSearchNoise( $this->rGetVal('search') );
 			$this->moduleSession->setModuleSetting( array('setting'=>'search','value'=>$modified_search) );
@@ -242,7 +242,8 @@ class SearchControllerGeneral extends SearchController
 			)
 		);
 
-		$this->smarty->assign('modules',$this->getProjectModules(array('ignore'=>MODCODE_MATRIXKEY)));
+		$this->smarty->assign('modules',
+		     $this->getProjectModules(['active' => 'y', 'ignore'=>MODCODE_MATRIXKEY]));
 		$this->smarty->assign('minSearchLength',$this->_minSearchLength);
 		$this->smarty->assign('search',
 			array(
@@ -867,7 +868,7 @@ class SearchControllerGeneral extends SearchController
 
 		$results=array();
 		$numOfResults=0;
-
+/*
 		if (isset($taxa))
 		{
 			$results[self::C_TAXA_SCI_NAMES]=
@@ -880,7 +881,7 @@ class SearchControllerGeneral extends SearchController
 
 			$numOfResults+=count((array)$taxa);
 		}
-
+*/
 		if (isset($content))
 		{
 			$results[self::C_TAXA_DESCRIPTIONS]=

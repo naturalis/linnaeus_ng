@@ -1,6 +1,8 @@
 <?php
 
 include_once ('Controller.php');
+include_once ('RdfController.php');
+
 class IndexController extends Controller
 {
     public $noResultCaching = true;
@@ -18,8 +20,22 @@ class IndexController extends Controller
         )
     );
 
-	private $_commonNameTypes=[PREDICATE_PREFERRED_NAME,PREDICATE_ALTERNATIVE_NAME];
-	private $_scientificNameTypes=[PREDICATE_VALID_NAME,PREDICATE_SYNONYM,PREDICATE_SYNONYM_SL,PREDICATE_HOMONYM,PREDICATE_MISSPELLED_NAME,PREDICATE_INVALID_NAME];
+	private $_commonNameTypes=[
+	    PREDICATE_PREFERRED_NAME,
+	    PREDICATE_ALTERNATIVE_NAME
+	];
+	private $_scientificNameTypes=[
+	    PREDICATE_VALID_NAME,
+	    PREDICATE_SYNONYM,
+	    PREDICATE_SYNONYM_SL,
+	    PREDICATE_HOMONYM,
+	    PREDICATE_MISSPELLED_NAME,
+	    PREDICATE_INVALID_NAME,
+	    PREDICATE_BASIONYM,
+	    PREDICATE_NOMEN_NUDEM,
+	    PREDICATE_MISIDENTIFICATION
+	];
+	private $rdf;
 
     /**
      * Constructor, calls parent's constructor
@@ -167,7 +183,9 @@ class IndexController extends Controller
 
     private function getIndexList( $p )
     {
-		$type = isset($p['type']) ? $p['type'] : null;
+        $this->Rdf = new RdfController;
+        
+        $type = isset($p['type']) ? $p['type'] : null;
 		$letter = isset($p['letter']) ? $p['letter'] : null;
 		$language = isset($p['language']) ? $p['language'] : null;
        	$ranks = $this->getProjectRanks();
@@ -192,30 +210,46 @@ class IndexController extends Controller
 			    'display_language_id' => $this->getCurrentLanguageId(),
 			    'valid_name_id' => $this->getNameTypeId(PREDICATE_VALID_NAME)
             ));
-
+		    
 			foreach((array)$list as $key=>$val)
 			{
 				//if ($val['nametype']==PREDICATE_VALID_NAME)
-					$list[$key]['label']=
+					$list[$key]['label'] =
 						$this->formatTaxon(
 							array(
-								'taxon'=>array('taxon'=>$val['name'],'rank_id'=>$val['rank_id'],'parent_id'=>$val['parent_id']),
-								'rankpos'=>'post',
-								'ranks'=>$ranks
+							    'taxon'=> [
+							        'taxon' => $val['name'],
+							        'rank_id' => $val['rank_id'],
+							        'parent_id' => $val['parent_id'], 
+							        'id' => $val['taxon_id'], 
+							        'authorship' => $val['authorship']
+							    ],
+								'rankpos' => 'post',
+								'ranks' => $ranks
 						));
 
 				if (!empty($val['ref_taxon']))
-					$list[$key]['ref_taxon']=
+					$list[$key]['ref_taxon'] =
 						$this->formatTaxon(
 							array(
-								'taxon'=>array('taxon'=>$val['ref_taxon'],'rank_id'=>$val['rank_id'],'parent_id'=>$val['parent_id']),
-								'rankpos'=>'post',
-								'ranks'=>$ranks
+							    'taxon'=> [
+							        'taxon' => $val['ref_taxon'],
+							        'rank_id' => $val['rank_id'],
+							        'parent_id' => $val['parent_id'], 
+							        'id' => $val['taxon_id'], 
+							        'authorship' => $val['ref_taxon_authorship']
+							    ],
+								'rankpos' => 'post',
+								'ranks' => $ranks
 						));
+				
+				if (!empty($val['nametype'])) {
+				    $list[$key]['nametype_translated'] = $this->Rdf->translatePredicate($val['nametype']);
+				}
 			}
 
 		}
-
+		
 		return $list;
 
     }

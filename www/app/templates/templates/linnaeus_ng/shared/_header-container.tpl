@@ -17,7 +17,7 @@
 		</div>
 		<div class="menu-bar__container">
 			<div class="menu-bar">
-				<a class="menu-toggle menu-toggle-js" href="javascript:void(0)"></a>
+				<div class="menu-toggle menu-toggle-js" href="javascript:void(0)"><div class="menu-toggle-text">MENU</div></div>
 				<!-- <a class="menu-toggle menu-toggle-over-js" href="javascript:void(0)"></a> -->
 				<div class="responsive-site-title">
 					{if !$session.app.project.logo}

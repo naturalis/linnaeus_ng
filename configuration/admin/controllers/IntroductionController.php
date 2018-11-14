@@ -452,8 +452,12 @@ class IntroductionController extends Controller
                         )
                     )
                 );
-
-                $this->logChange(array('before'=>$before,'after'=>$after,'note'=>'saved introduction '.$before['topic']));
+                
+                $this->logChange(array(
+                    'before'=>$before,
+                    'after'=>$after,
+                    'note'=>'saved introduction' . (!empty($before['topic']) ? ' ' . $before['topic'] : '')
+                ));
 
 				$this->setPageGotContent($id,true);
 
@@ -776,6 +780,10 @@ class IntroductionController extends Controller
 
     private function detachAllMedia ()
     {
+        if (empty($this->_mc)) {
+            return false;
+        }
+        
         $media = $this->_mc->getItemMediaFiles();
 
         if (!empty($media)) {

@@ -233,6 +233,9 @@ class IntroductionController extends Controller
 
             if ($media) {
                 $page['image']['file_name'] = $media[0]['rs_original'];
+                $page['image']['width'] = $media[0]['width'];
+                $page['image']['height'] = $media[0]['height'];
+                $page['image']['title'] = $media[0]['title'];
             }
 
 			return $page;

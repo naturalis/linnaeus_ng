@@ -2,8 +2,13 @@
 	<div class="page-generic-div">
 		<ul class="tabs" style="background-color: white;">
 			<li class="tab">
-				<a href="../search/search.php">{t}Advanced search{/t}</a>
+				<a href="../search/search.php">{t}Full search{/t}</a>
 			</li>
+			{if $hasTraits}
+			<li class="tab">
+				<a href="../search/nsr_search_extended.php">{t}Filter species{/t}</a>
+			</li>
+			{/if}
 			<li class="tab-active">
 				<a href="#">{t}Taxonomic tree{/t}</a>
 			</li>
@@ -188,18 +193,96 @@ li.child.no-expand {
 	<div id="content" class="taxon-detail">
 
 		<div id="taxonHeader" class="hasImage">
-			<div id="tree-container"></div>
+			<div id="tree-container">{if !$isPublished}{t}No data available.{/t}{/if}</div>
 		</div>
 
 	</div>
 
 </div>
 
+
+{if $isPublished}
 <script type="text/JavaScript">
 $(document).ready(function()
 {
 	restoretree();
 });
 </script>
+{/if}
 
+
+
+
+
+			<div id="allLookupList" class="allLookupListInvisible"></div>
+			</div>
+			</div>
+			</div>
+			<div id="bottombar" class="navbar navbar-inverted">
+				<div class="container">
+					<ul class="footer-menu__list">
+						<li>
+							<a href="http://linnaeus.naturalis.nl/" target="_blank">
+								Linnaeus
+							</a>
+						</li>
+						<li>
+							<a href="../../../admin/views/users/login.php">Login</a>
+						</li>
+						<li>
+							<span class="decode">{$contact}</span>
+						</li>
+						<li>
+							<a target="_blank" href="http://www.naturalis.nl">
+								Naturalis Biodiversity Center
+							</a>	
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/JavaScript">
+$(document).ready(function()
+{
+	//http://fancyapps.com/fancybox/3/docs/#options
+	$('[data-fancybox]').fancybox({
+		arrows : false,
+		infobar : true,
+		animationEffect : false
+	});
+
+	$(".inline-video").each(function()
+	{
+		$_me = $(this);
+
+        $_me
+            .removeAttr('onclick')
+				.attr('onClick', 'showVideo("' + arr_arguments[1] + '","' + arr_arguments[3] +'");');
+
+		arr_arguments = $_me.attr("onclick").split("'");
+	});
+
+
+	if( jQuery().prettyDialog )
+	{
+		$("a[rel^='prettyPhoto']").prettyDialog();
+	}
+
+	{if $search}onSearchBoxSelect('');{/if}
+	{foreach from=$requestData key=k item=v}
+	{if !$v|@is_array}
+	addRequestVar('{$k}','{$v|@addslashes}')
+	{/if}
+	{/foreach}
+	chkPIDInLinks({$session.app.project.id},'{$addedProjectIDParam}');
+	{if $searchResultIndexActive}
+	searchResultIndexActive = {$searchResultIndexActive};
+	{/if}
+
+})
+</script>
+</body>
+</html>
 

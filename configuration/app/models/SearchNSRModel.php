@@ -1628,9 +1628,8 @@ final class SearchNSRModel extends AbstractModel
 			where
 				_a.project_id=". $project_id."
 				and _a.trait_group_id 
-				and _grp.show_in_search=1
-				
 				" . ( is_array($group) ? " in (".implode(",",$group).") " : " = " . $group ) ."
+				and _grp.show_in_search=1
 
 			group by
 				_a.id

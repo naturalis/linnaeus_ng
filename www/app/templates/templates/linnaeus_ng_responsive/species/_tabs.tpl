@@ -18,6 +18,10 @@
 
 			{include file="_tab_literatuur.tpl"}
 
+		{elseif $activeCategory.tabname=='CTAB_EXPERTS'}
+
+			{include file="_tab_experts.tpl"}
+
 		{elseif $activeCategory.tabname=='CTAB_MEDIA'}
 
 			{include file="_tab_media.tpl"}

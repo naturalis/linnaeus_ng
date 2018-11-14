@@ -1,226 +1,113 @@
-{include file="../shared/header.tpl"}
+{include file="../shared/_head.tpl"}
+{include file="../shared/_body-start.tpl"}
+<div class="page-title">
+	<span class="set-as-title">{t}Filter species{/t}</span>
+</div>
 
-<div id="page-main">
+<style>
+.options-panel {
+	margin-top:5px;
+}
+.zoekknop {
+	cursor:pointer;
+}
+.traits-legend-cell {
+	width:150px;
+}	
+.arrow-container {
+	width:15px;
+}
+.arrow-e, .arrow-se, .arrow-s {
+	width: 0;
+	height: 0;
+	margin-right:2px;
+}
+.arrow-e {
+	margin-top:2px;
+	border-top: 5px solid transparent;
+	border-bottom: 5px solid transparent;
+	border-left: 10px solid black;
+}
+.arrow-se {
+	margin-top:2px;
+	border-top:10px dashed transparent;
+	border-right:10px solid black;
+}
+.arrow-s {
+	margin-top:3px;
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;
+	border-top: 10px solid black;
+}
+#search-parameters {
+	margin-top:5px;
+}
+</style>
+                
+<div id="main-body">
 
-	<h2>{t}Advanced search{/t}</h2>
+	{include file="_searchtabs.tpl" activeTab="extendedSearch" responsiveTabs="mobile"}
+	<div class="sidebar__container">
+		{include file="_extendedSearchFilters.tpl"}
+		{include file="_toolbox.tpl"}
+	</div>  
+	
+	<div id="page-container">
 
-    <form method="get" id="formSearchFacetsSpecies" name="formSearchFacetsSpecies">
+<!--
+	<div class="page-generic-div" {$responsiveTabs}>
+		<ul class="tabs" style="background-color: white;">
+			<li class="tab-active">
+				<a href="../search/nsr_search_extended.php">{t}Filter species{/t}</a>
+			</li>
+			<li class="tab">
+				<a href="../search/search.php">{t}Full search{/t}</a>
+			</li>
+			<li class="tab">
+				<a href="../species/tree.php">{t}Taxonomic tree{/t}</a>
+			</li>
+		</ul>
+	</div>
+	<div class="extendedSearch">
+	    <input type="text" size="60" class="field focusfirst" id="{$responsiveTabs}group" name="group" autocomplete="off" placeholder="{t}Filter by species group...{/t}" value="{$search.group}">
+	    <div id="{$responsiveTabs}group_suggestion" match="like" class="auto_complete" style="display:none;"></div>
+	</div>
+-->
 
+	<div id="dialogRidge">
+	
 	<div id="content" class="simple-search">
-
-		<div>
-
-            <input type="hidden" id="group_id" name="group_id" value="{$search.group_id}" />
-            {*<input type="hidden" id="author_id" name="author_id" value="{$search.author_id}" />*}
-
-
-			<div{if $search.display=='plain'} style="display:none;"{/if}>
-			<fieldset class="block">
-				<div class="formrow">
-					<label id="ext_search_soortgroep_label" style="display:inline-block;margin-left:13px;margin-top:2px" accesskey="g" for="search">{t}Soortgroep{/t}</label>
-					<input style="width:370px" type="text" size="60" class="field" id="group" name="group" autocomplete="off" value="{$search.group}">
-					<div id="group_suggestion" match="like" class="auto_complete" style="display:none;"></div>
-				</div>
-				{*<div class="formrow">
-					<label accesskey="g" for="author">{t}Auteur{/t}</label>
-					<input type="text" size="60" class="field" id="author" name="author" autocomplete="off" value="{$search.author}">
-					<div id="author_suggestion" match="like" class="auto_complete" style="display:none;"></div>
-				</div>*}
-			</fieldset>
-
-            <span id="all-panel-toggle" style="float:right;margin-top:3px;display:none;">
-            <div style="float:right;margin-top:3px;">
-                <a href="#" onclick="toggle_all_panels();return false;">{t}alles in-/uitklappen{/t}</a>&nbsp;&nbsp;
-                <span onmouseout="hintHide()" onmouseover="hint(this,'&lt;p&gt;{t}Met dit zoekscherm maak je uiteenlopende selecties (onder)soorten. Verruim je selectie door meer dan 1 waarde binnen een kenmerk te selecteren (bijv. soorten met Status voorkomen 1a &lt;b&gt;of&lt;/b&gt; 1b). Vernauw je selectie door een waarde binnen een ander kenmerk te selecteren (bijv. soorten met Status voorkomen 1a &lt;b&gt;en&lt;/b&gt; met foto\'s). Druk op > om een kenmerkwaarde te selecteren.{/t}&lt;/p&gt;');" class="link">{t}hulp bij zoeken{/t}</span>
-            </div>
-            </span>
-
-			<fieldset class="selectable-parameters" style="width:494px;margin-top:4px;">
-
-				{* if $automatic_tabs['CTAB_MEDIA'].suppress!==true *}
-
-				<div class="formrow">
-
-                	<span class="panel-toggle-placeholder"></span>
-
-                	<label
-                    	for="multimedia-options"
-                        panel="multimedia-options-panel"
-                        class="clickable"
-                        onmouseover="hover_panel_toggle(this);"
-                        onmouseout="hover_panel_toggle(this,true);"
-                        onclick="toggle_panel(this);">
-						<div class="arrow-container"><div class="arrow arrow-e"></div></div>
-	                    <strong>{t}Multimedia{/t}</strong>
-                    </label>
-                    <table class="options-panel" id="multimedia-options-panel" style="display:none">
-                    	<tr>
-                        	<td class="traits-legend-cell"><label for="multimedia-images">{t}Foto('s){/t}</label></td>
-                            <td>
-                                <select id="multimedia-images" style="width:250px;">
-                                    <option value="">{t}maak een keuze{/t}</option>
-                                    <option value="images_on">{t}met foto('s){/t}</option>
-                                    <option value="images_off">{t}zonder foto's{/t}</option>
-                                </select>
-                                <input type="button" value=" > " onclick="addSearchParameter('multimedia-images');" />
-							</td>
-						</tr>
-                    	<tr>
-                        	<td class="traits-legend-cell"><label for="multimedia-distribution">{t}Verspreidingskaart(en){/t}</label></td>
-                            <td>
-                                <select id="multimedia-distribution" style="width:250px;">
-                                    <option value="">{t}maak een keuze{/t}</option>
-                                    <option value="distribution_on">{t}met verspreidingskaart(en){/t}</option>
-                                    <option value="distribution_off">{t}zonder verspreidingskaarten{/t}</option>
-                                </select>
-                                <input type="button" value=" > " onclick="addSearchParameter('multimedia-distribution');" />
-							</td>
-						</tr>
-                    	<tr>
-                        	<td class="traits-legend-cell"><label for="multimedia-trend">{t}Trendgrafiek{/t}</label></td>
-                            <td>
-                                <select id="multimedia-trend" style="width:250px;">
-                                    <option value="">{t}maak een keuze{/t}</option>
-                                    <option value="trend_on">{t}met trendgrafiek{/t}</option>
-                                    <option value="trend_off">{t}zonder trendgrafiek{/t}</option>
-                                </select>
-                                <input type="button" value=" > " onclick="addSearchParameter('multimedia-trend');" />
-							</td>
-						</tr>
-					</table>
-				</div>
-
-				{* /if *}
-
-				{foreach $traits t k1}
-				<div class="formrow">
-
-	                <span class="panel-toggle-placeholder"></span>
-
-					<label
-                        class="clickable"
-                        panel="traits{$k1}-options"
-                        onmouseover="hover_panel_toggle(this);"
-                        onmouseout="hover_panel_toggle(this,true);"
-                        onclick="toggle_panel(this);">
-						<div class="arrow-container"><div class="arrow arrow-e"></div></div>
-						<strong>{$t.name}</strong>
-					</label>&nbsp;
-
-                    {if $t.help_link_url}
-					<a href="{$t.help_link_url}" target="_blank"  title="{t}klik voor help over dit onderdeel{/t}" class="help">&nbsp;</a>
-                    {/if}
-
-                    <table class="options-panel" id="traits{$k1}-options" style="display:none">
-                    {if $t.description}
-                    	<tr>
-                        	<td colspan="2"><p>{$t.description}</p></td>
-                        </tr>
-                    {/if}
-					{foreach $t.data d k2}
-                    {if $d.type_sysname!=='stringfree'}
-                    	<tr>
-                        	<td class="traits-legend-cell"><label for="trait-{$k1}{$k2}">{$d.name}</label></td>
-                            <td>
-                                {if $d.type_allow_values==1 && $d.value_count>0}
-                                <select trait-id="{$d.id}" id="trait-{$k1}{$k2}" style="width:250px;">
-                                    <option value="">{t}maak een keuze{/t}</option>
-	                                {foreach $d.values v k}
-                                    <option value="{$v.id}">{$v.string_value}</option>
-    	                            {/foreach}
-                                </select>
-                                {else if $d.type_allow_values==0}
-
-                                <select
-                                	class="operator"
-                                    trait-id="{$d.id}"
-                                    id="operator-{$k1}{$k2}"
-                                    style="width:150px"
-                                    onchange="$('#trait-{$k1}{$k2}-2').toggle($('option:selected',this).attr('range')==1);"
-								>
-	                                {foreach $operators v k}
-	                                <option value="{$k}"{if $v.range} range="1"{/if}>{t}{$v.label}{/t}</option>
-    	                            {/foreach}
-                                </select>
-
-                                <input
-                                	type="text"
-                                	id="trait-{$k1}{$k2}"
-                                    trait-id="{$d.id}"
-                                    placeholder="{$d.date_format_format_hr}"
-                                    maxlength="{$d.date_format_format_hr|@strlen}"
-                                    style="width:45px;"
-                                    />
-                                <input
-                                	id="trait-{$k1}{$k2}-2"
-                                	type="text"
-                                    trait-id="{$d.id}"
-                                    second-value="1"
-                                    placeholder="{$d.date_format_format_hr}"
-                                    maxlength="{$d.date_format_format_hr|@strlen}"
-                                    style="width:45px;display:none;"
-                                    />
-                                {/if}
-                                <input
-                                	type="button"
-                                    value=" > "
-                                    trait-id="{$d.id}"
-                                    class="add-trait"
-                                    onclick="addSearchParameter('trait-{$k1}{$k2}');" />
-							</td>
-						</tr>
-					{/if}
-					{/foreach}
-                    	{if $t.show_show_all_link}
-                    	<tr>
-                        	<td colspan="2" style="padding-top:0.5em"><a href="#" onclick="setTraitGroup({$t.group_id});submitSearchParams();return;">
-                            {if $t.all_link_text}{$t.all_link_text}{else}{t _s1=$t.name}Alle taxa met %s tonen{/t}{/if}
-                            </a></td>
-                        </tr>
-                        {/if}
-                    </table>
-				</div>
-				{/foreach}
-
-				<div class="formrow selected-parameters" style="display:none">
-					<strong>{t}Geselecteerde kenmerken{/t}</strong>
-                    <span id="remove-all" style="display:none">&nbsp;
-                    	<a href="#" onclick="removeAllSearchParameters();submitSearchParams();return;">{t}delete all{/t}</a>
-    				</span>
-                    <ul id="search-parameters">
-                    </ul>
-				</div>
-
-			</fieldset>
-
-			</div>
-
-		</div>
-
-		<div id="results">
-            <h4 style="display:inline-block">
-            	<span id="resultcount-header">{$results.count}</span>
-	            {* if $searchHR || $searchTraitsHR} {t}voor{/t} '{if $searchHR}{$searchHR}{/if}{if $searchTraitsHR}{$searchTraitsHR}{/if}'{/if *}
-            </h4>
-			<a href="#" id="just-species-toggle" style="padding-left:10px;" onclick="toggleJustSpeciesToggle();submitSearchParams();return false;">
-			{t}alleen soorten tonen{/t}
+		{include file="_searchtabs.tpl" activeTab="extendedSearch" responsiveTabs="desktop"}
+	
+		<div id="results" class="searchResultContainer"> 
+		<!--
+			<div class="searchHeader">
+	      <h2>
+	      	{t}Zoekresultaten{/t}
+	      </h2>
+          
+	      <div class="formrow orderList">
+		      <select name="sort" id="sort" class="customSelect" onchange="submitSearchParams();">
+	          <option value="name-valid"{if $search.sort!='name-valid'} selected="selected"{/if}>{t}Wetenschappelijke naam{/t}</option>
+	          <option value="name-pref-nl"{if $search.sort=='name-pref-nl'} selected="selected"{/if}>{t}Nederlandse naam{/t}</option>
+		      </select>
+	      </div>
+     	</div>
+	      -->
+	      
+         <div style="margin-bottom:40px;"><span id="resultcount-header" style="float:left"></span>
+            <a href="#" id="just-species-toggle" style="float:left;margin-left:10px;" onclick="toggleJustSpeciesToggle();submitSearchParams();return false;">
+            {t}hide infraspecies{/t}
             </a>
+        </div>
 
-            <div class="formrow" style="margin-bottom:15px">
-                {t}Resultaten sorteren op:{/t}
-                <select name="sort" id="sort" onchange="submitSearchParams();">
-                    <option value="name-valid"{if $search.sort!='name-valid'} selected="selected"{/if}>{t}Wetenschappelijk naam{/t}</option>
-                    <option value="name-pref-nl"{if $search.sort=='name-pref-nl'} selected="selected"{/if}>{t}Nederlandse naam{/t}</option>
-                </select>
-            </div>
 
-			{foreach $results.data v k}
-            <div class="result">
-                {if $v.overview_image}
-                <img src="{$taxon_base_url_images_thumb_s}{$v.overview_image}" />
-                {/if}
-                <strong><a href="../species/nsr_taxon.php?id={$v.id}">{$v.taxon}</a></strong><br />
-
+      <ul class="searchResult">
+			{foreach from=$results.data item=v}
+        <li class="result">
+        	<a href="../species/nsr_taxon.php?id={$v.taxon_id}" class="clicklink"></a>	
+          <a href="../species/nsr_taxon.php?id={$v.id}">{$v.taxon}</a>
+	          	<span class="commonName">
 				{if $show_all_preferred_names_in_results}
 					{foreach $v.common_names n nk}
                     {$n.name}
@@ -229,35 +116,52 @@
                 {else}
 					{if $v.common_name}{$v.common_name}<br />{/if}
 				{/if}
-
-                {if $show_presence_in_results}
-                    {if $v.presence_information_index_label || $v.presence_information_title}
-                    {t}Status voorkomen:{/t} {$v.presence_information_index_label} {$v.presence_information_title}
-                    {/if}
+			</span>
+      		<span class="status">
+            {if $show_presence_in_results}
+                {if $v.presence_information_index_label || $v.presence_information_title}
+                {t}Status voorkomen:{/t} {$v.presence_information_index_label} {$v.presence_information_title}
                 {/if}
-            </div>
+            {/if}
+        	</span>
+        	{if $v.overview_image}
+        		<div class="image" style="background-image: url('{$taxon_base_url_images_thumb_s}{$v.overview_image}');"></div>
+          {/if}
+        </li>
 			{/foreach}
+			</ul>
+
+        {if $search.just_species==1}
+        {capture A}{t}species{/t}{/capture}
+        {capture B}{t}species{/t}{/capture}
+        {else}
+        {capture A}{t}species (and infraspecies){/t}{/capture}
+        {capture B}{t}species (and infraspecies){/t}{/capture}
+        {/if}
+
+			{assign var=pgnEntityNames value=[$smarty.capture.A,$smarty.capture.B]}
+			{assign var=pgnResultCount value=$results.count}
+			{assign var=pgnResultsPerPage value=$results.perpage}
+			{assign var=pgnCurrPage value=$search.page}
+			{assign var=pgnURL value=$smarty.server.PHP_SELF}
+			{assign var=pgnQuerystring value=$querystring}
+			{include file="../shared/_paginator.tpl"}
 		</div>
-
- 		</form>
-
+	</div>
 	</div>
 
-</div>
 
 
 <script>
 $(document).ready(function()
 {
-	$('.panel-toggle-placeholder').first().replaceWith($('#all-panel-toggle').html());
-
 	{if $search}
-	{foreach $search.presence v k}
+	{foreach from=$search.presence item=v key=k}
 	$("#presenceStatusList").val('presence[{$k}]');
 	addSearchParameter('presenceStatusList');
 	{/foreach}
 
-	{foreach $search v k}
+	{foreach from=$search item=v key=k}
 	{if $k=='images' || $k=='distribution' || $k=='trend'}
 	$("#multimedia-options").val('{$k}');
 	addSearchParameter('multimedia-options');
@@ -275,7 +179,7 @@ $(document).ready(function()
 	addSearchParameter('multimedia-trend');
 	{/if}
 	{/foreach}
-
+	
 	{if $search.traits}
 
 	var h=$.parseJSON(decodeURIComponent('{$search.traits}'));
@@ -283,7 +187,7 @@ $(document).ready(function()
 	for (var i in h)
 	{
 		var d=h[i];
-
+		
 		if (d.valueid)
 		{
 			$('select[trait-id='+d.traitid+']').val(d.valueid);
@@ -314,6 +218,7 @@ $(document).ready(function()
 	{/if}
 
 
+
 	{/if}
 	{/if}
 
@@ -328,9 +233,9 @@ $(document).ready(function()
 			$('label[panel='+v.id+']').trigger('click').trigger('mouseout');
 		}
 	});
-
+	
 	{else}
-
+	
 		$('label[for=presenceStatusList]').trigger('click').trigger('mouseout');
 
 	{/if}
@@ -338,26 +243,35 @@ $(document).ready(function()
 	{if $search.just_species}
 	setJustSpeciesToggle({$search.just_species});
 	{/if}
+	
+	$('#just-species-toggle').html(getJustSpeciesToggle()==0 ? '{t}hide infraspecies{/t}' : '{t}show infraspecies{/t}' );
 
-	$('#just-species-toggle').html(getJustSpeciesToggle()==0 ? '{t}alleen soorten tonen{/t}' : '{t}soorten en lagere taxa tonen{/t}' );
-
-	$('title').html('{t}Uitgebreid zoeken naar soorten{/t} - '+$('title').html());
+	$('title').html('{t}Filter species{/t} - '+$('title').html());
 
 	bindKeys();
 
-	$("#group, #author").keyup(function(e)
-	{
+	$("[id$=group]").keyup(function(e)
+	{ 
 		var code = e.which;
 		if(code==13)
 		{
 			submitSearchParams();
 		}
 	});
-
+	
 	init=false;
-
-
+	acquireInlineTemplates();
+	
 });
 </script>
+
+<div class="inline-templates" id="lineTpl">
+<!--
+	<li id="item-%IDX%" ident="%IDENT%" onclick="window.open('../species/nsr_taxon.php?id=%IDENT%','_self');" onmouseover="activesuggestion=-1">
+    <div class="common">%COMMON_NAME%</div>
+    <div class="scientific">%SCIENTIFIC_NAME%</div>
+	</li>
+-->
+</div>
 
 {include file="../shared/footer.tpl"}

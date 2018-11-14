@@ -39,6 +39,7 @@ class SpeciesControllerNSR extends SpeciesController
         'CTAB_DNA_BARCODES'=>['id'=>-6,'title'=>'DNA barcodes'],
         'CTAB_DICH_KEY_LINKS'=>['id'=>-7,'title'=>'Key links'],
 //        'CTAB_NOMENCLATURE'=>['id'=>-8,'title'=>'Nomenclature'],
+        'CTAB_EXPERTS'=>['id'=>-10,'title'=>'Experts'],
         'CTAB_PRESENCE_STATUS'=>['id'=>-9,'title'=>'Presence status'],
     ];
 
@@ -825,7 +826,7 @@ class SpeciesControllerNSR extends SpeciesController
                 return -1;
             return 0;
         });
-
+        
         return $all_categories;
 
     }
@@ -840,6 +841,9 @@ class SpeciesControllerNSR extends SpeciesController
         // get all available categories (tabs)
         $categories=$this->getCategories($p);
 
+      //  var_dump($categories);
+        
+        
         $taxon_categories=array();
         $start_category=null;
         $cat=null;
@@ -848,16 +852,15 @@ class SpeciesControllerNSR extends SpeciesController
         {
             $cat=$requestedTab;
         }
-
+        
         // weed out the ones we don't want to display
         foreach((array)$categories as $key=>$val)
         {
             //if ( $val['suppress'] ) continue;
             //if ( $val['always_hide'] ) continue;
-
             if ($val['type']=='auto')
             {
-                $val['is_empty']=$this->isAutoTabEmpty( ['tab'=>$val['tabname'], 'taxon_id'=>$taxon['id'] ] );
+                 $val['is_empty']=$this->isAutoTabEmpty( ['tab'=>$val['tabname'], 'taxon_id'=>$taxon['id'] ] );
             }
 
             // parametrize external reference URLs
@@ -890,7 +893,7 @@ class SpeciesControllerNSR extends SpeciesController
 
             $taxon_categories[]=$val;
         }
-
+        
         // have the first non-automatic/external tab display the overview image
         foreach((array)$taxon_categories as $key=>$val)
         {
@@ -901,6 +904,8 @@ class SpeciesControllerNSR extends SpeciesController
             }
         }
 
+        
+        
         // determine with which category to open
         foreach((array)$taxon_categories as $key=>$val)
         {
@@ -938,6 +943,10 @@ class SpeciesControllerNSR extends SpeciesController
                 if ($start_category['tabname']!=$requestedTab) $start_category=null;
             }
         }
+        
+         
+        
+        
 
         return [ 'start'=>$start_category, 'categories'=>$taxon_categories ];
 
@@ -1395,8 +1404,14 @@ class SpeciesControllerNSR extends SpeciesController
                 $content['literature']=$this->getTaxonLiterature($taxon);
                 if ( $this->_show_inherited_literature )
                     $content['inherited_literature']=$this->getInheritedTaxonLiterature($taxon);
-                break;
-
+                    break;
+                    
+            case 'CTAB_EXPERTS':
+                $content['experts']=$this->getTaxonExperts($taxon);
+                if ( $this->_show_inherited_literature )
+                    $content['inherited_experts']=$this->getInheritedTaxonExperts($taxon);
+                    break;
+                    
             case 'CTAB_DNA_BARCODES':
                 $content=$this->getDNABarcodes( $taxon );
                 break;
@@ -1584,25 +1599,52 @@ class SpeciesControllerNSR extends SpeciesController
             'taxon_id' => $taxon_id,
         ));
     }
-
-    private function getInheritedTaxonLiterature( $taxon_id )
+    
+    private function getTaxonExperts ($taxon_id)
     {
+        return $this->models->{$this->_model}->getTaxonActors(array(
+            'project_id' => $this->getCurrentProjectId(),
+            'taxon_id' => $taxon_id,
+        ));
+    }
+    
+    private function getInheritedTaxonLiterature ($taxon_id)
+    {
+        return $this->getInheritedTaxonData($taxon_id, 'getTaxonReferences');
+    }
+    
+    private function getInheritedTaxonExperts ($taxon_id)
+    {
+        return $this->getInheritedTaxonData($taxon_id, 'getTaxonActors');
+    }
+    
+    /**
+     * Originally created for literature only, but fetching experts
+     * is only a matter of using a different model... If we pass that
+     * model to an abstracted method we save some lines of code.
+     */
+    private function getInheritedTaxonData ($taxon_id, $data_model = false)
+    {
+        if (!$data_model) {
+            return false;
+        }
+        
         $p=$this->models->TaxonQuickParentage->_get(array("id"=>
             array(
                 'project_id' => $this->getCurrentProjectId(),
                 'taxon_id' => $taxon_id,
-                )
+            )
         ));
-
+        
         $res=array();
-
+        
         if ($p)
         {
             $p=explode(' ',$p[0]['parentage']);
-
+            
             foreach($p as $val)
             {
-                $d=$this->models->{$this->_model}->getTaxonReferences(array(
+                $d=$this->models->{$this->_model}->{$data_model}(array(
                     'project_id' => $this->getCurrentProjectId(),
                     'taxon_id' => $val,
                 ));
@@ -1618,7 +1660,7 @@ class SpeciesControllerNSR extends SpeciesController
         }
         return $res;
     }
-
+    
     private function getTaxonKeyLinks( $taxon_id )
     {
         return $this->models->{$this->_model}->getTaxonKeyLinks(array(
@@ -1632,7 +1674,7 @@ class SpeciesControllerNSR extends SpeciesController
     {
         $taxon_id=isset($p['taxon_id']) ? $p['taxon_id'] : null;
         $tab=isset($p['tab']) ? $p['tab'] : null;
-
+        
         if ( is_null($taxon_id) ) return false;
 
         switch ( $tab )
@@ -1649,7 +1691,11 @@ class SpeciesControllerNSR extends SpeciesController
                 }
                 else
                 {
-                    return count((array)$this->getTaxonMedia(array('id'=>$taxon_id)))<=0;
+                    $mp['id'] = $taxon_id;
+                    if ($this->_inclOverviewImage) {
+                        $mp['inclOverviewImage'] = true;
+                    }
+                    return count((array)$this->getTaxonMedia($mp))<=0;
                 }
                 break;
             case 'CTAB_CLASSIFICATION':
@@ -1666,6 +1712,18 @@ class SpeciesControllerNSR extends SpeciesController
                 if ( $this->_show_inherited_literature )
                 {
                     $b=$this->getInheritedTaxonLiterature($taxon_id);
+                    return count((array)$a)+count((array)$b)<=0;
+                }
+                else
+                {
+                    return count((array)$a)<=0;
+                }
+                break;
+            case 'CTAB_EXPERTS':
+                $a=$this->getTaxonExperts($taxon_id);
+                if ( $this->_show_inherited_literature )
+                {
+                    $b=$this->getInheritedTaxonExperts($taxon_id);
                     return count((array)$a)+count((array)$b)<=0;
                 }
                 else

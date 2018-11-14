@@ -1473,18 +1473,36 @@ class Controller extends BaseClass
 			'maintainKeys' => true
 		));
 
-		$freeModules = $this->models->FreeModulesProjects->_get(array(
-			'id' => array(
-				'project_id' => $d['project_id']
-			)
-		));
+		$freeModules = $this->models->FreeModulesProjects->_get($p);
 
 		return array(
 			'modules' => $modules,
-			'freeModules' => $freeModules
+		    'freeModules' => !empty($freeModules) ? $freeModules : []
 		);
 
     }
+    
+    /**
+     * Checks if module is published/active
+     * 
+     * Check is necessary to see if data is module is published. If not, data should be hidden.
+     * 
+     * @param string $m Module controller or name
+     * @return boolean
+     */
+    public function isProjectModulePublished ($m)
+    {
+        foreach ($this->getProjectModules(['active' => 'y']) as $modules) {
+            foreach ($modules as $module) {
+                if ((isset($module['controller']) && $module['controller'] == strtolower($m)) || 
+                    strtolower($module['module']) == strtolower($m)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
 
     /**
      * Perfoms a usort, using user defined sort by-field, sort direction and case-sensitivity
@@ -1771,6 +1789,7 @@ class Controller extends BaseClass
 		$this->smarty->assign('show_advanced_search_in_public_menu', $this->getSetting('show_advanced_search_in_public_menu',1)==1 );
 		$this->smarty->assign('googleAnalyticsCode', $this->getGoogleAnalyticsCode());
 		$this->smarty->assign('generalHeaderSubtitle', $this->getGeneralHeaderSubtitle());
+		$this->smarty->assign('hasTraits', $this->isProjectModulePublished('traits'));
     }
 
     public function loadControllerConfig ($controllerBaseName = null)
@@ -3167,7 +3186,7 @@ class Controller extends BaseClass
         
         foreach ($lookup as $iso3 => $code) {
             $id = in_array($iso3, $iso3s) ? $l[array_search($iso3, $iso3s)]['id'] : $code[1];
-            define($code[0], $id);
+            if (!defined($code[0])) define($code[0], $id);
         }
      }
     

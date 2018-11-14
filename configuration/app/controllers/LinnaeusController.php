@@ -188,6 +188,19 @@ class LinnaeusController extends Controller
 		$this->smarty->assign('projects',$projects);
 		$this->smarty->assign('excludeLogout',true);
 		$this->smarty->assign('texts',$texts);
+		
+		/**
+		 * Documentation!
+		 * 
+		 * If the app refuses to start with the error 
+		 * 
+		 * PHP Fatal error:  Uncaught  --> Smarty: Unable to load template 'file:root_index.tpl' <-- \n  
+		 * thrown in /var/www/html/vendor/smarty/smarty/libs/sysplugins/smarty_internal_template.php on line 195
+		 * 
+		 * Check the following: configuration.php getGeneralSettings()['app']['skinName'] = ***'linnaeus_2'***
+		 * 
+		 * For projects that display this error, the setting was 'linnaeus_ng_responsive'
+		 */
 
         $this->printPage('root_index');
 

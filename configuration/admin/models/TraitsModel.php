@@ -225,10 +225,9 @@ final class TraitsModel extends AbstractModel
 		";
 		
 		return $this->freeQuery($query);
-		
 				
 	}
-
+	
     public function getTraitgroupTraitValues($params)
     {
 		$project_id=isset($params['project_id']) ? $params['project_id'] : null;

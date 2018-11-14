@@ -233,6 +233,9 @@ function updateValueList()
 		b.push(
 			'<li id="sortable'+val.id+'" data-id="'+i+'">'+
 			val.value+' \
+			<a href="traitgroup_trait_value.php?id=' + val.id + '" class="edit">'+
+			_('rename')+
+			'</a> \
 			<a href="#" class="edit" onclick="if(!verifyTraitValueRemoval('+val.usage_count+'))return;removeTraitValue('+i+');updateValueList();updateValueCount();return false;">'+
 			_('remove')+
 			'</a> \

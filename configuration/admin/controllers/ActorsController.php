@@ -16,7 +16,8 @@ class ActorsController extends NsrController
         'nsr_ids',
 		'presence_taxa',
 		'content_taxa',
-		'literature2_authors'
+		'literature2_authors',
+        'actors_taxa'
     );
 
     public $controllerPublicName = 'Actors';
@@ -84,7 +85,9 @@ class ActorsController extends NsrController
      */
     public function editAction()
 	{
-		if ($this->rHasId() && $this->rHasVal('action','delete')) {
+	    $this->checkAuthorisation();
+	    
+	    if ($this->rHasId() && $this->rHasVal('action','delete')) {
 
 			$this->UserRights->setActionType( $this->UserRights->getActionDelete() );
 			$this->checkAuthorisation();
@@ -126,7 +129,7 @@ class ActorsController extends NsrController
 			$this->setPageName($this->translate('Edit actor'));
 			$actor=$this->getActor();
 			$this->smarty->assign('actor',$actor);
-			$this->smarty->assign('links',$this->getActorLinks( $actor ));
+			$this->smarty->assign('links',$this->getActorLinks($actor));
 		}
 		else
 		{
@@ -231,6 +234,16 @@ class ActorsController extends NsrController
 			}
 
 		}
+		
+		foreach ((array)$this->rGetVal('new_taxa') as $taxon_id) {
+		    $this->models->ActorsModel->saveTaxonActor(array(
+	            "project_id" => $this->getCurrentProjectId(),
+	            "taxon_id" => $taxon_id,
+	            "actor_id" => $this->getActorId()
+	        ));
+	    }
+		    
+		
 	}
 
     /**
@@ -286,9 +299,14 @@ class ActorsController extends NsrController
 
 		$this->models->Literature2Authors->delete(
 		    array('actor_id'=>$id,'project_id'=>$this->getCurrentProjectId())
-		);
+		    );
 		$this->addMessage("Actor detached from ".$this->models->Literature2Authors->getAffectedRows()." literature references.");
-
+		
+		$this->models->ActorsTaxa->delete(
+		    array('actor_id'=>$id,'project_id'=>$this->getCurrentProjectId())
+		);
+		$this->addMessage("Actor detached from ".$this->models->ActorsTaxa->getAffectedRows()." taxa.");
+		
 		$this->models->Rdf->delete(
 		    array('object_id'=>$id,'object_type'=>'actor')
 		);
@@ -351,7 +369,6 @@ class ActorsController extends NsrController
 
 		if ($alphabet)
 		{
-
 			$actor=$alphabet[0];
 
 			// catching up...
@@ -360,7 +377,8 @@ class ActorsController extends NsrController
 				$nsrIds = $this->createNsrIds(array('id'=>$actor['id'],'type'=> 'actor', 'subtype'=> ( $alphabet[0]['is_company']==1 ? 'organization' : 'person' )));
 				$actor['nsr_id'] = $nsrIds['nsr_id'];
 			}
-
+			
+			$actor['taxa'] = $this->getActorTaxa($actor['id']);
 			return $actor;
 		}
 
@@ -408,6 +426,14 @@ class ActorsController extends NsrController
 				'isFullSet'=>count($data)<$maxResults
 			));
 
+    }
+    
+    private function getActorTaxa ($id)
+    {
+        return $this->models->ActorsModel->getActorTaxa([
+            'project_id' => $this->getCurrentProjectId(),
+            'actor_id' => $id,
+        ]);
     }
 
     /**
@@ -474,12 +500,13 @@ class ActorsController extends NsrController
 		    'name' => $name,
 		    'nameAlt' => $name_alt
 		));
-
+		
 		$result = array(
-				'names' => $names,
-				'presences'=>$presences,
-				'passports'=>$passports,
-				'literature'=>$literature,
+			'names' => $names,
+			'presences'=>$presences,
+			'passports'=>$passports,
+			'literature'=>$literature,
+		    'taxa' => $this->getActorTaxa($id)
 		);
 
 		return $result;

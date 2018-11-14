@@ -592,6 +592,7 @@ final class Literature2Model extends AbstractModel
 
 				_a.id,
 				_a.taxon,
+                _a.parent_id,
 				_r.id as base_rank_id,
 				_r.rank
 

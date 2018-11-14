@@ -183,10 +183,10 @@
 
 
         <div class="formrow selected-parameters" style="display:none">
-           <label class="clickable">{t}Geselecteerde kenmerken{/t}</label>
+           <label class="clickable">{t}Selected traits{/t}</label>
            <span id="remove-all" style="display:none">
-              <a href="#" class="removeAllParams" onclick="removeAllSearchParameters();submitSearchParams();return;">{t}alles verwijderen{/t}</a>
-              <!-- a href="nsr_search_extended.php">{t}alles verwijderen{/t}</a -->
+              <a href="#" class="removeAllParams" onclick="removeAllSearchParameters();submitSearchParams();return;">{t}remove all{/t}</a>
+              <!-- a href="nsr_search_extended.php">{t}remove all{/t}</a -->
            </span>
            <ul id="search-parameters">
            </ul>

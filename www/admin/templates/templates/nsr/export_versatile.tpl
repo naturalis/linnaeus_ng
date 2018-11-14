@@ -405,29 +405,26 @@ function doSubmit()
                 </tr>
             </table>
 		</div>
+
 		
 		{if $traits}
 		<div class="fieldsubset">
 		<h4>{t}Traits{/t}</h4>
         <table>
-        <tr>
-                <td colspan="2">
-                	<label>
-                    	<input
-                        	onchange="setTraits()"
-                            type="checkbox"
-                            id="all_traits" />{t}Export all traits{/t}</label>
-                </td>
-			</tr>
         <tbody id="trait-selector">
-        {foreach $traits group}
-        	<tr><td colspan=2>{$group.name}</td></tr>
-        	{foreach $group.traits trait}
-        	<tr>
-        		<td><input id=trait_{$group.id}_{$trait.id} type=checkbox name=traits[{$group.id}][] value={$trait.id}></td>
-        		<td><label for=trait_{$group.id}_{$trait.id}>{$trait.name}</label></td>
-        	</tr>
-        	{/foreach}
+		{foreach $traits group}
+        	<tr><td>
+			<input id="traitgroup_{$group.id}" type="checkbox" onclick="
+            	$('.traitgroup_{$group.id}').prop('disabled', !$(this).prop('checked')).toggle($(this).prop('checked'))
+            " /></td>
+ 			<td><label for="traitgroup_{$group.id}">{$group.name}</label>
+           	<div class="traitgroup_{$group.id}" style="display: none;">
+		    {foreach $group.traits trait}
+           		<input class="traitgroup_{$group.id}" checked="checked" disabled="disabled" id="trait_{$group.id}_{$trait.id}" type="checkbox" name="traits[{$group.id}][]" value="{$trait.id}">
+        		<label for="trait_{$group.id}_{$trait.id}">{$trait.name}</label></br>
+            {/foreach}
+            </div>
+			</td></tr>
         {/foreach}
         </tbody>
 		</table>

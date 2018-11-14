@@ -105,7 +105,9 @@ class RdfController extends Controller
 				PREDICATE_SYNONYM_SL=>'synoniem sensu lato',
 				PREDICATE_MISSPELLED_NAME=>'fout gespelde naam',
 				PREDICATE_INVALID_NAME=>'ongeldige naam',
-				PREDICATE_ALTERNATIVE_NAME=>'alternatieve %se naam'
+				PREDICATE_ALTERNATIVE_NAME=>'alternatieve %se naam',
+			    PREDICATE_NOMEN_NUDEM => 'nomen nudum',
+			    PREDICATE_MISIDENTIFICATION => 'foutieve identificatie',
 			),
 			26 => array(
 				PREDICATE_VALID_NAME=>'valid name',
@@ -116,7 +118,9 @@ class RdfController extends Controller
 				PREDICATE_SYNONYM_SL=>'synonym sensu lato',
 				PREDICATE_MISSPELLED_NAME=>'misspelled name',
 				PREDICATE_INVALID_NAME=>'invalid name',
-				PREDICATE_ALTERNATIVE_NAME=>'alternative %s name'
+				PREDICATE_ALTERNATIVE_NAME=>'alternative %s name',
+			    PREDICATE_NOMEN_NUDEM => 'nomen nudum',
+			    PREDICATE_MISIDENTIFICATION => 'misidentification'
 			)
 		);
 

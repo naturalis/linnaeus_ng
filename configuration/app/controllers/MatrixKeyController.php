@@ -188,7 +188,7 @@ class MatrixKeyController extends Controller
 		$this->setMasterMatrix();
 		$this->setDataSet();
 		$this->setScores();
-
+		
 		$this->smarty->assign( 'session_scores', json_encode( $this->getScores() ) );
 		$this->smarty->assign( 'session_states', json_encode( $this->getSessionStates() ) );
 		$this->smarty->assign( 'session_characters', json_encode( $this->getCharacterCounts() ) );

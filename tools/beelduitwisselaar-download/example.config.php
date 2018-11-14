@@ -23,4 +23,4 @@ $remoteHost = [
      'path' => '',
      'folder' => ''
 ];
-$lang = 24;
+$lang = 24; // Dutch

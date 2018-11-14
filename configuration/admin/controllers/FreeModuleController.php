@@ -48,7 +48,7 @@ class FreeModuleController extends Controller
     {
         parent::__construct();
 		$this->UserRights->setModuleType($this->UserRights->getModuleTypeCustom());
-		$this->UserRights->setFreeModuleId($this->getCurrentModuleId());
+		$this->UserRights->setFreeModuleId($this->getFreeModuleId());
 		$this->controllerPublicName = $this->getActiveModuleName();
 		$this->setMediaController();
     }
@@ -155,6 +155,12 @@ class FreeModuleController extends Controller
 
 			$this->redirect('preview.php?id='.$this->rGetId());
 		}
+		
+		// LINNA-1358
+		$id = $this->rHasId() ? $this->rGetId() : null;
+		if (is_null($id)) {
+		    $this->createPageAction();
+		}
 
 		$page = $this->getPage();
 
@@ -176,7 +182,7 @@ class FreeModuleController extends Controller
 		if (isset($page)) $this->smarty->assign('page', $page);
 
 		$this->smarty->assign('navCurrentId', $this->rGetId() ? $this->rGetId() : null);
-		$this->smarty->assign('id', $this->rHasId() ? $this->rGetId() : null );
+		$this->smarty->assign('id', $id);
 		$this->smarty->assign('languages', $this->getProjectLanguages());
 		$this->smarty->assign('activeLanguage', $this->getDefaultProjectLanguage());
 		$this->smarty->assign('includeHtmlEditor', true);
@@ -707,7 +713,7 @@ class FreeModuleController extends Controller
 	    return isset($activeModule['id']) ? $activeModule['id'] : false;
 
 	}
-
+	
 	private function isUserAuthorizedForFreeModule($id=null)
 	{
 
@@ -730,15 +736,10 @@ class FreeModuleController extends Controller
 	}
 
 
-	private function getFreeModule($id=null)
+	private function getFreeModule ($id=null)
 	{
 
-		$id =
-			isset($id) ?
-				$id :
-				!is_null($this->rGetVal('freeId')) ?
-					$this->rGetVal('freeId') :
-					$this->getCurrentModuleId();
+		$id = isset($id) ? $id : $this->getFreeModuleId();
 
 		$fmp = $this->models->FreeModulesProjects->_get(
 			array(
@@ -752,11 +753,18 @@ class FreeModuleController extends Controller
         if ($fmp) return $fmp[0];
 
 	}
+	
+	private function getFreeModuleId () 
+	{
+	    return !is_null($this->rGetVal('freeId')) ?
+	       $this->rGetVal('freeId') :
+	       $this->getCurrentModuleId();
+	}
 
 	private function createPage()
 	{
 
-		if (!$this->getCurrentModuleId()) return;
+	    if (!$this->getCurrentModuleId()) return;
 
 		$this->models->FreeModulesPages->save(
 			array(
@@ -1082,6 +1090,10 @@ class FreeModuleController extends Controller
 
     private function detachAllMedia ()
     {
+        if (empty($this->_mc)) {
+            return false;
+        }
+        
         $media = $this->_mc->getItemMediaFiles();
 
         if (!empty($media)) {
