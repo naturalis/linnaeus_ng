@@ -352,6 +352,28 @@ linked bioportal search:
                 }
             ]
         },
+        {
+            "field": "sourceSystem.code",
+            "operator": "EQUALS",
+            "value": "BRAHMS",
+            "or": [
+                {
+                    "field": "sourceSystem.code",
+                    "operator": "EQUALS",
+                    "value": "CRS"
+                },
+                {
+                    "field": "sourceSystem.code",
+                    "operator": "EQUALS",
+                    "value": "NSR"
+                },
+                {
+                    "field": "sourceSystem.code",
+                    "operator": "EQUALS",
+                    "value": "COL"
+                }
+            ]
+        },
     	{ "field" : "associatedMultiMediaUris.variant", "operator" : "NOT_EQUALS" }
 		%INFRA_SPECIFIC_EPITHET_CLAUSE%
     ],
