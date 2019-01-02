@@ -283,7 +283,7 @@
 			$query="
 				select
 					_t.taxon as name,
-					_r.rank,
+					replace(_r.rank,' ','_') as rank,
 					_t.id,
 					trim(LEADING '0' FROM replace(_rr.nsr_id,'tn.nlsr.concept/','')) as nsr_id,
 					trim(LEADING '0' FROM replace(_pp.nsr_id,'tn.nlsr.concept/','')) as nsr_id_parent,
