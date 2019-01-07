@@ -128,13 +128,13 @@ class SpeciesControllerNSR extends SpeciesController
 
         $taxon = $this->getTaxonById($this->getTaxonId());
         
-        $taxon['label'] = $this->formatTaxon($taxon);
-        if (!empty($taxon['authorship'])) {
-            $taxon['label'] .= ' ' . $taxon['authorship'];
-        }
-        
         if ( !empty($taxon) )
         {
+            $taxon['label'] = $this->formatTaxon($taxon);
+            if (!empty($taxon['authorship'])) {
+                $taxon['label'] .= ' ' . $taxon['authorship'];
+            }
+            
             $template = $this->rGetVal('headless',1) ? 'taxon_headless' : 'taxon' ;
 
             $categories=$this->getTaxonCategories( [
