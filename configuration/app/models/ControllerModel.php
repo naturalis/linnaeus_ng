@@ -213,7 +213,7 @@ final class ControllerModel extends AbstractModel
 				_a.id=". $taxonId ."
 				and _a.project_id=".$projectId."
 				".($trashCanExists ? " and ifnull(_trash.is_deleted,0)=0" : "");
-
+		
         $d = $this->freeQuery($query);
         return isset($d) ? $d[0] : null;
 	}
