@@ -103,7 +103,7 @@ class SpeciesController extends Controller
 
 	public function setTaxonId( $id )
 	{
-		$this->taxon_id=$id;
+		$this->taxon_id = (int)$id;
 	}
 
 	public function getTaxonId()

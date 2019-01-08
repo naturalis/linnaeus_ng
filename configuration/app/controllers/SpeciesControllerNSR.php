@@ -365,9 +365,13 @@ class SpeciesControllerNSR extends SpeciesController
 
     public function getTaxonById( $id,$formatTaxon=true )
     {
-        $taxon=parent::getTaxonById( $id, $formatTaxon );
+        if (!is_numeric($id)) {
+            return false;
+        }
+        
+        $taxon = parent::getTaxonById( $id, $formatTaxon );
 
-        if ( $this->show_nsr_specific_stuff )
+        if ( $taxon && $this->show_nsr_specific_stuff )
         {
             $taxon['nsr_id']=$this->getNSRId( [ 'id'=>$id ] );
         }
