@@ -1639,7 +1639,7 @@ class Controller extends BaseClass
 
     public function rGetId ()
     {
-        return $this->rGetVal('id');
+        return (int)$this->rGetVal('id');
     }
 
 

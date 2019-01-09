@@ -87,7 +87,7 @@ class IntroductionController extends Controller
      */
     public function topicAction()
     {
-		if (!$this->rHasId())
+        if (!$this->rHasId() || $this->rGetId() === 0)
 		{
 			$page = array(
 				'content' => $this->translate('No ID specified, or no content available.')
