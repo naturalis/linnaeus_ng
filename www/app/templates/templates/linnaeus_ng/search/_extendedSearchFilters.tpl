@@ -52,11 +52,19 @@
               <option value="{$k}"{if $v.range} range="1"{/if}>{t}{$v.label}{/t}</option>
               {/foreach}
             </select>
+
             <div class="openValue">
-              <input type="text" id="trait-{$k1}{$k2}" trait-id="{$d.id}" placeholder="{$d.date_format_format_hr}" maxlength="{$d.date_format_format_hr|@strlen}" />
-              <input id="trait-{$k1}{$k2}-2" type="text" trait-id="{$d.id}" second-value="1" placeholder="{$d.date_format_format_hr}" maxlength="{$d.date_format_format_hr|@strlen}" style="display:none;" />
+                {assign var="maxlength" value=$d.date_format_format_hr|@strlen}
+                {if $maxlength == 0 && $d.maxlength != ''}
+                    {$maxlength = $d.maxlength}
+                {else}
+                    {$maxlength = 10}
+                {/if}
+               <input type="text" id="trait-{$k1}{$k2}" trait-id="{$d.id}" placeholder="{$d.date_format_format_hr}" maxlength="{$maxlength}" />
+              <input id="trait-{$k1}{$k2}-2" type="text" trait-id="{$d.id}" second-value="1" placeholder="{$d.date_format_format_hr}" maxlength="{$maxlength}" style="display:none;" />
               <input type="button" value=" > " trait-id="{$d.id}" class="add-trait" onclick="addSearchParameter('trait-{$k1}{$k2}');" />  
             </div>
+
             {/if}
             </li>
           {/if}         
