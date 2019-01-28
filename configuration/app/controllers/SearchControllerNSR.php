@@ -14,16 +14,7 @@ class SearchControllerNSR extends SearchController
 	private $conceptIdPrefix='tn.nlsr.concept/';
 	private $httpHost;
 
-	private $_operators=array(
-		'=='=>array('label'=>'equals','range'=>false),
-		'!='=>array('label'=>'does not equal','range'=>false),
-		'>'=>array('label'=>'greater than','range'=>false),
-		'<'=>array('label'=>'less than','range'=>false),
-		'>='=>array('label'=>'great than or equals','range'=>false),
-		'=<'=>array('label'=>'less than or equals','range'=>false),
-		'BETWEEN'=>array('label'=>'between','range'=>true),
-		'NOT BETWEEN'=>array('label'=>'not between','range'=>true),
-	);
+	private $_operators;
 
 	public $csvExportSettings=array(
 		'field-sep'=>"\t",
@@ -84,7 +75,9 @@ class SearchControllerNSR extends SearchController
 
     private function initialise()
     {
-		$this->NSRFunctions=new NSRFunctionsController;
+		$this->setOperators();
+
+        $this->NSRFunctions=new NSRFunctionsController;
 		$this->moduleSettings=new ModuleSettingsReaderController;
 
 		$this->_search_presence_help_url = $this->moduleSettings->getModuleSetting( array('setting'=>'url_help_search_presence','module'=>'utilities') );
@@ -1038,6 +1031,21 @@ class SearchControllerNSR extends SearchController
 			$date=$d['year']."-".$d['month']."-".$d['day'];
 		}
 		return is_null($date) ? null : date_format(date_create($date),$format);
-	}	
+	}
+
+	private function setOperators ()
+    {
+        $this->_operators = array(
+            '=='=>array('label'=>$this->translate('equals'),'range'=>false),
+            '!='=>array('label'=>$this->translate('does not equal'),'range'=>false),
+            '>'=>array('label'=>$this->translate('greater than'),'range'=>false),
+            '<'=>array('label'=>$this->translate('less than'),'range'=>false),
+            '>='=>array('label'=>$this->translate('great than or equals'),'range'=>false),
+            '=<'=>array('label'=>$this->translate('less than or equals'),'range'=>false),
+            'BETWEEN'=>array('label'=>$this->translate('between'),'range'=>true),
+            'NOT BETWEEN'=>array('label'=>$this->translate('not between'),'range'=>true),
+        );
+        return $this->_operators;
+    }
 	
 }
