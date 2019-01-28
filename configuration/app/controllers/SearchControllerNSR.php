@@ -1040,8 +1040,8 @@ class SearchControllerNSR extends SearchController
             '!='=>array('label'=>$this->translate('does not equal'),'range'=>false),
             '>'=>array('label'=>$this->translate('greater than'),'range'=>false),
             '<'=>array('label'=>$this->translate('less than'),'range'=>false),
-            '>='=>array('label'=>$this->translate('great than or equals'),'range'=>false),
-            '=<'=>array('label'=>$this->translate('less than or equals'),'range'=>false),
+            '>='=>array('label'=>$this->translate('greater than or equal to'),'range'=>false),
+            '=<'=>array('label'=>$this->translate('less than or equal to'),'range'=>false),
             'BETWEEN'=>array('label'=>$this->translate('between'),'range'=>true),
             'NOT BETWEEN'=>array('label'=>$this->translate('not between'),'range'=>true),
         );
