@@ -1038,12 +1038,12 @@ class SearchControllerNSR extends SearchController
         $this->_operators = array(
             '=='=>array('label'=>$this->translate('equals'),'range'=>false),
             '!='=>array('label'=>$this->translate('does not equal'),'range'=>false),
-            '>'=>array('label'=>$this->translate('greater than'),'range'=>false),
-            '<'=>array('label'=>$this->translate('less than'),'range'=>false),
-            '>='=>array('label'=>$this->translate('greater than or equal to'),'range'=>false),
-            '=<'=>array('label'=>$this->translate('less than or equal to'),'range'=>false),
-            'BETWEEN'=>array('label'=>$this->translate('between'),'range'=>true),
-            'NOT BETWEEN'=>array('label'=>$this->translate('not between'),'range'=>true),
+            '>'=>array('label'=>$this->translate('is greater than'),'range'=>false),
+            '<'=>array('label'=>$this->translate('is less than'),'range'=>false),
+            '>='=>array('label'=>$this->translate('is greater than or equal to'),'range'=>false),
+            '=<'=>array('label'=>$this->translate('is less than or equal to'),'range'=>false),
+            'BETWEEN'=>array('label'=>$this->translate('is between'),'range'=>true),
+            'NOT BETWEEN'=>array('label'=>$this->translate('is not between'),'range'=>true),
         );
         return $this->_operators;
     }
