@@ -66,7 +66,8 @@ class TreeController extends Controller
 
 	public function treeAction()
 	{
-		/*
+
+	    /*
 		header('Expires: Sat, 26 Jul 1997 05:00:00 GMT');
 		header('Last-Modified: ' . gmdate( 'D, d M Y H:i:s') . ' GMT');
 		header('Cache-Control: no-store, no-cache, must-revalidate');
@@ -78,7 +79,7 @@ class TreeController extends Controller
 	    if ($published) {
 	        
        		$tree=$this->restoreTree();
-    		
+
     		if (is_null($tree))
     		{
     			$this->smarty->assign('nodes',json_encode($this->getTreeNode(array('node'=>false,'count'=>'species'))));
@@ -149,7 +150,15 @@ class TreeController extends Controller
 
 	private function getTreeTop()
 	{
-		$p=$this->models->TreeModel->getTreeTop(array("project_id"=>$this->getCurrentProjectId()));
+        // LINNA-1400: do not set rank id of top in stone, but check ranks used in project
+        // Assume first entry
+        $projectRanksIds = array_column($this->getProjectRanks(), 'rank_id');
+        $rankId = isset($projectRanksIds[1]) && $projectRanksIds[1] > 10 ? $projectRanksIds[1] : 10;
+
+        $p=$this->models->TreeModel->getTreeTop([
+            "project_id"=>$this->getCurrentProjectId(),
+            'top_rank_id' => $rankId
+        ]);
 
 		if ($p && count((array)$p)==1)
 		{

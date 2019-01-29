@@ -30,7 +30,8 @@ final class TreeModel extends AbstractModel
 
 	public function getTreeTop( $params )
 	{
-		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
+        $project_id = isset($params['project_id']) ? $params['project_id'] : null;
+        $top_rank_id = isset($params['top_rank_id']) ? $params['top_rank_id'] : 10;
 
 		if ( is_null($project_id) )
 			return;
@@ -59,7 +60,7 @@ final class TreeModel extends AbstractModel
 				_a.project_id = ".$project_id." 
 				and ifnull(_trash.is_deleted,0)=0
 				and _a.parent_id is null
-				and _r.id < 10
+				and _r.id <= $top_rank_id
 			";
 			
 		return $this->freeQuery($query);
