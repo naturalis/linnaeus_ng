@@ -520,7 +520,56 @@ class TraitsController extends Controller
 
 	}
 
-	public function formatDbDate($date,$format)
+    public function check_floatfree($p)
+    {
+        $value=isset($p['value']) ? $p['value'] : null;
+        $trait=isset($p['trait']) ? $p['trait'] : null;
+
+        $check=$this->_null_check($value,$trait);
+        if (!empty($check)) return $check;
+
+        $value=str_replace(' ','',$value);
+
+        if (is_numeric($value))
+        {
+            return array('pass'=>true,'value'=>$value);
+        }
+
+        if ($trait['can_have_range']==1)
+        {
+            $dash=null;
+            foreach((array)$this->_dashValues as $val)
+            {
+                if (strpos($value,$val)!==false)
+                {
+                    $dash=$val;
+                    break;
+                }
+            }
+
+            if (!is_null($dash))
+            {
+                $values=explode($dash,$value);
+                if (count($values)!=2)
+                {
+                    return array('pass'=>false,'error'=>$this->translate('illegal range'));
+                }
+                else
+                {
+                    if (is_numeric($values[0]) && is_numeric($values[1])) {
+                        return array('pass'=>true,'value'=>$values);
+                    }
+
+                }
+            }
+        }
+
+        return array('pass'=>false,'error'=>$this->translate('illegal value'));
+
+    }
+
+
+    public function formatDbDate($date,$format)
 	{
 		if ($format=="Y")
 		{

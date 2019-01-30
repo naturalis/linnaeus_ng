@@ -151,7 +151,7 @@ class TreeController extends Controller
 	private function getTreeTop()
 	{
         // LINNA-1400: do not set rank id of top in stone, but check ranks used in project
-        // Assume first entry
+        // Skip first entry assuming this is a region
         $projectRanksIds = array_column($this->getProjectRanks(), 'rank_id');
         $rankId = isset($projectRanksIds[1]) && $projectRanksIds[1] > 10 ? $projectRanksIds[1] : 10;
 
