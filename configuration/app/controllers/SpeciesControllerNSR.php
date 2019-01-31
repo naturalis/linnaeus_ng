@@ -227,6 +227,7 @@ class SpeciesControllerNSR extends SpeciesController
                     $name=$url=null;
                     foreach((array)$content['rdf'] as $key=>$val)
                     {
+
                         if ($val['predicate']=='hasPublisher')
                         {
                             $name=isset($val['data']['name']) ? $val['data']['name'] : null;
@@ -241,6 +242,7 @@ class SpeciesControllerNSR extends SpeciesController
                                 )
                             );
                         }
+
                         if ($val['predicate']=='hasReference')
                         {
                             $content['rdf'][$key]['data']['authors']=$this->getReferenceAuthors($val['data']['id']);
@@ -285,6 +287,7 @@ class SpeciesControllerNSR extends SpeciesController
             $this->smarty->assign('requested_category',$categories['start']);
             $this->smarty->assign('content',$content);
             $this->smarty->assign('sideBarLogos',isset($sideBarLogos) ? $sideBarLogos : null);
+            $this->smarty->assign('sideBarLogo', $this->getSideBarLogo());
             $this->smarty->assign('showMediaUploadLink',$taxon['base_rank_id']>=SPECIES_RANK_ID);
             $this->smarty->assign('categories',isset($categories['categories']) ? $categories['categories'] : null);
             $this->smarty->assign('activeCategory',$categories['start']);
@@ -311,6 +314,35 @@ class SpeciesControllerNSR extends SpeciesController
 
             $this->printPage( '../shared/404' );
         }
+    }
+
+    private function getSideBarLogo ()
+    {
+        if (!$this->getTaxonId()) {
+            return false;
+        }
+
+        $id = $this->getTaxonId();
+
+        // Logo directly available from expert; return the first hit
+        $experts = $this->getTaxonExperts($id);
+        // If none, check up the tree
+        if (empty($experts)) {
+            $experts = $this->getInheritedTaxonExperts($id);
+            krsort($experts);
+        }
+
+        foreach ($experts as $expert) {
+            if (!empty($expert['logo_url'])) {
+                return [
+                    'organisation' => $expert['label'],
+                    'logo' => $expert['logo_url'],
+                    'url'=> $expert['homepage']
+                ];
+            }
+         }
+
+        return null;
     }
 
     public function nameAction()

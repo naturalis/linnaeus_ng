@@ -1481,6 +1481,7 @@ class SpeciesModel extends AbstractModel
 					_b.homepage,
 					_b.gender,
 					_b.is_company,
+					_b.logo_url,
 					_b.employee_of_id
 
 				from %PRE%literature2_authors _a
@@ -1517,6 +1518,7 @@ class SpeciesModel extends AbstractModel
                 t1.name_alt,
                 t1.homepage,
                 t1.gender,
+                t1.logo_url,
                 t1.employee_of_id,
                 t1.is_company,
                 t2.name as company_of_name,

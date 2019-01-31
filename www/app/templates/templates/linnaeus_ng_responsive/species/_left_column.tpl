@@ -132,7 +132,7 @@
 			</tr>
 			{/foreach}			
 			</table>
-		</div>  
+		</div>
 
 		<div class="sideBarLogos desktop">
 			{foreach from=$sideBarLogos item=v}
@@ -148,6 +148,22 @@
 				</a>
 				{/if}
 			{/foreach}
+		</div>
+
+		<div class="sideBarLogos desktop">
+			{if $sideBarLogo}
+				{if $sideBarLogo.url}
+					<a href="{$sideBarLogo.url}" target="_blank">
+				{/if}
+				{if $sideBarLogo.logo}
+					<img src="{$sideBarLogo.logo}" {if $sideBarLogo.organisation}title="{$sideBarLogo.organisation}"{/if} />
+				{else}
+					<span style="padding-left:30px;">{$sideBarLogo.organisation}</span>
+				{/if}
+				{if $sideBarLogo.url}
+					</a>
+				{/if}
+			{/if}
 		</div>
 	</div>
 	

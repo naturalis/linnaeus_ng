@@ -85,6 +85,7 @@ function saveActorForm()
 		</td>
 	</tr>
 	<tr><th>homepage:</th><td><input class="large" type="text" name="homepage" value="{$actor.homepage}" /></td></tr>
+	<tr><th>logo url:</th><td><input class="large" type="text" name="logo_url" value="{$actor.logo_url}" /></td></tr>
 	<tr id="employee_of">
 		<th>employee of:</th>
 		<td>

@@ -84,3 +84,6 @@ CREATE TABLE if not exists `actors_taxa` (
   UNIQUE KEY `project_id` (`project_id`,`taxon_id`,`actor_id`,`organisation_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+
+UPDATE actors SET last_change = '1971-01-01 00:00:00' WHERE last_change = '0000-00-00 00:00:00';
+ALTER TABLE `actors` ADD `logo_url` VARCHAR(255)  NULL  DEFAULT NULL  AFTER `employee_of_id`;
