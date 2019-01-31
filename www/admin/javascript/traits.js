@@ -628,7 +628,8 @@ taxonTraits.__datefree=function()
 		val1=templateReplace( $( "#datefree_template_one" ).html() ,
 			{ value:'', max_length:df.format_hr.length, name: 'value_start', placeholder: df.format_hr } );
 
-		if ( taxonTraits.getCanHaveRange() || c.value_end.length!=0 )
+		val2 = '';
+		if ( taxonTraits.getCanHaveRange() )
 		{
 			val2=templateReplace( $( "#datefree_template_one" ).html() ,
 				{ value:'', max_length:df.format_hr.length, name: 'value_end', placeholder: df.format_hr } );
@@ -686,7 +687,8 @@ taxonTraits.__floatfree=function()
 		val1=templateReplace( $( "#datefree_template_one" ).html() ,
 			{ value:'', max_length:10, name: 'value_start', placeholder: '' } );
 
-		if ( taxonTraits.getCanHaveRange() || c.value_end.length!=0 )
+		val2='';
+		if ( taxonTraits.getCanHaveRange() )
 		{
 			val2=templateReplace( $( "#datefree_template_one" ).html() ,
 				{ value:'', max_length:10, name: 'value_end', placeholder: '' } );
