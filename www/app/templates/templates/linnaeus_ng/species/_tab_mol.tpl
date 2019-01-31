@@ -1,1 +1,2 @@
-<iframe src="{$external_content->full_url}" style="width: 750px; height: 600px; padding: 0; margin: 0;"></iframe>
+<iframe src="{$external_content->full_url}?embed&nosidebar" style="width: 750px; height: 600px; padding: 0; margin: 0;"></iframe>
+<p>View detailed map on the <a href="{$external_content->full_url}" target="_blank">Map of Life website</a></p>
