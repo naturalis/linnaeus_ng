@@ -441,7 +441,7 @@ class VersatileExportController extends Controller
 			    
 			limit " . $this->offset . ',' . $this->limit;
 
-			$this->names=$this->models->VersatileExportModel->doMainQuery( array("query"=>$this->query) );
+     		$this->names=$this->models->VersatileExportModel->doMainQuery( array("query"=>$this->query) );
 			
 			if ( $this->getPrintQuery() )
 			{

@@ -151,34 +151,34 @@
 		</div>
 
 		<div class="sideBarLogos desktop">
-			{if $sideBarLogo}
-				{if $sideBarLogo.url}
-					<a href="{$sideBarLogo.url}" target="_blank">
+			{foreach from=$sideBarLogosNew item=v}
+				{if $v.url}
+					<a href="{$v.url}" target="_blank">
 				{/if}
-				{if $sideBarLogo.logo}
-					<img src="{$sideBarLogo.logo}" {if $sideBarLogo.organisation}title="{$sideBarLogo.organisation}"{/if} />
-				{else}
-					<span style="padding-left:30px;">{$sideBarLogo.organisation}</span>
-				{/if}
-				{if $sideBarLogo.url}
-					</a>
-				{/if}
-			{/if}
-		</div>
-	</div>
-	
-	<div class="sideBarLogos responsive">
-		{foreach from=$sideBarLogos item=v}
-			{if $v.url}
-			<a href="{$v.url}" target="_blank">
-			{/if}
 				{if $v.logo}
 					<img src="{$v.logo}" {if $v.organisation}title="{$v.organisation}"{/if} />
 				{else}
 					<span style="padding-left:30px;">{$v.organisation}</span>
 				{/if}
+				{if $v.url}
+					</a>
+				{/if}
+			{/foreach}
+		</div>
+	</div>
+
+	<div class="sideBarLogos responsive">
+		{foreach from=$sideBarLogos item=v}
 			{if $v.url}
-			</a>
+				<a href="{$v.url}" target="_blank">
+			{/if}
+			{if $v.logo}
+				<img src="{$v.logo}" {if $v.organisation}title="{$v.organisation}"{/if} />
+			{else}
+				<span style="padding-left:30px;">{$v.organisation}</span>
+			{/if}
+			{if $v.url}
+				</a>
 			{/if}
 		{/foreach}
 	</div>
