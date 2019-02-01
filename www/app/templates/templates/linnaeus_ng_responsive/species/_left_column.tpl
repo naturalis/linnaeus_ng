@@ -137,22 +137,6 @@
 		<div class="sideBarLogos desktop">
 			{foreach from=$sideBarLogos item=v}
 				{if $v.url}
-				<a href="{$v.url}" target="_blank">
-				{/if}
-					{if $v.logo}
-						<img src="{$v.logo}" {if $v.organisation}title="{$v.organisation}"{/if} />
-					{else}
-						<span style="padding-left:30px;">{$v.organisation}</span>
-					{/if}
-				{if $v.url}
-				</a>
-				{/if}
-			{/foreach}
-		</div>
-
-		<div class="sideBarLogos desktop">
-			{foreach from=$sideBarLogosNew item=v}
-				{if $v.url}
 					<a href="{$v.url}" target="_blank">
 				{/if}
 				{if $v.logo}

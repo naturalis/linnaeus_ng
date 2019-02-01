@@ -343,8 +343,8 @@ class SpeciesControllerNSR extends SpeciesController
         }
         foreach ($experts as $expert) {
             $rank = $expert['referencing_taxon']['rank_id'];
-            if (!empty($expert['logo_url']) && !isset($previousRank) ||
-                !isset($logos) || (isset($logos) && $previousRank == $rank)) {
+            if (!empty($expert['logo_url']) && (!isset($previousRank) ||
+                !isset($logos) || (isset($logos) && $previousRank == $rank))) {
                 $logos[] = [
                     'organisation' => $expert['label'],
                     'logo' => $expert['logo_url'],
