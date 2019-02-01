@@ -56,6 +56,7 @@ CREATE TABLE IF NOT EXISTS `actors` (
   `homepage` varchar(255) DEFAULT NULL,
   `gender` enum('m','f') DEFAULT NULL,
   `is_company` tinyint(1) NOT NULL DEFAULT '0',
+  `logo_url` VARCHAR(500) DEFAULT NULL,
   `employee_of_id` int(11) DEFAULT NULL,
   `created` datetime NOT NULL,
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
