@@ -339,24 +339,24 @@ class SpeciesControllerNSR extends SpeciesController
         // If none, check up the tree
         if (!isset($logos)) {
             $experts = (array)$this->getInheritedTaxonExperts($id);
-            krsort($experts);
-        }
-        foreach ($experts as $expert) {
-            $rank = $expert['referencing_taxon']['rank_id'];
-            if (!empty($expert['logo_url']) && (!isset($previousRank) ||
-                !isset($logos) || (isset($logos) && $previousRank == $rank))) {
-                $logos[] = [
-                    'organisation' => $expert['label'],
-                    'logo' => $expert['logo_url'],
-                    'url'=> $expert['homepage']
-                ];
-            } else {
-                break;
+            usort($experts, function($a, $b) {
+                return $b['referencing_taxon']['taxon_order'] <=> $a['referencing_taxon']['taxon_order'];
+            });
+            foreach ($experts as $expert) {
+                $rank = $expert['referencing_taxon']['rank_id'];
+                if (!empty($expert['logo_url']) && (!isset($logos) || !isset($previousRank) ||
+                    (isset($logos) && $previousRank == $rank))) {
+                    $logos[] = [
+                        'organisation' => $expert['label'],
+                        'logo' => $expert['logo_url'],
+                        'url'=> $expert['homepage']
+                    ];
+                }
+                $previousRank = $rank;
             }
-            $previousRank = $rank;
         }
 
-        return isset($logos) ? $logos : null;
+        return isset($logos) ? array_slice($logos, 0, $max) : null;
     }
 
     public function nameAction()
