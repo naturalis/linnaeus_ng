@@ -96,12 +96,13 @@
 
 </p>
 
+<!--
 <p>
 	<a href="paspoort_meta.php?id={$concept.id}" class="edit"  style="margin:0">{t}metadata{/t}</a><br />
-	<!--<a id="media-overlay-links" href="#" class="edit" style="margin:0">{t}media overlay{/t}</a><br>-->
+	<a id="media-overlay-links" href="#" class="edit" style="margin:0">{t}media overlay{/t}</a><br>
 
 </p>
-
+-->
 <p>
 	<br>Language:
 	<select name="languageid" id="languagechanger" onchange="changeLanguage(this);">
