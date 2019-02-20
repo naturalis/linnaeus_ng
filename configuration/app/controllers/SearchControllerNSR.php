@@ -14,16 +14,7 @@ class SearchControllerNSR extends SearchController
 	private $conceptIdPrefix='tn.nlsr.concept/';
 	private $httpHost;
 
-	private $_operators=array(
-		'=='=>array('label'=>'is gelijk aan','range'=>false),
-		'!='=>array('label'=>'is ongelijk aan','range'=>false),
-		'>'=>array('label'=>'na','range'=>false),
-		'<'=>array('label'=>'voor','range'=>false),
-		'>='=>array('label'=>'na of gelijk aan','range'=>false),
-		'=<'=>array('label'=>'voor of gelijk aan','range'=>false),
-		'BETWEEN'=>array('label'=>'ligt tussen','range'=>true),
-		'NOT BETWEEN'=>array('label'=>'ligt niet tussen','range'=>true),
-	);
+	private $_operators;
 
 	public $csvExportSettings=array(
 		'field-sep'=>"\t",
@@ -60,7 +51,7 @@ class SearchControllerNSR extends SearchController
 	//['all' => ['traits.js', 'main.js']];
 
 	private $cTabs=[
-		'CTAB_NAMES'=>['id'=>-1,'title'=>'Naamgeving'],
+		'CTAB_NAMES'=>['id'=>-1,'title'=>'Nomenclature'],
 		'CTAB_MEDIA'=>['id'=>-2,'title'=>'Media'],
 		'CTAB_CLASSIFICATION'=>['id'=>-3,'title'=>'Classification'],
 		'CTAB_TAXON_LIST'=>['id'=>-4,'title'=>'Child taxa list'],
@@ -84,7 +75,9 @@ class SearchControllerNSR extends SearchController
 
     private function initialise()
     {
-		$this->NSRFunctions=new NSRFunctionsController;
+		$this->setOperators();
+
+        $this->NSRFunctions=new NSRFunctionsController;
 		$this->moduleSettings=new ModuleSettingsReaderController;
 
 		$this->_search_presence_help_url = $this->moduleSettings->getModuleSetting( array('setting'=>'url_help_search_presence','module'=>'utilities') );
@@ -214,8 +207,8 @@ class SearchControllerNSR extends SearchController
 			$template=null;
 		}
 
-		$this->traitGroupsToInclude=$this->getTraitGroups();
-		
+		$this->traitGroupsToInclude = $this->getTraitGroups();
+
 		if (count((array)$this->traitGroupsToInclude)>0) {
 
 		    $search['traits']=$this->rHasVal('traits') ? json_decode(urldecode($search['traits']),true) : null;
@@ -224,15 +217,13 @@ class SearchControllerNSR extends SearchController
 			$traits=array();
 			foreach((array)$this->traitGroupsToInclude as $val)
 			{			    
-			    $traits=$traits+$this->getTraits($val['id']);
+			    $traits = $traits + $this->getTraits($val['id']);
 				if ($val['group_id']==$search['trait_group']) {
 				    $search['trait_group_name']=$val['group_name'];
 				}
 			}
-			
-			ksort($traits);
-			
-			$this->smarty->assign('trait_group_name', isset($search['trait_group_name']) ? $search['trait_group_name'] : null );
+
+            $this->smarty->assign('trait_group_name', isset($search['trait_group_name']) ? $search['trait_group_name'] : null );
 			$this->smarty->assign('operators',$this->_operators);
 			$this->smarty->assign('traits',$traits);
 			$this->smarty->assign('searchTraitsHR',
@@ -243,7 +234,7 @@ class SearchControllerNSR extends SearchController
 				)
 			));
 		}
-		
+
 		$this->smarty->assign('searchHR',$this->makeReadableQueryString());
 		$this->smarty->assign('results',$this->doExtendedSearch($search));
 		$this->smarty->assign('search_presence_help_url',$this->_search_presence_help_url);
@@ -892,14 +883,15 @@ class SearchControllerNSR extends SearchController
 
 	private function getTraitGroups()
 	{
-		return $this->models->TraitsGroups->freeQuery("
+	    return $this->models->TraitsGroups->freeQuery("
 			select
 				_grp.id,
 				_grp.parent_id,
 				_grp.sysname,
-				_grp_b.translation as group_name,
+				ifnull(_grp_b.translation,_grp.sysname) as group_name,
 				_grp_c.translation as group_description,
-				_grp.id as group_id
+				_grp.id as group_id,
+				_grp.show_order as group_order
 
 			from
 				%PRE%traits_groups _grp
@@ -937,13 +929,14 @@ class SearchControllerNSR extends SearchController
 		foreach((array)$r as $key=>$trait)
 		{
 			$trait['values']=$this->getTraitgroupTraitValues($trait['id']);
-			$data[$trait['group_order']]['name']=$trait['group_name'];
-			$data[$trait['group_order']]['description']=$trait['group_description'];
-			$data[$trait['group_order']]['all_link_text']=$trait['group_all_link_text'];
-			$data[$trait['group_order']]['show_show_all_link']=$trait['group_show_show_all_link'];
-			$data[$trait['group_order']]['help_link_url']=$trait['group_help_link_url'];
-			$data[$trait['group_order']]['group_id']=$trait['group_id'];
-			$data[$trait['group_order']]['data'][]=$trait;
+			$data[$trait['group_id']]['name']=$trait['group_name'];
+			$data[$trait['group_id']]['description']=$trait['group_description'];
+			$data[$trait['group_id']]['all_link_text']=$trait['group_all_link_text'];
+			$data[$trait['group_id']]['show_show_all_link']=$trait['group_show_show_all_link'];
+			$data[$trait['group_id']]['help_link_url']=$trait['group_help_link_url'];
+            $data[$trait['group_id']]['group_id']=$trait['group_id'];
+            $data[$trait['group_id']]['group_order']=$trait['group_order'];
+            $data[$trait['group_id']]['data'][]=$trait;
 		}
 
 		return $data;
@@ -1036,6 +1029,21 @@ class SearchControllerNSR extends SearchController
 			$date=$d['year']."-".$d['month']."-".$d['day'];
 		}
 		return is_null($date) ? null : date_format(date_create($date),$format);
-	}	
+	}
+
+	private function setOperators ()
+    {
+        $this->_operators = array(
+            '=='=>array('label'=>$this->translate('equals'),'range'=>false),
+            '!='=>array('label'=>$this->translate('does not equal'),'range'=>false),
+            '>'=>array('label'=>$this->translate('is greater than'),'range'=>false),
+            '<'=>array('label'=>$this->translate('is less than'),'range'=>false),
+            '>='=>array('label'=>$this->translate('is greater than or equal to'),'range'=>false),
+            '=<'=>array('label'=>$this->translate('is less than or equal to'),'range'=>false),
+            'BETWEEN'=>array('label'=>$this->translate('is between'),'range'=>true),
+            'NOT BETWEEN'=>array('label'=>$this->translate('is not between'),'range'=>true),
+        );
+        return $this->_operators;
+    }
 	
 }

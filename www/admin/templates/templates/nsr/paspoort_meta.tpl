@@ -48,7 +48,7 @@ select {
 <table>
 	<tr style="vertical-align:top">
     	<th style="width:225px;">Author(s)</th>
-    	<th style="width:225px;">Organisation(s)</th>
+    	<!--<th style="width:225px;">Organisation(s)</th>-->
     	<th style="width:400px;">Publication(s)</th>
 	</tr>
     <tr>
@@ -57,11 +57,13 @@ select {
             <span id="authors">
             </span>
 		</td>
+        <!--
     	<td>
             <a class="edit" style="margin-left:0px;" href="#" onclick="addOrganisationField();return false;">{t}add organisation{/t}</a><br />
             <span id="organisations">
             </span>
 		</td>
+		-->
         <td>
             <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Publicatie');return false;" rel="reference_id">{t}add reference{/t}</a><br />
             <input type="hidden" id="reference_id" value="" onchange="collectReferences(this.value);"/>
@@ -122,7 +124,7 @@ select {
         <div class="passport-meta">
             <span class="label">Author(s):</span> {foreach from=$v.rdf.author item=f key=q}{if $q>0}; {/if}{$f.name}{/foreach}<br />
             <span class="label">Publication(s):</span> {foreach from=$v.rdf.reference item=f key=q}{if $q>0}; {/if}{$f.label}{/foreach}<br />
-            <span class="label">Organisation(s):</span> {foreach from=$v.rdf.publisher item=f key=q}{if $q>0}; {/if}{$f.name}{/foreach}<br />
+            <!-- <span class="label">Organisation(s):</span> {foreach from=$v.rdf.publisher item=f key=q}{if $q>0}; {/if}{$f.name}{/foreach}<br />-->
 			{if $v.rdf.author|@count>0 || $v.rdf.reference|@count>0 || $v.rdf.publisher|@count>0}
 			<a href="#" onclick="doDeleteMeta({$v.content_id});">{t}delete metadata{/t}</a>
             {/if}

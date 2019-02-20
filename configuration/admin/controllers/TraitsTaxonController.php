@@ -310,7 +310,7 @@ class TraitsTaxonController extends TraitsController
 			}
 		}
 		else
-		if ( $t['type_sysname']=='datefree' )
+		if ( $t['type_sysname']=='datefree' || $t['type_sysname']=='floatfree' )
 		{
 
 			$passed=true;
@@ -320,7 +320,7 @@ class TraitsTaxonController extends TraitsController
 				if (is_callable($func))
 				{
 					$dummy=$val.(isset($value_end) && !empty($value_end[$key]) ? '-'.$value_end[$key] : '' );
-					
+
 					$r=call_user_func( $func,array('value'=>$dummy,'trait'=>$t) );
 
 					if (!$r['pass'])
@@ -350,11 +350,21 @@ class TraitsTaxonController extends TraitsController
 					'project_id'=>$this->getCurrentProjectId(),
 					'taxon_id'=>$taxon,
 					'trait_id'=>$trait,
-					'date_value'=>$this->makeInsertableDate( $val, $t['date_format_format'] )
 				);
+
+				if ($t['type_sysname']=='datefree') {
+                    $d['date_value'] = $this->makeInsertableDate( $val, $t['date_format_format'] );
+                    if (isset($value_end) && !empty($value_end[$key])) {
+                        $d['date_value_end'] = $this->makeInsertableDate($value_end[$key], $t['date_format_format']);
+                    }
+                } else {
+                    $d['numerical_value'] = $val;
+                    if (isset($value_end) && !empty($value_end[$key])) {
+                        $d['numerical_value_end'] = $value_end[$key];
+                    }
+               }
 				
-				if (isset($value_end) && !empty($value_end[$key]))
-					$d['date_value_end']=$this->makeInsertableDate( $value_end[$key], $t['date_format_format'] );
+
 
 				$this->models->TraitsTaxonFreevalues->save( $d );
 			}

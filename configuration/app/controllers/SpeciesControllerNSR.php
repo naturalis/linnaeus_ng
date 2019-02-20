@@ -227,6 +227,7 @@ class SpeciesControllerNSR extends SpeciesController
                     $name=$url=null;
                     foreach((array)$content['rdf'] as $key=>$val)
                     {
+
                         if ($val['predicate']=='hasPublisher')
                         {
                             $name=isset($val['data']['name']) ? $val['data']['name'] : null;
@@ -241,6 +242,7 @@ class SpeciesControllerNSR extends SpeciesController
                                 )
                             );
                         }
+
                         if ($val['predicate']=='hasReference')
                         {
                             $content['rdf'][$key]['data']['authors']=$this->getReferenceAuthors($val['data']['id']);
@@ -284,7 +286,8 @@ class SpeciesControllerNSR extends SpeciesController
             $this->smarty->assign('external_content',isset($external_content) ? $external_content : null);
             $this->smarty->assign('requested_category',$categories['start']);
             $this->smarty->assign('content',$content);
-            $this->smarty->assign('sideBarLogos',isset($sideBarLogos) ? $sideBarLogos : null);
+            //$this->smarty->assign('sideBarLogos',isset($sideBarLogos) ? $sideBarLogos : null);
+            $this->smarty->assign('sideBarLogos', $this->getSideBarLogos());
             $this->smarty->assign('showMediaUploadLink',$taxon['base_rank_id']>=SPECIES_RANK_ID);
             $this->smarty->assign('categories',isset($categories['categories']) ? $categories['categories'] : null);
             $this->smarty->assign('activeCategory',$categories['start']);
@@ -311,6 +314,49 @@ class SpeciesControllerNSR extends SpeciesController
 
             $this->printPage( '../shared/404' );
         }
+    }
+
+    private function getSideBarLogos ($max = 2)
+    {
+        if (!$this->getTaxonId()) {
+            return false;
+        }
+
+        $id = $this->getTaxonId();
+
+        // Logos directly available from expert
+        $experts = (array)$this->getTaxonExperts($id);
+        foreach ($experts as $expert) {
+            if (!empty($expert['logo_url'])) {
+                $logos[] = [
+                    'organisation' => $expert['label'],
+                    'logo' => $expert['logo_url'],
+                    'url'=> $expert['homepage']
+                ];
+            }
+        }
+
+        // If none, check up the tree
+        if (!isset($logos)) {
+            $experts = (array)$this->getInheritedTaxonExperts($id);
+            usort($experts, function($a, $b) {
+                return $b['referencing_taxon']['taxon_order'] <=> $a['referencing_taxon']['taxon_order'];
+            });
+            foreach ($experts as $expert) {
+                $rank = $expert['referencing_taxon']['rank_id'];
+                if (!empty($expert['logo_url']) && (!isset($logos) || !isset($previousRank) ||
+                    (isset($logos) && $previousRank == $rank))) {
+                    $logos[] = [
+                        'organisation' => $expert['label'],
+                        'logo' => $expert['logo_url'],
+                        'url'=> $expert['homepage']
+                    ];
+                }
+                $previousRank = $rank;
+            }
+        }
+
+        return isset($logos) ? array_slice($logos, 0, $max) : null;
     }
 
     public function nameAction()

@@ -608,7 +608,7 @@ taxonTraits.__datefree=function()
 		val1=templateReplace( $( "#datefree_template_one" ).html() ,
 			{ value:c.value_start?c.value_start:'', max_length:df.format_hr.length, name: 'value_start', placeholder: df.format_hr } );
 
-		if (taxonTraits.getCanHaveRange() || c.value_end.length!=0)
+		if (taxonTraits.getCanHaveRange() || (c.value_end !== null && c.value_end.length!=0))
 		{
 			val2=templateReplace( $( "#datefree_template_one" ).html() ,
 				{ value:c.value_end?c.value_end:'', max_length:df.format_hr.length, name: 'value_end', placeholder: df.format_hr } );
@@ -628,7 +628,8 @@ taxonTraits.__datefree=function()
 		val1=templateReplace( $( "#datefree_template_one" ).html() ,
 			{ value:'', max_length:df.format_hr.length, name: 'value_start', placeholder: df.format_hr } );
 
-		if ( taxonTraits.getCanHaveRange() || c.value_end.length!=0 )
+		val2 = '';
+		if ( taxonTraits.getCanHaveRange() )
 		{
 			val2=templateReplace( $( "#datefree_template_one" ).html() ,
 				{ value:'', max_length:df.format_hr.length, name: 'value_end', placeholder: df.format_hr } );
@@ -647,6 +648,61 @@ taxonTraits.__datefree=function()
 //	taxonTraits.getCanHaveRange();
 //	taxonTraits.getCanSelectMultiple();
 //	taxonTraits.getSetDateFormat();
+
+	return templateReplace( $( "#datefree_template_three" ).html() , { SELECTED : selected.html() } );
+}
+
+taxonTraits.__floatfree=function()
+{
+	var b='';
+	var selected=$('<p>');
+
+	for(var i=0;i<taxonTraits.currentselection.length;i++)
+	{
+		var val1='';
+		var val2='';
+		var c=taxonTraits.currentselection[i];
+		b+=c.value_start+c.value_end;
+
+		val1=templateReplace( $( "#datefree_template_one" ).html() ,
+			{ value:c.value_start?c.value_start:'', max_length:10, name: 'value_start', placeholder: '' } );
+
+		if (taxonTraits.getCanHaveRange() || (c.value_end !== null && c.value_end.length!=0))
+		{
+			val2=templateReplace( $( "#datefree_template_one" ).html() ,
+				{ value:c.value_end?c.value_end:'', max_length:10, name: 'value_end', placeholder: '' } );
+		}
+
+		selected.append(
+			$( templateReplace(
+				$( "#datefree_template_two" ).html() ,
+				{ value_start:val1, separator:( val2.length>0 ? ' - ' : '' ), value_end:val2 }
+				)
+			));
+
+	}
+
+	if (i==0)
+	{
+		val1=templateReplace( $( "#datefree_template_one" ).html() ,
+			{ value:'', max_length:10, name: 'value_start', placeholder: '' } );
+
+		val2='';
+		if ( taxonTraits.getCanHaveRange() )
+		{
+			val2=templateReplace( $( "#datefree_template_one" ).html() ,
+				{ value:'', max_length:10, name: 'value_end', placeholder: '' } );
+		}
+
+		selected.append(
+			$( templateReplace(
+				$( "#datefree_template_two" ).html() ,
+				{ value_start:val1, separator:( val2.length>0 ? ' - ' : '' ), value_end:val2 }
+				)
+			));
+	}
+
+	taxonTraits.setOldValue( b );
 
 	return templateReplace( $( "#datefree_template_three" ).html() , { SELECTED : selected.html() } );
 }
@@ -707,7 +763,7 @@ taxonTraits.taxonTraitForm=function()
 		}
 	}
 
-	if ( taxonTraits.getTraitType()=='datefree' )
+	if ( taxonTraits.getTraitType()=='datefree' || taxonTraits.getTraitType()=='floatfree' )
 	{
 		if ( d.taxon_values && d.taxon_values.values )
 		{
@@ -736,6 +792,12 @@ taxonTraits.taxonTraitForm=function()
 	{
 		taxonTraits.setDialogHeight( 200 );
 		return taxonTraits.__datefree();
+	}
+	else
+	if ( taxonTraits.getTraitType()=='floatfree' )
+	{
+		taxonTraits.setDialogHeight( 200 );
+		return taxonTraits.__floatfree();
 	}
 }
 
@@ -777,7 +839,7 @@ taxonTraits.saveTaxonTrait=function()
 		});
 	}
 	else
-	if ( taxonTraits.getTraitType()=='datefree' )
+	if ( taxonTraits.getTraitType()=='datefree' || taxonTraits.getTraitType()=='floatfree')
 	{
 		$('input.__datefree[type=text]').each(function()
 		{

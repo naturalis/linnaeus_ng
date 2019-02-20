@@ -303,7 +303,7 @@ final class SearchNSRModel extends AbstractModel
 			".(isset($limit) ? "limit ".(int)$limit : "")."
 			".(isset($offset) & isset($limit) ? "offset ".(int)$offset : "")
 		;
-				
+
 		$data=$this->freeQuery( $query );
 		//SQL_CALC_FOUND_ROWS
 		$count=$this->freeQuery( "select found_rows() as total" );
@@ -1503,7 +1503,7 @@ final class SearchNSRModel extends AbstractModel
 				_grp.id,
 				_grp.parent_id,
 				_grp.sysname,
-				_grp_b.translation as group_name,
+				ifnull(_grp_b.translation,_grp.sysname) as group_name,
 				_grp_c.translation as group_description,
 				_grp.id as group_id
 
@@ -1859,20 +1859,22 @@ final class SearchNSRModel extends AbstractModel
 		{		
 			$trait=$this->getTraitgroupTrait( [ "trait_id" => $id, "project_id" => $project_id ] );
 
+			$column = !strpos($trait['type_sysname'], 'date') ? 'numerical' : 'date';
+
 			$trait_joins .=
 			"
 				right join %PRE%traits_taxon_freevalues _trait_values".$id."
 					on _a.project_id = _trait_values".$id.".project_id
 					and _trait_values".$id.".trait_id = ".$id."
 					and _a.id = _trait_values".$id.".taxon_id
-					and ifnull(_trait_values".$id.".date_value_end,_trait_values".$id.".date_value) is not null
+					and ifnull(_trait_values".$id."." . $column . "_value_end,_trait_values".$id."." . $column . "_value) is not null
 					and (
 			";
 
 			foreach((array)$vals as $key=>$val)
 			{
 				$value1=$value2=null;
-				
+
 				switch ($trait['type_sysname'])
 				{
 					case 'datelist':

@@ -218,7 +218,8 @@ class ActorsController extends NsrController
 		    'name_alt' => $this->translate('Alternative naam'),
 		    'gender' => $this->translate('Gender'),
 		    'is_company' => '"' . $this->translate('Person or organisation') . '"',
-		    'homepage' => $this->translate('Home page'),
+            'homepage' => $this->translate('Home page'),
+            'logo_url' => $this->translate('Logo url'),
 		    'employee_of_id' => '"' . $this->translate('Employee of') . '"'
 		);
 

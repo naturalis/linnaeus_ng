@@ -12,7 +12,7 @@
 		{capture name=references}
 		{foreach from=$rdf item=v}
 			{if $v.object_type=='reference' && $v.data.label!=''}
-			{assign var=hasReferences value=hasReferences+1}
+			{assign var=hasReferences value=$hasReferences+1}
 			<li>
                 <a href="../literature2/reference.php?id={$v.data.id}">
                 {capture authors}
