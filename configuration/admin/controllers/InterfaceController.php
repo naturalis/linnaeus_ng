@@ -121,7 +121,7 @@ class InterfaceController extends Controller
                 'language' => $l['language'],
             ];
         }
-        return array_merge($this->transationLanguages, $this->uiLanguages);
+        return array_unique(array_merge($this->transationLanguages, $this->uiLanguages), SORT_REGULAR);
     }
 
 
