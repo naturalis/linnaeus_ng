@@ -5,6 +5,8 @@ class InterfaceController extends Controller
 {
     private $_idDutch = 24;
     private $_idEnglish = 26;
+    private $translationLanguages;
+    
     public $usedModels = array();
     public $controllerPublicName = 'Interface texts';
     public $usedHelpers = array();
@@ -77,6 +79,8 @@ class InterfaceController extends Controller
 
         $env = $this->rhasVal('env') ? $this->rGetVal('env') : $this->getAppname();
         $lan = $this->rhasVal('lan') ? $this->rGetVal('lan') : $this->_idDutch;
+       
+        $this->smarty->assign('translationLanguages', $this->getTranslationLanguages());
 
         $texts = $this->getAllTexts(array(
             'lan' => $lan,
@@ -109,6 +113,16 @@ class InterfaceController extends Controller
         $this->printPage('index');
     }
 
+    private function getTranslationLanguages ()
+    {
+        foreach ($this->getProjectLanguages() as $l) {
+            $this->transationLanguages[] = [
+                'id' => $l['language_id'],
+                'language' => $l['language'],
+            ];
+        }
+        return array_unique(array_merge($this->transationLanguages, $this->uiLanguages), SORT_REGULAR);
+    }
 
 
     private function getAllTexts ($p = null)
