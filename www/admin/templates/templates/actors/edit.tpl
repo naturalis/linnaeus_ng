@@ -132,14 +132,29 @@ function saveActorForm()
 <p>
 <div>
 	<b>Links</b><br />
-	{if $links.presences|@count==0 && $links.names|@count==0 && $links.passports|@count==0 && $links.literature|@count==0}
+	{if $links.presences.total==0 && $links.names.total==0 && $links.passports.total==0 && $links.literature.total==0}
 	(no links)
 	{/if}
-	{if $links.names|@count > 0}
-	<a href="#" onclick="$('#links-names').toggle();return false;">Linked names: {$links.names|@count}</a>
+	
+	{if $links.taxa.total > 0}
+    <div>
+	<a href="#" onclick="$('#links-taxa').toggle();return false;">{t}Linked taxa{/t}: {$links.taxa.total} {if $links.taxa.total > $links.taxa.data|@count}({$links.taxa.data|@count} displayed){/if}</a>
+	<div id="links-taxa" style="display:none">
+		<ul class="small">
+			{foreach from=$links.taxa.data item=v}
+			<li><a href="../nsr/taxon.php?id={$v.id}">{$v.taxon} [{$v.rank}]</a></li>
+			{/foreach}
+		</ul>
+	</div>
+    </div>
+	{/if}
+	
+	
+	{if $links.names.total > 0}
+	<a href="#" onclick="$('#links-names').toggle();return false;">Linked names: {$links.names.total} {if $links.names.total > $links.names.data|@count}({$links.names.data|@count} displayed){/if}</a>
 	<div id="links-names" style="display:none">
 		<ul class="small">
-			{foreach from=$links.names item=v}
+			{foreach from=$links.names.data item=v}
 			<li><a href="../nsr/taxon.php?id={$v.taxon_id}">{$v.name}{if $v.nametype=='isValidNameOf'} ({$v.nametype_label}){else} ({$v.nametype_label} van {$v.taxon}){/if}</a></li>
 			{/foreach}
 		</ul>
@@ -147,11 +162,11 @@ function saveActorForm()
 	<br />
 	{/if}
 
-	{if $links.presences|@count > 0}
-	<a href="#" onclick="$('#links-presences').toggle();return false;">Linked presence statuses: {$links.presences|@count}</a>
+	{if $links.presences.total > 0}
+	<a href="#" onclick="$('#links-presences').toggle();return false;">Linked presence statuses: {$links.presences.total} {if $links.presences.total > $links.presences.data|@count}({$links.presences.data|@count} displayed){/if}</a>
 	<div id="links-presences" style="display:none">
 		<ul class="small">
-			{foreach from=$links.presences item=v}
+			{foreach from=$links.presences.data item=v}
 			<li><a href="../nsr/taxon.php?id={$v.taxon_id}">{$v.taxon}</a>, {$v.presence_label}</li>
 			{/foreach}
 		</ul>
@@ -159,12 +174,12 @@ function saveActorForm()
 	<br />
 	{/if}
 
-	{if $links.passports|@count > 0}
-	<a href="#" onclick="$('#links-passports').toggle();return false;">Linked passports: {$links.passports|@count}</a>
+	{if $links.passports.total > 0}
+	<a href="#" onclick="$('#links-passports').toggle();return false;">Linked passports: {$links.passports.total} {if $links.passports.total > $links.passports.data|@count}({$links.passports.data|@count} displayed){/if}</a>
 	<div id="links-passports" style="display:none">
 		<ul class="small">
         	{assign var=prev value=null}
-            {foreach from=$links.passports item=v key=k}{if $v.taxon_id!=$prev}
+            {foreach from=$links.passports.data item=v key=k}{if $v.taxon_id!=$prev}
             	</li><li><a href="../nsr/taxon.php?id={$v.taxon_id}">{$v.taxon}</a><br />&nbsp;&nbsp;
 			{else}, {/if}
             {$v.title}{assign var=prev value=$v.taxon_id}{/foreach}
@@ -174,8 +189,8 @@ function saveActorForm()
 	<br />
 	{/if}
 
-	{if $links.literature|@count > 0}
-	<a href="#" onclick="$('#links-literature').toggle();return false;">Linked references: {$links.literature|@count}</a>
+	{if $links.literature.total > 0}
+	<a href="#" onclick="$('#links-literature').toggle();return false;">Linked references: {$links.literature.total} {if $links.literature.total > $links.literature.data|@count}({$links.literature.data|@count} displayed){/if}</a>
 	<div id="links-literature" style="display:none">
 		<ul class="small">
             {foreach from=$links.literature item=v key=k}
@@ -185,20 +200,6 @@ function saveActorForm()
 	</div>
 	<br />
 	{/if}
-	
-	{if $links.taxa|@count > 0}
-    <div>
-	<a href="#" onclick="$('#links-taxa').toggle();return false;">{t}Linked taxa{/t} ({$links.taxa|@count})</a>
-	<div id="links-taxa" style="display:none">
-		<ul class="small">
-			{foreach from=$links.taxa item=v}
-			<li><a href="../nsr/taxon.php?id={$v.id}">{$v.taxon} [{$v.rank}]</a></li>
-			{/foreach}
-		</ul>
-	</div>
-    </div>
-	{/if}
-	
 
 </div>
 </p>
