@@ -135,7 +135,7 @@
         <ul id="traits{$k1}-options" class="selectableParametersPanel">
           {if $t.help_link_url}
             <li>
-              <a href="{$t.help_link_url}" target="_blank"  title="{t}klik voor help over dit onderdeel{/t}" class="help">{t}Meer informatie{/t}</a>
+              <a href="{$t.help_link_url}" target="_blank"  title="{t}klik voor hulp over dit onderdeel{/t}" class="help">{t}Meer informatie{/t}</a>
               </li>
           {/if}
           

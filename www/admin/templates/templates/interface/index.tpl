@@ -10,7 +10,7 @@ Environment:
 </select>
 Language:
 <select name="lan" onchange="$('#theForm').submit()">
-{foreach from=$uiLanguages item=v key=k}
+{foreach from=$translationLanguages item=v key=k}
 <option value="{$v.id}"{if $v.id==$lan} selected="selected"{/if}>{$v.language}</option>
 {if $v.id==$lan}{assign var=activeLanKey value=$k}{/if}
 {/foreach}
@@ -19,14 +19,14 @@ Language:
 </p>
 {if $isOriginalLanguage}
 <p>
-	{t _s1=$uiLanguages[$activeLanKey].language}As the original tags are in %s, they do not require translating, but if you do specify a translation, it will overrule the original tag.{/t}
+	{t _s1=$translationLanguages[$activeLanKey].language}As the original tags are in %s, they do not require translating, but if you do specify a translation, it will overrule the original tag.{/t}
 </p>
 {/if}
 <table>
 <tr>
 	<th>{t}identifier{/t}</th>
 	<th colspan=2>
-		{t _s1=$uiLanguages[$activeLanKey].language}translation in %s{/t}
+		{t _s1=$translationLanguages[$activeLanKey].language}translation in %s{/t}
 	</th>
 </tr>
 {foreach from=$texts item=v key=n}
