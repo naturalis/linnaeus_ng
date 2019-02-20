@@ -1503,7 +1503,7 @@ final class SearchNSRModel extends AbstractModel
 				_grp.id,
 				_grp.parent_id,
 				_grp.sysname,
-				_grp_b.translation as group_name,
+				ifnull(_grp_b.translation,_grp.sysname) as group_name,
 				_grp_c.translation as group_description,
 				_grp.id as group_id
 
