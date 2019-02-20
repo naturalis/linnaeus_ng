@@ -222,8 +222,6 @@ class SearchControllerNSR extends SearchController
 				    $search['trait_group_name']=$val['group_name'];
 				}
 			}
-			
-			//ksort($traits);
 
             $this->smarty->assign('trait_group_name', isset($search['trait_group_name']) ? $search['trait_group_name'] : null );
 			$this->smarty->assign('operators',$this->_operators);
@@ -885,12 +883,12 @@ class SearchControllerNSR extends SearchController
 
 	private function getTraitGroups()
 	{
-		return $this->models->TraitsGroups->freeQuery("
+	    return $this->models->TraitsGroups->freeQuery("
 			select
 				_grp.id,
 				_grp.parent_id,
 				_grp.sysname,
-				_grp_b.translation as group_name,
+				ifnull(_grp_b.translation,_grp.sysname) as group_name,
 				_grp_c.translation as group_description,
 				_grp.id as group_id,
 				_grp.show_order as group_order
