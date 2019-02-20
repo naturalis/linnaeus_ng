@@ -1,6 +1,8 @@
 ALTER DATABASE `linnaeus_ng` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE linnaeus_ng;
 
+
+
 insert ignore into name_types (
     select null, id as project_id, 'isMisidentificationOf', now(), now() from projects
 );
@@ -86,3 +88,14 @@ CREATE TABLE if not exists `actors_taxa` (
 
 
 UPDATE actors SET last_change = '1971-01-01 00:00:00' WHERE last_change = '0000-00-00 00:00:00';
+
+DROP PROCEDURE IF EXISTS `add_column_if_not_exists`;
+DELIMITER //
+CREATE PROCEDURE `add_column_if_not_exists`()
+BEGIN
+  DECLARE CONTINUE HANDLER FOR SQLEXCEPTION BEGIN END;
+  ALTER TABLE `actors` ADD `logo_url` VARCHAR(500)  NULL  DEFAULT NULL  AFTER `is_company`;
+END //
+DELIMITER ;
+CALL `add_column_if_not_exists`();
+DROP PROCEDURE `add_column_if_not_exists`;
