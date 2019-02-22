@@ -204,7 +204,7 @@ class VersatileExportController extends Controller
             
             $this->setNameTypeIds();
             
-            $this->doOutputStart();
+            echo $this->doOutputStart();
             do {
                 $this->doMainQuery();
                 $this->doAncestry();
@@ -813,11 +813,11 @@ class VersatileExportController extends Controller
         {
             if ( $this->getSuppressUnderscoredFields() && substr($rkey,0,1)=='_' ) continue;
             
-            if ( !$this->getNoQuotes() ) $this->print($this->getQuoteChar());
+            $this->print($this->getEnclosure());
             
             $this->print($this->getReplaceUnderscoresInHeaders() ? str_replace( '_', ' ', $rkey) : $rkey );
             
-            if ( !$this->getNoQuotes() ) $this->print($this->getQuoteChar());
+            $this->print($this->getEnclosure());
             
             $this->print($this->getFieldSep());
         }
@@ -837,11 +837,11 @@ class VersatileExportController extends Controller
                 
                 if ($this->getSuppressUnderscoredFields() && substr($key,0,1)=='_') continue;
                 
-                if ( !$this->getNoQuotes() ) $this->print($this->getQuoteChar());
+                $this->print($this->getEnclosure());
                 
                 $this->print($this->getUtf8ToUtf16() ? mb_convert_encoding($cell,'utf-16','utf-8') : $cell );
                 
-                if ( !$this->getNoQuotes() ) $this->print($this->getQuoteChar());
+                $this->print($this->getEnclosure());
                 
                 $this->print($this->getFieldSep());
                 
@@ -857,12 +857,17 @@ class VersatileExportController extends Controller
         $this->print($this->getNewLine());
     }
     
+    private function getEnclosure ()
+    {
+        return !$this->getNoQuotes() ? $this->getQuoteChar() : "";
+    }
+    
     private function doQueryParametersOutput () {
         if (!$this->getDoPrintQueryParameters())
             return;
         
         $d = $this->getTaxonById($this->getBranchTopId());
-        $this->print($this->translate("top"), $this->getFieldSep(), (!$this->getNoQuotes() ? $this->getQuoteChar() : ""), $d['taxon'], (!$this->getNoQuotes() ? $this->getQuoteChar() : ""));
+        $this->print($this->translate("top") . $this->getFieldSep() . $this->getEnclosure() . $d['taxon'] . $this->getEnclosure());
         $this->printNewLine();
         
         $d = array();
@@ -871,19 +876,19 @@ class VersatileExportController extends Controller
                 $d[] = $val["rank"];
             }
         }
-        $this->print($this->translate("rangen"), $this->getFieldSep(), (!$this->getNoQuotes() ? $this->getQuoteChar() : ""), $this->getAllRanks() ? $this->translate("(alle)") : $this->translate(
-            $this->operators[$this->getRankOperator()]['label']), " ", implode(", ", $d), (!$this->getNoQuotes() ? $this->getQuoteChar() : ""));
+        $this->print($this->translate("rangen") . $this->getFieldSep() . $this->getEnclosure() . ($this->getAllRanks() ? $this->translate("(alle)") : $this->translate(
+            $this->operators[$this->getRankOperator()]['label']) . " " . implode(", ", $d) . $this->getEnclosure()));
         $this->printNewLine();
         
-        $this->print($this->translate("statussen"), $this->getFieldSep(), (!$this->getNoQuotes() ? $this->getQuoteChar() : ""));
+        $this->print($this->translate("statussen") . $this->getFieldSep() . $this->getEnclosure());
         
         $p = $this->getPresenceStatusLabels();
         if (!empty($p)) {
-            $this->print("(", implode(",", $this->getPresenceStatusLabels()), ")");
+            $this->print("(" . implode(",", $this->getPresenceStatusLabels()) . ")");
         } else {
             $this->print($this->translate("(alle)"));
         }
-        $this->print(!$this->getNoQuotes() ? $this->getQuoteChar() : "");
+        $this->print($this->getEnclosure());
         
         $this->printNewLine();
         
