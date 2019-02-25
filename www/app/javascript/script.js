@@ -38,6 +38,9 @@ function closeImageOverlay() {
 }
 
 function showMoreInfoOverlay(info, url, nameScientific, nameCommon) {
+	if (info === null) {
+		info = '';
+	}
 	var moreInfo = "<div><a href='"+url+"' target='_blank'>"+popup_species_link+"</a></div>";
 	$('.imageOverlayContainer .name').html('<span class="result-name-scientific" title="'+nameScientific+'"><i>'+nameScientific+'</i></span><br><span class="result-name-common" title="'+nameCommon+'">'+nameCommon+'</span>');
 	$('.imageOverlayContainer .image').html(info + moreInfo);
