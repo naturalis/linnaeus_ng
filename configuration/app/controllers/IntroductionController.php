@@ -87,7 +87,7 @@ class IntroductionController extends Controller
      */
     public function topicAction()
     {
-        if (!$this->rHasId() || $this->rGetId() === 0)
+        if (!$this->rHasId())
 		{
 			$page = array(
 				'content' => $this->translate('No ID specified, or no content available.')
@@ -97,10 +97,10 @@ class IntroductionController extends Controller
 		else
 		{
 
-			if (!is_numeric($this->rGetId()))
+			if (!is_numeric($this->rGetVal('id')))
 			{
-				$id = $this->resolvePageName(
-					$this->rGetId(),
+			    $id = $this->resolvePageName(
+                    $this->rGetVal('id'),
 					($this->rHasVal('lan') ? $this->rGetVal('lan') : $this->getDefaultLanguageId())
 				);
 			}
