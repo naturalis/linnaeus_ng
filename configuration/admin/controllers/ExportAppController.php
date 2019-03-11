@@ -138,7 +138,7 @@ class ExportAppController extends Controller
 			$this->_makeImageList = $this->rHasVar('imageList', 'y') ? true : false;
 			$this->_projectVersion = $this->rHasVar('version') ? $this->rGetVal('version') : $this->_projectVersion;
 
-			$d = explode('-',$this->rGetId());
+			$d = explode('-',$this->rGetVal('id')); # don't change to rGetID(), which forces an int val
 			$matrixId = $d[0];
 			$languageId = $d[1];
 
