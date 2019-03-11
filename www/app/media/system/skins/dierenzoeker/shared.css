@@ -132,6 +132,7 @@ div.selectedfacets {
 	font-size: 12px;
 	font-weight: bold;
 	color: black;
+	line-height: 1;
 }
 .grid-labelbox.selected {
 	position: relative;

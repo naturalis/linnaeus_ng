@@ -23,7 +23,8 @@
                                     <div class="grid-iconbox" >
                                         <img src="{$projectUrls.projectMedia}__menu{$foo[0]|ucwords|regex_replace:"/\W/":""}.png" class="grid-icon" alt="" />
                                     </div>
-                                    <div class="grid-labelbox ">{$foo[0]}</div>
+									{assign var=blah value="/"|explode:$foo[0]}
+										<div class="grid-labelbox ">{$blah[0]}{if $blah[1]}/<br>{$blah[1]}{/if}</div>
                                 </a>
                             </div>
                         </li>
