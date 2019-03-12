@@ -87,29 +87,29 @@ class IntroductionController extends Controller
      */
     public function topicAction()
     {
-        if (!$this->rHasId() || $this->rGetId() === 0)
-		{
-			$page = array(
-				'content' => $this->translate('No ID specified, or no content available.')
-			);
-			$this->smarty->assign('page', $page);
-		}
-		else
-		{
+        if (!$this->rHasId())
+        {
+            $page = array(
+                'content' => $this->translate('No ID specified, or no content available.')
+            );
+            $this->smarty->assign('page', $page);
+        }
+        else
+        {
 
-			if (!is_numeric($this->rGetId()))
-			{
-				$id = $this->resolvePageName(
-					$this->rGetId(),
-					($this->rHasVal('lan') ? $this->rGetVal('lan') : $this->getDefaultLanguageId())
-				);
-			}
-			else
-			{
-				$id = $this->rGetId();
-			}
+            if (!is_numeric($this->rGetVal('id')))
+            {
+                $id = $this->resolvePageName(
+                    $this->rGetVal('id'),
+                    ($this->rHasVal('lan') ? $this->rGetVal('lan') : $this->getDefaultLanguageId())
+                );
+            }
+            else
+            {
+                $id = $this->rGetId();
+            }
 
-			$page = $this->getPage($id);
+            $page = $this->getPage($id);
 
 			$page['content'] = $this->matchHotwords($page['content']);
 
