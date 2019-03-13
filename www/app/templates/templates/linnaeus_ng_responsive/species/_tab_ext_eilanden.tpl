@@ -51,8 +51,8 @@ ul.traits li {
 				<td style="width:165px;">{if $k==0}{$v->trait->name}{/if}</td>
                 <td>{if $v->values|@count>1}<li>{/if}{$smarty.capture.value}</li></td>
 			</tr>
-			<tr><td class="last-row" colspan="2"></td></tr>
             {/foreach}
+            <tr><td class="last-row" colspan="2"></td></tr>
         {/foreach}
 		</table>
 
