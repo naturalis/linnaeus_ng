@@ -8,7 +8,7 @@
                     <div class="clearer"></div>               
 
                     <a href='http://www.naturalis.nl/' class="no-text" target="_blank"   
-                        style='display:block;position:absolute;left:385px;top:30px;width:68px;height:82px;border:0px solid black;'>Naturalis</a>
+                        style='display:block;position:absolute;left:300px;top:30px;width:153px;height:82px;border:0px solid black;'>Naturalis</a>
 
                     <a href='https://www.hetklokhuis.nl/' class="no-text" target="_blank"   
                         style='display:block;position:absolute;left:460px;top:30px;width:67px;height:82px;border:0px solid cyan;'>EIS</a>

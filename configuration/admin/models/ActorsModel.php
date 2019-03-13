@@ -119,6 +119,7 @@ final class ActorsModel extends AbstractModel
         $projectId = isset($params['projectId']) ? $params['projectId'] :  null;
         $languageId = isset($params['languageId']) ? $params['languageId'] : null;
         $expertId = isset($params['expertId']) ? $params['expertId'] : null;
+        $limit = isset($params['limit']) ? (int)$params['limit'] : 100000;
 
         if (is_null($projectId) || is_null($languageId) || is_null($expertId)) {
 			return null;
@@ -126,6 +127,7 @@ final class ActorsModel extends AbstractModel
 
         $query = "
             select
+                SQL_CALC_FOUND_ROWS
 				_a.taxon_id,
 				_a.name,
 				_b.nametype,
@@ -162,7 +164,9 @@ final class ActorsModel extends AbstractModel
     			and (
     				_a.expert_id=".$expertId." or
     				_a.organisation_id=".$expertId.
-    			")";
+    			")
+
+            limit $limit";
 
         return $this->freeQuery($query);
     }
@@ -172,6 +176,7 @@ final class ActorsModel extends AbstractModel
         $projectId = isset($params['projectId']) ? $params['projectId'] :  null;
         $languageId = isset($params['languageId']) ? $params['languageId'] : null;
         $expertId = isset($params['expertId']) ? $params['expertId'] : null;
+        $limit = isset($params['limit']) ? (int)$params['limit'] : 100000;
 
         if (is_null($projectId) || is_null($languageId) || is_null($expertId)) {
 			return null;
@@ -179,6 +184,7 @@ final class ActorsModel extends AbstractModel
 
         $query = "
             select
+                SQL_CALC_FOUND_ROWS
 				_a.taxon_id,
 				_g.taxon,
 				_g.parent_id,
@@ -206,7 +212,9 @@ final class ActorsModel extends AbstractModel
 				and (
 				_a.actor_id=".$expertId." or
 				_a.actor_org_id=".$expertId.
-			")";
+			")
+            
+            LIMIT $limit";
 
         return $this->freeQuery($query);
     }
@@ -216,14 +224,16 @@ final class ActorsModel extends AbstractModel
         $projectId = isset($params['projectId']) ? $params['projectId'] :  null;
         $languageId = isset($params['languageId']) ? $params['languageId'] : null;
         $expertId = isset($params['expertId']) ? $params['expertId'] : null;
-
+        $limit = isset($params['limit']) ? (int)$params['limit'] : 100000;
+        
         if (is_null($projectId) || is_null($languageId) || is_null($expertId)) {
 			return null;
 		}
 
         $query = "
             select
-				_a.id,
+                SQL_CALC_FOUND_ROWS
+ 				_a.id,
 				_a.subject_type,
 				_a.predicate,
 				_c.taxon,
@@ -258,7 +268,10 @@ final class ActorsModel extends AbstractModel
 				and _a.object_id=".$expertId."
 				and _a.object_type='actor'
 				and _a.subject_type='passport'
-			order by taxon, title";
+ 			
+            order by taxon, title       
+            
+            limit $limit ";
 
         return $this->freeQuery($query);
     }
@@ -269,13 +282,15 @@ final class ActorsModel extends AbstractModel
         $expertId = isset($params['expertId']) ? $params['expertId'] : null;
         $name = isset($params['name']) ? $params['name'] : null;
         $nameAlt = isset($params['nameAlt']) ? $params['nameAlt'] : null;
-
+        $limit = isset($params['limit']) ? (int)$params['limit'] : 100000;
+        
         if (is_null($projectId) || is_null($expertId)) {
 			return null;
 		}
 
         $query = "
             select
+                SQL_CALC_FOUND_ROWS
 				distinct
 				_b.id,
 				_b.label
@@ -295,7 +310,9 @@ final class ActorsModel extends AbstractModel
 					   mysqli_real_escape_string($this->databaseConnection, $name) ."%'" : "" )."
 					".( !empty($nameAlt) ? "or _b.author like '%".
 					   mysqli_real_escape_string($this->databaseConnection, $nameAlt) ."%'" : "" )."
-				)";
+			)
+
+            limit $limit";
 
         return $this->freeQuery($query);
     }
@@ -351,15 +368,23 @@ final class ActorsModel extends AbstractModel
             return;
         }
         
-        $query = "
-			insert into %PRE%actors_taxa
-				(project_id, taxon_id, actor_id, sort_order, created)
-			values
-				(".$project_id.",".$taxon_id.",".$actor_id.",".$sort_order.", now())";
+        $this->freeQuery("select id from %PRE%actors_taxa where project_id = $project_id and
+            taxon_id = $taxon_id and actor_id = $actor_id");
         
-        $this->freeQuery($query);
+        if ($this->getAffectedRows() == 0) {
+            
+            $query = "
+    			insert into %PRE%actors_taxa
+    				(project_id, taxon_id, actor_id, sort_order, created)
+    			values
+    				(".$project_id.",".$taxon_id.",".$actor_id.",".$sort_order.", now())";
+            
+            $this->freeQuery($query);
+            
+            return $this->getAffectedRows();
+        }
         
-        return $this->getAffectedRows();
+        return;
     }
     
     public function deleteTaxonActor ($params)

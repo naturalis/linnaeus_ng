@@ -429,13 +429,94 @@ class ActorsController extends NsrController
 
     }
     
-    private function getActorTaxa ($id)
+    public function getActorTaxa ($id)
     {
-        return $this->models->ActorsModel->getActorTaxa([
+         $taxa = $this->models->ActorsModel->getActorTaxa([
             'project_id' => $this->getCurrentProjectId(),
             'actor_id' => $id,
-        ]);
+            'limit' => 1000
+         ]);
+         
+         $count = $this->models->ActorsModel->freeQuery('select found_rows() as total');
+         
+         return ['data'=> $taxa, 'total' => $count[0]['total']];
     }
+    
+    public function getActorPresences ($id)
+    {
+        $presences = $this->models->ActorsModel->getActorPresences(array(
+            'projectId' => $this->getCurrentProjectId(),
+            'languageId' => $this->getDefaultProjectLanguage(),
+            'expertId' => $id,
+            'limit' => 1000
+        ));
+        
+        foreach((array)$presences as $key=>$val) {
+            $presences[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['taxon_id'],'parent_id'=>$val['parent_id'] ] );
+        }
+        
+        $count = $this->models->ActorsModel->freeQuery('select found_rows() as total');
+        
+        return ['data'=> $presences, 'total' => $count[0]['total']];
+    }
+    
+    public function getActorPassports ($id)
+    {
+        $passports = $this->models->ActorsModel->getActorPassports(array(
+            'projectId' => $this->getCurrentProjectId(),
+            'languageId' => $this->getDefaultProjectLanguage(),
+            'expertId' => $id,
+            'limit' => 1000
+        ));
+        
+        foreach((array)$passports as $key=>$val) {
+            $passports[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['taxon_id'],'parent_id'=>$val['parent_id'] ] );
+        }
+        
+        $count = $this->models->ActorsModel->freeQuery('select found_rows() as total');
+        
+        return ['data'=> $passports, 'total' => $count[0]['total']];
+    }
+    
+    public function getActorLiterature ($id, $name, $name_alt)
+    {
+        $literature = $this->models->ActorsModel->getActorLiterature(array(
+            'projectId' => $this->getCurrentProjectId(),
+            'expertId' => $id,
+            'name' => $name,
+            'nameAlt' => $name_alt,
+            'limit' => 1000
+        ));
+        
+        $count = $this->models->ActorsModel->freeQuery('select found_rows() as total');
+        
+        return ['data'=> $literature, 'total' => $count[0]['total']];
+    }
+    
+    public function getActorNames ($id)
+    {
+        $names = $this->models->ActorsModel->getActorNames(array(
+            'projectId' => $this->getCurrentProjectId(),
+            'languageId' => $this->getDefaultProjectLanguage(),
+            'expertId' => $id,
+            'limit' => 1000
+        ));
+        
+        foreach((array)$names as $key=>$val) {
+            $names[$key]['name']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['name'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['taxon_id'],'parent_id'=>$val['parent_id'] ] );
+            
+            if ($val['nametype']==PREDICATE_VALID_NAME) {
+                $names[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['taxon_id'],'parent_id'=>$val['parent_id'] ] );
+            }
+            
+            $names[$key]['nametype_label']=sprintf($this->Rdf->translatePredicate($val['nametype']),$val['language_label']);
+        }
+        
+        $count = $this->models->ActorsModel->freeQuery('select found_rows() as total');
+        
+        return ['data'=> $names, 'total' => $count[0]['total']];
+    }
+    
 
     /**
      * Get Actor links
@@ -454,63 +535,14 @@ class ActorsController extends NsrController
 		}
 
 		if ( empty($id) ) return;
-
-		// NAMES
-		$names = $this->models->ActorsModel->getActorNames(array(
-    		'projectId' => $this->getCurrentProjectId(),
-    		'languageId' => $this->getDefaultProjectLanguage(),
-    		'expertId' => $id
-		));
-
-		foreach((array)$names as $key=>$val) {
-			$names[$key]['name']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['name'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['taxon_id'],'parent_id'=>$val['parent_id'] ] );
-
-			if ($val['nametype']==PREDICATE_VALID_NAME) {
-				$names[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['taxon_id'],'parent_id'=>$val['parent_id'] ] );
-			}
-
-			$names[$key]['nametype_label']=sprintf($this->Rdf->translatePredicate($val['nametype']),$val['language_label']);
-		}
-
-		// PRESENCE
-		$presences = $this->models->ActorsModel->getActorPresences(array(
-    		'projectId' => $this->getCurrentProjectId(),
-    		'languageId' => $this->getDefaultProjectLanguage(),
-    		'expertId' => $id
-		));
-
-		foreach((array)$presences as $key=>$val) {
-			$presences[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['taxon_id'],'parent_id'=>$val['parent_id'] ] );
-		}
-
-		// PASSPORTS
-		$passports = $this->models->ActorsModel->getActorPassports(array(
-    		'projectId' => $this->getCurrentProjectId(),
-    		'languageId' => $this->getDefaultProjectLanguage(),
-    		'expertId' => $id
-		));
-
-		foreach((array)$passports as $key=>$val) {
-			$passports[$key]['taxon']=$this->addHybridMarkerAndInfixes( [ 'name'=>$val['taxon'],'base_rank_id'=>$val['base_rank_id'],'taxon_id'=>$val['taxon_id'],'parent_id'=>$val['parent_id'] ] );
-		}
-
-		// LITERATURE
-		$literature = $this->models->ActorsModel->getActorLiterature(array(
-    		'projectId' => $this->getCurrentProjectId(),
-    		'expertId' => $id,
-		    'name' => $name,
-		    'nameAlt' => $name_alt
-		));
 		
-		$result = array(
-			'names' => $names,
-			'presences'=>$presences,
-			'passports'=>$passports,
-			'literature'=>$literature,
+		return [
+		    'names' => $this->getActorNames($id),
+		    'presences'=> $this->getActorPresences($id),
+		    'passports'=> $this->getActorPassports($id),
+		    'literature'=> $this->getActorLiterature($id, $name, $name_alt),
 		    'taxa' => $this->getActorTaxa($id)
-		);
-
-		return $result;
+		];
 	}
 
     /**

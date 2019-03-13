@@ -60,6 +60,7 @@ function checkAutoExpand()
 {
 	// called from buildtree(); call directly after adding nodes with addAutoExpandNode()
 	var node=autoExpandArray.shift();
+
 	if (node)
 	{
 		buildtree(node);
@@ -105,7 +106,6 @@ function buildtree(node)
 			growbranches(data);
 			storetree();
 			checkAutoExpand();
-			
 		}
 	});
 }
@@ -195,6 +195,8 @@ function growbranches(data)
 	}
 	else
 	{
+		// LINNA-1167: trim leading zeroes from activeNode!
+		activeNode = +activeNode;
 		$( "#node-"+activeNode ).replaceWith( buffer );
 	}
 	
@@ -242,7 +244,7 @@ function restoretree()
 function setAutoExpand(id)
 {
 	setHighlightNode(id);
-	
+
 	$.ajax({
 		url : ajaxTreeUrl,
 		type: "POST",
@@ -260,6 +262,7 @@ function setAutoExpand(id)
                     addAutoExpandNode(data[index]);
                 }
             }
+			//console.log(autoExpandArray);
 			buildtree(false);
 			//checkAutoExpand();
 		}
