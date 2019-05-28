@@ -1,8 +1,10 @@
 <?php
 
 include_once ('Controller.php');
-include_once ('RdfController.php');
 include_once ('ModuleSettingsReaderController.php');
+include_once ('RdfController.php');
+
+
 class WebservicesController extends Controller
 {
     private $_usage=null;
@@ -36,7 +38,7 @@ class WebservicesController extends Controller
     public function __construct($p=null)
     {
         parent::__construct($p);
-		$this->initialise();
+        $this->initialise();
     }
 
     public function __destruct ()
@@ -46,7 +48,7 @@ class WebservicesController extends Controller
 
 	public function namesAction()
 	{
-		$this->_usage=
+        $this->_usage=
 "url: http://$_SERVER[HTTP_HOST]$_SERVER[PHP_SELF]?pid=<id>&from=<YYYYMMDD>[&rows=<n>[&offset=<n>]][&count=1]
 parameters:
   pid".chr(9)." : project id (mandatory)
@@ -55,6 +57,7 @@ parameters:
   offset : specify offset of rows returned. format: <n> (optional; only works in combination with the 'rows' parameter)
   count".chr(9)." : when set to 1, only the number of records in the resultset are returned (optional)
 ";
+
 
 		// pid is mandatory, now checked in initialise()
 		//$this->checkProject();
@@ -1235,13 +1238,13 @@ parameters:
 
     private function initialise()
     {
-		$this->Rdf = new RdfController(array('checkForProjectId'=>false));
-		$this->moduleSettings=new ModuleSettingsReaderController;
+        $this->Rdf = new RdfController(array('checkForProjectId'=>false));
+		$this->moduleSettings=new ModuleSettingsReaderController(array('checkForProjectId'=>false));
 	
 		$this->useCache=false;
 		$this->checkProject();
 
-		if (is_null($this->getCurrentProjectId()))
+        if (is_null($this->getCurrentProjectId()))
 		{
 			$this->addError('cannot get project settings.');
 		} 

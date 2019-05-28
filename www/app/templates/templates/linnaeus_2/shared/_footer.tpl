@@ -31,7 +31,9 @@ $(document).ready(function(){
 {/literal}
 	{if $search}onSearchBoxSelect('{$search|@addslashes}');{/if}
 	{foreach from=$requestData key=k item=v}
-	addRequestVar('{$k}','{$v|addslashes}')
+	{if !$v|strstr:"javascript"}
+	addRequestVar('{$k}','{$v|@addslashes}')
+	{/if}
 	{/foreach}
 	chkPIDInLinks({$session.app.project.id},'{$addedProjectIDParam}');
 	{if $searchResultIndexActive}

@@ -63,8 +63,8 @@ $(document).ready(function()
 
 	{if $search}onSearchBoxSelect('');{/if}
 	{foreach from=$requestData key=k item=v}
-	{if !$v|@is_array}
-	addRequestVar('{$k}',{$v|@json_encode})
+	{if !$v|@is_array && !$v|strstr:"javascript"}
+	addRequestVar('{$k}',{$v|@addslashes})
 	{/if}
 	{/foreach}
 	chkPIDInLinks({$session.app.project.id},'{$addedProjectIDParam}');

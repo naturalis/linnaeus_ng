@@ -266,13 +266,17 @@ class Controller extends BaseClass
 
     public function checkForProjectId()
     {
-		if (!$this->getCheckForProjectId()) return;
+        list($childClass, $caller) = debug_backtrace(false, 2);
+        var_dump($caller);
+        var_dump($this->getCheckForProjectId());
+
+        if (!$this->getCheckForProjectId()) return;
 
         $pB = $this->getCurrentProjectId();
 
         if ($this->rHasVal('p'))
 		{
-            $this->resolveProjectId();
+ 		    $this->resolveProjectId();
         }
         else
 		if ($this->rHasVal($this->generalSettings['addedProjectIDParam']))
