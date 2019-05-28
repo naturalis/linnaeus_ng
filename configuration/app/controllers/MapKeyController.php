@@ -136,7 +136,7 @@ class MapKeyController extends Controller
 		} 
 		else 
 		{
-			$mapId = $this->requestData['m'];
+			$mapId = (int)$this->requestData['m'];
 		}
 
 		$maps = $this->l2GetMaps();
@@ -326,7 +326,7 @@ class MapKeyController extends Controller
 
 		if ($this->rHasVal('mapId'))
 		{
-			$mapId = $this->requestData['mapId'];
+			$mapId = (int)$this->requestData['mapId'];
 		} 
 		else
 		{

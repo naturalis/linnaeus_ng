@@ -143,7 +143,7 @@ class IndexController extends Controller
 
 		$this->smarty->assign('alpha',$d['alpha']);
 
-		$this->smarty->assign('letter',$this->rHasVal('letter') ? $this->rGetVal('letter') : null);
+		$this->smarty->assign('letter',$this->rHasVal('letter') ? htmlentities($this->rGetVal('letter')) : null);
 
 		$this->smarty->assign('ranks',$ranks);
 
@@ -197,7 +197,7 @@ class IndexController extends Controller
 
 		if ($this->rHasVal('activeLanguage')) {
 
-			$activeLanguage = $this->rGetVal('activeLanguage');
+			$activeLanguage = htmlentities($this->rGetVal('activeLanguage'));
 
 		} else {
 
@@ -226,7 +226,7 @@ class IndexController extends Controller
 
 		$this->smarty->assign('alpha',$d['alpha']);
 
-		$this->smarty->assign('letter',$this->rHasVal('letter') ? $this->rGetVal('letter') : (isset($d['alpha'][0]) ? $d['alpha'][0] : null));
+		$this->smarty->assign('letter',$this->rHasVal('letter') ? htmlentities($this->rGetVal('letter')) : (isset($d['alpha'][0]) ? $d['alpha'][0] : null));
 
 		$this->smarty->assign('taxa',$pagination['items']);
 
@@ -252,7 +252,7 @@ class IndexController extends Controller
 
         if ($this->rHasVal('action','get_lookup_list') && !empty($this->rGetVal('search'))) {
 
-            $this->getLookupList($this->rGetVal('search'));
+            $this->getLookupList(htmlentities($this->rGetVal('search')));
 
         }
 

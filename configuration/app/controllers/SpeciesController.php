@@ -296,13 +296,13 @@ class SpeciesController extends Controller
         else
 		if ($this->rHasVal('action', 'get_media_info') && !empty($this->requestData['id'])) {
 
-			$return=json_encode($this->getTaxonMedia(array('id'=>$this->requestData['id'])));
+			$return=json_encode($this->getTaxonMedia(array('id'=>intval($this->requestData['id']))));
 
         }
 		else
 		if ($this->rHasVal('action', 'get_parentage') && $this->rHasId())
 		{
-	        $return=json_encode($this->getTaxonParentage($this->rGetVal('id')));
+	        $return=json_encode($this->getTaxonParentage(intval($this->rGetVal('id'))));
         }
 
         $this->allowEditPageOverlay = false;
