@@ -30,7 +30,8 @@ class WebservicesController extends Controller
 		'media_meta',
 		'literature2',
 		'taxon_trend_years',
-		'labels_projects_ranks'
+		'labels_projects_ranks',
+        'tree'
     );
 
     public $controllerPublicName = 'Webservices';
@@ -128,9 +129,11 @@ parameters:
 					(_a.last_change!='0000-00-00 00:00:00' && _a.last_change>=STR_TO_DATE('".$this->getFromDate()."','%Y%m%d'))
 				)
 				and _e.rank_id >= ".SPECIES_RANK_ID."
-				and _d.taxon is not null".
+				and _d.taxon is not null
+				order by _a.taxon_id ".
 				(!is_null($rowcount) ? ' limit '.$rowcount : '').
-				(!is_null($rowcount) && !is_null($offset) ? ' offset '.$offset : '');
+				(!is_null($rowcount) && !is_null($offset) ? ' offset '.$offset : ''
+                );
 
 		}
 
@@ -164,13 +167,14 @@ parameters:
 		$this->printOutput();
 	}
 
-	public function taxonAction()	
+
+    public function taxonAction()
 	{
 		$this->_usage=
 "url: http://$_SERVER[HTTP_HOST]$_SERVER[PHP_SELF]?pid=<id>&taxon=<scientific name>
 parameters:
   pid".chr(9)." : project id (mandatory)
-  taxon".chr(9)." : scientific name of the taxon to retrieve (mandatory)
+  taxon".chr(9)." : scientific name or id of the taxon to retrieve (mandatory)
 ";
 
 		// pid is mandatory, now checked in initialise()
@@ -320,7 +324,7 @@ parameters:
 "url: http://$_SERVER[HTTP_HOST]$_SERVER[PHP_SELF]?pid=<id>&taxon=<scientific name>&cat=<page ID>
 parameters:
   pid".chr(9)." : project id (mandatory)
-  taxon".chr(9)." : scientific name of the taxon to retrieve (mandatory)
+  taxon".chr(9)." : scientific name or id of the taxon to retrieve (mandatory)
   cat".chr(9)." : page ID of the content page (mandatory)
 ";
 
@@ -1195,7 +1199,7 @@ parameters:
 "url: http://$_SERVER[HTTP_HOST]$_SERVER[PHP_SELF]?pid=<id>&taxon=<scientific name>
 parameters:
   pid".chr(9)." : project id (mandatory)
-  taxon".chr(9)." : scientific name of the taxon to retrieve (mandatory)
+  taxon".chr(9)." : scientific name or id of the taxon to retrieve (mandatory)
 ";
 
 		if (is_null($this->getCurrentProjectId()))
@@ -1223,11 +1227,22 @@ parameters:
 			'node' =>  $this->getTaxonId()
 		] );
 
-		$p=$this->getProject();
+        $parentIds = $this->models->WebservicesModel->getTaxonParentage([
+            'projectId' => $this->getCurrentProjectId(),
+            'taxonId' => $this->getTaxonId(),
+        ]);
+        foreach ($parentIds as $id) {
+            $p = $this->getTaxonById($id);
+            $classification[] = ['taxon'=>$p['taxon'],'rank'=>$p['rank']];
+        }
+        $classification[] = ['taxon'=>$taxon['taxon'],'rank'=>$taxon['rank']];
+
+        $p=$this->getProject();
 		$result['project']=$p['title'];
-		$result['taxon']=[ 'taxon'=>$taxon['taxon'],'rank'=>$taxon['rank']];
+		$result['taxon']=['taxon'=>$taxon['taxon'],'rank'=>$taxon['rank']];
 		$result['parent']=['taxon'=>$parent['taxon'],'rank'=>$parent['rank']];
-		$result['children']=$data;
+        $result['classification'] = $classification;
+        $result['children']=$data;
 
 		$this->setJSON(json_encode($result));
 		header('Content-Type: application/json');			
@@ -1240,7 +1255,7 @@ parameters:
     {
         $this->Rdf = new RdfController(array('checkForProjectId'=>false));
 		$this->moduleSettings=new ModuleSettingsReaderController(array('checkForProjectId'=>false));
-	
+
 		$this->useCache=false;
 		$this->checkProject();
 
@@ -1336,19 +1351,25 @@ parameters:
 		{
 			$this->addError('no taxon name specified.');
 		} 
-		else
-		{
+		else {
+            // Sneakily also accept id as input ;)
+            if (is_numeric($this->requestData['taxon'])) {
 
-			$taxon=trim(strip_tags($this->requestData['taxon']));
-			
-			$this->setMatchType('literal');
+                $t[0]['id'] = $this->requestData['taxon'];
 
-			$t = $this->models->Taxa->_get(array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'taxon' => $taxon
-				)
-			));
+            } else {
+
+                $taxon = trim(strip_tags($this->requestData['taxon']));
+
+                $this->setMatchType('literal');
+
+                $t = $this->models->Taxa->_get(array(
+                    'id' => array(
+                        'project_id' => $this->getCurrentProjectId(),
+                        'taxon' => $taxon
+                    )
+                ));
+            }
 
 			if ($t) $nametype='isValidNameOf';
 

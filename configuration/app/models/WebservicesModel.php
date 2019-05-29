@@ -239,6 +239,27 @@ class WebservicesModel extends AbstractModel
 		return $this->freeQuery( $query );
 	}
 
+	public function getTaxonParentage ($params)
+    {
+        $projectId = isset($params['projectId']) ? $params['projectId'] : null;
+        $taxonId = isset($params['taxonId']) ? $params['taxonId'] : null;
+
+        if ( is_null($projectId) || is_null($taxonId) ) return;
+
+        $query = "
+                select
+                    parentage
+                from
+                    %PRE%taxon_quick_parentage
+                where
+                    project_id = ".$projectId."
+                    and taxon_id = ".$taxonId;
+
+        $d = $this->freeQuery($query);
+
+        return !empty($d) ? explode(' ',$d[0]['parentage']) : null;
+    }
+
     public function getTaxonPage( $params )
 	{
 		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
