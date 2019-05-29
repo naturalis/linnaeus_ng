@@ -1,5 +1,21 @@
 <?php
 
+/*
+ * *** START OF RANT ***
+ *
+ * When this module is initialized outside the context of a Linnaeus project (business as
+ * usual I would say), so without an existing project id, a lot of services just fail badly.
+ * They work when the page is reloaded in a browser, but this of course is not how web
+ * services are supposed to work. Debugging is a f*cking hell.
+ *
+ * As a consequence, some methods have simply been replicated using fixed values
+ * (e.g. getTaxonById()) and probably can't used in a general way.
+ * The whole program structure needs a rethink here.
+ *
+ * *** END OF RANT ***
+ */
+
+
 include_once ('Controller.php');
 include_once ('ModuleSettingsReaderController.php');
 include_once ('RdfController.php');
@@ -31,7 +47,6 @@ class WebservicesController extends Controller
 		'literature2',
 		'taxon_trend_years',
 		'labels_projects_ranks',
-        'tree'
     );
 
     public $controllerPublicName = 'Webservices';
@@ -1202,7 +1217,7 @@ parameters:
   taxon".chr(9)." : scientific name or id of the taxon to retrieve (mandatory)
 ";
 
-		if (is_null($this->getCurrentProjectId()))
+	    if (is_null($this->getCurrentProjectId()))
 		{
 			$this->sendErrors();
 			return;
@@ -1216,9 +1231,9 @@ parameters:
 			return;
 		}
 
-		$taxon=$this->getTaxonById($this->getTaxonId());
+ 		$taxon=$this->getTaxonById($this->getTaxonId());
 		$parent=$this->getTaxonById($taxon['parent_id']);
-		
+
 		$taxon['label']=$this->formatTaxon($taxon);
 		$parent['label']=$this->formatTaxon($parent);
 
@@ -1231,9 +1246,10 @@ parameters:
             'projectId' => $this->getCurrentProjectId(),
             'taxonId' => $this->getTaxonId(),
         ]);
+
         foreach ($parentIds as $id) {
-            $p = $this->getTaxonById($id);
-            $classification[] = ['taxon'=>$p['taxon'],'rank'=>$p['rank']];
+            $par = $this->getTaxonById((int)$id);
+            $classification[] = ['taxon'=> $par['taxon'],'rank'=> $par['rank']];
         }
         $classification[] = ['taxon'=>$taxon['taxon'],'rank'=>$taxon['rank']];
 
@@ -1265,7 +1281,7 @@ parameters:
 		} 
 		else 
 		{
-			$this->models->Taxa->freeQuery("SET lc_time_names = '".$this->moduleSettings->getGeneralSetting( array( 'setting'=>'db_lc_time_names','subst'=>'nl_NL'))."'");
+ 		    $this->models->Taxa->freeQuery("SET lc_time_names = '".$this->moduleSettings->getGeneralSetting( array( 'setting'=>'db_lc_time_names','subst'=>'nl_NL'))."'");
 			$this->checkJSONPCallback();
 		}
     }
@@ -1609,4 +1625,24 @@ function returns data as JSON. for JSONP, add a parameter 'callback=<name>' with
 		$this->printPage('template');
 	}
 
+   /*
+    * Copied from Controller. Some settings aren't available when the webservice is
+    * called outside the scope of a Linnaeus project
+    */
+    public function getTaxonById ($id, $formatTaxon = true)
+    {
+        if (empty($id) || !is_numeric($id) || $id==0) {
+            return;
+        }
+
+        return $this->models->ControllerModel->getTaxonById(array(
+            'trashCanExists' => $this->models->TrashCan->getTableExists(),
+            'projectId' => $this->getCurrentProjectId(),
+            'languageId'=>LANGUAGE_ID_DUTCH,
+            'taxonId' => $id,
+            'predicateValidNameId' => 1,
+            'predicatePreferredNameId' => 7,
+            'scientificLanguageId' => LANGUAGE_ID_SCIENTIFIC,
+        ));
+    }
 }
