@@ -154,7 +154,7 @@ parameters:
 				)
 				" . $rankWhereClause . "
 				and _d.taxon is not null
-				order by _a.taxon_id ".
+				order by _a.taxon_id, _a.type_id, _a.id ".
 				(!is_null($rowcount) ? ' limit '.$rowcount : '').
 				(!is_null($rowcount) && !is_null($offset) ? ' offset '.$offset : ''
                 );
