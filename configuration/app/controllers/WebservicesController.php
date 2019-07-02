@@ -65,13 +65,14 @@ class WebservicesController extends Controller
 	public function namesAction()
 	{
         $this->_usage=
-"url: http://$_SERVER[HTTP_HOST]$_SERVER[PHP_SELF]?pid=<id>&from=<YYYYMMDD>[&rows=<n>[&offset=<n>]][&count=1]
+"url: http://$_SERVER[HTTP_HOST]$_SERVER[PHP_SELF]?pid=<id>&from=<YYYYMMDD>[&rows=<n>[&offset=<n>]][&count=1][&all=1]
 parameters:
   pid".chr(9)." : project id (mandatory)
   from".chr(9)." : date of start of retrieval window, based on last change. format: <YYYYMMDD> (mandatory)
   rows".chr(9)." : limits the number of rows returned. format: <n> (optional)
   offset : specify offset of rows returned. format: <n> (optional; only works in combination with the 'rows' parameter)
   count".chr(9)." : when set to 1, only the number of records in the resultset are returned (optional)
+  all".chr(9)." : when set to 1, names of all taxa are returned, not just species or lower (optional)
 ";
 
 
@@ -87,6 +88,14 @@ parameters:
 		$offset = isset($this->requestData['offset']) && is_numeric($this->requestData['offset']) ? (int)$this->requestData['offset'] : null;
 		$rowcount = isset($this->requestData['rows']) && is_numeric($this->requestData['rows']) ? (int)$this->requestData['rows'] : null;
 		$onlyCount = $this->rHasVal('count','1');
+		$allTaxa = $this->rHasVal('all','1');
+
+		if ($allTaxa) {
+			$rankWhereClause = "";
+		}
+		else {
+			$rankWhereClause = "and _e.rank_id >= ".SPECIES_RANK_ID;
+		}
 
 		if ($onlyCount) {
 
@@ -101,7 +110,7 @@ parameters:
 					(_a.last_change='0000-00-00 00:00:00' && _a.created>=STR_TO_DATE('".$this->getFromDate()."','%Y%m%d')) ||
 					(_a.last_change!='0000-00-00 00:00:00' && _a.last_change>=STR_TO_DATE('".$this->getFromDate()."','%Y%m%d'))
 				)
-				and _e.rank_id >= ".SPECIES_RANK_ID."
+				" . $rankWhereClause . "
 				and _d.taxon is not null";
 
 		} else {
@@ -143,7 +152,7 @@ parameters:
 					(_a.last_change='0000-00-00 00:00:00' && _a.created>=STR_TO_DATE('".$this->getFromDate()."','%Y%m%d')) ||
 					(_a.last_change!='0000-00-00 00:00:00' && _a.last_change>=STR_TO_DATE('".$this->getFromDate()."','%Y%m%d'))
 				)
-				and _e.rank_id >= ".SPECIES_RANK_ID."
+				" . $rankWhereClause . "
 				and _d.taxon is not null
 				order by _a.taxon_id ".
 				(!is_null($rowcount) ? ' limit '.$rowcount : '').
