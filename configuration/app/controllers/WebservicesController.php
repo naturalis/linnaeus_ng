@@ -1258,9 +1258,22 @@ parameters:
 
         foreach ($parentIds as $id) {
             $par = $this->getTaxonById((int)$id);
-            $classification[] = ['taxon'=> $par['taxon'],'rank'=> $par['rank']];
+            $class = ['taxon'=> $par['taxon'],'rank'=> $par['rank']];
+            if (isset($par['authorship']))
+            {
+                  $class['authorship'] = $par['authorship'];
+            }
+            $classification[] = $class;
         }
-        $classification[] = ['taxon'=>$taxon['taxon'],'rank'=>$taxon['rank']];
+        
+        $class = ['taxon'=>$taxon['taxon'],'rank'=>$taxon['rank']];
+
+        if (isset($taxon['authorship']))
+        {
+            $class['authorship'] = $taxon['authorship'];
+        }
+
+        $classification[] = $class;
 
         $p=$this->getProject();
 		$result['project']=$p['title'];
