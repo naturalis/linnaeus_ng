@@ -315,6 +315,25 @@ parameters:
 				_e.meta_date desc
 			");
 
+       /* 
+          this is a quick fix! ideally, $overviewImageRS should also include 
+	  meta-data and replace $media for projects that have RS
+      */
+       $overviewImageRS=$this->models->MediaTaxon->freeQuery("
+            select
+                t1.rs_original
+            from media as t1
+            left join
+                media_modules as t2 on t1.id = t2.media_id
+            where
+	        t2.overview_image = 1 and
+                t2.item_id =  ".$this->getTaxonId()." and
+                t2.project_id = ".$this->getCurrentProjectId()." and
+                t1.deleted = 0
+            order by
+                t2.sort_order,
+                t1.name");
+    
 		$result=array(
 			'pId'=>$this->getCurrentProjectId(),
 			'search'=>$this->requestData['taxon'],
@@ -335,7 +354,12 @@ parameters:
 			'names'=>$names,
 			'media'=>$media
 		);
-
+	    
+	        if (isset($overviewImageRS[0]) && isset($overviewImageRS[0]['rs_original']))
+		{
+			$result['taxon']['overview_image']=$overviewImageRS[0]['rs_original'];
+		}
+	    
 		$this->setJSON(json_encode($result));
 		header('Content-Type: application/json');			
 		$this->printOutput();
