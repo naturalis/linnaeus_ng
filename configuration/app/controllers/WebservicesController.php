@@ -133,7 +133,8 @@ parameters:
 					_d.taxon, 
 					_f.default_label as rank,
 					concat('".$url."',_a.taxon_id) as url,
-					_h.id as taxon_valid_name_id
+					_h.id as taxon_valid_name_id,
+					_k.addition as remark
 				from %PRE%names _a
 				
 				left join %PRE%name_types _b on _a.type_id=_b.id and _a.project_id=_b.project_id
@@ -146,6 +147,11 @@ parameters:
 				left join %PRE%names _h on _h.taxon_id=_a.taxon_id and _h.type_id=_g.id and _a.project_id=_h.project_id
 
 				left join %PRE%nsr_ids _i on _a.project_id=_i.project_id and _a.taxon_id=_i.lng_id and _i.item_type='taxon'
+				
+				left join %PRE%names_additions _k
+				  on _a.project_id=_k.project_id 
+				  and _a.id=_k.name_id 
+				  and _k.language_id=" .$this->getCurrentLanguageId()."
 
 				where _a.project_id=".$this->getCurrentProjectId()."
 				and (
