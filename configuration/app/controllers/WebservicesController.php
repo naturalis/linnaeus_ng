@@ -1364,6 +1364,7 @@ parameters:
 			{
 				$this->setProject($p);
 				$this->setCurrentProjectId($p['id']);
+				$this->setCurrentLanguageId();
 				return $p;
 			}
 		}
