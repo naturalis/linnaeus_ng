@@ -151,7 +151,7 @@ parameters:
 				left join %PRE%names_additions _k
 				  on _a.project_id=_k.project_id 
 				  and _a.id=_k.name_id 
-				  and _k.language_id=" .$this->getCurrentLanguageId()."
+				  and _k.language_id=" .LANGUAGE_ID_DUTCH."
 
 				where _a.project_id=".$this->getCurrentProjectId()."
 				and (
@@ -1364,7 +1364,6 @@ parameters:
 			{
 				$this->setProject($p);
 				$this->setCurrentProjectId($p['id']);
-				$this->setCurrentLanguageId();
 				return $p;
 			}
 		}
