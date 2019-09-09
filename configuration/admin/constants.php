@@ -59,4 +59,3 @@
 	
 	if (!defined('MATRIX_STYLE_DEFAULT')) define('MATRIX_STYLE_DEFAULT','default');
 	if (!defined('MATRIX_STYLE_NBC')) define('MATRIX_STYLE_NBC','nbc');
-
