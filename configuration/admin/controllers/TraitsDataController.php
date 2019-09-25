@@ -234,7 +234,7 @@ class TraitsDataController extends TraitsController
 		$this->moduleSession->setModuleSetting( array('setting'=>'joinrows' ) );
 		if (!is_null($data))
 		{
-			$data=array();
+			//$data=array();
 			foreach((array)$data as $val)
 			{
 				$d=explode(",",trim($val,'[]'));
