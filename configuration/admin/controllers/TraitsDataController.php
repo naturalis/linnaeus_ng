@@ -582,7 +582,7 @@ class TraitsDataController extends TraitsController
 					
 					if (!empty($this->_taxonIdResolveQuery))
 					{
-						$t2=$this->models->Taxa->freeQuery(
+					    $t2=$this->models->Taxa->freeQuery(
 							str_replace(
 								array('%pid%','%tid%'),
 								array($this->getCurrentProjectId(),$cell),$this->_taxonIdResolveQuery)

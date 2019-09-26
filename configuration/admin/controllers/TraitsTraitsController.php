@@ -287,12 +287,16 @@ class TraitsTraitsController extends TraitsController
         }
         
         $this->setPageName($this->translate('Rename trait value'));
-        
         $trait_value = $this->models->TraitsValues->_get(['id' => $this->rGetId()]);
-        
+
         if ($this->rHasVal('action','save'))  {
-             $this->saveTraitgroupTraitValue(['id' => $this->rGetId(), 'sysname' => $this->rGetVal('sysname')]);
-             $this->redirect('traitgroup_trait_values.php?trait=' . $trait_value['trait_id']);
+            $this->saveTraitgroupTraitValue(['id' => $this->rGetId(), 'sysname' => $this->rGetVal('sysname')]);
+            $this->logChange([
+                 'before' => $trait_value,
+                 'after' => $this->models->TraitsValues->_get(['id' => $this->rGetId()]),
+                 'note'=> 'updated trait value ' . $trait_value['string_value']
+            ]);
+            $this->redirect('traitgroup_trait_values.php?trait=' . $trait_value['trait_id']);
         }
          
         $trait = $this->getTraitgroupTrait(['trait' => $trait_value['trait_id']]);
