@@ -69,7 +69,7 @@ function growbranches(data)
 	if (progeny) progeny='<ul id="children-'+data.node.id+'">'+progeny+'</ul>';
 
 	var buffer=
-		'<ul>'+
+		//'<ul>'+
 			'<li class="child">'+
 				(!activeNode ?
 					'<a href="#" onclick="buildtree(false);return false">'+data.node.label+'</a>' :
@@ -92,8 +92,8 @@ function growbranches(data)
 					'<a href="nsr_taxon.php?id='+data.node.id+'" class="detail-link">&rarr;</a>'
 				)+
 				progeny+
-			'</li>'+
-		'</ul>';
+			'</li>';
+		//'</ul>';
 				
 	if (activeNode==false)
 	{
