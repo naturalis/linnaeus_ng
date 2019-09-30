@@ -117,49 +117,6 @@
 
         <tr><td colspan="2" style="height:5px;"></td></tr>
 
-        <tr><th>{t}expert:{/t}</th>
-            <td>
-                {if $presence.expert_id!=''}
-                    {$presence.expert_name}
-                {else}{t}n.a.{/t}{/if}
-                <a class="edit" href="#" onclick="toggleedit(this);return false;" rel="presence_expert_id">{t}edit{/t}</a>
-                <span class="editspan" id="expert">
-
-                <select id="presence_expert_id">
-                    <option value="-1" selected="selected">{t}n.a.{/t}</option>
-                {foreach from=$actors item=v key=k}
-                {if $v.is_company=='0'}
-                    <option value="{$v.id}" {if $v.id==$presence.expert_id} selected="selected"{/if}>{$v.label}</option>
-                {/if}
-                {/foreach}
-                </select>
-
-                </span>
-            </td>
-        </tr>
-
-        <tr><th>{t}organisation{/t}:</th>
-            <td>
-                {if $presence.organisation_id!=''}
-                    {$presence.organisation_name}
-                {else}{t}n.a.{/t}{/if}
-                <a class="edit" href="#" onclick="toggleedit(this);return false;" rel="presence_organisation_id">{t}edit{/t}</a>
-                <span class="editspan" id="organisation">
-
-                <select id="presence_organisation_id">
-                    <option value="-1" selected="selected">{t}n.a.{/t}</option>
-                {foreach from=$actors item=v key=k}
-                {if $v.is_company=='1'}
-                    <option value="{$v.id}" {if $v.id==$presence.organisation_id} selected="selected"{/if}>{$v.label}</option>
-                {/if}
-                {/foreach}
-                </select>
-
-                </span>
-                <input type="hidden" id="" value="{$presence.organisation_id}" />
-            </td>
-        </tr>
-
         <tr><th>{t}publication{/t}:</th>
             <td>
                 <span id="presence_reference">{if $presence.reference_id!=''}{$presence.reference_label}{/if}</span>

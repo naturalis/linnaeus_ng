@@ -114,29 +114,6 @@
         <a class="edit" style="margin-left:0" href="#" onclick="dropListDialog(this,'Publicatie');return false;" rel="name_reference_id">edit</a><br />
         <input type="hidden" id="name_reference_id" value="{$name.reference_id}" />
 	</td></tr>
-
-	<tr><th>{t}expert{/t}:</th><td>
-		<select id="name_expert_id">
-			<option value="" {if !$name.expert_id} selected="selected"{/if}>{t}n.a.{/t}</option>
-		{foreach from=$actors item=v key=k}
-		{if $v.is_company=='0'}
-			<option value="{$v.id}" {if $v.id==$name.expert_id} selected="selected"{/if}>{$v.label}</option>
-		{/if}
-		{/foreach}
-		</select>
-	</td></tr>
-
-	<tr><th>{t}organisation{/t}:</th><td>
-		<select id="name_organisation_id">
-			<option value="" {if !$name.organisation_id} selected="selected"{/if}>{t}n.a.{/t}</option>
-		{foreach from=$actors item=v key=k}
-		{if $v.is_company=='1'}
-			<option value="{$v.id}" {if $v.id==$name.organisation_id} selected="selected"{/if}>{$v.label}</option>
-		{/if}
-		{/foreach}
-		</select>
-	</td></tr>
-
     {/if}
 
 	{if !$newname}
