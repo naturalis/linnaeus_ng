@@ -193,7 +193,7 @@ function saveActorForm()
 	<a href="#" onclick="$('#links-literature').toggle();return false;">Linked references: {$links.literature.total} {if $links.literature.total > $links.literature.data|@count}({$links.literature.data|@count} displayed){/if}</a>
 	<div id="links-literature" style="display:none">
 		<ul class="small">
-            {foreach from=$links.literature item=v key=k}
+            {foreach from=$links.literature.data item=v key=k}
             <li><a href="../literature2/edit.php?id={$v.id}">{$v.label}</a></li>
             {/foreach}
 		</ul>
