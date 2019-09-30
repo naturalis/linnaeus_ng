@@ -854,6 +854,18 @@ taxonTraits.saveTaxonTrait=function()
 		}
 	}
 
+	// Check if references have been set before trait was edited; if so append to this form.
+	// Initial number of references was set when page was loaded in var initialNrRefs.
+	// A bit of a hack, but see LINNA-1426.
+	if (taxonTraits.references.length != initialNrRefs) {
+		for (var i = 0; i < taxonTraits.references.length; i++) {
+			form.append(
+				'<input type="hidden" name="references[]" value="' +
+				(taxonTraits.references[i].id ? taxonTraits.references[i].id : -1) + ',' + taxonTraits.references[i].literature_id +
+				'" />');
+		};
+	}
+
 	$('body').append(form);
 	form.submit();
 }
@@ -907,7 +919,7 @@ taxonTraits.removeReference=function( i )
 taxonTraits.printReferences=function()
 {
 	var buffer=[]
-	for(var i=0;i<taxonTraits.references.length;i++)
+	for(i=0;i<taxonTraits.references.length;i++)
 	{
 		buffer.push(
 			'<li>'+

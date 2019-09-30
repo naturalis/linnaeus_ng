@@ -159,6 +159,8 @@ li.values:hover {
 
 
 <script>
+    var initialNrRefs = {$references|@count};
+
 $(document).ready(function()
 {
 	taxonTraits.setConcept( {$concept.id} );

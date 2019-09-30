@@ -61,7 +61,17 @@ class TraitsTaxonController extends TraitsController
 		$this->checkAuthorisation();
 		$this->setPageName( $this->translate('Taxon trait data') );
 
-		if ($this->rHasVal('action','deletegroup') && $this->rHasVal('id') && $this->rHasVal('group'))
+        if ($this->rHasVal('action','savereferences'))
+        {
+            $this->saveReferences(array(
+                'taxon'=>$this->rGetVal( 'id' ),
+                'group'=>$this->rGetVal( 'group' ),
+                'references'=>$this->rGetVal( 'references' )
+            ));
+            $this->addMessage('Saved');
+        }
+        else
+        if ($this->rHasVal('action','deletegroup') && $this->rHasVal('id') && $this->rHasVal('group'))
 		{
 			$this->deleteTaxonTraitData(array('taxon'=>$this->rGetVal( 'id' ),'group'=>$this->rGetVal( 'group' )));
 			$this->deleteReferences(array('taxon'=>$this->rGetVal( 'id' ),'group'=>$this->rGetVal( 'group' )));
@@ -76,16 +86,6 @@ class TraitsTaxonController extends TraitsController
 			$this->addMessage('Deleted');
 		} 
 		else
-		if ($this->rHasVal('action','savereferences'))
-		{
-			$this->saveReferences(array(
-				'taxon'=>$this->rGetVal( 'id' ),
-				'group'=>$this->rGetVal( 'group' ),
-				'references'=>$this->rGetVal( 'references' )
-			));
-			$this->addMessage('Saved');
-		} 
-		else
 		if ($this->rHasVal('action','save') && $this->rHasId() && $this->rHasVal('group'))
 		{
 			$this->saveTaxonTraitData(array(
@@ -95,6 +95,18 @@ class TraitsTaxonController extends TraitsController
 				'value_start'=>$this->rGetVal('value_start'),
 				'value_end'=>$this->rGetVal('value_end'),
 			));
+
+			// Possibly references have been set before the trait was edited;
+            // if so, they have been appended to this form.
+            if (!empty($this->rGetVal( 'references' ))) {
+                $this->saveReferences(array(
+                    'taxon'=>$this->rGetVal( 'id' ),
+                    'group'=>$this->rGetVal( 'group' ),
+                    'references'=>$this->rGetVal( 'references' )
+                ));
+
+            }
+
 			$this->addMessage('Saved');
 		}
 		
