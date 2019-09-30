@@ -2134,3 +2134,7 @@ strong {
       font-size : 8px ! important;
     }
 }
+
+.partners {
+  float: right;
+}
