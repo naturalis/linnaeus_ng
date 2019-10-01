@@ -57,7 +57,9 @@ var matrixsettings={
 	alwaysSortByInitial: 0,
 	noTaxonImages: false,
 	suppressImageEnlarge: false,
-	hideImagesWhenNoneAvailable: true
+	hideImagesWhenNoneAvailable: true,
+	observationUrl: "",
+	observationThreshold: 5,
 };
 
 var data={
@@ -734,6 +736,14 @@ function formatResult( data )
 						fetchTemplate( 'iconSimilarTpl' ).replace('%IMG-URL%',matrixsettings.imageRootSkin+"gelijk_grijs.png") : "")
 				: "" )
 			)
+			.replace(/%OBSERVATION-LINK%/i, matrixsettings.observationUrl.length > 0 && getResultCount() <= matrixsettings.observationThreshold ?
+				fetchTemplate( 'observationLinkIconHtmlTpl' )
+					.replace('%LINK%', matrixsettings.observationUrl.replace('%SCIENTIFICNAME%', sciName))
+					.replace('%TITLE%', __('waarneming invoeren'))
+					.replace('%OBSERVATION-LINK-ICON%',
+						fetchTemplate( 'iconUrlHtmlTpl' ).replace('%IMG-URL%',matrixsettings.imageRootSkin+"waarneming_grijs.png"))
+				: fetchTemplate( 'noActionIconHtmlTpl' ) )
+
 			.replace('%STATES%', showStates ? fetchTemplate( 'statesHtmlTpl' ).replace( '%STATES%',states.join( fetchTemplate( 'statesJoinHtmlTpl' ) ) ) : "" )
 			.replace(/%LOCAL-ID%/g,id)
 			.replace(/%ID%/g,data.id)
@@ -1562,6 +1572,11 @@ function setResultSet(resultset)
 function getResultSet()
 {
 	return data.resultset;
+}
+
+function getResultCount()
+{
+	return data.resultset.length;
 }
 
 function setMenu(menu)

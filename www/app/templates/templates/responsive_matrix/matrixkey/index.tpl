@@ -51,6 +51,7 @@ $(document).ready(function()
 		{ key : 'toon alle kenmerken', translation : '{t}toon alle kenmerken{/t}' },
 		{ key : 'foto', translation : '{t}foto{/t}' },
 		{ key : 'gelijkende soorten', translation : '{t}gelijkende soorten{/t}' },
+		{ key : 'waarneming invoeren', translation : '{t}waarneming invoeren{/t}' },
 		{ key : 'kenmerken verbergen', translation : '{t}kenmerken verbergen{/t}' },
 		{ key : 'alle kenmerken verbergen', translation : '{t}alle kenmerken verbergen{/t}' },
 		{ key : 'meer resultaten laden', translation : '{t}meer resultaten laden{/t}' },
@@ -81,6 +82,7 @@ $(document).ready(function()
 		perPage: {if $settings->items_per_page}{$settings->items_per_page}{else}15{/if},
 		perLine: {if $settings->items_per_line}{$settings->items_per_line}{else}3{/if},
 		generalSpeciesInfoUrl: '{$settings->species_info_url}',
+		observationUrl: '{$settings->url_observation_page}',
 		showScores: {if $settings->show_scores}{$settings->show_scores}{else}0{/if},
 		initialSortColumn: '{$settings->initial_sort_column}',
 		alwaysSortByInitial: {if $settings->always_sort_by_initial}{$settings->always_sort_by_initial}{else}0{/if},
@@ -157,6 +159,10 @@ $(document).ready(function()
 	<div class="result-icon icon-details" id="tog-%LOCAL-ID%" onClick="toggleDetails('%LOCAL-ID%');return false;" title="%TITLE%">%SHOW-STATES-ICON%</div>
 </div>
 
+<div class="inline-templates" id="observationLinkIconHtmlTpl">
+	<div class="result-icon" title="%TITLE%"><a href="%LINK%" target="_blank">%OBSERVATION-LINK-ICON%</a></div>
+</div>
+
 <div class="inline-templates" id="relatedIconHtmlTpl">
 	<div class="result-icon icon-resemblance" onClick="setSimilar({ id:%ID%,type:'%TYPE%' });return false;" title="%TITLE%">%RELATED-ICON%</div>
 </div>
@@ -191,6 +197,7 @@ $(document).ready(function()
         	%REMOTE-LINK%
             %SHOW-STATES%
             %RELATED-TAXA%
+			%OBSERVATION-LINK%
             %MATRIX-LINK%
         </div>%STATES%
     </div>
