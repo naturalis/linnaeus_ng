@@ -59,7 +59,7 @@ var matrixsettings={
 	suppressImageEnlarge: false,
 	hideImagesWhenNoneAvailable: true,
 	observationUrl: "",
-	observationThreshold: 5,
+	observationThreshold: 0,
 };
 
 var data={

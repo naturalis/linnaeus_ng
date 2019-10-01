@@ -83,6 +83,7 @@ $(document).ready(function()
 		perLine: {if $settings->items_per_line}{$settings->items_per_line}{else}3{/if},
 		generalSpeciesInfoUrl: '{$settings->species_info_url}',
 		observationUrl: '{$settings->url_observation_page}',
+		observationThreshold: {if $settings->observation_link_threshold}{$settings->observation_link_threshold}{else}5{/if},
 		showScores: {if $settings->show_scores}{$settings->show_scores}{else}0{/if},
 		initialSortColumn: '{$settings->initial_sort_column}',
 		alwaysSortByInitial: {if $settings->always_sort_by_initial}{$settings->always_sort_by_initial}{else}0{/if},
