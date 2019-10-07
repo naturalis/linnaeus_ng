@@ -47,8 +47,8 @@ gulp.task('admin-copy', function () {
     ], { base: 'node_modules' })
         .pipe(gulp.dest('./www/admin/vendor'));
     gulp.src([
-        'bower_components/Javascript InfoVis Toolkit/Jit/*.js'
-    ],{ base: 'bower_components/Javascript InfoVis Toolkit'})
+        'node_modules/\@bower_components/Javascript InfoVis Toolkit/Jit/*.js'
+    ],{ base: 'node_modules/\@bower_components/Javascript InfoVis Toolkit'})
         .pipe(gulp.dest('./www/admin/vendor'));
 });
 gulp.task('app-bundle', ['modernizr'], function () {
@@ -76,8 +76,8 @@ gulp.task('app-copy', function () {
     ], { base: 'node_modules' })
         .pipe(gulp.dest('./www/app/vendor'));
     gulp.src([
-        'bower_components/fancybox/dist/**/*'
-    ], { base: 'bower_components/fancybox/dist/' })
+        'node_modules/\@bower_components/fancybox/dist/**/*'
+    ], { base: 'node_modules/\@bower_components/fancybox/dist/' })
         .pipe(gulp.dest('./www/app/vendor/fancybox'));
 });
 gulp.task('default',
