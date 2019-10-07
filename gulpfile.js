@@ -3,7 +3,7 @@ var gulp = require('gulp');
 var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
 var concat = require('gulp-concat');
-var uglify = require('gulp-uglifyes');
+var terser = require('gulp-terser');
 var gutil = require('gulp-util');
 var modernizr = require('gulp-modernizr');
 
@@ -17,7 +17,7 @@ gulp.task('admin-bundle', ['modernizr'], function () {
     return browserify('./gulp/admin.js').bundle()
         .pipe(source('bundle.js'))
         .pipe(buffer())
-        .pipe(uglify())
+        .pipe(terser())
         .on('error', gutil.log)
         .pipe(gulp.dest('./www/admin/vendor/'));
 });
@@ -56,7 +56,7 @@ gulp.task('app-bundle', ['modernizr'], function () {
     return browserify('./gulp/app.js').bundle()
         .pipe(source('bundle.js'))
         .pipe(buffer())
-        .pipe(uglify())
+        .pipe(terser())
         .on('error', gutil.log)
         .pipe(gulp.dest('./www/app/vendor/'));
 });

@@ -23,7 +23,10 @@
   },
   "homepage": "https://github.com/naturalis/linnaeus_ng#readme",
   "dependencies": {
-    "bower": "^1.8.4",
+    "@bower_components/fancybox": "fancyapps/fancyBox#^3.3.5",
+    "@bower_components/jit": "philogb/jit#2.0.2",
+    "@bower_components/jquery": "jquery/jquery-dist#>=1.9.0",
+    "@bower_components/purl": "allmarkedup/purl#^2.3.2",
     "browserify": "^16.2.0",
     "browserify-shim": "^3.8.14",
     "ckeditor": "^4.9.1",
@@ -33,8 +36,8 @@
     "gulp-concat-css": "^3.1.0",
     "gulp-modernizr": "^3.0.0",
     "gulp-sourcemaps": "^2.6.4",
+    "gulp-terser": "^1.2.0",
     "gulp-uglifyes": "^0.2.1",
-    "gulp-util": "^3.0.8",
     "ionicons": "^4.4.4",
     "jquery": "^3.3.1",
     "jquery-sortable": "git+https://github.com/johnny/jquery-sortable.git",
@@ -48,13 +51,10 @@
     "prettyPhoto": "git+https://github.com/fredriks/prettyphoto.git",
     "sprintf-js": "git+https://github.com/alexei/sprintf.js.git",
     "tablesorter": "^2.30.1",
+    "terser": "^4.3.8",
     "tinymce": "^4.7.10",
     "vinyl-buffer": "^1.0.1",
-    "vinyl-source-stream": "^2.0.0",
-    "@bower_components/fancybox": "fancyapps/fancyBox#^3.3.5",
-    "@bower_components/jit": "philogb/jit#2.0.2",
-    "@bower_components/jquery": "jquery/jquery-dist#>=1.9.0",
-    "@bower_components/purl": "allmarkedup/purl#^2.3.2"
+    "vinyl-source-stream": "^2.0.0"
   },
   "engines": {
     "yarn": ">= 1.0.0"
