@@ -244,24 +244,6 @@ class VersatileExportController extends Controller
         die('Ready');
     }
 
-    private function createTraitGroupLookup () {
-        foreach ($this->taxonTraits as $id => $traits) {
-            foreach ($traits as $traitId) {
-                if (!isset($this->traitGroupLookup[$traitId])) {
-                    $trait = $this->tc->getTraitGroupTrait(['trait' => $traitId]);
-                    $group = $this->tc->getTraitgroup($trait['trait_group_id']);
-                    $this->traitGroupLookup[$traitId] = [
-                        'id' => $group['id'],
-                        'name' => isset($group['names'][$this->getDefaultProjectLanguage()]) ?
-                            $group['names'][$this->getDefaultProjectLanguage()] :
-                            $group['sysname']
-                    ];
-                }
-            }
-        }
-        return $this->traitGroupLookup;
-    }
-
     private function traitGroupLookup ($traitId) {
         if (!isset($this->traitGroupLookup[$traitId])) {
             $trait = $this->tc->getTraitGroupTrait(['trait' => $traitId]);
