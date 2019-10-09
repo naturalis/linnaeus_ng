@@ -179,8 +179,6 @@ class TraitsTaxonController extends TraitsController
 
 		$language=$this->getDefaultProjectLanguage();
 
-		$data=array();
-
 		if ( empty($taxon) || empty($language) )
 		{
 			return;
@@ -193,43 +191,49 @@ class TraitsTaxonController extends TraitsController
 			'trait_id'=>$trait,
 			'group_id'=>$group
 		));
-	
-		$d=array();
-		
-		foreach((array)$r as $key=>$val)
-		{
-			$d[$val['trait_id']]['trait']=
-				array(
-					'id'=>$val['trait_id'],
-					'sysname'=>$val['trait_sysname'],
-					'name'=>$val['trait_name'],
-					'code'=>$val['trait_code'],
-					'description'=>$val['trait_description'],
-					'type'=>$val['trait_type_sysname'],
-				);
-				
-			if (!empty($val['_date_value']))
-				$val['value_start']=$this->formatDbDate($val['_date_value'],$val['_date_format']);
-			if (!empty($val['_date_value_end']))
-				$val['value_end']=$this->formatDbDate($val['_date_value_end'],$val['_date_format']);
 
-			$d[$val['trait_id']]['values'][]=
-				array(
-					'id'=>$val['id'],
-					'value_id'=>$val['value_id'],
-					'value_start'=>$val['value_start'],
-					'value_end'=>$val['value_end'],
-				);
-		}
-
-		foreach($d as $val)
-		{
-			$data[]=$val;
-		}
-
-		return $data;
-
+		return $this->formatTraitsTaxonValues($r);
 	}
+
+	public function formatTraitsTaxonValues ($r)
+    {
+        $data=array();
+
+        $d=array();
+
+        foreach((array)$r as $key=>$val)
+        {
+            $d[$val['trait_id']]['trait']=
+                array(
+                    'id'=>$val['trait_id'],
+                    'sysname'=>$val['trait_sysname'],
+                    'name'=>$val['trait_name'],
+                    'code'=>$val['trait_code'],
+                    'description'=>$val['trait_description'],
+                    'type'=>$val['trait_type_sysname'],
+                );
+
+            if (!empty($val['_date_value']))
+                $val['value_start']=$this->formatDbDate($val['_date_value'],$val['_date_format']);
+            if (!empty($val['_date_value_end']))
+                $val['value_end']=$this->formatDbDate($val['_date_value_end'],$val['_date_format']);
+
+            $d[$val['trait_id']]['values'][]=
+                array(
+                    'id'=>$val['id'],
+                    'value_id'=>$val['value_id'],
+                    'value_start'=>$val['value_start'],
+                    'value_end'=>$val['value_end'],
+                );
+        }
+
+        foreach($d as $val)
+        {
+            $data[]=$val;
+        }
+
+        return $data;
+    }
 
 	private function saveTaxonTraitData( $p )
 	{

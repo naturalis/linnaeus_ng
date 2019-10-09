@@ -32,6 +32,10 @@ class Db
                 'SET CHARACTER SET ' . $config['characterSet']);
         }
 
+        // Problems with strict mode in Traits mode; force enable "loose" mode
+        mysqli_query(self::$instance[$id],
+            'SET SESSION sql_mode = "NO_ENGINE_SUBSTITUTION"');
+
         return true;
     }
 

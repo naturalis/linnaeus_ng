@@ -47,7 +47,7 @@ class TraitsController extends Controller
 
 	private function formatDbDate($date,$format)
 	{
-		if ($format=="Y")
+ 	    if ($format=="Y")
 		{
 			$d=date_parse($date);
 			if ($d['month']==0) $d['month']=1;

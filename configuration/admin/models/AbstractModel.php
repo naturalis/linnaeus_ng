@@ -36,6 +36,12 @@ class AbstractModel extends BaseClass
         parent::__destruct();
     }
 
+    public function databaseConnection ()
+    {
+
+
+    }
+
 	public function setLogger($logger)
 	{
 		$this->logger = $logger;
@@ -409,5 +415,4 @@ class AbstractModel extends BaseClass
 	{
 		return $this->error;
 	}
-
 }

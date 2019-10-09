@@ -13,6 +13,7 @@ class VersatileExportController extends Controller
         'presence',
         'names',
         'name_types',
+        'traits_matrix'
     );
     
     public $modelNameOverride='VersatileExportModel';
@@ -83,7 +84,10 @@ class VersatileExportController extends Controller
     
     private $limit = 20000;
     private $offset = 0;
-     
+
+    private $taxonTraits = [];
+    private $traitGroupLookup = [];
+
     /*
      when the number of names is larger than synonymStrategyThrehold, the
      program will fetch all synonyms in one query, and filter and assign them
@@ -131,7 +135,6 @@ class VersatileExportController extends Controller
     
     public function __construct ()
     {
-        set_time_limit(300);
         parent::__construct();
         $this->initialize();
     }
@@ -169,11 +172,185 @@ class VersatileExportController extends Controller
             $this->columnHeaders[$key]=$this->translate($val);
         }
     }
-    
+
+    private function saveTaxonTraitValues ($d, $type)
+    {
+        $i = 0;
+        $model = 'getTaxonTraits' . ucfirst($type) . 'Values';
+
+        foreach ($d as $row) {
+            $data = [
+                'language_id' => $this->getDefaultProjectLanguage(),
+                'project_id' => $this->getCurrentProjectId(),
+                'taxon_id' => $row['taxon_id']
+            ];
+            foreach (explode(',', $row['trait_ids']) as $traitId) {
+                $i++;
+                // Simplified query for values used
+                $taxonValues = $this->models->VersatileExportModel->{$model}([
+                    'project_id' => $this->getCurrentProjectId(),
+                    'language_id' => $this->getDefaultProjectLanguage(),
+                    'taxon_id' => $row['taxon_id'],
+                    'trait_id' => $traitId,
+                ]);
+
+                print_r($taxonValues); die();
+
+
+                if (!empty($taxonValues)) {
+                    // Values have not been formatted yet
+                    $taxonValues = $this->tc->formatTraitsTaxonValues($taxonValues);
+                    $values = [];
+                    foreach ($taxonValues[0]['values'] as $value) {
+                        $values[] = $value['value_start'] . (!empty($value['value_end']) ? '-' . $value['value_end'] : '');
+                    }
+                    $traits[] = [
+                        'trait_group_id' => $this->traitGroupLookup($traitId)['id'],
+                        'trait_group_name' => $this->traitGroupLookup($traitId)['name'],
+                        'trait_id' => $traitId,
+                        'trait_name' => $taxonValues[0]['trait']['name'],
+                        'trait_value' => implode('|', $values),
+                    ];
+                }
+            }
+            $data['traits'] = $traits;
+
+            print_r( $data); die();
+
+
+            $this->models->VersatileExportModel->saveTaxonTraitValues($data);
+        }
+
+        die('taxa:' . count($d) . '; traits:' . $i);
+    }
+
+    private function createTraitsMatrix ()
+    {
+        set_time_limit(600);
+        $this->tc = new TraitsTaxonController();
+        $this->models->VersatileExportModel->emptyTraitsMatrix();
+
+        // Fixed values
+        $values = $this->models->VersatileExportModel->getTaxaTraitsFixedValues([
+            'project_id' => $this->getCurrentProjectId(),
+        ]);
+        print_r($values);
+
+        $this->saveTaxonTraitValues($values, 'fixed');
+
+        // Get free value traits per taxon
+        $values = $this->models->VersatileExportModel->getTaxaTraitsFreeValues([
+            'project_id' => $this->getCurrentProjectId(),
+        ]);
+        $this->saveTaxonTraitValues($values, 'free');
+
+
+
+
+
+
+
+
+
+
+
+        // Merge fixed value traits to get a minimal set of data to parse
+        foreach ($values as $row) {
+            $this->taxonTraits[$row['taxon_id']] = isset($this->taxonTraits[$row['taxon_id']]) ?
+                array_merge($this->taxonTraits[$row['taxon_id']], explode(',', $row['trait_ids'])) :
+                explode(',', $row['trait_ids']);
+        }
+
+        $this->models->VersatileExportModel->emptyTraitsMatrix();
+        $this->tc = new TraitsTaxonController();
+
+
+
+
+        foreach ($this->taxonTraits as $taxonId => $traitIds) {
+            $data = [
+                'language_id' => $this->getDefaultProjectLanguage(),
+                'project_id' => $this->getCurrentProjectId(),
+                'taxon_id' => $taxonId,
+            ];
+            $traits = [];
+            foreach ($traitIds as $traitId) {
+                $groupId = $this->traitGroupLookup($traitId)['id'];
+                $taxonValues = $this->tc->getTaxonValues([
+                    'taxon' => $taxonId,
+                    'trait' => $traitId, 'group' => $groupId,
+                ]);
+
+                print_r($taxonValues); die();
+
+                if (!empty($taxonValues)) {
+                    $values = [];
+                    foreach ($taxonValues[0]['values'] as $value) {
+                        $values[] = $value['value_start'] . (!empty($value['value_end']) ? '-' . $value['value_end'] : '');
+                    }
+                    $traits[] = [
+                        'trait_group_id' => $groupId,
+                        'trait_group_name' => $this->traitGroupLookup($traitId)['name'],
+                        'trait_id' => $traitId,
+                        'trait_name' => $taxonValues[0]['trait']['name'],
+                        'trait_value' => implode('|', $values),
+                    ];
+                } else {
+                    $this->log( "Trait matrix error: could not fetch trait values for:
+                        taxon id: $taxonId, trait id: $traitId,  group id: $groupId ", 1);
+
+                }
+            }
+            $data['traits'] = $traits;
+            $this->models->VersatileExportModel->saveTaxonTraitValues($data);
+        }
+
+
+        die('Ready');
+    }
+
+    private function createTraitGroupLookup () {
+        foreach ($this->taxonTraits as $id => $traits) {
+            foreach ($traits as $traitId) {
+                if (!isset($this->traitGroupLookup[$traitId])) {
+                    $trait = $this->tc->getTraitGroupTrait(['trait' => $traitId]);
+                    $group = $this->tc->getTraitgroup($trait['trait_group_id']);
+                    $this->traitGroupLookup[$traitId] = [
+                        'id' => $group['id'],
+                        'name' => isset($group['names'][$this->getDefaultProjectLanguage()]) ?
+                            $group['names'][$this->getDefaultProjectLanguage()] :
+                            $group['sysname']
+                    ];
+                }
+            }
+        }
+        return $this->traitGroupLookup;
+    }
+
+    private function traitGroupLookup ($traitId) {
+        if (!isset($this->traitGroupLookup[$traitId])) {
+            $trait = $this->tc->getTraitGroupTrait(['trait' => $traitId]);
+            $group = $this->tc->getTraitgroup($trait['trait_group_id']);
+
+            $this->traitGroupLookup[$traitId] = [
+                'id' => $group['id'],
+                'name' => isset($group['names'][$this->getDefaultProjectLanguage()]) ?
+                    $group['names'][$this->getDefaultProjectLanguage()] :
+                    $group['sysname']
+             ];
+        }
+        return $this->traitGroupLookup[$traitId];
+    }
+
     public function exportAction()
     {
         $this->setPageName( $this->translate('Multi-purpose export') );
-        
+
+        if ($this->rHasVal('action','matrix')) {
+            $this->createTraitsMatrix();
+            die();
+        }
+
         if ($this->rHasVal('action','export'))
         {
             $this->setBranchTopSession( array( $this->rGetVal('branch_top_id'), $this->rGetVal('branch_top_label') ) );
@@ -522,6 +699,8 @@ class VersatileExportController extends Controller
         foreach ((array)$this->names as $key => $val) {
             foreach ($this->selectedTraits as $id => $name) {
                 list($groupId, $traitId) = explode('-', $id);
+
+                /*
                 $traits = [];
                 $taxonTraits = $this->tc->getTaxonValues([
                     'taxon' => $val['_taxon_id'],
@@ -534,8 +713,35 @@ class VersatileExportController extends Controller
                     }
                 }
                 $this->names[$key][$name] = implode('|', $traits);
+                */
+
+                $value = $this->getTraitValueFromMatrix([
+                    'group_id' => $groupId,
+                    'trait_id' => $traitId,
+                    'taxon_id' => $val['_taxon_id'],
+                ]);
+                $this->names[$key][$name] = $value;
             }
         }
+    }
+
+    private function getTraitValueFromMatrix ($p)
+    {
+        $groupId = $p['group_id'] ?? null;
+        $traitId = $p['trait_id'] ?? null;
+        $taxonId = $p['taxon_id'] ?? null;
+
+        if (is_null($groupId) || is_null($traitId) || is_null($taxonId)) {
+            return false;
+        }
+
+        return $this->models->VersatileExportModel->getTraitValueFromMatrix([
+            'group_id' => $groupId,
+            'taxon_id' => $taxonId,
+            'trait_id' => $traitId,
+            'language_id' => $this->getDefaultProjectLanguage(),
+            'project_id' => $this->getCurrentProjectId(),
+        ]);
     }
     
     private function doSynonymsQuery()
@@ -543,130 +749,122 @@ class VersatileExportController extends Controller
         if ( !$this->getDoSynonyms() )
             return;
             
-            //,replace(_c.nsr_id,'tn.nlsr.name/','') as nsr_id
-            /*
-             left join %PRE%nsr_ids _c
-             on _names.project_id = _c.project_id
-             and _names.id = _c.lng_id
-             and _c.item_type = 'name'
-             */
-            
-            // Ruud: restart synonyms for each $names output cycle
-            $this->synonyms = [];
-            
-            $this->query="
-			SELECT
-				_names.id,
-				_names.name,
-				".( $this->query_bit_name_parts )."
-				".( $this->hasCol( 'database_id' ) ? " _names.id as database_id, " : "" )."
-				".( $this->hasCol( 'rank' ) ? " ifnull(_lpr.label,_r.rank) as " . $this->columnHeaders['rank'] . ", " : "" )."
-				_b.nametype,
-				_c.language,
-				_names.taxon_id as _taxon_id
-				    
-			FROM
-				%PRE%names _names
-				    
-			left join %PRE%name_types _b
-				on _names.project_id=_b.project_id
-				and _names.type_id=_b.id
-				    
-			left join %PRE%languages _c
-				on _names.language_id=_c.id
-				    
-			left join %PRE%projects_ranks _f
-				on _names.rank_id=_f.id
-				and _names.project_id=_f.project_id
-				    
-			left join %PRE%ranks _r
-				on _f.rank_id=_r.id
-				    
-			left join %PRE%labels_projects_ranks _lpr
-				on _f.project_id=_lpr.project_id
-				and _f.id=_lpr.project_rank_id
-				and _lpr.language_id = " . LANGUAGE_ID_DUTCH . "
-				    
-			where
-				_names.project_id=".$this->getCurrentProjectId()."
-				and _names.type_id in (" . implode(",",(array)$this->getSelectedSynonymTypes()) . ")
-				%ID-CLAUSE%
-			order by
-				_names.name
-			";
-            
-            $get_all=count((array)$this->names) >= $this->synonymStrategyThrehold;
-            
+        // Ruud: restart synonyms for each $names output cycle
+        $this->synonyms = [];
+
+        $this->query="
+            SELECT
+                _names.id,
+                _names.name,
+                ".( $this->query_bit_name_parts )."
+                ".( $this->hasCol( 'database_id' ) ? " _names.id as database_id, " : "" )."
+                ".( $this->hasCol( 'rank' ) ? " ifnull(_lpr.label,_r.rank) as " . $this->columnHeaders['rank'] . ", " : "" )."
+                _b.nametype,
+                _c.language,
+                _names.taxon_id as _taxon_id
+                    
+            FROM
+                %PRE%names _names
+                    
+            left join %PRE%name_types _b
+                on _names.project_id=_b.project_id
+                and _names.type_id=_b.id
+                    
+            left join %PRE%languages _c
+                on _names.language_id=_c.id
+                    
+            left join %PRE%projects_ranks _f
+                on _names.rank_id=_f.id
+                and _names.project_id=_f.project_id
+                    
+            left join %PRE%ranks _r
+                on _f.rank_id=_r.id
+                    
+            left join %PRE%labels_projects_ranks _lpr
+                on _f.project_id=_lpr.project_id
+                and _f.id=_lpr.project_rank_id
+                and _lpr.language_id = " . LANGUAGE_ID_DUTCH . "
+                    
+            where
+                _names.project_id=".$this->getCurrentProjectId()."
+                and _names.type_id in (" . implode(",",(array)$this->getSelectedSynonymTypes()) . ")
+                %ID-CLAUSE%
+            order by
+                _names.name
+            ";
+
+        $get_all=count((array)$this->names) >= $this->synonymStrategyThrehold;
+
+        if ( !$get_all )
+        {
+            $this->query=str_replace('%ID-CLAUSE%','and _names.taxon_id = %ID%',$this->query);
+        }
+        else
+        {
+            $all_synonyms=array();
+            $q=str_replace('%ID-CLAUSE%','',$this->query);
+            $synonyms=$this->models->Names->freeQuery( $q );
+            foreach((array)$synonyms as $key=>$val)
+            {
+                $all_synonyms[$val['_taxon_id']][]=$val;
+            }
+            unset($synonyms);
+        }
+
+        foreach( (array)$this->names as $key=>$val )
+        {
             if ( !$get_all )
             {
-                $this->query=str_replace('%ID-CLAUSE%','and _names.taxon_id = %ID%',$this->query);
+                $q=str_replace( '%ID%', $val['_taxon_id'], $this->query );
+                $synonyms=$this->models->Names->freeQuery( $q );
             }
             else
             {
-                $all_synonyms=array();
-                $q=str_replace('%ID-CLAUSE%','',$this->query);
-                $synonyms=$this->models->Names->freeQuery( $q );
-                foreach((array)$synonyms as $key=>$val)
-                {
-                    $all_synonyms[$val['_taxon_id']][]=$val;
-                }
-                unset($synonyms);
+                $synonyms=isset($all_synonyms[$val['_taxon_id']]) ? $all_synonyms[$val['_taxon_id']] : array();
             }
-            
-            foreach( (array)$this->names as $key=>$val )
+
+            foreach( (array)$synonyms as $row )
             {
-                if ( !$get_all )
+                $tmp=array();
+
+                if ( $this->hasCol( 'name_parts' ) )
                 {
-                    $q=str_replace( '%ID%', $val['_taxon_id'], $this->query );
-                    $synonyms=$this->models->Names->freeQuery( $q );
+                    foreach($this->getNameParts() as $name_part=>$name_part_state)
+                    {
+                        $tmp[$name_part]=isset($row[$name_part]) ? $row[$name_part] : null;
+                    }
                 }
-                else
+                if ( $this->hasCol( 'database_id' ) )
                 {
-                    $synonyms=isset($all_synonyms[$val['_taxon_id']]) ? $all_synonyms[$val['_taxon_id']] : array();
+                    if (isset($row[$this->columnHeaders['database_id']])) $tmp[$this->columnHeaders['database_id']]=$row[$this->columnHeaders['database_id']];
                 }
-                
-                foreach( (array)$synonyms as $row )
+
+                if ( $this->hasCol( 'rank' ) )
                 {
-                    $tmp=array();
-                    
-                    if ( $this->hasCol( 'name_parts' ) )
-                    {
-                        foreach($this->getNameParts() as $name_part=>$name_part_state)
-                        {
-                            $tmp[$name_part]=isset($row[$name_part]) ? $row[$name_part] : null;
-                        }
-                    }
-                    if ( $this->hasCol( 'database_id' ) )
-                    {
-                        if (isset($row[$this->columnHeaders['database_id']])) $tmp[$this->columnHeaders['database_id']]=$row[$this->columnHeaders['database_id']];
-                    }
-                    
-                    if ( $this->hasCol( 'rank' ) )
-                    {
-                        if (isset($row[$this->columnHeaders['rank']])) $tmp[$this->columnHeaders['rank']]=$row[$this->columnHeaders['rank']];
-                    }
-                    
-                    $d=
-                    array(
-                        $this->columnHeaders['synonym']=>isset($row['name']) ? $row['name'] : null,
-                        $this->columnHeaders['synonym_type']=>isset($row['nametype']) ? $row['nametype'] : null,
-                        $this->columnHeaders['language']=>isset($row['language']) ? $row['language'] : null,
-                        $this->columnHeaders['taxon']=>isset($val['scientific_name']) ? $val['scientific_name'] : null,
+                    if (isset($row[$this->columnHeaders['rank']])) $tmp[$this->columnHeaders['rank']]=$row[$this->columnHeaders['rank']];
+                }
+
+                $d=
+                array(
+                    $this->columnHeaders['synonym']=>isset($row['name']) ? $row['name'] : null,
+                    $this->columnHeaders['synonym_type']=>isset($row['nametype']) ? $row['nametype'] : null,
+                    $this->columnHeaders['language']=>isset($row['language']) ? $row['language'] : null,
+                    $this->columnHeaders['taxon']=>isset($val['scientific_name']) ? $val['scientific_name'] : null,
+                );
+
+                if (isset($val['nsr_id']))
+                {
+                    $d['taxon_nsr_id'] = $val['nsr_id'];
+                }
+
+                array_push(
+                    $this->synonyms,
+                    array_merge($d,$tmp)
                     );
-                    
-                    if (isset($val['nsr_id']))
-                    {
-                        $d['taxon_nsr_id'] = $val['nsr_id'];
-                    }
-                    
-                    array_push(
-                        $this->synonyms,
-                        array_merge($d,$tmp)
-                        );
-                    
-                    unset( $d );
-                }
+
+                unset( $d );
             }
+        }
     }
     
     private function doOutputStart ()

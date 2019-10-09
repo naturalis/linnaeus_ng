@@ -84,7 +84,7 @@ final class TraitsTaxonModel extends AbstractModel
 
 	public function getTraitsTaxonValues($params)
 	{
-		$project_id=isset($params['project_id']) ? $params['project_id'] : null;
+	    $project_id=isset($params['project_id']) ? $params['project_id'] : null;
 		$language_id=isset($params['language_id']) ? $params['language_id'] : null;
 		$taxon_id=isset($params['taxon_id']) ? $params['taxon_id'] : null;
 		$trait_id=isset($params['trait_id']) ? $params['trait_id'] : null;

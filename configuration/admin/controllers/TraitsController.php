@@ -26,6 +26,10 @@ class TraitsController extends Controller
 	public $_inputFileFieldEncloser='"';
 	public $_inputFileReferenceSeparators=";";
 
+    public $usedModels = array(
+        'traits',
+    );
+
     public function __construct ()
     {
         parent::__construct();
@@ -568,10 +572,9 @@ class TraitsController extends Controller
 
     }
 
-
     public function formatDbDate($date,$format)
 	{
-		if ($format=="Y")
+	    if ($format=="Y")
 		{
 			$d=date_parse($date);
 			if ($d['month']==0) $d['month']=1;
