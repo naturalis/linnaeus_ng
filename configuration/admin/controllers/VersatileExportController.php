@@ -173,14 +173,12 @@ class VersatileExportController extends Controller
         }
     }
 
-    private function saveTaxonTraitValues ($d, $type)
+    private function saveTaxonTraitValues ($values, $type)
     {
         $i = 0;
-        $method = 'getTaxonTraits' . ucfirst($type) . 'Values';
+        $method = 'getTaxonTraits' . ucfirst(strtolower($type)) . 'Values';
 
-        echo $method;
-
-        foreach ($d as $row) {
+        foreach ($values as $row) {
             $data = [
                 'language_id' => $this->getDefaultProjectLanguage(),
                 'project_id' => $this->getCurrentProjectId(),
