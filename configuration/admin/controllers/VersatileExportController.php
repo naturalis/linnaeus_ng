@@ -197,16 +197,16 @@ class VersatileExportController extends Controller
                 if (!empty($taxonValues)) {
                     // Values have not been formatted yet
                     $taxonValues = $this->tc->formatTraitsTaxonValues($taxonValues);
-                    $values = [];
+                    $v = [];
                     foreach ($taxonValues[0]['values'] as $value) {
-                        $values[] = $value['value_start'] . (!empty($value['value_end']) ? '-' . $value['value_end'] : '');
+                        $v[] = $value['value_start'] . (!empty($value['value_end']) ? '-' . $value['value_end'] : '');
                     }
                     $traits[] = [
                         'trait_group_id' => $this->traitGroupLookup($traitId)['id'],
                         'trait_group_name' => $this->traitGroupLookup($traitId)['name'],
                         'trait_id' => $traitId,
                         'trait_name' => $taxonValues[0]['trait']['name'],
-                        'trait_value' => implode('|', $values),
+                        'trait_value' => implode('|', $v),
                     ];
                 }
             }
