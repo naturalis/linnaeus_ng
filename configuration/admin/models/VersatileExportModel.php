@@ -379,6 +379,9 @@ final class VersatileExportModel extends AbstractModel
                 and _a.taxon_id=".$taxon_id."
                 and _b.trait_id=" . $trait_id;
 
+        die($query);
+
+
          return $this->freeQuery($query);
     }
 

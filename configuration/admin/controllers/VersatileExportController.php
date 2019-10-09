@@ -176,7 +176,9 @@ class VersatileExportController extends Controller
     private function saveTaxonTraitValues ($d, $type)
     {
         $i = 0;
-        $model = 'getTaxonTraits' . ucfirst($type) . 'Values';
+        $method = 'getTaxonTraits' . ucfirst($type) . 'Values';
+
+        echo $method;
 
         foreach ($d as $row) {
             $data = [
@@ -187,7 +189,7 @@ class VersatileExportController extends Controller
             foreach (explode(',', $row['trait_ids']) as $traitId) {
                 $i++;
                 // Simplified query for values used
-                $taxonValues = $this->models->VersatileExportModel->{$model}([
+                $taxonValues = $this->models->VersatileExportModel->{$method}([
                     'project_id' => $this->getCurrentProjectId(),
                     'language_id' => $this->getDefaultProjectLanguage(),
                     'taxon_id' => $row['taxon_id'],
@@ -234,8 +236,6 @@ class VersatileExportController extends Controller
         $values = $this->models->VersatileExportModel->getTaxaTraitsFixedValues([
             'project_id' => $this->getCurrentProjectId(),
         ]);
-        print_r($values);
-
         $this->saveTaxonTraitValues($values, 'fixed');
 
         // Get free value traits per taxon
