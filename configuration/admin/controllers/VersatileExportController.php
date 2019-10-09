@@ -196,9 +196,6 @@ class VersatileExportController extends Controller
                     'trait_id' => $traitId,
                 ]);
 
-                print_r($taxonValues); die();
-
-
                 if (!empty($taxonValues)) {
                     // Values have not been formatted yet
                     $taxonValues = $this->tc->formatTraitsTaxonValues($taxonValues);
@@ -243,68 +240,6 @@ class VersatileExportController extends Controller
             'project_id' => $this->getCurrentProjectId(),
         ]);
         $this->saveTaxonTraitValues($values, 'free');
-
-
-
-
-
-
-
-
-
-
-
-        // Merge fixed value traits to get a minimal set of data to parse
-        foreach ($values as $row) {
-            $this->taxonTraits[$row['taxon_id']] = isset($this->taxonTraits[$row['taxon_id']]) ?
-                array_merge($this->taxonTraits[$row['taxon_id']], explode(',', $row['trait_ids'])) :
-                explode(',', $row['trait_ids']);
-        }
-
-        $this->models->VersatileExportModel->emptyTraitsMatrix();
-        $this->tc = new TraitsTaxonController();
-
-
-
-
-        foreach ($this->taxonTraits as $taxonId => $traitIds) {
-            $data = [
-                'language_id' => $this->getDefaultProjectLanguage(),
-                'project_id' => $this->getCurrentProjectId(),
-                'taxon_id' => $taxonId,
-            ];
-            $traits = [];
-            foreach ($traitIds as $traitId) {
-                $groupId = $this->traitGroupLookup($traitId)['id'];
-                $taxonValues = $this->tc->getTaxonValues([
-                    'taxon' => $taxonId,
-                    'trait' => $traitId, 'group' => $groupId,
-                ]);
-
-                print_r($taxonValues); die();
-
-                if (!empty($taxonValues)) {
-                    $values = [];
-                    foreach ($taxonValues[0]['values'] as $value) {
-                        $values[] = $value['value_start'] . (!empty($value['value_end']) ? '-' . $value['value_end'] : '');
-                    }
-                    $traits[] = [
-                        'trait_group_id' => $groupId,
-                        'trait_group_name' => $this->traitGroupLookup($traitId)['name'],
-                        'trait_id' => $traitId,
-                        'trait_name' => $taxonValues[0]['trait']['name'],
-                        'trait_value' => implode('|', $values),
-                    ];
-                } else {
-                    $this->log( "Trait matrix error: could not fetch trait values for:
-                        taxon id: $taxonId, trait id: $traitId,  group id: $groupId ", 1);
-
-                }
-            }
-            $data['traits'] = $traits;
-            $this->models->VersatileExportModel->saveTaxonTraitValues($data);
-        }
-
 
         die('Ready');
     }

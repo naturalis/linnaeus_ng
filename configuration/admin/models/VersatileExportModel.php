@@ -286,8 +286,6 @@ final class VersatileExportModel extends AbstractModel
         return $this->freeQuery(rtrim($q, ','));
     }
 
-
-
     public function getTaxonTraitsFixedValues ($params)
     {
         $project_id=isset($params['project_id']) ? $params['project_id'] : null;
@@ -378,9 +376,6 @@ final class VersatileExportModel extends AbstractModel
                 _a.project_id=".$project_id."
                 and _a.taxon_id=".$taxon_id."
                 and _b.trait_id=" . $trait_id;
-
-        die($query);
-
 
          return $this->freeQuery($query);
     }
