@@ -36,13 +36,7 @@ class AbstractModel extends BaseClass
         parent::__destruct();
     }
 
-    public function databaseConnection ()
-    {
-
-
-    }
-
-	public function setLogger($logger)
+ 	public function setLogger($logger)
 	{
 		$this->logger = $logger;
 	}
@@ -415,4 +409,21 @@ class AbstractModel extends BaseClass
 	{
 		return $this->error;
 	}
+
+    public function switchConnection ($mysqli)
+    {
+        $this->databaseConnection = $mysqli;
+
+    }
+
+    public function ping ()
+    {
+        // Only works for persistent database connection
+        if (get_class($this->databaseConnection) == 'Db2') {
+            return $this->databaseConnection->ping();
+        }
+    }
+
+
+
 }

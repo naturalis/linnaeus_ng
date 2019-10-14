@@ -3,24 +3,14 @@ include_once (__DIR__ . "/AbstractModel.php");
 
 final class VersatileExportModel extends AbstractModel
 {
-
     public function __construct ()
     {
-
         parent::__construct();
-
-        $this->connectToDatabase() or die(_('Failed to connect to database '.
-            $this->databaseSettings['database'].
-        	' with user ' . $this->databaseSettings['user'] . '. ' .
-            mysqli_connect_error() . '. Correct the getDatabaseSettings() settings
-        	in configuration/admin/config.php.'));
-
-     }
+    }
 
     public function __destruct ()
     {
-        if ($this->databaseConnection)
-		{
+        if ($this->databaseConnection) {
             $this->disconnectFromDatabase();
         }
         parent::__destruct();
@@ -145,7 +135,7 @@ final class VersatileExportModel extends AbstractModel
             select 
                 trait_value 
             from 
-                 %PRE%traits_matrix
+                 %PRE%traits_index
             where
                 taxon_id = ' . $taxonId . ' and 
                 trait_id = ' . $traitId . ' and 
@@ -168,11 +158,14 @@ final class VersatileExportModel extends AbstractModel
             from 
                  %PRE%traits_taxon_freevalues
             where 
-                project_id = ' . $projectId . '
+                project_id = ' . $projectId . "
             group by 
-                taxon_id';
+                taxon_id
+            order by 
+                taxon_id";
 
-        return $this->freeQuery($q);
+        $this->ping();
+        return $this->traitsQuery($q);
     }
 
     public function getTaxaTraitsFixedValues ($p)
@@ -188,58 +181,27 @@ final class VersatileExportModel extends AbstractModel
                 %PRE%traits_values as t2 on t1.value_id = t2.id
             where 
                 t2.trait_id is not null and 
-                t1.project_id = ' . $projectId . '
+                t1.project_id = ' . $projectId . "
             group by 
-                t1.taxon_id';
+                t1.taxon_id
+            order by 
+                t1.taxon_id";
 
-        return $this->freeQuery($q);
+        $this->ping();
+        return $this->traitsQuery($q);
     }
 
-    public function emptyTraitsMatrix ()
+    public function emptyTraitsIndex ()
     {
-        return $this->freeQuery('truncate table %PRE%traits_matrix');
+        return $this->freeQuery('truncate table %PRE%traits_index');
     }
 
-    public function saveTaxonTraitValue ($p)
+    public function getIndexLastUpdate ()
     {
-        $projectId = $p['project_id'] ?? null;
-        $languageId = $p['language_id'] ?? null;
-        $taxonId = $p['taxon_id'] ?? null;
-        $groupId = $p['trait_group_id'] ?? null;
-        $groupName = $p['trait_group_name'] ?? null;
-        $traitId = $p['trait_id'] ?? null;
-        $traitName = $this->escapeString($p['trait_name']) ?? null;
-        $traitValue = $this->escapeString($p['trait_value']) ?? null;
-
-        $q = "
-            insert ignore into
-                %PRE%traits_matrix
-            (
-                language_id, 
-                project_id, 
-                taxon_id, 
-                trait_group_id, 
-                trait_group_name, 
-                trait_id,
-                trait_name,
-                trait_value
-            ) 
-            values 
-            (
-                $projectId,
-                $languageId,
-                $taxonId,
-                $groupId,
-                '$groupName',
-                $traitId,
-                '$traitName',
-                '$traitValue'
-            )";
-
-        return $this->freeQuery($q);
+        $q = 'select `created` from traits_index order by `created` desc limit 1';
+        $date = $this->freeQuery($q);
+        return $date ? $date[0]['created'] : null;
     }
-
-
 
     public function saveTaxonTraitValues ($p)
     {
@@ -249,16 +211,17 @@ final class VersatileExportModel extends AbstractModel
 
         $q = "
             insert ignore into
-                %PRE%traits_matrix
+                %PRE%traits_index
             (
-                language_id, 
                 project_id, 
+                language_id, 
                 taxon_id, 
                 trait_group_id, 
                 trait_group_name, 
                 trait_id,
                 trait_name,
-                trait_value
+                trait_value,
+                created
             ) 
             values ";
 
@@ -279,11 +242,12 @@ final class VersatileExportModel extends AbstractModel
                     '$groupName',
                     $traitId,
                     '$traitName',
-                    '$traitValue'
+                    '$traitValue',
+                    now()
                 ),";
         }
-
-        return $this->freeQuery(rtrim($q, ','));
+        $this->ping();
+        return $this->traitsQuery(rtrim($q, ','), false);
     }
 
     public function getTaxonTraitsFixedValues ($params)
@@ -377,7 +341,8 @@ final class VersatileExportModel extends AbstractModel
                 and _a.taxon_id=".$taxon_id."
                 and _b.trait_id=" . $trait_id;
 
-         return $this->freeQuery($query);
+        $this->ping();
+        return $this->traitsQuery($query);
     }
 
 
@@ -460,19 +425,25 @@ final class VersatileExportModel extends AbstractModel
                 and _a.taxon_id=".$taxon_id."
                 and _a.trait_id=".$trait_id;
 
-        return $this->freeQuery($query);
+        $this->ping();
+        return $this->traitsQuery($query);
+    }
+
+    // Circumvent freeQuery as this caused major headaches with
+    // the database connection dropping
+    private function traitsQuery ($query, $fetch = true)
+    {
+        $query = str_ireplace('%table%', $this->tableName, $query);
+        $query = str_ireplace('%pre%', $this->_tablePrefix, $query);
+
+        $set = $this->databaseConnection->query($query);
+        if ($fetch) {
+            return $set->fetch_all(MYSQLI_ASSOC);
+        }
     }
 
 
 
-
-
-
-
-
-
-
-
-
-
 }
+
+

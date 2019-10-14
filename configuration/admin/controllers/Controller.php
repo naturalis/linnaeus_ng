@@ -3073,5 +3073,35 @@ class Controller extends BaseClass
 	    if (!defined('LANGUAGECODE_ENGLISH')) define('LANGUAGECODE_ENGLISH',LANGUAGE_ID_ENGLISH);
 	    
 	}
-	
+
+    /**
+     * Offers an option to switch to a different, persistent MySQL connection.
+     * See Db2 class for more info!
+     */
+    public function switchToPersistentConnection ()
+    {
+        include_once (__DIR__ . "/../Db2.php");
+
+        $config = new configuration;
+        $settings = $config->getDatabaseSettings();
+        $pc = new Db2($settings);
+
+        if (!empty($this->models)) {
+            foreach ($this->models as $model) {
+                $model->switchConnection($pc);
+            }
+        }
+    }
+
+    public function formatDateTime ($dateTime)
+    {
+        if (!strtotime($dateTime)) {
+            return $dateTime;
+        }
+        list($date, $time) = explode(' ', $dateTime);
+        return date('j F Y', strtotime($date)) . ' ' .
+            $this->translate('at') . ' ' . $time;
+    }
+
+
 }

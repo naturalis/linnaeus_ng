@@ -99,3 +99,19 @@ END //
 DELIMITER ;
 CALL `add_column_if_not_exists`();
 DROP PROCEDURE `add_column_if_not_exists`;
+
+CREATE TABLE if not exists `traits_index` (
+    `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+    `project_id` int(11) NOT NULL,
+    `taxon_id` int(11) NOT NULL,
+    `language_id` int(11) NOT NULL,
+    `trait_group_id` int(11) DEFAULT NULL,
+    `trait_group_name` varchar(100) DEFAULT NULL,
+    `trait_id` int(11) DEFAULT NULL,
+    `trait_name` varchar(100) DEFAULT NULL,
+    `trait_value` varchar(1000) DEFAULT NULL,
+    `created` datetime NOT NULL,
+    `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `project_id` (`project_id`,`taxon_id`,`language_id`,`trait_group_id`,`trait_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;

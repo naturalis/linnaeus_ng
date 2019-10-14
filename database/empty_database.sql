@@ -1721,6 +1721,23 @@ CREATE TABLE `traits_groups` (
   UNIQUE KEY `sysname` (`project_id`,`sysname`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `traits_index`;
+CREATE TABLE `traits_index` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `project_id` int(11) NOT NULL,
+  `taxon_id` int(11) NOT NULL,
+  `language_id` int(11) NOT NULL,
+  `trait_group_id` int(11) DEFAULT NULL,
+  `trait_group_name` varchar(100) DEFAULT NULL,
+  `trait_id` int(11) DEFAULT NULL,
+  `trait_name` varchar(100) DEFAULT NULL,
+  `trait_value` varchar(1000) DEFAULT NULL,
+  `created` datetime NOT NULL,
+  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `project_id` (`project_id`,`taxon_id`,`language_id`,`trait_group_id`,`trait_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `traits_project_types`;
 CREATE TABLE `traits_project_types` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

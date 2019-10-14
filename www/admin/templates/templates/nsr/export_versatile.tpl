@@ -26,6 +26,11 @@ div.fieldsubset {
 	margin:5px 0 5px 0;
 }
 
+.update-ready {
+    color: red;
+    font-weight: bold;
+}
+
 /* tree */
 #dialog_tree {
 	font-size:0.9em;
@@ -37,7 +42,29 @@ div.fieldsubset {
 
 <script>
 
+
+
 var lastop='ge';
+
+function updateTraitIndex ()
+{
+    $('#update_link').html('Updating the index...');
+    allShowLoadingDiv();
+
+    $.ajax({
+        url: "ajax_interface_index.php" ,
+        type: "GET",
+        data: ({
+            'action': 'update'
+        }),
+        success: function (data) {
+            allHideLoadingDiv();
+            $('#update_message').css("display", "inline")
+            $('#update_date').html(data);
+            $('#update_link').html("Update ready!").addClass("update-ready");
+        }
+    });
+}
 
 function addEstablishedOrNot(state)
 {
@@ -181,6 +208,21 @@ function doSubmit()
 </script>
 
 <div id="page-main">
+
+    {if $traits}
+    <div id="trait-matrix" style="margin-bottom: 40px;">
+        <p>The Multi-purpose export uses a pre-compiled index of the traits and their values to significantly speed up the export.
+            <span id="update_message" style="display: {if $index_last_update}inline{else}none{/if};">
+            This index was last updated on <span id="update_date">{$index_last_update}</span>.
+            </span>
+            If your export is intended to contain traits and traits have recently been added, modified or deleted,
+            you should update the index by clicking the link below.  Note that the update may take several minutes, so please be patient!
+        </p>
+        <p id="update_link">
+            <a href="#" onclick=updateTraitIndex()>Update the trait index now</a>
+        </p>
+    </div>
+    {/if}
 
 	<form id="theForm" method="post" target="_self">
 
@@ -409,7 +451,7 @@ function doSubmit()
 		
 		{if $traits}
 		<div class="fieldsubset">
-		<h4>{t}Traits{/t}</h4>
+		<h4>{t}Traits{/t} (is the <a href="#top">index up-to-date</a>?)</h4>
         <table>
         <tbody id="trait-selector">
 		{foreach $traits group}

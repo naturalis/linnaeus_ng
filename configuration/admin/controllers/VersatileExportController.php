@@ -8,7 +8,6 @@ include_once ('TraitsTaxonController.php');
 
 class VersatileExportController extends Controller
 {
-    
     public $usedModels = array(
         'presence',
         'names',
@@ -135,15 +134,33 @@ class VersatileExportController extends Controller
     
     public function __construct ()
     {
+        set_time_limit(600);
         parent::__construct();
+
+        $this->switchToPersistentConnection();
         $this->initialize();
+
+        $this->tc = new TraitsTaxonController();
+        $this->tc->switchToPersistentConnection();
     }
     
     public function __destruct ()
     {
         parent::__destruct();
     }
-    
+
+    public function ajaxInterfaceAction()
+    {
+        if (!$this->rHasVal('action')) $this->smarty->assign('returnText','error');
+
+        if ($this->rHasVal('action','update')) {
+            $this->smarty->assign('returnText', $this->createTraitsIndex());
+        }
+
+        $this->allowEditPageOverlay = false;
+        $this->printPage();
+    }
+
     private function initialize()
     {
         $this->UserRights->setRequiredLevel( ID_ROLE_LEAD_EXPERT );
@@ -173,98 +190,9 @@ class VersatileExportController extends Controller
         }
     }
 
-    private function saveTaxonTraitValues ($values, $type)
-    {
-        $i = 0;
-        $method = 'getTaxonTraits' . ucfirst(strtolower($type)) . 'Values';
-
-        foreach ($values as $row) {
-            $data = [
-                'language_id' => $this->getDefaultProjectLanguage(),
-                'project_id' => $this->getCurrentProjectId(),
-                'taxon_id' => $row['taxon_id']
-            ];
-            foreach (explode(',', $row['trait_ids']) as $traitId) {
-                $i++;
-                // Simplified query for values used
-                $taxonValues = $this->models->VersatileExportModel->{$method}([
-                    'project_id' => $this->getCurrentProjectId(),
-                    'language_id' => $this->getDefaultProjectLanguage(),
-                    'taxon_id' => $row['taxon_id'],
-                    'trait_id' => $traitId,
-                ]);
-
-                if (!empty($taxonValues)) {
-                    // Values have not been formatted yet
-                    $taxonValues = $this->tc->formatTraitsTaxonValues($taxonValues);
-                    $v = [];
-                    foreach ($taxonValues[0]['values'] as $value) {
-                        $v[] = $value['value_start'] . (!empty($value['value_end']) ? '-' . $value['value_end'] : '');
-                    }
-                    $traits[] = [
-                        'trait_group_id' => $this->traitGroupLookup($traitId)['id'],
-                        'trait_group_name' => $this->traitGroupLookup($traitId)['name'],
-                        'trait_id' => $traitId,
-                        'trait_name' => $taxonValues[0]['trait']['name'],
-                        'trait_value' => implode('|', $v),
-                    ];
-                }
-            }
-            $data['traits'] = $traits;
-
-            print_r( $data); die();
-
-
-            $this->models->VersatileExportModel->saveTaxonTraitValues($data);
-        }
-
-        die('taxa:' . count($d) . '; traits:' . $i);
-    }
-
-    private function createTraitsMatrix ()
-    {
-        set_time_limit(600);
-        $this->tc = new TraitsTaxonController();
-        $this->models->VersatileExportModel->emptyTraitsMatrix();
-
-        // Fixed values
-        $values = $this->models->VersatileExportModel->getTaxaTraitsFixedValues([
-            'project_id' => $this->getCurrentProjectId(),
-        ]);
-        $this->saveTaxonTraitValues($values, 'fixed');
-
-        // Get free value traits per taxon
-        $values = $this->models->VersatileExportModel->getTaxaTraitsFreeValues([
-            'project_id' => $this->getCurrentProjectId(),
-        ]);
-        $this->saveTaxonTraitValues($values, 'free');
-
-        die('Ready');
-    }
-
-    private function traitGroupLookup ($traitId) {
-        if (!isset($this->traitGroupLookup[$traitId])) {
-            $trait = $this->tc->getTraitGroupTrait(['trait' => $traitId]);
-            $group = $this->tc->getTraitgroup($trait['trait_group_id']);
-
-            $this->traitGroupLookup[$traitId] = [
-                'id' => $group['id'],
-                'name' => isset($group['names'][$this->getDefaultProjectLanguage()]) ?
-                    $group['names'][$this->getDefaultProjectLanguage()] :
-                    $group['sysname']
-             ];
-        }
-        return $this->traitGroupLookup[$traitId];
-    }
-
     public function exportAction()
     {
         $this->setPageName( $this->translate('Multi-purpose export') );
-
-        if ($this->rHasVal('action','matrix')) {
-            $this->createTraitsMatrix();
-            die();
-        }
 
         if ($this->rHasVal('action','export'))
         {
@@ -307,13 +235,17 @@ class VersatileExportController extends Controller
             } while (!empty($this->names));
             $this->doOutputEnd();
         }
-        
+
+        $dt = $this->models->VersatileExportModel->getIndexLastUpdate();
+        $lastUpdate = $this->formatDateTime($dt) ?? '';
+
         $this->smarty->assign( 'presence_labels', $this->getPresenceStatuses() );
         $this->smarty->assign( 'ranks', $this->getRanks() );
         $this->smarty->assign('traits', $this->traitGroups);
         $this->smarty->assign( 'branch_top', $this->getBranchTopSession() );
         $this->smarty->assign( 'nametypes', $this->_nameTypeIds );
         $this->smarty->assign('is_nsr', $this->show_nsr_specific_stuff);
+        $this->smarty->assign('index_last_update', $lastUpdate);
         
         $this->printPage();
         
@@ -1385,5 +1317,93 @@ class VersatileExportController extends Controller
               unlink($this->synonyms_file_path);
          }
      }
-    
+
+
+
+
+    private function createTraitsIndex ()
+    {
+        $this->models->VersatileExportModel->emptyTraitsIndex();
+
+        // Fixed values
+        $values = $this->models->VersatileExportModel->getTaxaTraitsFixedValues([
+            'project_id' => $this->getCurrentProjectId(),
+        ]);
+        $this->saveTaxonTraitValues($values, 'fixed');
+
+        // Free values
+        $values = $this->models->VersatileExportModel->getTaxaTraitsFreeValues([
+            'project_id' => $this->getCurrentProjectId(),
+        ]);
+        $this->saveTaxonTraitValues($values, 'free');
+
+        $dt = $this->models->VersatileExportModel->getIndexLastUpdate();
+        return $this->formatDateTime($dt);
+    }
+
+    private function saveTaxonTraitValues ($values, $type)
+    {
+        $method = 'getTaxonTraits' . ucfirst(strtolower($type)) . 'Values';
+
+        foreach ($values as $row) {
+            $data = [
+                'language_id' => $this->getDefaultProjectLanguage(),
+                'project_id' => $this->getCurrentProjectId(),
+                'taxon_id' => $row['taxon_id']
+            ];
+            $traits = [];
+            foreach (explode(',', $row['trait_ids']) as $traitId) {
+                // Simplified query for values used
+                $taxonValues = $this->models->VersatileExportModel->{$method}([
+                    'project_id' => $this->getCurrentProjectId(),
+                    'language_id' => $this->getDefaultProjectLanguage(),
+                    'taxon_id' => $row['taxon_id'],
+                    'trait_id' => $traitId,
+                ]);
+
+                if (!empty($taxonValues)) {
+                    // Values have not been formatted yet
+                    $taxonValues = $this->tc->formatTraitsTaxonValues($taxonValues);
+                    $v = [];
+                    foreach ($taxonValues[0]['values'] as $value) {
+                        $v[] = $value['value_start'] . (!empty($value['value_end']) ? '-' . $value['value_end'] : '');
+                    }
+                    $traits[] = [
+                        'trait_group_id' => $this->traitGroupLookup($traitId)['id'],
+                        'trait_group_name' => $this->traitGroupLookup($traitId)['name'],
+                        'trait_id' => $traitId,
+                        'trait_name' => $taxonValues[0]['trait']['name'],
+                        'trait_value' => implode('|', $v),
+                    ];
+                } else {
+                    $this->log('Could not retrieve export values for trait ' . $traitId);
+                    die();
+                }
+            }
+            $data['traits'] = $traits;
+            $this->models->VersatileExportModel->saveTaxonTraitValues($data);
+        }
+    }
+
+    private function traitGroupLookup ($traitId) {
+        if (!isset($this->traitGroupLookup[$traitId])) {
+            $trait = $this->tc->getTraitGroupTrait(['trait' => $traitId]);
+            $group = $this->tc->getTraitgroup($trait['trait_group_id']);
+
+            $this->traitGroupLookup[$traitId] = [
+                'id' => $group['id'],
+                'name' => isset($group['names'][$this->getDefaultProjectLanguage()]) ?
+                    $group['names'][$this->getDefaultProjectLanguage()] :
+                    $group['sysname']
+            ];
+        }
+        return $this->traitGroupLookup[$traitId];
+    }
+
+
+
+
+
+
+
 }
