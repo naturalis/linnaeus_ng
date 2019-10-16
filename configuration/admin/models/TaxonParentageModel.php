@@ -33,7 +33,7 @@ final class TaxonParentageModel extends AbstractModel
 		if ( is_null($project_id) )
 			return;
 
-		$query="
+		$baseQuery="
 			select
 				_a.id,
 				_a.taxon,
@@ -57,11 +57,17 @@ final class TaxonParentageModel extends AbstractModel
 				_a.project_id = ".$project_id." 
 				and ifnull(_trash.is_deleted,0)=0
 				and _a.parent_id is null
-				and _r.id < 10
 			";
-			
-		return $this->freeQuery($query);
 
+		// Original query
+		$r = $this->freeQuery($baseQuery . " and _r.id < 10");
+
+		// but the tree top isn't necessarily always among the first 10 rows...
+		if (empty($r)) {
+            $r = $this->freeQuery($baseQuery);
+        }
+
+        return $r;
 	}
 	
 }
