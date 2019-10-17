@@ -1,5 +1,9 @@
 <?php
 
+
+$image_server = getEnv("IMAGE_SERVER_ADDRESS") ?? "images.naturalis.nl";
+
+
 $conn = array( 
     'host'=>'localhost', 
     'user'=>'db_user', 
@@ -19,7 +23,7 @@ $origHost = [
 ];
 $remoteHost = [
      'user' => '',
-     'host' => '',
+     'host' => $image_server,
      'path' => '',
      'folder' => ''
 ];
