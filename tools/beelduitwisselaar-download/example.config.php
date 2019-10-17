@@ -1,7 +1,7 @@
 <?php
 
 
-$image_server = getEnv("IMAGE_SERVER_ADDRESS") ?? "images.naturalis.nl";
+$image_server = getEnv("IMAGE_SERVER_ADDRESS") ?? "145.136.243.50";
 
 
 $conn = array( 
