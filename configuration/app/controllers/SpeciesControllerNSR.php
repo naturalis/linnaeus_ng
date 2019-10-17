@@ -1060,7 +1060,7 @@ class SpeciesControllerNSR extends SpeciesController
             }
 
             $names[$key]['addition']=$this->getNameAddition(array('name_id'=>$val['id']));
-
+/*
             if (!empty($val['expert_id']))
             {
                 $names[$key]['expert']=$this->getActor($val['expert_id']);
@@ -1070,7 +1070,7 @@ class SpeciesControllerNSR extends SpeciesController
             {
                 $names[$key]['organisation']=$this->getActor($val['organisation_id']);
             }
-
+*/
             $names[$key]['nametype_label']=sprintf($this->Rdf->translatePredicate($val['nametype']),$val['language_label']);
 
             /*
