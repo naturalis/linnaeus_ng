@@ -1424,9 +1424,10 @@ class SpeciesModel extends AbstractModel
 
         if ( is_null($project_id) || is_null($taxon_id) ) return;
 
-        $query = "
+        $literature = [];
+
+        $baseQuery = "
             select
-				_t.id as literature_taxa_id,
 				_a.id,
 				_a.language_id,
 				_a.label,
@@ -1452,52 +1453,173 @@ class SpeciesModel extends AbstractModel
 				on _a.periodical_id = _i.id
 				and _a.project_id=_i.project_id
 
-			right join %PRE%literature_taxa _t
-				on _a.project_id=_t.project_id
-				and _a.id=_t.literature_id
+			right join [join]
 
 			left join %PRE%actors _b
 				on _a.actor_id = _b.id
 				and _a.project_id=_b.project_id
 
-			where
-				_a.project_id = ".$project_id."
-				and _t.taxon_id= " . $taxon_id . "
-			order by
-				ifnull(_b.name,_a.author), _a.date, _a.label
-			";
+			where [where]";
 
+        $joins = [
+            // Literate linked directly to taxon
+            [
+                'join' => "
+                    %PRE%literature_taxa _t
+                    on _a.project_id=_t.project_id
+                    and _a.id=_t.literature_id
+                ",
+                'where' => "
+                    _a.project_id = ".$project_id."
+				    and _t.taxon_id= " . $taxon_id . "
+                ",
+            ],
+            // Literature linked to presence status
+            [
+                'join' => "
+                    %PRE%presence_taxa _pt
+                    on _a.project_id=_pt.project_id
+                    and _a.id=_pt.reference_id
+                ",
+                'where' => "
+                    _a.project_id = ".$project_id."
+				    and _pt.taxon_id= " . $taxon_id . "
+				    and _pt.reference_id is not null
+                ",
+            ],
+            // Literature linked to traits
+            [
+                'join' => "
+                    %PRE%traits_taxon_references _ttr
+                    on _a.project_id=_ttr.project_id
+                    and _a.id=_ttr.reference_id
+                ",
+                'where' => "
+                    _a.project_id = ".$project_id."
+				    and _ttr.taxon_id= " . $taxon_id . "
+                ",
+            ],
+            // Literature linked to names
+            [
+                'join' => "
+                    %PRE%names _n
+                    on _a.project_id=_n.project_id
+                    and _a.id=_n.reference_id
+                ",
+                'where' => "
+                    _a.project_id = ".$project_id."
+				    and _n.taxon_id= " . $taxon_id . "
+				    and _n.reference_id is not null
+                ",
+            ],
+        ];
 
-		$literature=$this->freeQuery($query);
+        foreach ($joins as $d) {
+            $query = str_replace(['[join]', '[where]'], [$d['join'], $d['where']], $baseQuery);
+            $new = $this->freeQuery($query);
+            if ($new) {
+                $literature = array_merge($literature, $new);
+            }
+        }
 
+        // Literature linked to metadata
+        $query = "
+            select
+                t3.id, 
+                t3.language_id, 
+                t3.label, 
+                t3.alt_label, 
+                t3.alt_label_language_id, 
+                t3.date, 
+                t3.author, 
+                t3.publication_type, 
+                ifnull(t3.publishedin,ifnull(t4.label,null)) as publishedin, 
+                ifnull(t3.periodical,ifnull(t5.label,null)) as periodical, 
+                t3.pages, 
+                t3.volume, 
+                t3.external_link, 
+                ifnull(t6.name,t3.author) as author 
+ 
+                from 
+                     content_taxa as t1
+                
+                left join rdf as t2 
+                    on t1.id = t2.subject_id
+
+                left join literature2 as t3 
+                    on t2.object_id = t3.id
+
+                left join literature2 as t4 on 
+                    t3.publishedin_id = t4.id 
+                    and t3.project_id = t4.project_id 
+
+                left join literature2 as t5 
+                    on t3.periodical_id = t5.id 
+                    and t3.project_id = t5.project_id
+
+                left join actors as t6 
+                    on t3.actor_id = t6.id 
+                    and t1.project_id = t6.project_id 
+
+                where 
+                    t1.project_id = $project_id 
+                    and t1.taxon_id = $taxon_id 
+                    and t2.object_type = 'reference'
+                
+                group by 
+                     t2.object_id";
+
+        $new = $this->freeQuery($query);
+        if ($new) {
+            $literature = array_merge($literature, $new);
+        }
+
+        // Sort by author, year, label as per original query
+        usort($literature, function($a, $b) {
+            $r = $a['author'] <=> $b['author'];
+            if ($r == 0) {
+                $r = $a['date'] <=> $b['date'];
+                if ($r == 0) {
+                    $r = $a['label'] <=> $b['label'];
+                }
+            }
+            return $r;
+        });
+
+        // Use this existing loop to remove any duplicates
+        $done = [];
 		foreach((array)$literature as $key=>$val)
 		{
+		    if (in_array($val['id'], $done)) {
+                unset($literature[$key]);
+                continue;
+            }
+            $query = "
+                select
+                    _a.actor_id,
+                    _b.name,
+                    _b.name_alt,
+                    _b.homepage,
+                    _b.gender,
+                    _b.is_company,
+                    _b.logo_url,
+                    _b.employee_of_id
 
-			$query = "
-				select
-					_a.actor_id,
-					_b.name,
-					_b.name_alt,
-					_b.homepage,
-					_b.gender,
-					_b.is_company,
-					_b.logo_url,
-					_b.employee_of_id
+                from %PRE%literature2_authors _a
 
-				from %PRE%literature2_authors _a
+                left join %PRE%actors _b
+                    on _a.actor_id = _b.id
+                    and _a.project_id=_b.project_id
 
-				left join %PRE%actors _b
-					on _a.actor_id = _b.id
-					and _a.project_id=_b.project_id
+                where
+                    _a.project_id = " . $project_id . "
+                    and _a.literature2_id =" . $val['id'] . "
 
-				where
-					_a.project_id = ".$project_id."
-					and _a.literature2_id =".$val['id']."
+                order by
+                    _a.sort_order,_b.name";
 
-				order by
-					_a.sort_order,_b.name";
-
-				$literature[$key]['authors']=$this->freeQuery($query);
+            $literature[$key]['authors'] = $this->freeQuery($query);
+            $done[] = $val['id'];
 		}
 
         return $literature;
