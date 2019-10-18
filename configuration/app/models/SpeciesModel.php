@@ -1545,9 +1545,11 @@ class SpeciesModel extends AbstractModel
                 
                 left join rdf as t2 
                     on t1.id = t2.subject_id
+                    and t1.project_id = t2.project_id 
 
                 left join literature2 as t3 
                     on t2.object_id = t3.id
+                    and t2.project_id = t3.project_id 
 
                 left join literature2 as t4 on 
                     t3.publishedin_id = t4.id 

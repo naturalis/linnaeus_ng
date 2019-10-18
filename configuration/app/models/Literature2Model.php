@@ -247,9 +247,8 @@ final class Literature2Model extends AbstractModel
 
         if ( is_null($project_id) || is_null($literature_id) ) return;
 
-        $query = "
+        $baseQuery = "
             select
-
 				_a.id,
 				_a.taxon,
 				_a.parent_id,
@@ -258,9 +257,7 @@ final class Literature2Model extends AbstractModel
 
 			from %PRE%taxa _a
 
-			right join %PRE%literature_taxa _t
-				on _a.project_id=_t.project_id
-				and _a.id=_t.taxon_id
+			right join [join]
 
 			left join %PRE%projects_ranks _p
 				on _a.project_id=_p.project_id
@@ -269,15 +266,126 @@ final class Literature2Model extends AbstractModel
 			left join %PRE%ranks _r
 				on _p.rank_id=_r.id
 
-			where
-				_a.project_id = ".$project_id."
-				and _t.literature_id= " . $literature_id . " 
+			where [where]
+            
+			[group]";
 
-			order by
-				_a.taxon
-			";
+        $joins = [
+            // Taxa directly linked to literature
+            [
+                'join' => "
+                    %PRE%literature_taxa _t
+				    on _a.project_id=_t.project_id
+				    and _a.id=_t.taxon_id
+                ",
+                'where' => "
+                    _a.project_id = ".$project_id."
+				    and _t.literature_id= " . $literature_id,
+                'group' => ''
+            ],
+            // Taxa linked to presence status
+            [
+                'join' => "
+                   %PRE%presence_taxa _pt on 
+                       _a.project_id=_pt.project_id 
+                       and _a.id=_pt.taxon_id 
+                ",
+                'where' => "
+                    _a.project_id = ".$project_id."
+				    and _pt.reference_id= " . $literature_id,
+                'group' => ''
+            ],
+            // Taxa linked to traits
+            [
+                'join' => "
+                   %PRE%traits_taxon_references _ttr on 
+                   _a.project_id=_ttr.project_id 
+                   and _a.id=_ttr.taxon_id  
+                ",
+                'where' => "
+                    _a.project_id = ".$project_id."
+				    and _ttr.reference_id= " . $literature_id,
+                'group' => ''
+            ],
+            // Taxa linked to names
+            [
+                'join' => "
+                   %PRE%names _n on 
+                   _a.project_id=_n.project_id 
+                   and _a.id=_n.taxon_id  
+                ",
+                'where' => "
+                    _a.project_id = ".$project_id."
+				    and _n.reference_id= " . $literature_id,
+                'group' => 'group by _n.taxon_id'
+            ],
+        ];
 
-        return $this->freeQuery($query);
+        $taxa = [];
+        foreach ($joins as $d) {
+            $query = str_replace(
+                ['[join]', '[where]', '[group]'],
+                [$d['join'], $d['where'], $d['group']],
+                $baseQuery
+            );
+            $new = $this->freeQuery($query);
+            if ($new) {
+                $taxa = array_merge($taxa, $new);
+            }
+        }
+
+        $query = "
+            select 
+                   t3.id, 
+                   t3.taxon, 
+                   t3.parent_id, 
+                   t5.id as base_rank_id, 
+                   t5.rank
+
+            from rdf as t1
+            
+            left join content_taxa as t2 
+                on t1.subject_id = t2.id 
+                and t1.project_id=t2.project_id
+        
+            left join taxa as t3 
+                on t2.taxon_id = t3.id 
+                and t2.project_id=t3.project_id
+        
+            left join projects_ranks as t4 
+                on t3.project_id=t4.project_id 
+                and t3.rank_id=t4.id 
+        
+            left join ranks t5 
+                on t4.rank_id=t5.id 
+            
+            where 
+                t1.project_id = $project_id 
+                and t1.object_type = 'reference' 
+                and t1.object_id = $literature_id
+            
+            group by t2.taxon_id ";
+
+        $new = $this->freeQuery($query);
+        if ($new) {
+            $taxa = array_merge($taxa, $new);
+        }
+
+        usort($taxa, function($a, $b) {
+            $r = $a['taxon'] <=> $b['taxon'];
+            return $r;
+        });
+
+        $done = [];
+        foreach ($taxa as $i => $taxon) {
+            if (in_array($taxon['id'], $done)) {
+                unset($taxa[$i]);
+                continue;
+            }
+            $done[] = $taxon['id'];
+        }
+
+        return $taxa;
     }
 
     public function getReferenceAuthors($params)
