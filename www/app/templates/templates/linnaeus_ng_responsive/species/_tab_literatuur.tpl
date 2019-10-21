@@ -10,7 +10,7 @@
         {/capture}
     
     
-        <li><a href="../literature2/reference.php?id={$v.id}">
+        <li class="general-list"><a href="../literature2/reference.php?id={$v.id}">
             {if $v.author}
             {$v.author}
             {else}
@@ -18,7 +18,7 @@
             {$smarty.capture.authors|@trim}
             {/if}
             {/if}
-            {if $v.date} {$v.date}{/if}{if $v.author_name || $v.date}. {/if}{$v.label}</a>
+            {if $v.date} {$v.date}{/if}{if $v.author_name || $v.date}.</a> {/if}{$v.label}
         </li>
     {/foreach}
     </ul>
@@ -36,7 +36,7 @@
             {/foreach}
         {/capture}
 
-        <li>
+        <li class="general-list">
             <a href="../literature2/reference.php?id={$v.id}">
             {if $v.author}
             {$v.author}
@@ -45,7 +45,7 @@
             {$smarty.capture.authors|@trim}
             {/if}
             {/if}
-            {if $v.date} {$v.date}{/if}{if $v.author_name || $v.date}. {/if}{$v.label}</a>
+            {if $v.date} {$v.date}{/if}{if $v.author_name || $v.date}.</a> {/if}{$v.label}
             (<a href="?id={$v.referencing_taxon.id}">{$v.referencing_taxon.taxon}</a>)
         </li>
     {/foreach}

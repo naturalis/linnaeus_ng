@@ -2138,3 +2138,7 @@ strong {
 .partners {
   float: right;
 }
+
+li.general-list {
+    padding: 5px 0;
+}

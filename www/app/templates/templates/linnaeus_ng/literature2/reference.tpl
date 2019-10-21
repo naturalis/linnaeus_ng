@@ -97,7 +97,7 @@
 	            {if $taxa}
 		            <ul>
 		            {foreach $taxa v k}
-		            <li><a href="../species/nsr_taxon.php?id={$v.id}">{$v.taxon}</a></li>
+		            <li class="general-list"><a href="../species/nsr_taxon.php?id={$v.id}">{$v.taxon}</a></li>
 		            {/foreach}
 		            </ul>
 	            {/if}

@@ -27,12 +27,13 @@
 				{$smarty.capture.authors|@trim}{if $v.data.date}{if $smarty.capture.authors|@trim|@strlen>0}, {/if}{$v.data.date}{/if}
                 {/capture}
                 {if $smarty.capture.authorstring|@trim|@strlen>0}{$smarty.capture.authorstring|@trim}.{/if}
-                {if $v.data.label|@trim|@strlen>0}{$v.data.label|@trim}{if !($v.data.label|@trim|@substr:-1)|@in_array:array('?','!','.')}{if $v.data.publication_type!='Website'}.{/if} {/if}{/if}
+				</a>
+				{if $v.data.label|@trim|@strlen>0}{$v.data.label|@trim}{if !($v.data.label|@trim|@substr:-1)|@in_array:array('?','!','.')}{if $v.data.publication_type!='Website'}.{/if} {/if}{/if}
                 {if $v.data.periodical_id}{$v.data.periodical_ref.label} {elseif $v.data.periodical}{$v.data.periodical} {/if}
                 {if $v.data.publishedin_id}{$v.data.publishedin_ref.label} {elseif $v.data.publishedin}{$v.data.publishedin} {/if}
                 {if $v.data.volume}{$v.data.volume}{/if}{if $v.data.pages}: {$v.data.pages}. {/if}
                 {if $v.data.publisher}{$v.data.publisher}.{/if}      
-                </a></li>
+                </li>
             {*
                 {elseif $v.predicate=='hasReference' && $v.data.citation!=''}
                 {assign var=hasReferences value=hasReferences+1}
