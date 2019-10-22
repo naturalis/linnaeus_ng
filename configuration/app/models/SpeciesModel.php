@@ -419,8 +419,6 @@ class SpeciesModel extends AbstractModel
 				_a.language_id,
 				_c.language,
 				_d.label as language_label,
-				_e.name as expert_name,
-				_f.name as organisation_name,
 				_g.label as reference_label,
 				_g.author as reference_author,
 				_g.date as reference_date,
@@ -451,14 +449,6 @@ class SpeciesModel extends AbstractModel
 				on _a.language_id=_d.language_id
 				and _a.project_id=_d.project_id
 				and _d.label_language_id=".$languageId."
-
-			left join %PRE%actors _e
-				on _a.expert_id = _e.id
-				and _a.project_id=_e.project_id
-
-			left join %PRE%actors _f
-				on _a.organisation_id = _f.id
-				and _a.project_id=_f.project_id
 
 			left join %PRE%literature2 _g
 				on _a.reference_id = _g.id
