@@ -3,7 +3,7 @@ var gulp = require('gulp');
 var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
 var concat = require('gulp-concat');
-var uglify = require('gulp-uglifyes');
+var terser = require('gulp-terser');
 var gutil = require('gulp-util');
 var modernizr = require('gulp-modernizr');
 
@@ -17,7 +17,7 @@ gulp.task('admin-bundle', ['modernizr'], function () {
     return browserify('./gulp/admin.js').bundle()
         .pipe(source('bundle.js'))
         .pipe(buffer())
-        .pipe(uglify())
+        .pipe(terser())
         .on('error', gutil.log)
         .pipe(gulp.dest('./www/admin/vendor/'));
 });
@@ -47,8 +47,8 @@ gulp.task('admin-copy', function () {
     ], { base: 'node_modules' })
         .pipe(gulp.dest('./www/admin/vendor'));
     gulp.src([
-        'bower_components/Javascript InfoVis Toolkit/Jit/*.js'
-    ],{ base: 'bower_components/Javascript InfoVis Toolkit'})
+        'node_modules/\@bower_components/Javascript InfoVis Toolkit/Jit/*.js'
+    ],{ base: 'node_modules/\@bower_components/Javascript InfoVis Toolkit'})
         .pipe(gulp.dest('./www/admin/vendor'));
 });
 gulp.task('app-bundle', ['modernizr'], function () {
@@ -56,7 +56,7 @@ gulp.task('app-bundle', ['modernizr'], function () {
     return browserify('./gulp/app.js').bundle()
         .pipe(source('bundle.js'))
         .pipe(buffer())
-        .pipe(uglify())
+        .pipe(terser())
         .on('error', gutil.log)
         .pipe(gulp.dest('./www/app/vendor/'));
 });
@@ -76,8 +76,8 @@ gulp.task('app-copy', function () {
     ], { base: 'node_modules' })
         .pipe(gulp.dest('./www/app/vendor'));
     gulp.src([
-        'bower_components/fancybox/dist/**/*'
-    ], { base: 'bower_components/fancybox/dist/' })
+        'node_modules/\@bower_components/fancybox/dist/**/*'
+    ], { base: 'node_modules/\@bower_components/fancybox/dist/' })
         .pipe(gulp.dest('./www/app/vendor/fancybox'));
 });
 gulp.task('default',

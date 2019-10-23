@@ -133,7 +133,8 @@ parameters:
 					_d.taxon, 
 					_f.default_label as rank,
 					concat('".$url."',_a.taxon_id) as url,
-					_h.id as taxon_valid_name_id
+					_h.id as taxon_valid_name_id,
+					_k.addition as remark
 				from %PRE%names _a
 				
 				left join %PRE%name_types _b on _a.type_id=_b.id and _a.project_id=_b.project_id
@@ -146,6 +147,11 @@ parameters:
 				left join %PRE%names _h on _h.taxon_id=_a.taxon_id and _h.type_id=_g.id and _a.project_id=_h.project_id
 
 				left join %PRE%nsr_ids _i on _a.project_id=_i.project_id and _a.taxon_id=_i.lng_id and _i.item_type='taxon'
+				
+				left join %PRE%names_additions _k
+				  on _a.project_id=_k.project_id 
+				  and _a.id=_k.name_id 
+				  and _k.language_id=" .LANGUAGE_ID_DUTCH."
 
 				where _a.project_id=".$this->getCurrentProjectId()."
 				and (
@@ -315,6 +321,25 @@ parameters:
 				_e.meta_date desc
 			");
 
+       /* 
+          this is a quick fix! ideally, $overviewImageRS should also include 
+	  meta-data and replace $media for projects that have RS
+      */
+       $overviewImageRS=$this->models->MediaTaxon->freeQuery("
+            select
+                t1.rs_original
+            from media as t1
+            left join
+                media_modules as t2 on t1.id = t2.media_id
+            where
+	        t2.overview_image = 1 and
+                t2.item_id =  ".$this->getTaxonId()." and
+                t2.project_id = ".$this->getCurrentProjectId()." and
+                t1.deleted = 0
+            order by
+                t2.sort_order,
+                t1.name");
+    
 		$result=array(
 			'pId'=>$this->getCurrentProjectId(),
 			'search'=>$this->requestData['taxon'],
@@ -335,7 +360,12 @@ parameters:
 			'names'=>$names,
 			'media'=>$media
 		);
-
+	    
+	        if (isset($overviewImageRS[0]) && isset($overviewImageRS[0]['rs_original']))
+		{
+			$result['taxon']['overview_image']=$overviewImageRS[0]['rs_original'];
+		}
+	    
 		$this->setJSON(json_encode($result));
 		header('Content-Type: application/json');			
 		$this->printOutput();
