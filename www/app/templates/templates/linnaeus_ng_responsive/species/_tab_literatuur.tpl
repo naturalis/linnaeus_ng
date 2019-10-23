@@ -9,7 +9,6 @@
             {/foreach}
         {/capture}
     
-    
         <li class="general-list"><a href="../literature2/reference.php?id={$v.id}">
             {if $v.author}
             {$v.author}

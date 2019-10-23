@@ -1699,6 +1699,9 @@ class SpeciesControllerNSR extends SpeciesController
                 if ($d) {
                     foreach ($d as $r) {
                         if (isset($r['id']) && !array_key_exists($r['id'], $res)) {
+                            if (empty($r['author']) && !empty($r['authors'])) {
+                                $r['author'] = $this::compileAuthorString($r['authors']);
+                            }
                             $res[$r['id']] = $r;
                             $res[$r['id']]['referencing_taxon'] = $this->getTaxonById($id);
                         }

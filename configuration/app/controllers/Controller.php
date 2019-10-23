@@ -3200,6 +3200,22 @@ class Controller extends BaseClass
 			'isiOS'=>$this->helpers->MobileDetect->isiOS()
 		]);
 	}
+
+    /**
+     * @param $authors
+     * @return string
+     *
+     * Compiles an author string from individual authors, as in e.g.
+     */
+	public static function compileAuthorString ($authors)
+    {
+        $authors = array_map('trim', array_column($authors, 'name'));
+        $author = array_pop($authors);
+        if ($authors) {
+            $author = implode(', ', $authors) . " & " . $author;
+        }
+        return $author;
+    }
 }
  
  
