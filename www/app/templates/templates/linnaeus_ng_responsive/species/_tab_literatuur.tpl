@@ -45,7 +45,9 @@
             {$smarty.capture.authors|@trim}
             {/if}
             {/if}
-            {if $v.date} {$v.date}{/if}{if $v.author_name || $v.date}.</a> {/if}{$v.label}
+            {if $v.date} {$v.date}{/if}{if $v.author_name || $v.date}.{/if}
+            </a>
+            {$v.label}
             (<a href="?id={$v.referencing_taxon.id}">{$v.referencing_taxon.taxon}</a>)
         </li>
     {/foreach}

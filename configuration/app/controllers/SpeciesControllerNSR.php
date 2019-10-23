@@ -1691,23 +1691,33 @@ class SpeciesControllerNSR extends SpeciesController
         if ($p)
         {
             $p=explode(' ',$p[0]['parentage']);
-            
-            foreach($p as $val)
-            {
-                $d=$this->models->{$this->_model}->{$data_model}(array(
+            foreach ($p as $id) {
+                $d = $this->models->{$this->_model}->{$data_model}(array(
                     'project_id' => $this->getCurrentProjectId(),
-                    'taxon_id' => $val,
+                    'taxon_id' => $id,
                 ));
-                if ($d)
-                {
-                    foreach((array)$d as $dkey=>$dval)
-                    {
-                        $d[$dkey]['referencing_taxon']=$this->getTaxonById( $val );
+                if ($d) {
+                    foreach ($d as $r) {
+                        if (isset($r['id']) && !array_key_exists($r['id'], $res)) {
+                            $res[$r['id']] = $r;
+                            $res[$r['id']]['referencing_taxon'] = $this->getTaxonById($id);
+                        }
                     }
-                    $res=array_merge($res,$d);
                 }
             }
         }
+
+        usort($res, function($a, $b) {
+            $r = $a['author'] <=> $b['author'];
+            if ($r == 0) {
+                $r = $a['date'] <=> $b['date'];
+                if ($r == 0) {
+                    $r = $a['label'] <=> $b['label'];
+                }
+            }
+            return $r;
+        });
+
         return $res;
     }
     
