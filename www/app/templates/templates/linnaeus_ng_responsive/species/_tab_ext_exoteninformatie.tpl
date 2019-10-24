@@ -78,7 +78,7 @@ ul.exotica li {
 				{if $v->label|@trim|@strlen>0}{$v->label|@trim}{if !($v->label|@trim|@substr:-1)|@in_array:array('?','!','.')}. {/if}{/if}
                 {if $v->periodical_id}{$v->periodical_ref->label} {elseif $v->periodical}{$v->periodical} {/if}
                 {if $v->publishedin_id}{$v->publishedin_ref->label} {elseif $v->publishedin}{$v->publishedin} {/if}
-                {if $v->volume}{$v->volume}{/if}{if $v->pages}: {$v->pages}. {/if}
+                {if $v->volume}{$v->volume}{/if}{if $v->volume && $v->pages}: {/if}{if $v->pages}{$v->pages}. {/if}
                 {if $v->publisher}{$v->publisher}.{/if}      
 
 	        {if $content->result->references|@count>1}</li>{/if}

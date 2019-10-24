@@ -17,7 +17,13 @@
             {$smarty.capture.authors|@trim}
             {/if}
             {/if}
-            {if $v.date} {$v.date}{/if}{if $v.author_name || $v.date}.</a> {/if}{$v.label}
+            {if $v.date} {$v.date}{/if}{if $v.author_name || $v.date}.{/if}
+            </a>
+            {$v.label}{if !($v.label|@trim|@substr:-1)|@in_array:array('?','!','.')}. {/if}
+            {if $v.periodical_id}{$v.periodical_ref.label} {elseif $v.periodical}{$v.periodical} {/if}
+            {if $v.publishedin_id}{$v.publishedin_ref.label} {elseif $v.publishedin}{$v.publishedin} {/if}
+            {if $v.volume}{$v.volume}{/if}{if $v.volume && $v.pages}: {/if}{if $v.pages}{$v.pages}. {/if}
+            {if $v.publisher}{$v.publisher}.{/if}
         </li>
     {/foreach}
     </ul>
@@ -46,7 +52,11 @@
             {/if}
             {if $v.date} {$v.date}{/if}{if $v.author_name || $v.date}.{/if}
             </a>
-            {$v.label}
+            {$v.label}{if !($v.label|@trim|@substr:-1)|@in_array:array('?','!','.')}. {/if}
+            {if $v.periodical_id}{$v.periodical_ref.label} {elseif $v.periodical}{$v.periodical} {/if}
+            {if $v.publishedin_id}{$v.publishedin_ref.label} {elseif $v.publishedin}{$v.publishedin} {/if}
+            {if $v.volume}{$v.volume}{/if}{if $v.volume && $v.pages}: {/if}{if $v.pages}{$v.pages}. {/if}
+            {if $v.publisher}{$v.publisher}.{/if}
             (<a href="?id={$v.referencing_taxon.id}">{$v.referencing_taxon.taxon}</a>)
         </li>
     {/foreach}

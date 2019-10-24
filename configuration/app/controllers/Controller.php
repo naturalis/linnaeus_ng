@@ -3216,6 +3216,14 @@ class Controller extends BaseClass
         }
         return $author;
     }
+
+
+    public static function compileReference ()
+    {
+
+    }
+
+
 }
  
  
