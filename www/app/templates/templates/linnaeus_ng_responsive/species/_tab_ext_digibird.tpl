@@ -9,24 +9,28 @@
 
     function draw()
     {
-        var b=[];
-        for(var i=0;i<results.length;i++)
-        {
-            if (i>=max) continue;
-            var tpl=fetchTemplate( 'aSoundTpl' );
-            b.push(
-                tpl
-                    .replace(/%MP3-PATH%/,results[i].file)
-                    .replace(/%LABEL%/,general_label)
-                    .replace(/%URL%/g,results[i].url)
-                    .replace(/%LICENSE%/g,results[i].lic)
-                    .replace(/%CREATOR%/g,results[i].rec)
-                    .replace(/%SPATIAL%/g,results[i].loc)
-                    .replace(/%TEMPORAL%/g,results[i].date)
-            );
-        }
+        if (results.length > 0) {
+            var b = [];
+            for (var i = 0; i < results.length; i++) {
+                if (i >= max) continue;
+                var tpl = fetchTemplate('aSoundTpl');
+                b.push(
+                    tpl
+                        .replace(/%MP3-PATH%/, results[i].file)
+                        .replace(/%LABEL%/, general_label)
+                        .replace(/%URL%/g, results[i].url)
+                        .replace(/%LICENSE%/g, results[i].lic)
+                        .replace(/%CREATOR%/g, results[i].rec)
+                        .replace(/%SPATIAL%/g, results[i].loc)
+                        .replace(/%TEMPORAL%/g, results[i].date)
+                );
+            }
+           $('#results').html(b.join("\n"));
 
-        $( '#results' ).html( b.join("\n") );
+        // No results for The Netherlands; present link to XC
+        } else {
+            $('#results').html(fetchTemplate('noResultsTpl'));
+        }
     }
 
     function run()
@@ -44,7 +48,7 @@
             }),
             success : function(data)
             {
-                results=data.recordings;
+                results = data.recordings;
                 draw();
             },
             complete : function( jqXHR, textStatus )
@@ -106,4 +110,16 @@
     <!--
         Er is een fout opgetreden (%STATUS%).
     -->
+</div>
+
+<div class="inline-templates" id="noResultsTpl">
+<!--
+    <div>
+        Geen geluiden gevonden die in Nederland opgenomen zijn.<br>
+        Bezoek
+        <a href="http://www.xeno-canto.org/species/{$external_content->subst_values['%GENUS%']}-{$external_content->subst_values['%SPECIES%']}" target="_blank">
+        de soortpagina op Xeno-canto
+        </a> voor eventuele opnamen uit het buitenland.
+    </div>
+-->
 </div>
