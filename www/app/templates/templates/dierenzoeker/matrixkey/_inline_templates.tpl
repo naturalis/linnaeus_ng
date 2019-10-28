@@ -210,6 +210,17 @@
 
 <div class="inline-templates" id="drzkr_selectedFacetHtmlTemplate">
 <!--
-<li><div class="ui-block-a"><a class="chosen-facet" onclick="clearStateValue('%STATE-VAL%');return false;" href="#"><div class="grid-iconbox"><div class="grid-labelbox" style="color:white;font-style:italic;margin-top:-15px;padding-bottom:5px;">%CHARACTER-LABEL%</div><img class="grid-icon" src="%ICON%" style="top:25px;" alt=""><img src="%IMG-ROOT-SKIN%button-close-shadow-overlay.png" style="position:relative;top:-5px;left:0px;margin-left:-73px;" alt=""></div><div class="grid-labelbox" style="margin-top:-5px;">%STATE-LABEL%</div></a></div></li>
+<li>
+    <div class="ui-block-a">
+        <a class="chosen-facet" onclick="clearStateValue('%STATE-VAL%');return false;" href="#">
+            <div class="grid-iconbox">
+                <div class="grid-labelbox" style="color:white;font-style:italic;margin-top:-15px;padding-bottom:5px;">%CHARACTER-LABEL%</div>
+                <img class="grid-icon" src="%ICON%" style="top:25px;" alt="">
+            </div>
+            <div class="grid-labelbox" style="margin-top:-5px;">%STATE-LABEL%</div>
+            <img src="%IMG-ROOT-SKIN%button-close-shadow-overlay.png" style="position:absolute;top:0;" alt="">
+        </a>
+    </div>
+</li>
 -->
 </div>
