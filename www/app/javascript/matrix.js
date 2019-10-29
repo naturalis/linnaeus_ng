@@ -195,6 +195,14 @@ function printResults()
 		$('#results-container').html( fetchTemplate( 'noResultHtmlTpl' ).replace('%MESSAGE%',__('Geen resultaten.')));
 	}
 
+	// Adjust icon width if there are more than 3
+	$('.result-icons').each(function() {
+		var icons = $(this).children('.result-icon');
+		if (icons.length > 3) {
+			icons.css('width', String(100/icons.length) + '%');
+		}
+	});
+
 	clearOverhead();
 	printHeader();
 	prettyPhotoInit();
@@ -207,9 +215,11 @@ function printResults()
 	{
 		$(this).find('img').attr('src', $(this).find('img').attr('src') ? $(this).find('img').attr('src').replace('.png','_grijs.png')  : "" );
 	});
-	
+
+
 	if (typeof hook_postPrintResults == 'function') { hook_postPrintResults(); }
 }
+
 
 function shouldDisableChar( id )
 {
@@ -758,7 +768,7 @@ function formatResult( data )
 	{
 		resultHtml=resultHtml.replace('%PHOTOGRAPHER%', "");
 	}
-	
+
 	return resultHtml;
 }
 
