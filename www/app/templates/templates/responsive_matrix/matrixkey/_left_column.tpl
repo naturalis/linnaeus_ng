@@ -52,6 +52,9 @@
                 <li><img class="legend-icon-image icon-nsr" alt="{t}Informatie{/t}" src="{$image_root_skin}information_grijs.png" />{t}Informatie{/t}</li>
                 <li><img class="legend-icon-image icon-info" alt="{t}Kenmerken{/t}" src="{$image_root_skin}lijst_grijs.png" />{t}Kenmerken{/t}</li>
                 <li><img class="legend-icon-image icon-similar" alt="{t}Gelijkende soorten{/t}" src="{$image_root_skin}gelijk_grijs.png" />{t}Gelijkende soorten{/t}</li>
+                {if $settings->url_observation_page}
+                <li><img class="legend-icon-image icon-waarneming" alt="{t}Waarneming invoeren{/t}" src="{$image_root_skin}waarneming_grijs.png" />{t}Waarneming invoeren{/t}</li>
+                {/if}
             </ul>
         </div>  
 
