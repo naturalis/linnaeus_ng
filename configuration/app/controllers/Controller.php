@@ -3202,25 +3202,86 @@ class Controller extends BaseClass
 	}
 
     /**
-     * @param $authors
+     * @param $reference reference object/array
      * @return string
      *
-     * Compiles an author string from individual authors, as in e.g.
+     * Takes a reference object/array and returns the author string. This is necessary because
+     * in NSR the author string is stored either in the author field (no action required) or
+     * in the authors field. The latter contains an array of individual authors. In this case,
+     * the author string is compiled and returned.
      */
-	public static function compileAuthorString ($authors)
+    public static function setAuthorString ($reference = [])
     {
-        $authors = array_map('trim', array_column($authors, 'name'));
-        $author = array_pop($authors);
-        if ($authors) {
-            $author = implode(', ', $authors) . " & " . $author;
+        $reference = (array)$reference;
+
+        if (!empty($reference['author'])) {
+            return $reference['author'];
         }
-        return $author;
+
+        if (!empty($reference['authors'])) {
+            $authors = array_map('trim', array_column($reference['authors'], 'name'));
+            if (!empty($authors)) {
+                $author = array_pop($authors);
+                if ($authors) {
+                    $author = implode(', ', $authors) . " & " . $author;
+                }
+                return $author;
+            }
+        }
+        return null;
     }
 
-
-    public static function compileReference ()
+    /**
+     * @param array $reference
+     * @param $baseUrl link to litereature module
+     * @return string
+     *
+     * Unified way to format a reference in Linnaeus. Previously this was formatted using smarty
+     * in various templates in several variations.
+     */
+    public static function setReferenceString ($reference = [], $baseUrl)
     {
-
+        $r = (array)$reference;
+        // Base part
+        $url = '<a href="' . $baseUrl . $r['id'] . '">%s</a>';
+        $str = self::setAuthorString($r);
+        if (!empty($r['date'])) {
+            $str .= $r['date'];
+        }
+        if (!empty($str)) {
+            $str .= '. ';
+        }
+        // Wrap in link
+        $str = sprintf($url, $str);
+        // Append the rest
+        $str .= $r['label'];
+        if (in_array(substr($r['label'], -1), ['?','!','.'])) {
+            $str .= '.';
+        }
+        $str .= ' ';
+        if (!empty($r['periodical_id'])) {
+            $str .= $r['periodical_ref']['label'];
+        } else if (!empty($r['periodical'])) {
+            $str .= $r['periodical'];
+        }
+        if (!empty($r['publishedin_id'])) {
+            $str .= $r['publishedin_ref']['label'] . ' ';
+        } else if (!empty($r['publishedin'])) {
+            $str .= $r['publishedin'] . ' ';
+        }
+        if (!empty($r['volume'])) {
+            $str .= $r['volume'];
+        }
+        if (!empty($r['volume']) && !empty($r['pages'])) {
+            $str .= ': ';
+        }
+        if (!empty($r['pages'])) {
+            $str .= $r['pages'] . '. ';
+        }
+        if (!empty($r['publisher'])) {
+            $str .= $r['publisher'] . '.';
+        }
+        return $str;
     }
 
 
