@@ -14,7 +14,6 @@ $conn = array(
 );
 
 $webSeviceUrl='http://natuurinbeeld.nederlandsesoorten.nl/webservice/newimages?date=%DATE%&limit=%LIMIT%';
-	
 
 $origHost = [
      'user' => '',
@@ -28,3 +27,8 @@ $remoteHost = [
      'folder' => ''
 ];
 $lang = 24; // Dutch
+
+$urlWebImageSearch="https://www.nederlandsesoorten.nl/linnaeus_ng/app/views/search/nsr_search_pictures.php?page=%s";
+// $urlWebImageSearch="https://www.dutchcaribbeanspecies.org/linnaeus_ng/app/views/search/nsr_search_pictures.php?page=%s";
+
+// $fetchFromDateOverride = '2018-05-06 23:59:59';
