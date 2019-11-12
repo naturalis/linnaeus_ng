@@ -1657,42 +1657,23 @@ class SpeciesControllerNSR extends SpeciesController
             'taxon_id' => $taxon_id,
         ));
     }
-    
+
     private function getInheritedTaxonLiterature ($taxon_id)
     {
-        return $this->getInheritedTaxonData($taxon_id, 'getTaxonReferences');
-    }
-    
-    private function getInheritedTaxonExperts ($taxon_id)
-    {
-        return $this->getInheritedTaxonData($taxon_id, 'getTaxonActors');
-    }
-    
-    /**
-     * Originally created for literature only, but fetching experts
-     * is only a matter of using a different model... If we pass that
-     * model to an abstracted method we save some lines of code.
-     */
-    private function getInheritedTaxonData ($taxon_id, $data_model = false)
-    {
-        if (!$data_model) {
-            return false;
-        }
-        
         $p=$this->models->TaxonQuickParentage->_get(array("id"=>
             array(
                 'project_id' => $this->getCurrentProjectId(),
                 'taxon_id' => $taxon_id,
             )
         ));
-        
+
         $res=array();
-        
+
         if ($p)
         {
             $p=explode(' ',$p[0]['parentage']);
             foreach ($p as $id) {
-                $d = $this->models->{$this->_model}->{$data_model}(array(
+                $d = $this->models->{$this->_model}->getTaxonReferences(array(
                     'project_id' => $this->getCurrentProjectId(),
                     'taxon_id' => $id,
                 ));
@@ -1721,7 +1702,41 @@ class SpeciesControllerNSR extends SpeciesController
 
         return $res;
     }
-    
+
+    private function getInheritedTaxonExperts ($taxon_id)
+    {
+        $p=$this->models->TaxonQuickParentage->_get(array("id"=>
+            array(
+                'project_id' => $this->getCurrentProjectId(),
+                'taxon_id' => $taxon_id,
+            )
+        ));
+
+        $res=array();
+
+        if ($p)
+        {
+            $p=explode(' ',$p[0]['parentage']);
+
+            foreach($p as $val)
+            {
+                $d=$this->models->{$this->_model}->getTaxonActors(array(
+                    'project_id' => $this->getCurrentProjectId(),
+                    'taxon_id' => $val,
+                ));
+                if ($d)
+                {
+                    foreach((array)$d as $dkey=>$dval)
+                    {
+                        $d[$dkey]['referencing_taxon']=$this->getTaxonById( $val );
+                    }
+                    $res=array_merge($res,$d);
+                }
+            }
+        }
+        return $res;
+    }
+
     private function getTaxonKeyLinks( $taxon_id )
     {
         return $this->models->{$this->_model}->getTaxonKeyLinks(array(
