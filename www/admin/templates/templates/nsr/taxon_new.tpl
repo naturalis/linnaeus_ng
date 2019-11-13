@@ -68,10 +68,9 @@
 		<tr><th>{t}year{/t}:</th><td><input type="text" class="small" id="name_authorship_year" value="" disabled="disabled" label="{t}year{/t}" /></td></tr>
 
 		{if $show_nsr_specific_stuff}
-
+<!--
 		<tr><td colspan="2" style="height:5px;"></td></tr>
 
-		<tr>
 			<th>{t}expert{/t}:</th>
 			<td>
 				<select id="name_expert_id">
@@ -98,7 +97,7 @@
 				</select>
 			</td>
 		</tr>
-
+-->
 		<tr><th>{t}publication{/t}:</th>
 			<td style="vertical-align:bottom">
                 <span id="name_reference"></span>
@@ -146,8 +145,9 @@
 
         {if $show_nsr_specific_stuff}
 
-		<tr><td colspan="2" style="height:5px;"></td></tr>
+			<!--
 
+		<tr><td colspan="2" style="height:5px;"></td></tr>
 		<tr>
 			<th>{t}expert{/t}:</th>
 			<td>
@@ -175,7 +175,7 @@
 				</select>
 			</td>
 		</tr>
-
+-->
 		<tr><th>{t}publication{/t}:</th>
 			<td style="vertical-align:bottom">
                 <span id="main_language_name_reference"></span>
@@ -220,7 +220,7 @@
 				</select>
 			</td>
 		</tr>
-
+<!--
 		<tr><td colspan="2" style="height:5px;"></td></tr>
 
 		<tr>
@@ -250,7 +250,7 @@
 				</select>
 			</td>
 		</tr>
-
+-->
 		<tr>
         	<th>{t}publication{/t}:</th>
 			<td style="vertical-align:bottom">
