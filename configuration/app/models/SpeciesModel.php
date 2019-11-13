@@ -1654,7 +1654,7 @@ class SpeciesModel extends AbstractModel
                 
             order by
 				t3.sort_order, t1.name";
-        
+
         return $this->freeQuery($query);
     }
     
