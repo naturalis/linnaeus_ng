@@ -1453,7 +1453,7 @@ class SpeciesControllerNSR extends SpeciesController
             case 'CTAB_LITERATURE':
                 $content['literature']=$this->getTaxonLiterature($taxon);
                 if ( $this->_show_inherited_literature )
-                    $content['inherited_literature']=$this->getInheritedTaxonLiterature($taxon);
+                    $content['inherited_literature']=$this->getInheritedTaxonLiterature($taxon, $content['literature']);
                     break;
                     
             case 'CTAB_EXPERTS':
@@ -1658,7 +1658,7 @@ class SpeciesControllerNSR extends SpeciesController
         ));
     }
 
-    private function getInheritedTaxonLiterature ($taxon_id)
+    private function getInheritedTaxonLiterature ($taxon_id, $mainLiterature = [])
     {
         $p=$this->models->TaxonQuickParentage->_get(array("id"=>
             array(
@@ -1667,10 +1667,10 @@ class SpeciesControllerNSR extends SpeciesController
             )
         ));
 
-        $res=array();
+        $res = [];
+        $existing = !empty($mainLiterature) ? array_column($mainLiterature, 'id') : [];
 
-        if ($p)
-        {
+        if ($p) {
             $p=explode(' ',$p[0]['parentage']);
             foreach ($p as $id) {
                 $d = $this->models->{$this->_model}->getTaxonReferences(array(
@@ -1679,7 +1679,7 @@ class SpeciesControllerNSR extends SpeciesController
                 ));
                 if ($d) {
                     foreach ($d as $r) {
-                        if (isset($r['id']) && !array_key_exists($r['id'], $res)) {
+                        if (isset($r['id']) && !array_key_exists($r['id'], $res) && !in_array($r['id'], $existing)) {
                             $r['author'] = $this::setAuthorString($r);
                             $res[$r['id']] = $r;
                             $res[$r['id']]['referencing_taxon'] = $this->getTaxonById($id);
@@ -1724,16 +1724,17 @@ class SpeciesControllerNSR extends SpeciesController
                     'project_id' => $this->getCurrentProjectId(),
                     'taxon_id' => $val,
                 ));
-                if ($d)
-                {
-                    foreach((array)$d as $dkey=>$dval)
-                    {
-                        $d[$dkey]['referencing_taxon']=$this->getTaxonById( $val );
+                if ($d) {
+                    foreach ($d as $r) {
+                        if (isset($r['actor_id']) && !array_key_exists($r['actor_id'], $res)) {
+                            $res[$r['actor_id']] = $r;
+                            $res[$r['actor_id']]['referencing_taxon'] = $this->getTaxonById($val);
+                        }
                     }
-                    $res=array_merge($res,$d);
                 }
             }
         }
+
         return $res;
     }
 
@@ -1922,8 +1923,10 @@ class SpeciesControllerNSR extends SpeciesController
                                 break;
                             case 'CTAB_LITERATURE':
                                 $content['literature']=$this->getTaxonLiterature($taxon_id);
-                                if ( $this->_show_inherited_literature )
-                                    $content['inherited_literature']=$this->getInheritedTaxonLiterature($taxon_id);
+                                if ( $this->_show_inherited_literature ) {
+                                    $content['inherited_literature'] =
+                                        $this->getInheritedTaxonLiterature($taxon_id, $content['literature']);
+                                }
                                 break;
                             case 'CTAB_DNA_BARCODES':
                                 $content=$this->getDNABarcodes( $taxon_id );
