@@ -6,11 +6,22 @@
     $b = new beeldbankDownloader;
 
     $b->setPrintParameters( false );
-    //$b->setFetchFromDateOverride( '2018-05-06 23:59:59' );
+
+    if (!empty($fetchFromDateOverride))
+    {
+        $b->setFetchFromDateOverride( $fetchFromDateOverride );
+    }
+    
+    if (!empty($urlWebImageSearch))
+    {
+        $b->seturlWebImageSearch( $urlWebImageSearch );
+    }
+    //$b->setDoRequestWebImageSearchPages( false );
+
     //$b->setDoMoveImages( false );
     //$b->setDoDownloadImages( false );
     //$b->setDoWriteToDatabase( false );
-    //$b->setDoRequestNsrImageSearchPages( false );
+
     $b->setConnectData( $conn );
     $b->setWebserviceUrl( $webSeviceUrl );
     $b->setFetchLimit( 9999 );

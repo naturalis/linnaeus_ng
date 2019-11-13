@@ -15,7 +15,7 @@ class beeldbankDownloader
     private $doMoveImages = true;
     private $doDownloadImages = true;
     private $doWriteToDatabase = true;
-    private $doRequestNsrImageSearchPages = true;
+    private $doRequestWebImageSearchPages = true;
     private $doWriteDeleteList = true;
     private $deleteList;
     private $batchIdentifier;
@@ -36,7 +36,7 @@ class beeldbankDownloader
     private $scpOriginAddress;
     private $scpOriginBasePath;
 
-    private $urlNsrImageSearch = "https://www.nederlandsesoorten.nl/linnaeus_ng/app/views/search/nsr_search_pictures.php?0=0&page=%s";
+    private $urlWebImageSearch = null;
 
     private $number_in_feed = 0;
     private $number_downloaded = 0;
@@ -68,12 +68,12 @@ class beeldbankDownloader
             $this->downloadImages();
             $this->moveImages();
             $this->saveImageData();
-            $this->requestNsrImagePages();
-            $this->writeToNSRLog();
+            $this->writeToLNGLog();
             $this->writeToLogTable();
             $this->writeDeleteList();
             $this->putDeleteList();
             $this->printStats();
+            $this->requestWebImagePages();
             $this->cleanUp();
         } catch (Exception $e) {
             $this->handleException($e);
@@ -187,10 +187,15 @@ class beeldbankDownloader
             $this->doWriteToDatabase = $state;
     }
 
-    public function setDoRequestNsrImageSearchPages($state)
+    public function setDoRequestWebImageSearchPages($state)
     {
         if (is_bool($state))
-            $this->doRequestNsrImageSearchPages = $state;
+            $this->doRequestWebImageSearchPages = $state;
+    }
+
+    public function seturlWebImageSearch($url)
+    {
+            $this->urlWebImageSearch = $url;
     }
 
     public function setDoWriteDeleteList($state)
@@ -698,21 +703,20 @@ class beeldbankDownloader
         }
     }
 
-    private function requestNsrImagePages()
+    private function requestWebImagePages()
     {
-        if ($this->number_saved > 0) {
-            if ($this->doRequestNsrImageSearchPages) {
-                $this->feedback("requesting NSR image search pages (for caching purposes)");
-                for ($i = 0; $i <= 10; $i++) {
-                    $d = $this->getCurl(sprintf($this->urlNsrImageSearch, $i));
-                }
-            } else {
-                $this->feedback("skipping requesting NSR image search pages");
+        if ($this->number_saved>0 && $this->doRequestWebImageSearchPages && !is_null($this->urlWebImageSearch))
+        {
+            $this->feedback("requesting web image search pages (for caching purposes)");
+
+            for ($i = 0; $i <= 10; $i++)
+            {
+                $d = $this->getCurl(sprintf($this->urlWebImageSearch, $i));
             }
         }
     }
 
-    private function writeToNSRLog()
+    private function writeToLNGLog()
     {
         foreach ((array)$this->newImages as $key => $val) {
             if (empty($val->_status)) {
