@@ -1859,7 +1859,7 @@ final class SearchNSRModel extends AbstractModel
 		{		
 			$trait=$this->getTraitgroupTrait( [ "trait_id" => $id, "project_id" => $project_id ] );
 
-			$column = !strpos($trait['type_sysname'], 'date') ? 'numerical' : 'date';
+			$column = strpos($trait['type_sysname'], 'date') === false ? 'numerical' : 'date';
 
 			$trait_joins .=
 			"
