@@ -593,8 +593,8 @@ class TraitsController extends Controller
 		{
 			return
 				(!empty($r['year']) ? $r['year'] : '0000')."-".
-				(!empty($r['month']) ? sprintf('%02s',$r['month']) : '01')."-".
-				(!empty($r['day']) ? sprintf('%02s',$r['day']) : '01')." ".
+				(!empty($r['month']) ? sprintf('%02s',$r['month']) : '00')."-".
+				(!empty($r['day']) ? sprintf('%02s',$r['day']) : '00')." ".
 				(!empty($r['hour']) ? sprintf('%02s',$r['hour']) : '00').":".
 				(!empty($r['minute']) ? sprintf('%02s',$r['minute']) : '00').":".
 				(!empty($r['second']) ? sprintf('%02s',$r['second']) : '00')
