@@ -3284,6 +3284,11 @@ class Controller extends BaseClass
         if (!empty($r['publisher'])) {
             $str .= $r['publisher'] . '.';
         }
+        $str = trim($str);
+        // Add closing dot if this is lacking
+        if (substr($str, -1) !== '.') {
+            $str .= '.';
+        }
         // Remove any double spaces if necessary
         return preg_replace('/\s+/', ' ', $str);
     }
