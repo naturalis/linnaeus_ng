@@ -24,6 +24,10 @@
             {if $v.publishedin_id}{$v.publishedin_ref.label} {elseif $v.publishedin}{$v.publishedin} {/if}
             {if $v.volume}{$v.volume}{/if}{if $v.volume && $v.pages}: {/if}{if $v.pages}{$v.pages}. {/if}
             {if $v.publisher}{$v.publisher}.{/if}
+
+            <br><br>
+            {$v.formatted}
+
         </li>
     {/foreach}
     </ul>
@@ -58,6 +62,15 @@
             {if $v.volume}{$v.volume}{/if}{if $v.volume && $v.pages}: {/if}{if $v.pages}{$v.pages}. {/if}
             {if $v.publisher}{$v.publisher}.{/if}
             (<a href="?id={$v.referencing_taxon.id}">{$v.referencing_taxon.taxon}</a>)
+
+
+            <br><br>
+            {$v.formatted}
+            (<a href="?id={$v.referencing_taxon.id}">{$v.referencing_taxon.taxon}</a>)
+            <br><br>
+
+
+
         </li>
     {/foreach}
     </ul>

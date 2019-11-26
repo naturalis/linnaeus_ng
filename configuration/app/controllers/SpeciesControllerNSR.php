@@ -1644,10 +1644,16 @@ class SpeciesControllerNSR extends SpeciesController
 
     private function getTaxonLiterature( $taxon_id )
     {
-        return $this->models->{$this->_model}->getTaxonReferences(array(
+        $res = $this->models->{$this->_model}->getTaxonReferences(array(
             'project_id' => $this->getCurrentProjectId(),
             'taxon_id' => $taxon_id,
         ));
+
+        foreach ($res as $k => $v) {
+            $res[$k]['formatted'] = $this->setReferenceString($v);
+        }
+
+        return $res;
     }
     
     private function getTaxonExperts ($taxon_id)
@@ -1681,6 +1687,7 @@ class SpeciesControllerNSR extends SpeciesController
                     foreach ($d as $r) {
                         if (isset($r['id']) && !array_key_exists($r['id'], $res) && !in_array($r['id'], $existing)) {
                             $r['author'] = $this::setAuthorString($r);
+                            $r['formatted'] = $this->setReferenceString($r);
                             $res[$r['id']] = $r;
                             $res[$r['id']]['referencing_taxon'] = $this->getTaxonById($id);
                         }

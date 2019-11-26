@@ -3233,29 +3233,32 @@ class Controller extends BaseClass
 
     /**
      * @param array $reference
-     * @param $baseUrl link to litereature module
      * @return string
      *
      * Unified way to format a reference in Linnaeus. Previously this was formatted using smarty
      * in various templates in several variations.
      */
-    public static function setReferenceString ($reference = [], $baseUrl)
+    public function setReferenceString ($reference = [])
     {
         $r = (array)$reference;
-        // Base part
-        $url = '<a href="' . $baseUrl . $r['id'] . '">%s</a>';
-        $str = self::setAuthorString($r);
-        if (!empty($r['date'])) {
-            $str .= $r['date'];
+        if (empty($r)) {
+           return '';
         }
-        if (!empty($str)) {
-            $str .= '. ';
+        // Base part
+        $url = '<a href="' . $this->baseUrl . $this->appName . '/views/literature2/reference.php?id=' .
+            $r['id'] . '">%s</a>';
+        $author = self::setAuthorString($r);
+        if (!empty($r['date'])) {
+            $author .= ' ' . $r['date'];
         }
         // Wrap in link
-        $str = sprintf($url, $str);
+        $str = sprintf($url, $author);
         // Append the rest
-        $str .= $r['label'];
-        if (in_array(substr($r['label'], -1), ['?','!','.'])) {
+        if (substr($author, -1) !== '.') {
+            $str .= '.';
+        }
+        $str .= ' ' . $r['label'];
+        if (!in_array(substr($r['label'], -1), ['?','!','.'])) {
             $str .= '.';
         }
         $str .= ' ';
@@ -3270,7 +3273,7 @@ class Controller extends BaseClass
             $str .= $r['publishedin'] . ' ';
         }
         if (!empty($r['volume'])) {
-            $str .= $r['volume'];
+            $str .= ' ' . $r['volume'];
         }
         if (!empty($r['volume']) && !empty($r['pages'])) {
             $str .= ': ';
@@ -3281,7 +3284,8 @@ class Controller extends BaseClass
         if (!empty($r['publisher'])) {
             $str .= $r['publisher'] . '.';
         }
-        return $str;
+        // Remove any double spaces if necessary
+        return preg_replace('/\s+/', ' ', $str);
     }
 
 
