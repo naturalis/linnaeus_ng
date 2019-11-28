@@ -3210,7 +3210,7 @@ class Controller extends BaseClass
      * in the authors field. The latter contains an array of individual authors. In this case,
      * the author string is compiled and returned.
      */
-    public static function setAuthorString ($reference = [])
+    public function setAuthorString ($reference = [])
     {
         $reference = (array)$reference;
 
@@ -3238,7 +3238,7 @@ class Controller extends BaseClass
      * Unified way to format a reference in Linnaeus. Previously this was formatted using smarty
      * in various templates in several variations.
      */
-    public function setReferenceString ($reference = [])
+    public function formatReference ($reference = [])
     {
         $r = (array)$reference;
         if (empty($r)) {
@@ -3247,7 +3247,7 @@ class Controller extends BaseClass
         // Base part
         $url = '<a href="' . $this->baseUrl . $this->appName . '/views/literature2/reference.php?id=' .
             $r['id'] . '">%s</a>';
-        $author = self::setAuthorString($r);
+        $author = $this->setAuthorString($r);
         if (!empty($r['date'])) {
             $author .= ' ' . $r['date'];
         }
@@ -3261,22 +3261,30 @@ class Controller extends BaseClass
         if (!in_array(substr($r['label'], -1), ['?','!','.'])) {
             $str .= '.';
         }
-        $str .= ' ';
-        if (!empty($r['periodical_id'])) {
-            $str .= $r['periodical_ref']['label'];
+
+        $pub = '';
+        if (!empty($r['periodical_id']) && isset($r['periodical_ref'])) {
+            $pub .= $r['periodical_ref']['label'] . ' ';
         } else if (!empty($r['periodical'])) {
-            $str .= $r['periodical'];
+            $pub .= $r['periodical'] . ' ';
         }
-        if (!empty($r['publishedin_id'])) {
-            $str .= $r['publishedin_ref']['label'] . ' ';
+        if (isset($r['publishedin_id']) && !empty($r['publishedin_id'] && !empty($r['publishedin_ref']['label']))) {
+            $pub .= $r['publishedin_ref']['label'] . ' ';
         } else if (!empty($r['publishedin'])) {
-            $str .= $r['publishedin'] . ' ';
+            $pub .= $r['publishedin'] . ' ';
         }
-        if (!empty($r['volume'])) {
-            $str .= ' ' . $r['volume'];
+
+        // Strip dot if volume directly after label
+        if (trim($pub) == '' && !empty($r['volume'])) {
+            $str = substr(trim($str), 0, -1);
+        } else {
+            $str .= " $pub";
         }
+
         if (!empty($r['volume']) && !empty($r['pages'])) {
             $str .= ': ';
+        } else if (!empty($r['volume'])) {
+            $str .= ' ' . $r['volume'] . '. ';
         }
         if (!empty($r['pages'])) {
             $str .= $r['pages'] . '. ';

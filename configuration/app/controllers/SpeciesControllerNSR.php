@@ -1650,7 +1650,7 @@ class SpeciesControllerNSR extends SpeciesController
         ));
 
         foreach ($res as $k => $v) {
-            $res[$k]['formatted'] = $this->setReferenceString($v);
+            $res[$k]['formatted'] = $this->formatReference($v);
         }
 
         return $res;
@@ -1687,7 +1687,7 @@ class SpeciesControllerNSR extends SpeciesController
                     foreach ($d as $r) {
                         if (isset($r['id']) && !array_key_exists($r['id'], $res) && !in_array($r['id'], $existing)) {
                             $r['author'] = $this::setAuthorString($r);
-                            $r['formatted'] = $this->setReferenceString($r);
+                            $r['formatted'] = $this->formatReference($r);
                             $res[$r['id']] = $r;
                             $res[$r['id']]['referencing_taxon'] = $this->getTaxonById($id);
                         }

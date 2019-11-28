@@ -62,7 +62,8 @@ ul.traits li {
 		<ul class="traits">
         {foreach from=$external_content->content_json_decoded->result->references item=v}
             {if $external_content->content_json_decoded->result->references|@count>1}<li>{/if}
-            <a href="../literature2/reference.php?id={$v->id}">
+                {*
+                <a href="../literature2/reference.php?id={$v->id}">
                 {capture authors}
                     {foreach from=$v->authors item=author key=ak}{if $ak>0}, {/if}{$author->name|@trim}{/foreach}
                     {if $ak|@is_null}{$v->author}{/if}
@@ -74,7 +75,11 @@ ul.traits li {
                 {if $v->volume}{$v->volume}: {/if}
                 {if $v->pages}{$v->pages}. {/if}
                 {if $v->publisher}{$v->publisher}.{/if}
-            </a>
+                 </a>
+                *}
+
+                {$v->formatted}
+
             {if $external_content->content_json_decoded->result->references|@count>1}</li>{/if}
         {/foreach}
         {/if}

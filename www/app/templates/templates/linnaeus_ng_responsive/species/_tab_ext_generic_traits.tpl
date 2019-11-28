@@ -46,9 +46,10 @@
         <br />
         <h4 class="source">{t}Publicatie{if $external_content->content_json_decoded->result->references|@count>1}s{/if}{/t}</h4>
 		<ul class="exotica">
-        
         {foreach from=$external_content->content_json_decoded->result->references item=v}
 	        {if $external_content->content_json_decoded->result->references|@count>1}<li>{/if}
+
+				{*
                 <a href="../literature2/reference.php?id={$v->id}">
                 {capture authors}
                 {foreach from=$v->authors item=author key=ak}{if $ak>0}, {/if}{$author->name|@trim}{/foreach}
@@ -60,7 +61,10 @@
                 {if $v->periodical_id}{$v->periodical_ref->label} {elseif $v->periodical}{$v->periodical} {/if}
                 {if $v->publishedin_id}{$v->publishedin_ref->label} {elseif $v->publishedin}{$v->publishedin} {/if}
                 {if $v->volume}{$v->volume}{/if}{if $v->pages}: {$v->pages}. {/if}
-                {if $v->publisher}{$v->publisher}.{/if}      
+                {if $v->publisher}{$v->publisher}.{/if}
+				*}
+
+				{$v->formatted}
 
 	        {if $content->result->references|@count>1}</li>{/if}
         {/foreach}

@@ -14,6 +14,7 @@
 			{if $v.object_type=='reference' && $v.data.label!=''}
 			{assign var=hasReferences value=$hasReferences+1}
 			<li>
+				{*
                 <a href="../literature2/reference.php?id={$v.data.id}">
                 {capture authors}
 				{if $v.data.author}
@@ -32,8 +33,12 @@
                 {if $v.data.periodical_id}{$v.data.periodical_ref.label} {elseif $v.data.periodical}{$v.data.periodical} {/if}
                 {if $v.data.publishedin_id}{$v.data.publishedin_ref.label} {elseif $v.data.publishedin}{$v.data.publishedin} {/if}
                 {if $v.data.volume}{$v.data.volume}{/if}{if $v.data.pages}: {$v.data.pages}. {/if}
-                {if $v.data.publisher}{$v.data.publisher}.{/if}      
-                </li>
+                {if $v.data.publisher}{$v.data.publisher}.{/if}
+                *}
+
+				{$v.data.formatted}
+
+            </li>
             {*
                 {elseif $v.predicate=='hasReference' && $v.data.citation!=''}
                 {assign var=hasReferences value=hasReferences+1}

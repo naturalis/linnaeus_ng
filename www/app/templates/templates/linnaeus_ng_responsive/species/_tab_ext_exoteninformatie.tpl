@@ -61,7 +61,7 @@ ul.exotica li {
         <br />
         <h4 class="source">{t}Publicatie{if $content->result->references|@count>1}s{/if}{/t}</h4>
 		<ul class="exotica">
-        
+
         {foreach from=$content->result->references item=v}
 	        {if $content->result->references|@count>1}<li>{/if}
                 <a href="../literature2/reference.php?id={$v->id}">

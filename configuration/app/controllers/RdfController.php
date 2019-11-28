@@ -79,10 +79,13 @@ class RdfController extends Controller
 						unset($actor[0]['last_change']);
 						$data[0]['actor']=$actor[0];
 					}
+
+                    $data[0]['formatted'] = $this->formatReference($data[0]);
+
 					break;
 				default : $data=null;
 			}
-			
+
 			unset($data[0]['created']);
 			unset($data[0]['last_change']);
 			
