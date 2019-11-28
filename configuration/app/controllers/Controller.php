@@ -3240,10 +3240,11 @@ class Controller extends BaseClass
      */
     public function formatReference ($reference = [])
     {
-        $r = (array)$reference;
+        $r = array_map('trim', (array)$reference);
         if (empty($r)) {
            return '';
         }
+
         // Base part
         $url = '<a href="' . $this->baseUrl . $this->appName . '/views/literature2/reference.php?id=' .
             $r['id'] . '">%s</a>';

@@ -3,7 +3,7 @@
         <h3 id="name-header">{t}Literature{/t}</h3>
         <ul>
         {foreach $content.literature v k}
-        <li><a href="../literature2/reference.php?id={$v.id}">{if $v.author_name}{$v.author_name}, {/if}{$v.label}{if $v.date} ({$v.date}){/if}</a></li>
+            <li>{$v.formatted}</li>
         {/foreach}
         </ul>
         <br />
@@ -14,8 +14,7 @@
         <ul>
         {foreach $content.inherited_literature v k}
         <li>
-            <a href="../literature2/reference.php?id={$v.id}">{if $v.author_name}{$v.author_name}, {/if}{$v.label}{if $v.date} ({$v.date}){/if}</a>
-            (<a href="?id={$v.referencing_taxon.id}">{$v.referencing_taxon.taxon}</a>)
+            {$v.formatted} (<a href="?id={$v.referencing_taxon.id}">{$v.referencing_taxon.taxon}</a>)
         </li>
         {/foreach}
         </ul>
