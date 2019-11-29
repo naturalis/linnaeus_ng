@@ -202,6 +202,15 @@ function saveLitForm()
         <td><input class="large" type="text" name="external_link" value="{$reference.external_link}" /></td>
 	</tr>
 
+	{if $reference.id}
+	<tr style="height: 15px;"><th></th><td></td></tr>
+	<tr>
+		<th>{t}preview{/t}:</th>
+		<td>{$reference.formatted}</td>
+	</tr>
+	{/if}
+
+	<tr style="height: 15px;"><th></th><td></td></tr>
 	<tr>
     	<th>
         	{t}link to taxa{/t}:

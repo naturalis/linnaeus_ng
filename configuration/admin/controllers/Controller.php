@@ -3103,5 +3103,113 @@ class Controller extends BaseClass
             $this->translate('at') . ' ' . $time;
     }
 
+    /**
+     * MUST MATCH THE SAME METHOD IN APP!
+
+     * @param $reference reference object/array
+     * @return string
+     *
+     * Takes a reference object/array and returns the author string. This is necessary because
+     * in NSR the author string is stored either in the author field (no action required) or
+     * in the authors field. The latter contains an array of individual authors. In this case,
+     * the author string is compiled and returned.
+     */
+    public function setAuthorString ($reference = [])
+    {
+        $reference = (array)$reference;
+
+        if (!empty($reference['author'])) {
+            return $reference['author'];
+        }
+
+        if (!empty($reference['authors'])) {
+            $authors = array_map('trim', array_column($reference['authors'], 'name'));
+            if (!empty($authors)) {
+                $author = array_pop($authors);
+                if ($authors) {
+                    $author = implode(', ', $authors) . " & " . $author;
+                }
+                return $author;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * MUST MATCH THE SAME METHOD IN APP!
+     *
+     * @param array $reference
+     * @return string
+     *
+     * Unified way to format a reference in Linnaeus. Previously this was formatted using smarty
+     * in various templates in several variations.
+     */
+    public function formatReference ($reference = [])
+    {
+        $r = (array)$reference;
+        if (empty($r)) {
+            return '';
+        }
+        // Trim white space
+        array_walk_recursive($r, function(&$v) {
+            $v = trim($v);
+        });
+
+        // Base part
+        $url = '<a href="' . $this->baseUrl . $this->appName . '/views/literature2/edit.php?id=' .
+            $r['id'] . '">%s</a>';
+        $author = $this->setAuthorString($r);
+        if (!empty($r['date'])) {
+            $author .= ' ' . $r['date'];
+        }
+        // Wrap in link
+        $str = sprintf($url, $author);
+        // Append the rest
+        if (substr($author, -1) !== '.') {
+            $str .= '.';
+        }
+        $str .= ' ' . $r['label'];
+        if (!in_array(substr($r['label'], -1), ['?','!','.'])) {
+            $str .= '.';
+        }
+
+        $pub = '';
+        if (!empty($r['periodical_id']) && isset($r['periodical_ref'])) {
+            $pub .= $r['periodical_ref']['label'] . ' ';
+        } else if (!empty($r['periodical'])) {
+            $pub .= $r['periodical'] . ' ';
+        }
+        if (isset($r['publishedin_id']) && !empty($r['publishedin_id'] && !empty($r['publishedin_ref']['label']))) {
+            $pub .= $r['publishedin_ref']['label'] . ' ';
+        } else if (!empty($r['publishedin'])) {
+            $pub .= $r['publishedin'] . ' ';
+        }
+
+        // Strip dot if volume directly after label
+        if (trim($pub) == '' && !empty($r['volume'])) {
+            $str = substr(trim($str), 0, -1);
+        } else {
+            $str .= " $pub";
+        }
+
+        if (!empty($r['volume']) && !empty($r['pages'])) {
+            $str .= ': ';
+        } else if (!empty($r['volume'])) {
+            $str .= ' ' . $r['volume'] . '. ';
+        }
+        if (!empty($r['pages'])) {
+            $str .= $r['pages'] . '. ';
+        }
+        if (!empty($r['publisher'])) {
+            $str .= $r['publisher'] . '.';
+        }
+        $str = trim($str);
+        // Add closing dot if this is lacking
+        if (substr($str, -1) !== '.') {
+            $str .= '.';
+        }
+        // Remove any double spaces if necessary
+        return preg_replace('/\s+/', ' ', $str);
+    }
 
 }

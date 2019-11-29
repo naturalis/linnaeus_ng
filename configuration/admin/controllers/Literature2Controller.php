@@ -1353,6 +1353,10 @@ class Literature2Controller extends NsrController
                 'projectId' => $this->getCurrentProjectId(),
     		    'literatureId' => $id
     		));
+
+			//print_r($l[0]); die();
+
+            $l[0]['formatted'] = $this->formatReference($l[0]);
 			
 			$l[0]['taxa'] =
                 $this->getReferencedTaxa($this->referenceBefore['id']);

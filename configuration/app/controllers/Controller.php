@@ -3232,6 +3232,8 @@ class Controller extends BaseClass
     }
 
     /**
+     * MUST MATCH THE SAME METHOD IN ADMIN!
+     *
      * @param array $reference
      * @return string
      *
@@ -3240,10 +3242,14 @@ class Controller extends BaseClass
      */
     public function formatReference ($reference = [])
     {
-        $r = array_map('trim', (array)$reference);
+        $r = (array)$reference;
         if (empty($r)) {
-           return '';
+            return '';
         }
+        // Trim white space
+        array_walk_recursive($r, function(&$v) {
+            $v = trim($v);
+        });
 
         // Base part
         $url = '<a href="' . $this->baseUrl . $this->appName . '/views/literature2/reference.php?id=' .
