@@ -199,7 +199,8 @@ class InterfaceController extends Controller
         $p = $this->rGetVal('param');
         $id = empty($p['id']) ? null : $p['id'];
         $lan = empty($p['lan']) ? null : $p['lan'];
-        $newVal = empty($p['newVal']) ? null : $p['newVal'];
+        // LINNA-944: decode &quot;
+        $newVal = empty($p['newVal']) ? null : html_entity_decode($p['newVal']);
 
         if (is_null($id) || is_null($lan)) {
             $this->smarty->assign('returnText', 'not saved<br/>(' . (is_null($id) ? 'no id' : 'no lang. id') . ')');

@@ -33,9 +33,10 @@ function interfaceEnableTransEdit(ele) {
 	if (interfaceBeingEdited[idx]==true || oId==undefined || oId=='') return;
 	
 	var nId = 'trans2-'+oId;
-	
-	interfaceOldVals[idx] = $(ele).html();
-	
+
+	// LINNA-944: escape double quotes, otherwise entry is truncated
+	interfaceOldVals[idx] = $(ele).html().replace(/"/g, "&quot;");
+
 	$(ele).html('<input type="text" id="'+nId+'" value="'+interfaceOldVals[idx]+'" style="width:240px">');
 
 	$('#trans2-'+oId).keyup(function(e) {
