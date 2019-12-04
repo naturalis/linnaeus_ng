@@ -806,10 +806,12 @@ final class SearchNSRModel extends AbstractModel
 	        
  	        //SQL_CALC_FOUND_ROWS
 	        $count=$this->freeQuery( "select found_rows() as total" );
-	        
-	        foreach ($data as $k => $v) {
-	            $data[$k] = array_merge($v, $this->getMediaMetadata($v['taxon_id'], $v['id'], $project_id));
-	        }
+
+	        if (!empty($data)) {
+                foreach ($data as $k => $v) {
+                    $data[$k] = array_merge($v, $this->getMediaMetadata($v['taxon_id'], $v['id'], $project_id));
+                }
+            }
 	        
 	        return array('data'=>$data,'count'=>$count[0]['total']);
 	        

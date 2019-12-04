@@ -33,7 +33,7 @@
 				</div>
 				<div id="group_suggestion" class="suggestion" match="like" class="auto_complete" style="display:none;"></div>
 			</div>
-            
+
 			<div class="formrow">
 				<label accesskey="g" for="photographer">
 					{t}Fotograaf{/t}
@@ -54,7 +54,7 @@
                     {foreach $photographers v foo}
                         {if $smarty.foreach.foo.index < 5}
                         <li>
-                            <a href="nsr_search_pictures.php?photographer={$v.name}">{$v.name} ({$v.picture_count}/{$v.taxon_count})</a>
+                            <a href="{$photographer_url}{$v.name|@urlencode}">{$v.name} ({$v.picture_count}/{$v.taxon_count})</a>
                         </li>
                         {/if}
                     {/foreach}
@@ -85,7 +85,7 @@
                     {foreach $validators v foo}
                         {if $smarty.foreach.foo.index < 5}
                         <li>
-                            <a href="nsr_search_pictures.php?validator={$v.name}">{$v.name} ({$v.picture_count}/{$v.taxon_count})</a>
+                            <a href="{$validator_url}{$v.name|@urlencode}">{$v.name} ({$v.picture_count}/{$v.taxon_count})</a>
                         </li>
                         {/if}
                     {/foreach}
@@ -99,6 +99,7 @@
 
 		</fieldset>
 	</form>
+
 </div>
 
 <script type="text/JavaScript">

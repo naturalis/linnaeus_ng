@@ -262,7 +262,7 @@ class SearchControllerNSR extends SearchController
 			$this->smarty->assign('photographers',$this->getPhotographersPictureCount($search));
 			$this->smarty->assign('validators',$this->getValidatorPictureCount($search));
 			$this->smarty->assign('searchHR',$this->makeReadableQueryString());
-			$this->smarty->assign('url_taxon_detail',"http://". $this->httpHost.'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
+			$this->smarty->assign('url_taxon_detail',"//". $this->httpHost.'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
 			$this->smarty->assign('imageExport',true);
 		}
 
@@ -273,11 +273,23 @@ class SearchControllerNSR extends SearchController
 
 		$results = $this->doPictureSearch( $search );
 
+        $this->smarty->assign('photographer_url',$this->setPicturesResultString($search, 'photographer'));
+        $this->smarty->assign('validator_url',$this->setPicturesResultString($search, 'validator'));
 		$this->smarty->assign('search',$search);
 		$this->smarty->assign('querystring',$this->reconstructQueryString(array('search'=>$search,'ignore'=>array('page'))));
 		$this->smarty->assign('results',$results);
 
         $this->printPage($template);
+    }
+
+    private function setPicturesResultString ($p, $active = '')
+    {
+        if (isset($p[$active])) {
+            unset($p[$active]);
+        }
+        $search = !empty($p) ? http_build_query($p) . '&' : '';
+        return "//". $this->httpHost . '/linnaeus_ng/' . $this->getAppname() . '/views/search/nsr_search_pictures.php?' .
+            $search . $active . '=';
     }
 
     public function recentPicturesAction()

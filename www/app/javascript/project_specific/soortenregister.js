@@ -164,12 +164,15 @@ function setSuggestionId(ele)
 
 	if ($('#formSearchFacetsSpecies').length)
 	{
-	    $.each(urlParameters, function(key, value){
-	    	if (['group','panels', 'traits'].indexOf(key)<0) {
-                $('#formSearchFacetsSpecies')
-                    .append('<input type=hidden value="'+value+'" name="'+key+'">');
-			}
-		});
+		// LINNA-1430: do not process url when searching images; needs refactor
+		if (!$($("#formSearchFacetsSpecies")).hasClass("filterPictures")) {
+			$.each(urlParameters, function(key, value){
+				if (['group','panels', 'traits'].indexOf(key)<0) {
+					$('#formSearchFacetsSpecies')
+						.append('<input type=hidden value="'+ value +'" name="'+key+'">');
+				}
+			});
+		}
 		$('#formSearchFacetsSpecies')
 			.append('<input type=hidden value="'+$('input[type=text][name=group]').val()+'" name=group>')
 			.submit();
