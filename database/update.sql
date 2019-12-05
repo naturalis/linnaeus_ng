@@ -1,8 +1,6 @@
 ALTER DATABASE `linnaeus_ng` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE linnaeus_ng;
 
-
-
 insert ignore into name_types (
     select null, id as project_id, 'isMisidentificationOf', now(), now() from projects
 );
@@ -115,3 +113,6 @@ CREATE TABLE if not exists `traits_index` (
     PRIMARY KEY (`id`),
     UNIQUE KEY `project_id` (`project_id`,`taxon_id`,`language_id`,`trait_group_id`,`trait_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+update `modules` set `module` = 'Multi-access key' where `module` = 'Multi-entry key';
+
