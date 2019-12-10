@@ -26,7 +26,7 @@ final class Literature2Model extends AbstractModel
         parent::__destruct();
     }
 
-	public function getReference( $params )
+	public function getReference ( $params )
     {
 		$project_id = isset($params['project_id']) ? $params['project_id'] : null;
 		$language_id = isset($params['language_id']) ? $params['language_id'] : null;
@@ -86,7 +86,7 @@ final class Literature2Model extends AbstractModel
 
 		$d=$this->freeQuery( $query );
 		$data=$d[0];
-		
+/*
 		$query="
 			select
 				_b.name
@@ -104,11 +104,245 @@ final class Literature2Model extends AbstractModel
 		";
 		
 		$data['authors']=$this->freeQuery( $query );
+*/
+        $data['authors'] = $this->getReferenceAuthors([
+            'projectId' => $project_id,
+            'literatureId' => $literature2_id,
+        ]);
 
 		return $data;
 	}
 
-    public function getReferences($params)
+    public function getReferencesByAuthorStartLetter ($params)
+    {
+        $projectId = isset($params['projectId']) ? $params['projectId'] : null;
+        $letter = isset($params['letter']) ? mb_substr($params['letter'], 0, 1) : null;
+
+        if (is_null($projectId) || is_null($letter)) {
+            return null;
+        }
+
+        /*
+         * Assuming author in literature2 table takes precedence over first actor in actor table.
+         */
+        $query = "
+            select 
+                t1.id,
+                t1.language_id,
+                t1.label,
+                t1.alt_label,
+                t1.alt_label_language_id,
+                t1.date,
+                t1.author,
+                t1.publication_type,
+                ifnull(t1.publishedin,ifnull(t1.publishedin_id,null)) as publishedin,
+                ifnull(t1.periodical,ifnull(t1.periodical_id,null)) as periodical,
+                t1.pages,
+                t1.volume,
+                t1.external_link,
+                if(t1.actor_id=-1,1,0) as unparsed
+            from 
+                literature2 as t1 
+            where 
+                t1.project_id = $projectId and 
+                t1.author like '$letter%'
+            
+            union 
+            
+            select 
+                t1.id,
+                t1.language_id,
+                t1.label,
+                t1.alt_label,
+                t1.alt_label_language_id,
+                t1.date,
+                t3.name as author,
+                t1.publication_type,
+                ifnull(t1.publishedin,ifnull(publishedin_id,null)) as publishedin,
+                ifnull(t1.periodical,ifnull(periodical_id,null)) as periodical,
+                t1.pages,
+                t1.volume,
+                t1.external_link,
+                if(t1.actor_id=-1,1,0) as unparsed
+            from 
+                 literature2 as t1
+            left join  
+                literature2_authors as t2 on t1.id = t2.literature2_id
+            left join 
+                actors as t3 on t2.actor_id = t3.id and t2.sort_order = 
+                (
+                    select 
+                        min(t4.sort_order) 
+                    from 
+                        literature2_authors as t4 
+                    where 
+                        t4.literature2_id = t1.id
+                    limit 1
+                )
+                
+            where 
+                  t1.project_id = $projectId and 
+                  t1.author is null and
+                  t3.name like '$letter%'
+            
+            order by author";
+
+        $data = $this->freeQuery($query);
+
+        foreach ((array)$data as $key => $val) {
+            $authors = $this->getReferenceAuthors([
+                'projectId' => $projectId,
+                'literatureId' => $val['id'],
+            ]);
+            $data[$key]['authors'] = $authors;
+            // In original template, this overrides the entry for author
+            // Replace here, this saves some processing later...
+            if (!empty($authors)) {
+                $data[$key]['author'] = implode(', ', array_column($authors, 'name'));
+            }
+
+            // Fields publishedin and periodical need to be retrieved if referenced in the same table.
+            // Doing this outside of the main query saves a couple of joins.
+            $data[$key]['periodical'] = $this->getPublication([
+                'projectId' => $projectId,
+                'id' => $val['periodical']
+            ]);
+            $data[$key]['publishedin'] = $this->getPublication([
+                'projectId' => $projectId,
+                'id' => $val['publishedin']
+            ]);
+        }
+
+        return $data;
+    }
+
+
+    public function getReferencesByTitleStartLetter ($params)
+    {
+        $projectId = isset($params['projectId']) ? $params['projectId'] : null;
+        $letter = isset($params['letter']) ? strtolower(substr($params['letter'], 0, 1)) : null;
+
+        if (is_null($projectId) || is_null($letter)) {
+            return null;
+        }
+
+        $query = "
+            select 
+                t1.id,
+                t1.language_id,
+                t1.label,
+                t1.alt_label,
+                t1.alt_label_language_id,
+                t1.date,
+                t1.author,
+                t1.publication_type,
+                ifnull(t1.publishedin,ifnull(publishedin_id,null)) as publishedin,
+                ifnull(t1.periodical,ifnull(periodical_id,null)) as periodical,
+                t1.pages,
+                t1.volume,
+                t1.external_link,
+                if(t1.actor_id=-1,1,0) as unparsed
+            from 
+                literature2 as t1 
+            where 
+                t1.project_id = $projectId and 
+                t1.label like '$letter%'
+             
+            order by t1.label";
+
+        $data = $this->freeQuery($query);
+
+        // We need to add those references starting with quotes etc. and parse these
+        $query = "
+            select 
+                t1.id,
+                t1.language_id,
+                t1.label,
+                t1.alt_label,
+                t1.alt_label_language_id,
+                t1.date,
+                t1.author,
+                t1.publication_type,
+                ifnull(t1.publishedin,ifnull(publishedin_id,null)) as publishedin,
+                ifnull(t1.periodical,ifnull(periodical_id,null)) as periodical,
+                t1.pages,
+                t1.volume,
+                t1.external_link,
+                if(t1.actor_id=-1,1,0) as unparsed
+            from 
+                literature2 as t1 
+            where 
+                t1.project_id = $projectId and 
+                t1.label not rlike '^[A-Za-z0-9]'
+             
+            order by t1.label";
+
+        $bonus = $this->freeQuery($query);
+
+        foreach ((array)$bonus as $key => $val) {
+            $test = strip_tags($val['label']);
+            // First character is non-alphanumerical and second matches letter
+             if (preg_match("/[^\d \pL]/u", substr($test, 0, 1)) === 1 &&
+                strpos(strtolower(preg_replace('/[^A-Za-z0-9]/','', $test)), $letter) === 0) {
+                    // Prepend to existing results
+                    array_unshift($data, $val);
+             }
+        }
+
+        foreach ((array)$data as $key => $val) {
+            $authors = $this->getReferenceAuthors([
+                'projectId' => $projectId,
+                'literatureId' => $val['id'],
+            ]);
+            $data[$key]['authors'] = $authors;
+            // In original template, this overrides the entry for author
+            // Replace here, this saves some processing later...
+            if (!empty($authors)) {
+                $data[$key]['author'] = implode(', ', array_column($authors, 'name'));
+            }
+            // Fields publishedin and periodical need to be retrieved if referenced in the same table.
+            // Doing this outside of the main query saves a couple of joins.
+            $data[$key]['periodical'] = $this->getPublication([
+                'projectId' => $projectId,
+                'id' => $val['periodical']
+            ]);
+            $data[$key]['publishedin'] = $this->getPublication([
+                'projectId' => $projectId,
+                'id' => $val['publishedin']
+            ]);
+        }
+
+        return $data;
+    }
+
+    private function getPublication ($params)
+    {
+        $projectId = isset($params['projectId']) ? $params['projectId'] : null;
+        $id = isset($params['id']) ? $params['id'] : null;
+
+        if (is_null($projectId) || is_null($id)) {
+            return null;
+        }
+        // It's a string, don't touch it
+        if (!is_numeric($id)) {
+            return $id;
+        }
+
+        $query = "
+            select 
+                label 
+            from 
+                literature2 
+            where 
+                project_id = $projectId and
+                id = " . (int)$id;
+
+        $data = $this->freeQuery($query);
+
+        return !empty($data) ? $data[0]['label'] : null;
+    }
+
+    public function getReferences ($params)
     {
         $projectId = isset($params['projectId']) ? $params['projectId'] : null;
         $publicationTypeId = isset($params['publicationTypeId']) ? $params['publicationTypeId'] : null;
@@ -158,6 +392,7 @@ final class Literature2Model extends AbstractModel
 		
 		foreach((array)$data as $key=>$val)
 		{
+			/*
 			$query="
 				select
 					_b.name
@@ -175,6 +410,12 @@ final class Literature2Model extends AbstractModel
 			";
 		
 			$data[$key]['authors']=$this->freeQuery( $query );
+			*/
+
+            $data[$key]['authors'] = $this->getReferenceAuthors([
+                'projectId' => $projectId,
+                'literatureId' => $val['id'],
+            ]);
 		}
 		
 		return $data;
@@ -213,6 +454,7 @@ final class Literature2Model extends AbstractModel
 		if ( is_null($project_id) )
 			return;
 
+		/*
         $query = "
             select distinct * from (
 				select
@@ -236,6 +478,33 @@ final class Literature2Model extends AbstractModel
 					_a.project_id = ".$project_id."
 			) as unification
 			order by letter";
+		*/
+
+        $query = "
+            select distinct * from (
+			
+				select
+					distinct substr(_a.author,1,1) as letter
+				from
+					%PRE%literature2 _a
+				where
+					_a.project_id = ".$project_id."
+			
+			union
+				
+				select
+					distinct substr(_a.author,1,1) as letter
+				from
+					%PRE%literature2 _a
+				left join %PRE%actors _f
+					on _a.actor_id = _f.id
+					and _a.project_id=_f.project_id
+				where
+					_a.project_id = ".$project_id."
+			
+			) as unification
+			
+			order by letter collate utf8_unicode_ci;";
 
         return $this->freeQuery( $query );
     }
@@ -415,6 +684,7 @@ final class Literature2Model extends AbstractModel
 			order by _a.sort_order,_b.name";
 
         return $this->freeQuery($query);
+
     }
 	
 }

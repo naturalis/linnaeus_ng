@@ -14,6 +14,8 @@ class Literature2Controller extends Controller
 {
 
 	private $_lookupListMaxResults=99999;
+	private $authorAlphabet;
+    private $titleAlphabet;
 
     public $usedModels = array(
 		'literature2',
@@ -62,11 +64,53 @@ class Literature2Controller extends Controller
 
     }
 
-    public function indexAction()
+    public function indexAction ()
     {
-		$this->smarty->assign( 'authorAlphabet', $this->getAuthorAlphabet() );
-		$this->smarty->assign( 'titleAlphabet', $this->getTitleAlphabet() );
+        $this->smarty->assign('authorAlphabet', $this->getAuthorAlphabet());
+		$this->smarty->assign('titleAlphabet', $this->getTitleAlphabet());
+        $this->smarty->assign('letter', $this->getCurrentLetter());
+        $this->smarty->assign('tab', $this->getCurrentTab());
+        $this->smarty->assign('references', $this->getReferencesByStartLetter());
+
         $this->printPage();
+    }
+
+    private function getReferencesByStartLetter ()
+    {
+        $letter = $this->getCurrentLetter();
+        if (!empty($letter)) {
+            $method = 'getReferencesBy' . $this->getCurrentTab() . 'StartLetter';
+            return $this->models->Literature2Model->{$method}([
+                'projectId' => $this->getCurrentProjectId(),
+                'letter' => $letter,
+            ]);
+        }
+        return [];
+    }
+
+    private function getCurrentTab ()
+    {
+        if ($this->rHasVal('title')) {
+            return 'title';
+        }
+        return 'author';
+    }
+
+    private function getCurrentLetter ()
+    {
+        $this->getTitleAlphabet();
+        $this->getAuthorAlphabet();
+
+        foreach (['title', 'author'] as $tab) {
+            if ($this->rHasVal($tab)) {
+                $var = $tab . 'Alphabet';
+                $letter = mb_substr(html_entity_decode($this->rGetVal($tab)), 0, 1);
+                if (!$letter && !empty($this->{$var})) {
+                    $letter = $this->{$var}[0]['letter'];
+                }
+            }
+        }
+        return isset($letter) ? mb_strtolower($letter) : false;
     }
 
     public function referenceAction()
@@ -125,12 +169,20 @@ class Literature2Controller extends Controller
 
 	private function getTitleAlphabet()
 	{
-		return $this->models->Literature2Model->getTitleAlphabet( array( 'project_id'=>$this->getCurrentProjectId() ) );
+		if (!$this->titleAlphabet) {
+            $this->titleAlphabet =
+                $this->models->Literature2Model->getTitleAlphabet(['project_id'=>$this->getCurrentProjectId()]);
+        }
+		return $this->titleAlphabet;
 	}
 
 	private function getAuthorAlphabet()
 	{
-		return $this->models->Literature2Model->getAuthorAlphabet(array( 'project_id'=>$this->getCurrentProjectId() ) );
+        if (!$this->authorAlphabet) {
+            $this->authorAlphabet =
+                $this->models->Literature2Model->getAuthorAlphabet(['project_id'=>$this->getCurrentProjectId()]);
+        }
+        return $this->authorAlphabet;
 	}
 
 	private function getReferenceAuthors( $id )
