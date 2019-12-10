@@ -9,7 +9,7 @@
 		{if $matrix.default==1}
 			{t}(this is the default matrix){/t}
 		{else}
-			{t}(this is not currently the default matrix;{/t} <a href="?action=def&id={$matrix.id}">{t}make this matrix the default matrix{/t}</a>)
+			{t}(this is not currently the default matrix;{/t} <a href="?default={$matrix.id}">{t}make this matrix the default matrix{/t}</a>)
 		{/if}
 		<br />
 	{/if}

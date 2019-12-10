@@ -280,15 +280,27 @@ class MatrixKeyController extends Controller
     {
         $this->checkAuthorisation();
 
-        if ($this->getCurrentMatrixId() == null)
+        if ($this->getCurrentMatrixId() == null) {
             $this->redirect('matrices.php');
+        }
 
-        $matrix=$this->getMatrix( $this->getCurrentMatrixId() );
+        if ($this->rHasVal('default'))
+        {
+            $this->UserRights->setActionType( $this->UserRights->getActionUpdate() );
+            $this->checkAuthorisation();
+            $this->setDefaultMatrix($this->rGetVal('default'));
+            $this->setCurrentMatrixId($this->rGetVal('default'));
+        }
+        $matrix = $this->getMatrix( $this->getCurrentMatrixId() );
 
         $this->setPageName(sprintf($this->translate('Editing matrix "%s"'), $matrix['label']), $this->translate('Editing matrix'));
 
-        if ($this->rHasVal('char')) $this->smarty->assign('activeCharacteristic', $this->rGetVal('char'));
-        if ($this->_useVariations) $this->smarty->assign('variations', $this->getVariationsInMatrix());
+        if ($this->rHasVal('char')) {
+            $this->smarty->assign('activeCharacteristic', $this->rGetVal('char'));
+        }
+        if ($this->_useVariations) {
+            $this->smarty->assign('variations', $this->getVariationsInMatrix());
+        }
 
 		$this->smarty->assign( 'characteristics', $this->getCharacteristics() );
         $this->smarty->assign( 'taxa', $this->getTaxa() );
