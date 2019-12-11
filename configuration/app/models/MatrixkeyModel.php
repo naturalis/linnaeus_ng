@@ -941,15 +941,10 @@ final class MatrixKeyModel extends AbstractModel
 					trim(_c.label) as label,
 					_c.taxon_id as taxon_id,
 					_d.taxon as taxon,
-					null as commonname
+					_e.commonname as commonname
 
 				from
 					%PRE%matrices_variations _a
-
-				left join %PRE%matrices_taxa_states _b
-					on _a.matrix_id = _b.matrix_id
-					and _a.variation_id = _b.variation_id
-					and _b.project_id = " . $project_id . "
 
 				left join %PRE%taxa_variations _c
 					on _a.variation_id = _c.id
@@ -959,9 +954,24 @@ final class MatrixKeyModel extends AbstractModel
 					on _c.taxon_id = _d.id
 					and _d.project_id = " . $project_id . "
 
+                left join %PRE%commonnames _e
+                    on _e.taxon_id = _d.id
+                    and _e.language_id = $language_id
+                    and _e.project_id = $project_id
+
+				left join %PRE%matrices_taxa_states _b
+					on _a.matrix_id = _b.matrix_id
+					and _a.variation_id = _b.variation_id
+					and _b.taxon_id = _d.id
+                    and _b.project_id = " . $project_id . "
+
 				where _a.project_id = " . $project_id . "
 					and _a.matrix_id = " . $matrix_id . "
-					and (lower(_c.label) like '%". $search ."%' or lower(_d.taxon) like '%". $search ."%')
+					and (
+					    _c.label like '%". $search ."%' or 
+					    _e.commonname like '%". $search ."%' or 
+					    _d.taxon like '%". $search ."%'
+					)
 
 				union
 
