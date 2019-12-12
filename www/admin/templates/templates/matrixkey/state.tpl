@@ -72,7 +72,7 @@ input[type=text] {
 			{if $state.file_name}
 				<img src="{$state.file_name}" onclick="allShowMedia('{$state.file_name}','');" class="image-preview" />
 				<input type="hidden" name="existing_file" value="{$state.file_name}" /><br />
-				<span class="a" onclick="matrixDeleteStateImage();">{t}delete image{/t}</span>
+				<span class="a" onclick="matrixDeleteStateImage();">{t}detach image{/t}</span>
 			{else}
 				<a href="../media/upload.php?item_id={$state.id}&amp;module_id={$module_id}">{t}Upload{/t}</a> or
 				<a href="../media/select.php?item_id={$state.id}&amp;module_id={$module_id}">{t}attach media{/t}</a> {t}to this state{/t}.
