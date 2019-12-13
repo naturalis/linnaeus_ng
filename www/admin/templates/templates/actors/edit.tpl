@@ -216,24 +216,19 @@ $(document).ready(function()
 {
 
 	$( 'input[name=is_company]' ).on( "click", function() {
-		$( 'input[name=is_company]' ).each(function(){
-			if ($(this).attr('checked')=='checked')
-			{
-				if ($(this).val()==1)
-				{
-					$('#employee_of').toggle(false);
-					$('#employee_of_id').val("");
 
-					$('#gender').toggle(false);
-					$('#no_gender').attr("checked","checked");
-				}
-				else
-				{
-					$('#employee_of').toggle(true);
-					$('#gender').toggle(true);
-				}
-			}
-		});
+		if ($("input[name=is_company]:checked").val() == 1) {
+			$('#employee_of').toggle(false);
+			$('#employee_of_id').val("");
+
+			$('#gender').toggle(false);
+			$('#no_gender').attr("checked","checked");
+		}
+		else
+		{
+			$('#employee_of').toggle(true);
+			$('#gender').toggle(true);
+		}
 	} );
 
 	{if $actor.is_company=='1'}

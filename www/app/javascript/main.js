@@ -498,7 +498,7 @@ function chkPIDInLink(h,p) {
 		p: paramter & value ("p=123") to check for
 	*/
 
-	if (h && h.indexOf('javascript:')==-1) {
+	if (h && h.indexOf('javascript:')==-1 && h.indexOf('mailto:')==-1) {
 
 		var url = $.url(h); // pass in a URI as a string and parse that
 
@@ -545,9 +545,12 @@ function chkPIDInLinks(pid,par) {
 	var p = par+'='+pid;
 
 	$('a').each(function() {
+		// Assume new window links are not related to Linnaeus; don not append epi
+		if ($(this).attr('target') !== '_blank') {
 
-		$(this).attr('href',chkPIDInLink($(this).attr('href'),p));
+			$(this).attr('href', chkPIDInLink($(this).attr('href'), p));
 
+		}
 	});
 
 }
