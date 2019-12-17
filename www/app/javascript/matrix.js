@@ -746,7 +746,7 @@ function formatResult( data )
 						fetchTemplate( 'iconSimilarTpl' ).replace('%IMG-URL%',matrixsettings.imageRootSkin+"gelijk_grijs.png") : "")
 				: "" )
 			)
-			.replace(/%OBSERVATION-LINK%/i, matrixsettings.observationUrl.length > 0 && getResultCount() <= matrixsettings.observationThreshold ?
+			.replace(/%OBSERVATION-LINK%/i, matrixsettings.observationUrl.length > 0 && getResultCount() <= matrixsettings.observationThreshold && data.type!='matrix' ?
 				fetchTemplate( 'observationLinkIconHtmlTpl' )
 					.replace('%LINK%', matrixsettings.observationUrl.replace('%SCIENTIFICNAME%', sciName))
 					.replace('%TITLE%', __('waarneming invoeren'))
