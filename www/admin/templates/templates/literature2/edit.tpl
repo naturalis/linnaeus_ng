@@ -206,7 +206,7 @@ function saveLitForm()
 	<tr style="height: 15px;"><th></th><td></td></tr>
 	<tr>
 		<th>{t}preview{/t}:</th>
-		<td>{$reference.formatted}</td>
+		<td style="max-width: 450px;">{$reference.formatted}</td>
 	</tr>
 	{/if}
 

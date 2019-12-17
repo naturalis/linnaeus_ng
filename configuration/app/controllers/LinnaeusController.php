@@ -208,14 +208,7 @@ class LinnaeusController extends Controller
 
     public function noProjectAction()
 	{
-		$this->redirect($this->baseUrl.'?nopid');
-		/*
-		$projects = $this->models->Project->_get(array('id' => array('published' => 1)));
-
-		$this->smarty->assign('excludeLogout',true);
-
-        $this->printPage();
-		*/
+	    $this->redirect($this->baseUrl.'?nopid');
 	}
 
 	public function getContent($sub=null,$id=null)

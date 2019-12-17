@@ -283,9 +283,22 @@ class Controller extends BaseClass
 
         $d = $this->getCurrentProjectId();
 
+        // Last resort: if there's only one published project and
+        // a pid has not been set yet, accept and use this id
+        if (is_null($d)) {
+            $projects = $this->models->Projects->_get([
+                'id'=>array('published'=>1),
+            ]);
+            if (count($projects) == 1 && is_null($pB)) {
+                $d = $pB = $projects[0]['id'];
+                $this->setCurrentProjectId($d);
+            }
+        }
+
         // Also check if project is published
-        if ($d == null || !$this->projectIsPublished($d))
+        if ($d == null || $d !== null && !$this->projectIsPublished($d)) {
             $this->redirect($this->generalSettings['urlNoProjectId']);
+        }
 
 		if ($pB != $d)
 			unset($_SESSION['app']['user']);
@@ -302,6 +315,7 @@ class Controller extends BaseClass
             $p = $this->models->Projects->_get(array(
                 'id' => (int)$pId
             ));
+
             return $p['published'] == 1;
         }
         return false;
