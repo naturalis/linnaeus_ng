@@ -101,7 +101,6 @@ database/shared.php
 database/taxon.php
 database/users.php
 database/schema_changes
-configuration/admin/controllers/Literature2Controller.php
 configuration/admin/controllers/SearchController-ORG.php
 www/app/style/linnaeus_ng/.sass-cache
 configuration/locale
@@ -111,7 +110,6 @@ configuration/app/rewrite/
 configuration/app/custom-configuration.php
 configuration/admin/custom-configuration.php
 www/app/templates/templates/linnaeus_ng/index/index--IMPROVED (work in progress).tpl
-cron/nsr-nba-export/nsr-nba-export.php
 tools/beelduitwisselaar-download/imageupload.key
 tools/beelduitwisselaar-download/config.php
 gulp/js/bundle.js
