@@ -20,15 +20,16 @@
 
     class SitemapCreator
     {
-		private $config;
+        private $config;
+        private $dbSettings;
 	    private $mysqli;
 	    private $tablePrefix;
 	    private $outputDir;
 	    private $domains;
-	    private $files = array();
-	    private $projects = array();
+	    private $files = [];
 	    private $projectId;
 	    private $domain;
+	    private $modulePath;
 	    private $moduleId;
 	    private $modulePages;
 	    private $mediaPages;
@@ -36,7 +37,7 @@
 
         public function __construct ()
         {
-            $this->getConfig();
+            $this->setConfig();
             $this->connectDb();
             $this->setOutputDir();
             $this->initXmlWriter();
@@ -49,17 +50,23 @@
             }
         }
 
-		public function run () {
+		public function run ()
+        {
             $this->bootstrap();
+            $this->setDomains();
             $this->deleteOldFiles();
             $this->writeFiles();
+            $this->writeIndex();
+            echo "Ready\n";
 		}
 
 		private function bootstrap ()
 		{
-            // Domains array is a must!
-            if (!is_array($this->domains) || empty($this->domains)) {
-                die("Domains should be set in an array: please refer to docs for instruction!\n");
+		    // Test if domains are set for project ids
+            if (!method_exists($this->config, 'getProjectsDomains') ||
+                empty($this->config->getProjectsDomains())) {
+                die('No relations between project ids and domain names defined in configuration/admin/configuration.php.' .
+                "\nPlease enter required data to getProjectsDomains() method.\n");
             }
             // Test if output directory exists; if not try to create it
             if (!file_exists($this->outputDir) && !mkdir($this->outputDir) && !is_dir($this->outputDir)) {
@@ -73,14 +80,15 @@
 
 		private function deleteOldFiles ()
 		{
-		    array_map('unlink', glob($this->outputDir . '*'));
+		    array_map('unlink', glob($this->outputDir . 'sitemap*'));
 		}
 
-		private function getConfig ()
+		private function setConfig ()
 		{
-            require_once __DIR__ . '/../../configuration/admin/configuration.php';
+		    require_once __DIR__ . '/../../configuration/admin/configuration.php';
             $this->config = new configuration();
-		}
+            $this->dbSettings = $this->config->getDatabaseSettings();
+        }
 
 		private function initXmlWriter ()
 		{
@@ -92,9 +100,9 @@
 
 		private function writeFiles ()
 		{
-            foreach ($this->domains as $this->projectId => $this->domain) {
+            foreach ($this->domains as $this->projectId => $domain) {
                 if ($this->projectIsPublic()) {
-                    $this->domain .= '/linnaeus_ng/app/views/';
+                    $this->setDomain($domain);
                     $this->writeIntroduction();
                     $this->writeKey();
                     $this->writeTaxa();
@@ -102,11 +110,20 @@
             }
 		}
 
+        private function setDomain ($domain)
+        {
+            if (strpos($domain, 'https://') === false) {
+                die('Protocol in domain name should start with https://! Currently is ' . $domain);
+            }
+            $this->domain = rtrim($domain, '/') . '/';
+            $this->modulePath = $this->domain . 'linnaeus_ng/app/views/';
+        }
+
 		private function writeIntroduction ()
 		{
             if ($this->moduleIsPublic('introduction')) {
                 $this->getIntroductionPages();
-                $this->writeModulePages('introduction_' . $this->projectId . '.xml');
+                $this->writeModulePages('sitemap_introduction_' . $this->projectId . '.xml');
             }
 		}
 
@@ -114,7 +131,7 @@
 		{
             if ($this->moduleIsPublic('key')) {
                 $this->getKeyPages();
-                $this->writeModulePages('key_' . $this->projectId . '.xml');
+                $this->writeModulePages('sitemap_key_' . $this->projectId . '.xml');
             }
 		}
 
@@ -122,8 +139,31 @@
         {
             if ($this->moduleIsPublic('nsr')) {
                 $this->getTaxonPages();
-                $this->writeModulePages('taxon_' . $this->projectId . '.xml');
+                $this->writeModulePages('sitemap_taxon_' . $this->projectId . '.xml');
             }
+        }
+
+        private function writeIndex ()
+        {
+            $this->xmlWriter->startDocument('1.0', 'UTF-8');
+            $this->xmlWriter->startElement('sitemapindex');
+            $this->xmlWriter->startAttribute('xmlns');
+            $this->xmlWriter->text('http://www.sitemaps.org/schemas/sitemap/0.9');
+            $this->xmlWriter->endAttribute();
+            foreach ($this->files as $projectId => $files) {
+                foreach ($files as $file) {
+                    $this->xmlWriter->startElement('sitemap');
+                    $this->xmlWriter->writeElement('loc', $file);
+                    $this->xmlWriter->writeElement('lastmod', date('Y-m-d'));
+                    $this->xmlWriter->endElement();
+                }
+            }
+            $this->xmlWriter->endElement();
+            file_put_contents(
+                $this->outputDir . 'sitemap_index.xml',
+                $this->xmlWriter->flush(true),
+                FILE_APPEND
+            );
         }
 
 		private function writeModulePages ($fileName)
@@ -135,7 +175,7 @@
 
         	foreach ($this->modulePages as $id => $url) {
         		$this->xmlWriter->startElement('url');
-        		$this->xmlWriter->writeElement('loc', $this->domain . $url);
+        		$this->xmlWriter->writeElement('loc', $this->modulePath . $url);
 
                 if (isset($this->mediaPages[$id])) {
                     foreach ($this->mediaPages[$id] as $media) {
@@ -158,18 +198,44 @@
         	   FILE_APPEND
         	);
 
-        	$this->files[$this->projectId][] = $this->outputDir . $fileName;
+        	$this->files[$this->projectId][] = $this->domain . $fileName;
 		}
 
-		private function getIntroductionPages ()
+        private function setDomains ()
+        {
+            $configDomains = $this->config->getProjectsDomains();
+
+            $q = '
+                select 
+                    id
+                from
+                    ' . $this->tablePrefix . 'projects
+                where
+                    published = 1';
+            $r = $this->mysqli->query($q);
+            while ($row = $r->fetch_assoc()) {
+                if (isset($configDomains[$row['id']])) {
+                    $this->domains[$row['id']] = $configDomains[$row['id']];
+                }
+            }
+
+            if (empty($this->domains)) {
+                die('No relations between project ids and domain names found in configuration/admin/configuration.php.' .
+                    "\nPlease enter required data to getProjectsDomains() method.\n");
+            }
+        }
+
+        private function getIntroductionPages ()
 		{
             $this->resetPages();
             $q = '
-                select id
+                select 
+                    id
                 from
                     ' . $this->tablePrefix . 'introduction_pages
                 where
                     project_id = ' . $this->projectId;
+
             $r = $this->mysqli->query($q);
             while ($row = $r->fetch_assoc()) {
                 $this->modulePages[$row['id']] = 'introduction/topic.php?id=' . $row['id'] .
@@ -182,7 +248,8 @@
 		{
             $this->resetPages();
 		    $q = '
-                select t1.id
+                select 
+                    t1.id
                 from
                     ' . $this->tablePrefix . 'keysteps as t1
                 left join
@@ -191,10 +258,12 @@
                     t2.title is not null
                     and t2.title != ""
                     and t2.title != t1.number
-                    and t1.project_id = ' . $this->projectId;
-		            $r = $this->mysqli->query($q);
+                    and t1.project_id = ' . $this->projectId . '
+		        limit 50000';
+
+		    $r = $this->mysqli->query($q);
             while ($row = $r->fetch_assoc()) {
-                $this->modulePages[$row['id']] = 'species/nsr_taxon.php?id=' . $row['id'] .
+                $this->modulePages[$row['id']] = 'key/index.php?step='. $row['id'] .
                     '&epi=' . $this->projectId;
             }
 		}
@@ -203,17 +272,18 @@
 		{
 		    $this->resetPages();
 		    $q = '
-                select id
+                select 
+                    id
 		        from
                     ' . $this->tablePrefix . 'taxa
 		        where
 		            is_empty = 0
                     and project_id = ' . $this->projectId . '
-                    limit 50000';
+                limit 50000';
 
 		    $r = $this->mysqli->query($q);
             while ($row = $r->fetch_assoc()) {
-                $this->modulePages[$row['id']] = 'key/index.php?choice=' . $row['id'] .
+                $this->modulePages[$row['id']] = 'species/nsr_taxon.php?id=' . $row['id'] .
                     '&epi=' . $this->projectId;
             }
 
@@ -226,7 +296,10 @@
 		private function setTaxonMedia ($id)
 		{
             $q = '
-                select t1.rs_original, t1.mime_type, t3.caption
+                select 
+                    t1.rs_original, 
+                    t1.mime_type, 
+                    t3.caption
                 from
                     ' . $this->tablePrefix . 'media as t1
                 left join
@@ -242,7 +315,8 @@
                     and t1.deleted = 0
                     and t4.def_language = 1
                     and t1.project_id = ' . $this->projectId;
-		    $r = $this->mysqli->query($q);
+
+            $r = $this->mysqli->query($q);
             while ($row = $r->fetch_assoc()) {
                 // Only images for now
                 if (strpos($row['mime_type'], 'image') !== false) {
@@ -256,8 +330,15 @@
 
 		private function setModuleId ($controller)
 		{
-            $q = 'select id from ' . $this->tablePrefix . 'modules where controller = "' .
+            $q = '
+                select 
+                    id 
+                from 
+                    ' . $this->tablePrefix . 'modules 
+                where 
+                    controller = "' .
                 $this->mysqli->real_escape_string($controller) . '"';
+
             $r = $this->mysqli->query($q);
             $row = $r->fetch_assoc();
             $this->moduleId = isset($row['id']) ? $row['id'] : 0;
@@ -272,6 +353,7 @@
                 where
                     id = ' . $this->projectId . '
                     and published = 1';
+
             $r = $this->mysqli->query($q);
             return $r->num_rows == 1;
 		}
@@ -288,6 +370,7 @@
                     t2.controller = "' . $controller .'"
                     and t1.project_id = ' . $this->projectId . '
                     and t1.active = "y"';
+
             $r = $this->mysqli->query($q);
             return $r->num_rows == 1;
 		}
@@ -298,116 +381,31 @@
             $this->moduleId = false;
 		}
 
-		public function setOutputDir ($path = false)
+		public function setOutputDir ()
 		{
-            $this->outputDir = dirname(__FILE__) . '/../../www/' . (!$path ? 'sitemap/' : $path . '/');
-		}
-
-		public function setDomains ($d = array())
-		{
-		    $this->domains = $d;
+            $this->outputDir = dirname(__FILE__) . '/../../www/';
 		}
 
     	private function connectDb()
 		{
-			$c = $this->config->getDatabaseSettings();
-			$this->tablePrefix = $c['tablePrefix'];
-
-		    $this->mysqli = new mysqli($c['host'], $c['user'], $c['password'], $c['database']);
+			$this->tablePrefix = isset($this->dbSettings['tablePrefix']) ?
+                $this->dbSettings['tablePrefix'] : '';
+		    $this->mysqli = new mysqli(
+		        $this->dbSettings['host'],
+                $this->dbSettings['user'],
+                $this->dbSettings['password'],
+                $this->dbSettings['database']
+            );
 
 			if ($this->mysqli->connect_error) {
 				throw new Exception($this->mysqli->connect_error . "\n");
 			}
 
-			$this->mysqli->query('SET NAMES ' . $c['characterSet']);
-			$this->mysqli->query('SET CHARACTER SET ' . $c['characterSet']);
+			$this->mysqli->query('SET NAMES ' . $this->dbSettings['characterSet']);
+			$this->mysqli->query('SET CHARACTER SET ' . $this->dbSettings['characterSet']);
 		}
     }
 
 
     $smc = new SitemapCreator();
-    $smc->setDomains(array(
-        85 => 'http://insecten_van_europa.linnaeus.naturalis.nl',
-        2 => 'http://de_interactieve_paddenstoelengids.linnaeus.naturalis.nl',
-        101 => 'http://dagvlinders_van_europa.linnaeus.naturalis.nl',
-        11 => 'http://turtles_of_the_world.linnaeus.naturalis.nl',
-        6 => 'http://vogels_van_europa.linnaeus.naturalis.nl',
-        7 => 'http://interactive_guide_to_caribbean_diving.linnaeus.naturalis.nl',
-        8 => 'http://euphausiids_of_the_world_ocean.linnaeus.naturalis.nl',
-        168 => 'http://sponges_of_the_north_east_atlantic_2.0.linnaeus.naturalis.nl',
-/*        67 => 'http://reptielen_&_amfibieën.linnaeus.naturalis.nl',
-        116 => 'http://marine_planarians_of_the_world.linnaeus.naturalis.nl',
-        97 => 'http://zoetwatervissen_van_nederland.linnaeus.naturalis.nl',
-        23 => 'http://zooplankton_of_the_south_atlantic_ocean.linnaeus.naturalis.nl',
-        24 => 'http://reef_corals_of_the_indo-malayan_seas.linnaeus.naturalis.nl',
-        25 => 'http://marine_lobsters_of_the_world.linnaeus.naturalis.nl',
-        26 => 'http://north_australian_sea_cucumbers.linnaeus.naturalis.nl',
-        27 => 'http://macrobenthos_of_the_north_sea_-_miscellaneous_worms.linnaeus.naturalis.nl',
-        93 => 'http://macrobenthos_of_the_north_sea_-_polychaeta.linnaeus.naturalis.nl',
-        103 => 'http://plant_resources_of_south-east_asia,_edible_fruits_and_nuts.linnaeus.naturalis.nl',
-        34 => 'http://zooplankton_and_micronekton_of_the_north_sea.linnaeus.naturalis.nl',
-        32 => 'http://crabs_of_japan.linnaeus.naturalis.nl',
-        87 => 'http://otoliths_of_north_sea_fish_1.0.linnaeus.naturalis.nl',
-        55 => 'http://agromyzidae_of_the_world.linnaeus.naturalis.nl',
-        164 => 'http://eurasian_tortricidae_2.0.linnaeus.naturalis.nl',
-        43 => 'http://flora_of_the_burren_and_southeast_connemara.linnaeus.naturalis.nl',
-        94 => 'http://marine_planktonic_ostracods.linnaeus.naturalis.nl',
-        77 => 'http://chironomidae_exuviae.linnaeus.naturalis.nl',
-        210 => 'http://zooplankton_and_micronekton_of_the_north_sea_2.0.linnaeus.naturalis.nl',
-        51 => 'http://interactive_flora_of_the_british_isles.linnaeus.naturalis.nl',
-        162 => 'http://butterflies_of_europe.linnaeus.naturalis.nl',
-        59 => 'http://marine_mammals.linnaeus.naturalis.nl',
-        195 => 'http://braconidae_-_an_illustrated_key_to_all_subfamilies.linnaeus.naturalis.nl',
-        117 => 'http://flora_malesiana_-_caesalpinioideae.linnaeus.naturalis.nl',
-        76 => 'http://turbellaria_of_the_world.linnaeus.naturalis.nl',
-        74 => 'http://sharks_of_the_world.linnaeus.naturalis.nl',
-        142 => 'http://tree_seedlings_of_indonesia.linnaeus.naturalis.nl',
-        124 => 'http://freshwater_oligochaeta_of_north-west_europe_1.0.linnaeus.naturalis.nl',
-        81 => 'http://torymus.linnaeus.naturalis.nl',
-        82 => 'http://pteromalus.linnaeus.naturalis.nl',
-        129 => 'http://plant_resources_of_south-east_asia,_bamboos.linnaeus.naturalis.nl',
-        96 => 'http://prosea_timber_trees.linnaeus.naturalis.nl',
-        92 => 'http://blackflies_of_northern_europe_(diptera:_simuliidae).linnaeus.naturalis.nl',
-        202 => 'http://useful_plants_-_an_introduction_to_economic_botany.linnaeus.naturalis.nl',
-        128 => 'http://plant_resources_of_south-east_asia,_rattans.linnaeus.naturalis.nl',
-        137 => 'http://interactive_guide_to_mushrooms_and_other_fungi.linnaeus.naturalis.nl',
-        119 => 'http://decapodos_de_chile.linnaeus.naturalis.nl',
-        115 => 'http://cultivation_and_farming_of_marine_plants.linnaeus.naturalis.nl',
-        125 => 'http://de_interactieve_duikgids.linnaeus.naturalis.nl',
-        192 => 'http://blackflies_of_northern_europe_(diptera:_simuliidae)_25.linnaeus.naturalis.nl',
-        190 => 'http://chironomidae_larvae.linnaeus.naturalis.nl',
-        204 => 'http://mush33.linnaeus.naturalis.nl',
-        207 => 'http://birds_of_europe_3.1.linnaeus.naturalis.nl',
-        135 => 'http://reptiles_and_amphibians_of_the_british_isles.linnaeus.naturalis.nl',
-        203 => 'http://orchids_of_the_philippines_2.0.linnaeus.naturalis.nl',
-        141 => 'http://fishes_of_the_northeastern_atlantic_and_mediterranean.linnaeus.naturalis.nl',
-        143 => 'http://sponges_of_the_ne_atlantic.linnaeus.naturalis.nl',
-        209 => 'http://belgische_flora_test_2014.linnaeus.naturalis.nl',
-        145 => 'http://libellenlarven_van_nederland.linnaeus.naturalis.nl',
-        148 => 'http://lemurs.linnaeus.naturalis.nl',
-        147 => 'http://bird_remains_identification_system.linnaeus.naturalis.nl',
-        150 => 'http://davalliaceae_1,_a_family_of_old_world_(sub-)tropical_ferns.linnaeus.naturalis.nl',
-        152 => 'http://bats_of_the_indian_subcontinent.linnaeus.naturalis.nl',
-        169 => 'http://pelagic_molluscs_2.0.linnaeus.naturalis.nl',
-        155 => 'http://diaspididae_of_the_world_2.0.linnaeus.naturalis.nl',
-        156 => 'http://tutorial_preparation_genitalia.linnaeus.naturalis.nl',
-        157 => 'http://mormyridae_(osteoglossomorpha).linnaeus.naturalis.nl',
-        159 => 'http://fish_eggs_and_larvae_from_amw.linnaeus.naturalis.nl',
-        211 => 'http://european_limnofauna.linnaeus.naturalis.nl',
-        165 => 'http://flora_malesiana_-_caesalpinioideae_2.0.linnaeus.naturalis.nl',
-        167 => 'http://harmful_marine_dinoflagellates.linnaeus.naturalis.nl',
-        171 => 'http://macrobenthos_of_the_north_sea_-_platyhelminthes.linnaeus.naturalis.nl',
-        172 => 'http://macrobenthos_of_the_north_sea_-_sipuncula.linnaeus.naturalis.nl',
-        173 => 'http://macrobenthos_of_the_north_sea_-_nemertina.linnaeus.naturalis.nl',
-        177 => 'http://macrobenthos_of_the_north_sea_-_brachiopoda.linnaeus.naturalis.nl',
-        176 => 'http://macrobenthos_of_the_north_sea_-_anthozoa.linnaeus.naturalis.nl',
-        180 => 'http://macrobenthos_of_the_north_sea_-_crustacea.linnaeus.naturalis.nl',
-        181 => 'http://macrobenthos_of_the_north_sea_-_tunicata.linnaeus.naturalis.nl',
-        182 => 'http://macrobenthos_of_the_north_sea_-_pycnogonida.linnaeus.naturalis.nl',
-        183 => 'http://macrobenthos_of_the_north_sea_-_mollusca.linnaeus.naturalis.nl',
-        185 => 'http://macrobenthos_of_the_north_sea_-_echinodermata.linnaeus.naturalis.nl',
-        186 => 'http://flora_arbórea_de_chile.linnaeus.naturalis.nl',
-        193 => 'http://aetideidae_of_the_world_ocean.linnaeus.naturalis.nl'
-        */
-    ));
     $smc->run();

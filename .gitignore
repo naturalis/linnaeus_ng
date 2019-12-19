@@ -120,3 +120,4 @@ node_modules
 vendor
 composer.lock
 yarn.lock
+www/sitemap*

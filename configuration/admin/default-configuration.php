@@ -33,6 +33,17 @@ class configuration
         );
     }
 
+    /*
+     * Assign (sub)domain names to project ids; required to generate sitemaps!
+     * Format is [project id => domain name]
+     */
+    public function getProjectsDomains ()
+    {
+        return [
+            // 1 => 'https://example.linnaeus.naturalis.nl',
+        ];
+    }
+
     public function getSmartySettings ()
     {
         return array(
