@@ -3260,6 +3260,7 @@ class Controller extends BaseClass
         if (empty($r)) {
             return '';
         }
+
         // Trim white space
         array_walk_recursive($r, function(&$v) {
             $v = trim($v);
@@ -3273,12 +3274,18 @@ class Controller extends BaseClass
             $author .= ' ' . $r['date'];
         }
         // Wrap in link
-        $str = sprintf($url, $author);
-        // Append the rest
-        if (substr($author, -1) !== '.') {
-            $str .= '.';
+        if ($author != '') {
+            $str = sprintf($url, $author);
+            if (substr($author, -1) !== '.') {
+                $str .= '.';
+            }
+            $str .= ' ';
+        } else {
+            $str = '';
         }
-        $str .= ' ' . $r['label'];
+
+        // Append the rest
+        $str .= $r['label'];
         if (!in_array(substr($r['label'], -1), ['?','!','.'])) {
             $str .= '.';
         }
@@ -3303,7 +3310,7 @@ class Controller extends BaseClass
         }
 
         if (!empty($r['volume']) && !empty($r['pages'])) {
-            $str .= ': ';
+            $str .= $r['volume'] . ': ';
         } else if (!empty($r['volume'])) {
             $str .= ' ' . $r['volume'] . '. ';
         }
@@ -3317,6 +3324,9 @@ class Controller extends BaseClass
         // Add closing dot if this is lacking
         if (substr($str, -1) !== '.') {
             $str .= '.';
+        }
+        if (!empty($r['external_link'])) {
+            $str .= ' [<a href="' . $r['external_link'] . '" target="_blank">link</a>]';
         }
         // Remove any double spaces if necessary
         return preg_replace('/\s+/', ' ', $str);

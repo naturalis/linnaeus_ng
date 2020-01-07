@@ -3150,40 +3150,54 @@ class Controller extends BaseClass
         if (empty($r)) {
             return '';
         }
+
         // Trim white space
         array_walk_recursive($r, function(&$v) {
             $v = trim($v);
         });
 
         // Base part
-        $url = '<a href="' . $this->baseUrl . $this->appName . '/views/literature2/edit.php?id=' .
+        $url = '<a href="' . $this->baseUrl . $this->appName . '/views/literature2/reference.php?id=' .
             $r['id'] . '">%s</a>';
         $author = $this->setAuthorString($r);
         if (!empty($r['date'])) {
             $author .= ' ' . $r['date'];
         }
         // Wrap in link
-        $str = sprintf($url, $author);
-        // Append the rest
-        if (substr($author, -1) !== '.') {
-            $str .= '.';
+        if ($author != '') {
+            $str = sprintf($url, $author);
+            if (substr($author, -1) !== '.') {
+                $str .= '.';
+            }
+            $str .= ' ';
+        } else {
+            $str = '';
         }
-        $str .= ' ' . $r['label'];
+
+        // Append the rest
+        $str .= $r['label'];
         if (!in_array(substr($r['label'], -1), ['?','!','.'])) {
             $str .= '.';
         }
 
         $pub = '';
-        if (!empty($r['periodical_id']) && isset($r['periodical_ref'])) {
-            $pub .= $r['periodical_ref']['label'] . ' ';
+        /*
+        * This part is different from the app method! Do not
+        * copy/paste directly from app :)
+        */
+        if (!empty($r['periodical_label'])) {
+            $pub .= $r['periodical_label'] . ' ';
         } else if (!empty($r['periodical'])) {
             $pub .= $r['periodical'] . ' ';
         }
-        if (isset($r['publishedin_id']) && !empty($r['publishedin_id'] && !empty($r['publishedin_ref']['label']))) {
-            $pub .= $r['publishedin_ref']['label'] . ' ';
+        if (isset($r['publishedin_label'])) {
+            $pub .= $r['publishedin_label'] . ' ';
         } else if (!empty($r['publishedin'])) {
             $pub .= $r['publishedin'] . ' ';
         }
+        /*
+         * End of different part!
+         */
 
         // Strip dot if volume directly after label
         if (trim($pub) == '' && !empty($r['volume'])) {
@@ -3193,7 +3207,7 @@ class Controller extends BaseClass
         }
 
         if (!empty($r['volume']) && !empty($r['pages'])) {
-            $str .= ': ';
+            $str .= $r['volume'] . ': ';
         } else if (!empty($r['volume'])) {
             $str .= ' ' . $r['volume'] . '. ';
         }
@@ -3207,6 +3221,9 @@ class Controller extends BaseClass
         // Add closing dot if this is lacking
         if (substr($str, -1) !== '.') {
             $str .= '.';
+        }
+        if (!empty($r['external_link'])) {
+            $str .= ' [<a href="' . $r['external_link'] . '" target="_blank">link</a>]';
         }
         // Remove any double spaces if necessary
         return preg_replace('/\s+/', ' ', $str);

@@ -1429,6 +1429,7 @@ class SpeciesModel extends AbstractModel
 				ifnull(_a.publishedin,ifnull(_h.label,null)) as publishedin,
 				ifnull(_a.periodical,ifnull(_i.label,null)) as periodical,
 				_a.pages,
+                _a.publisher,
 				_a.volume,
 				_a.external_link,
 				ifnull(_b.name,_a.author) as author
