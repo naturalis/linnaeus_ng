@@ -160,7 +160,7 @@
             }
             $this->xmlWriter->endElement();
             file_put_contents(
-                $this->outputDir . 'sitemap_index.xml',
+                $this->outputDir . 'linnaeus/sitemap_index.xml',
                 $this->xmlWriter->flush(true),
                 FILE_APPEND
             );
