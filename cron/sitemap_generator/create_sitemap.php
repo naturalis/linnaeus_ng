@@ -160,7 +160,7 @@
             }
             $this->xmlWriter->endElement();
             file_put_contents(
-                $this->outputDir . 'linnaeus/sitemap_index.xml',
+                $this->outputDir . 'sitemap_index.xml',
                 $this->xmlWriter->flush(true),
                 FILE_APPEND
             );
@@ -198,7 +198,7 @@
         	   FILE_APPEND
         	);
 
-        	$this->files[$this->projectId][] = $this->domain . $fileName;
+        	$this->files[$this->projectId][] = $this->domain . 'linnaeus_ng/' . $fileName;
 		}
 
         private function setDomains ()
