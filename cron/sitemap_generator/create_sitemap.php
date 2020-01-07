@@ -1,17 +1,17 @@
 <?php
 /*
  * This class creates a sitemap for Linnaeus. Currently there is no way
- * to link projects to absolute urls required for the sitemap. A provisional
- * solution is to initialize the class with an array like this:
+ * to link projects to absolute urls required for the sitemap.
  *
- * $class->setDomains(array(
- *     project_id_1 => 'absolute_url_1',
- *     project_id_2 => 'absolute_url_2',
- *     etc...
- * );
+ * To fix this, this script needs to be told the full server name. This should be
+ * set in configuration/admin/configuration.php:
  *
- * where the absolute_url is the full domain:
- * http://project.linnaeus.naturalis.nl
+ *  public function getProjectsDomains ()
+    {
+        return [
+            // 1 => 'https://example.linnaeus.naturalis.nl',
+        ];
+    }
  *
  */
 

@@ -3297,9 +3297,9 @@ class Controller extends BaseClass
             $pub .= $r['periodical'] . ' ';
         }
         if (isset($r['publishedin_id']) && !empty($r['publishedin_id'] && !empty($r['publishedin_ref']['label']))) {
-            $pub .= $r['publishedin_ref']['label'] . ' ';
+            $pub .= 'In: ' . $r['publishedin_ref']['label'] . '. ';
         } else if (!empty($r['publishedin'])) {
-            $pub .= $r['publishedin'] . ' ';
+            $pub .= 'In: ' . $r['publishedin'] . '. ';
         }
 
         // Strip dot if volume directly after label
@@ -3317,6 +3317,7 @@ class Controller extends BaseClass
         if (!empty($r['pages'])) {
             $str .= $r['pages'] . '. ';
         }
+
         if (!empty($r['publisher'])) {
             $str .= $r['publisher'] . '.';
         }

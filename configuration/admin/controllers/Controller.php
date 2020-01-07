@@ -3191,9 +3191,9 @@ class Controller extends BaseClass
             $pub .= $r['periodical'] . ' ';
         }
         if (isset($r['publishedin_label'])) {
-            $pub .= $r['publishedin_label'] . ' ';
+            $pub .= 'In: ' . $r['publishedin_label'] . '. ';
         } else if (!empty($r['publishedin'])) {
-            $pub .= $r['publishedin'] . ' ';
+            $pub .= 'In: ' . $r['publishedin'] . '. ';
         }
         /*
          * End of different part!
