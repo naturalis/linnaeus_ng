@@ -3156,8 +3156,8 @@ class Controller extends BaseClass
             $v = trim($v);
         });
 
-        // Base part
-        $url = '<a href="' . $this->baseUrl . $this->appName . '/views/literature2/reference.php?id=' .
+        // Base part -- different from app!
+        $url = '<a href="' . $this->baseUrl . $this->appName . '/views/literature2/edit.php?id=' .
             $r['id'] . '">%s</a>';
         $author = $this->setAuthorString($r);
         if (!empty($r['date'])) {
