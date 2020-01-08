@@ -3151,8 +3151,6 @@ class Controller extends BaseClass
             return '';
         }
 
-        print_r($reference);
-
         // Trim white space
         array_walk_recursive($r, function(&$v) {
             $v = trim($v);
