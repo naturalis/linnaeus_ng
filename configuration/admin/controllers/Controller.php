@@ -3151,6 +3151,8 @@ class Controller extends BaseClass
             return '';
         }
 
+        print_r($reference);
+
         // Trim white space
         array_walk_recursive($r, function(&$v) {
             $v = trim($v);
@@ -3164,14 +3166,13 @@ class Controller extends BaseClass
             $author .= ' ' . $r['date'];
         }
         // Wrap in link
+        $str = '';
         if ($author != '') {
             $str = sprintf($url, $author);
             if (substr($author, -1) !== '.') {
                 $str .= '.';
             }
             $str .= ' ';
-        } else {
-            $str = '';
         }
 
         // Append the rest
@@ -3190,7 +3191,7 @@ class Controller extends BaseClass
         } else if (!empty($r['periodical'])) {
             $pub .= $r['periodical'] . ' ';
         }
-        if (isset($r['publishedin_label'])) {
+        if (!empty($r['publishedin_label'])) {
             $pub .= 'In: ' . $r['publishedin_label'] . '. ';
         } else if (!empty($r['publishedin'])) {
             $pub .= 'In: ' . $r['publishedin'] . '. ';

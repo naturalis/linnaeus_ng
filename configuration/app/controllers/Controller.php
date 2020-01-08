@@ -3274,14 +3274,13 @@ class Controller extends BaseClass
             $author .= ' ' . $r['date'];
         }
         // Wrap in link
+        $str = '';
         if ($author != '') {
             $str = sprintf($url, $author);
             if (substr($author, -1) !== '.') {
                 $str .= '.';
             }
             $str .= ' ';
-        } else {
-            $str = '';
         }
 
         // Append the rest
