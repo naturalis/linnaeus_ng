@@ -3295,7 +3295,7 @@ class Controller extends BaseClass
         } else if (!empty($r['periodical'])) {
             $pub .= $r['periodical'] . ' ';
         }
-        if (isset($r['publishedin_id']) && !empty($r['publishedin_id'] && !empty($r['publishedin_ref']['label']))) {
+        if (!empty($r['publishedin_id']) && !empty($r['publishedin_id'] && !empty($r['publishedin_ref']['label']))) {
             $pub .= 'In: ' . $r['publishedin_ref']['label'] . '. ';
         } else if (!empty($r['publishedin'])) {
             $pub .= 'In: ' . $r['publishedin'] . '. ';
@@ -3329,6 +3329,7 @@ class Controller extends BaseClass
             $str .= ' [<a href="' . $r['external_link'] . '" target="_blank">link</a>]';
         }
         // Remove any double spaces if necessary
+
         return preg_replace('/\s+/', ' ', $str);
     }
 
