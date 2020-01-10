@@ -158,9 +158,9 @@ class TraitsController extends Controller
 		foreach((array)$l as $key=>$val)
 		{
 			$l[$key]['authors']=$this->getReferenceAuthors(array('id'=>$val['id'],'project'=>$project));
-            $l[$key]['formatted'] = $this->formatReference($l[$key]);
-			$l[$key]['periodical_ref']=$this->getReference(array('id'=>$val['periodical_id'],'project'=>$project));
+ 			$l[$key]['periodical_ref']=$this->getReference(array('id'=>$val['periodical_id'],'project'=>$project));
 			$l[$key]['publishedin_ref']=$this->getReference(array('id'=>$val['publishedin_id'],'project'=>$project));
+            $l[$key]['formatted'] = $this->formatReference($l[$key]);
 		}
 		
 		if ( !empty($l) )
