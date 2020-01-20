@@ -34,6 +34,7 @@
 	    private $modulePages;
 	    private $mediaPages;
 	    private $xmlWriter;
+	    private $linksPerSitemap = 50000;
 
         public function __construct ()
         {
@@ -123,7 +124,7 @@
 		{
             if ($this->moduleIsPublic('introduction')) {
                 $this->getIntroductionPages();
-                $this->writeModulePages('sitemap_introduction_' . $this->projectId . '.xml');
+                $this->writeModulePages('sitemap_introduction');
             }
 		}
 
@@ -131,7 +132,7 @@
 		{
             if ($this->moduleIsPublic('key')) {
                 $this->getKeyPages();
-                $this->writeModulePages('sitemap_key_' . $this->projectId . '.xml');
+                $this->writeModulePages('sitemap_key');
             }
 		}
 
@@ -139,7 +140,7 @@
         {
             if ($this->moduleIsPublic('nsr')) {
                 $this->getTaxonPages();
-                $this->writeModulePages('sitemap_taxon_' . $this->projectId . '.xml');
+                $this->writeModulePages('sitemap_taxon');
             }
         }
 
@@ -166,39 +167,49 @@
             );
         }
 
-		private function writeModulePages ($fileName)
+		private function writeModulePages ($file)
 		{
-        	$this->xmlWriter->startDocument('1.0', 'UTF-8');
-        	$this->xmlWriter->startElement('urlset');
-        	$this->xmlWriter->writeAttribute('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9');
-        	$this->xmlWriter->writeAttribute('xmlns:image', 'http://www.google.com/schemas/sitemap-image/1.1');
 
-        	foreach ($this->modulePages as $id => $url) {
-        		$this->xmlWriter->startElement('url');
-        		$this->xmlWriter->writeElement('loc', $this->modulePath . $url);
+            $sets = array_chunk($this->modulePages, $this->linksPerSitemap);
 
-                if (isset($this->mediaPages[$id])) {
-                    foreach ($this->mediaPages[$id] as $media) {
-                        $this->xmlWriter->startElement('image:image');
-                        $this->xmlWriter->writeElement('image:loc', $media['loc']);
-                        if (!empty($media['caption'])) {
-                            $this->xmlWriter->writeElement('image:caption', $media['caption']);
+		    foreach ($sets as $i => $pages) {
+
+                $fileName = $file . '_' . $this->projectId . '_' . ($i + 1) . '.xml';
+
+                $this->xmlWriter->startDocument('1.0', 'UTF-8');
+                $this->xmlWriter->startElement('urlset');
+                $this->xmlWriter->writeAttribute('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9');
+                $this->xmlWriter->writeAttribute('xmlns:image', 'http://www.google.com/schemas/sitemap-image/1.1');
+
+                foreach ($pages as $id => $url) {
+
+                    $this->xmlWriter->startElement('url');
+                    $this->xmlWriter->writeElement('loc', $this->modulePath . $url);
+
+                    if (isset($this->mediaPages[$id])) {
+                        foreach ($this->mediaPages[$id] as $media) {
+                            $this->xmlWriter->startElement('image:image');
+                            $this->xmlWriter->writeElement('image:loc', $media['loc']);
+                            if (!empty($media['caption'])) {
+                                $this->xmlWriter->writeElement('image:caption', $media['caption']);
+                            }
+                            $this->xmlWriter->endElement();
                         }
-                        $this->xmlWriter->endElement();
                     }
-        		}
 
-        	    $this->xmlWriter->endElement();
-        	}
+                    $this->xmlWriter->endElement();
+                }
 
-        	$this->xmlWriter->endElement();
-        	file_put_contents(
-        	   $this->outputDir . $fileName,
-        	   $this->xmlWriter->flush(true),
-        	   FILE_APPEND
-        	);
+                $this->xmlWriter->endElement();
+                file_put_contents(
+                    $this->outputDir . $fileName,
+                    $this->xmlWriter->flush(true),
+                    FILE_APPEND
+                );
 
-        	$this->files[$this->projectId][] = $this->domain . 'linnaeus_ng/' . $fileName;
+                $this->files[$this->projectId][] = $this->domain . 'linnaeus_ng/' . $fileName;
+
+            }
 		}
 
         private function setDomains ()
@@ -258,8 +269,7 @@
                     t2.title is not null
                     and t2.title != ""
                     and t2.title != t1.number
-                    and t1.project_id = ' . $this->projectId . '
-		        limit 50000';
+                    and t1.project_id = ' . $this->projectId;
 
 		    $r = $this->mysqli->query($q);
             while ($row = $r->fetch_assoc()) {
@@ -277,9 +287,7 @@
 		        from
                     ' . $this->tablePrefix . 'taxa
 		        where
-		            is_empty = 0
-                    and project_id = ' . $this->projectId . '
-                limit 50000';
+		            project_id = ' . $this->projectId;
 
 		    $r = $this->mysqli->query($q);
             while ($row = $r->fetch_assoc()) {
