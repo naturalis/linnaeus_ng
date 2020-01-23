@@ -194,7 +194,11 @@
 				$this->fileNameDate = date('Y-m-d_Hi');
 			}
 			
-			$this->filename = $this->fileNameBase . "--" . $this->fileNameDate . "--" . sprintf( '%02s', $this->filecounter++ ) . '.xml';
+			$this->filename = 
+				$this->fileNameBase . "--" . 
+				$this->fileNameDate . "--" . 
+				sprintf( '%02s', $this->filecounter++ ) . 
+				'.xml';
 
 			$this->feedback( sprintf("writing to %s", $this->filename ) );
 			
@@ -203,32 +207,41 @@
 
 		private function checkEssentials()
 		{
-			if ( empty($this->connector->user) ) {
+			if ( empty($this->connector->user) )
+			{
                 $b[] = "missing database user";
             }
-			if ( empty($this->connector->host) ) {
+			if ( empty($this->connector->host) )
+			{
                 $b[] = 'missing database host';
             }
-			if ( empty($this->connector->database) ) {
+			if ( empty($this->connector->database) )
+			{
                 $b[] = "missing database name";
             }
-			if ( empty($this->connector->project_id) ) {
+			if ( empty($this->connector->project_id) )
+			{
                 $b[] = "missing project id";
             }
-			if ( is_null($this->languageId) ) {
+			if ( is_null($this->languageId) )
+			{
                 $b[] = "missing language id";
             }
-			if ( is_null($this->exportFolder) ) {
+			if ( is_null($this->exportFolder) )
+			{
                 $b[] = "missing export folder";
             }
-			if ( !is_writable($this->exportFolder) ) {
+			if ( !is_writable($this->exportFolder) )
+			{
                 $b[] = "export folder not writable";
             }
-			if ( is_null($this->fileNameBase) ) {
+			if ( is_null($this->fileNameBase) )
+			{
                 $b[] = "missing export filename";
             }
 
-			if ( !empty( $b ) ) {
+			if ( !empty( $b ) )
+			{
                 throw new \Exception(implode("\n", $b));
             }
 		}
@@ -351,8 +364,6 @@
 					" . ( $ranks ? $ranks : "" ) ."
 				" . ( !empty( $this->limit ) ? "limit " . $this->limit : "" ) . "
 			";
-
-
 			
 			$result=$this->mysqli->query( $query );
 
@@ -369,8 +380,10 @@
 		{
 			$query="
 				select
+					_x1.id,
 					_x2.title,_x1.content as text,
-					if (_x2.title='Summary','English',_x3.language) as language
+					if (_x2.title='Summary','English',_x3.language) as language,
+					_x1.last_change
 
 				from
 					".$this->connector->prefix."content_taxa _x1
@@ -399,14 +412,50 @@
 					$d[]=$row;
 				}
 			}
+
+
+			$query="
+				select
+					_act.name
+				from ".
+					$this->connector->prefix."rdf 
+				left join ".$this->connector->prefix."actors _act
+					on _act.id = rdf.object_id
+				where 
+					rdf.subject_type = 'passport' 
+					and rdf.predicate = 'hasAuthor' 
+					and rdf.subject_id = %s"
+			;
+
+
+			$e=array();
+
+			foreach ($d as $key => $val)
+			{
+				$val["authors"]=[];
+				$result=$this->mysqli->query( sprintf($query,$val["id"]) );
+
+				if ( $result )
+				{
+					while( $row=$result->fetch_assoc() )
+					{
+						$val["authors"][]=$row["name"];
+					}
+				}
+				
+				unset($val["id"]);
+
+				$e[]=$val;
+			}
 			
-			return $d;
+			return $e;
 		}
 
 		private function getNames( $id )
 		{
 			$query="
 				select
+					distinct
 					_a.name as fullname,
 					_a.uninomial,
 					_a.specific_epithet,
@@ -425,7 +474,8 @@
 					_g.date as reference_date,
 					_lan.language
 	
-				from ".$this->connector->prefix."names _a
+				from ".
+					$this->connector->prefix."names _a
 	
 				left join ".$this->connector->prefix."name_types _b 
 					on _a.type_id=_b.id 
@@ -482,7 +532,8 @@
 					if (upper(substring(_meta10.meta_data,1,2))='CC',_meta10.meta_data,if(_c.meta_data is null,'','All rights reserved')) as licence,
 					if (upper(substring(_meta10.meta_data,1,2))='CC','Copyright',if(_c.meta_data is null,'','Copyright')) as licence_type
 				
-				from  ".$this->connector->prefix."media_taxon _m
+				from  ".
+					$this->connector->prefix."media_taxon _m
 				
 				left join ".$this->connector->prefix."media_meta _c
 					on _m.project_id=_c.project_id
@@ -570,7 +621,8 @@
 				left join ".$this->connector->prefix."ranks _r
 					on _f.rank_id=_r.id
 	
-				where _t.project_id = ".$this->connector->project_id." and _t.id=".$pId
+				where
+					_t.project_id = ".$this->connector->project_id." and _t.id=".$pId
 			;
 
 			
