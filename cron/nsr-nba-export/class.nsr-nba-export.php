@@ -708,6 +708,8 @@
 			
 				$val = $this->_addSecondaryData($val);
 
+				unset($this->taxa[$key]);
+
 				$xml= '<taxon></taxon>';
 		
 				$simpleXmlObject = new SimpleXMLElement($xml);
@@ -770,7 +772,7 @@
 			foreach((array)$this->taxa as $key=>$val)
 			{
 				$val = $this->_addSecondaryData($val);
-			
+
 				file_put_contents( $this->exportFolder . $this->filename , json_encode($val) . "\n", FILE_APPEND);
 			
 				if (++$batch==$this->maxBatchSize)
@@ -856,8 +858,6 @@
 			}
 
             unset($val['id'], $val['status_status'], $val['status_reference_title'], $val['status_expert_name'], $val['status_organisation_name']);
-
-            unset($this->taxa[$key]);
 
             return $val;
 
