@@ -412,11 +412,10 @@ parameters:
 			$lang = $this->rGetVal('lang');
 	        $matches = array_filter($this->getProjectLanguages(),function($a) use ($lang)
 	        {
-	        	var_dump($a);
-	        	var_dump($lang);
-
 	            return $a["language_id"]==$lang;
 	        });
+
+	        var_dump($matches);
 
 	        $lang = count($matches)==1 ? $matches[0]["language_id"] : $this->getDefaultLanguageId();
 		}
