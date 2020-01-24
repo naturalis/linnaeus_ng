@@ -412,6 +412,9 @@ parameters:
 			$lang = $this->rGetVal('lang');
 	        $matches = array_filter($this->getProjectLanguages(),function($a) use ($lang)
 	        {
+	        	var_dump($a);
+	        	var_dump($lang);
+
 	            return $a["language_id"]==$lang;
 	        });
 
@@ -447,6 +450,9 @@ parameters:
 				_a.project_id=".$this->getCurrentProjectId()."
 				and _a.id=" . $this->rGetVal('cat')
 			;
+
+
+var_dump($query);
 
 		$p=$this->models->Names->freeQuery($query);
 
