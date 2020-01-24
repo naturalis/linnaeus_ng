@@ -415,9 +415,7 @@ parameters:
 	            return $a["language_id"]==$lang;
 	        });
 
-	        var_dump($matches);
-
-	        $lang = count($matches)==1 ? $matches[0]["language_id"] : $this->getDefaultLanguageId();
+	        $lang = count($matches)==1 ? array_alues($matches)[0]["language_id"] : $this->getDefaultLanguageId();
 		}
 		else
 		{
@@ -449,9 +447,6 @@ parameters:
 				_a.project_id=".$this->getCurrentProjectId()."
 				and _a.id=" . $this->rGetVal('cat')
 			;
-
-
-var_dump($query);
 
 		$p=$this->models->Names->freeQuery($query);
 
