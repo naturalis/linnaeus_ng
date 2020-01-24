@@ -187,7 +187,7 @@
 			$this->feedback(  date(DATE_RFC2822) );
 		}
 
-		private function generateOutFile()
+		private function generateOutFile( $extension='xml')
 		{
 			if ( $this->filecounter==0 )
 			{
@@ -198,7 +198,7 @@
 				$this->fileNameBase . "--" . 
 				$this->fileNameDate . "--" . 
 				sprintf( '%02s', $this->filecounter++ ) . 
-				'.xml';
+				'.' . ltrim($extension,'.');
 
 			$this->feedback( sprintf("writing to %s", $this->filename ) );
 			
@@ -688,8 +688,16 @@
 			{
 				throw new Exception( 'Found no taxa.' );
 			}
-			
-			$this->generateOutFile();
+
+			// $this->_writeXML();
+			$this->_writeJSON();
+		}
+
+
+		private function _writeXML()
+		{
+
+			$this->generateOutFile('xml');
 
 			$this->startXmlDocument();
 			
@@ -698,80 +706,7 @@
 			foreach((array)$this->taxa as $key=>$val)
 			{
 			
-				if ( $this->includeDescriptions )
-				{
-					$pages=$this->getDescriptions( $val['id'] );
-					$j=0;
-					$description=array();
-					foreach((array)$pages as $page) $description['page__'.($j++)]=$page;
-				}
-
-				if ( $this->includeNames )
-				{
-					$n=$this->getNames( $val['id'] );
-					$k=0;
-					$names=array();
-					foreach((array)$n as $vdsdvsdfs) $names['name__'.($k++)]=$vdsdvsdfs;
-				}
-
-				if ( $this->includeImages )
-				{
-					$c=$this->getImages( $val['id'] );
-					$l=0;
-					$images=array();
-					foreach((array)$c as $buytjyuy) 
-					{
-						$buytjyuy['licence']=$this->cleanImageLicence($buytjyuy['licence']);
-						$images['image__'.($l++)]=$buytjyuy;
-					}
-				}
-
-				$val['status']=
-					array(
-						'status' => $val['status_status'],
-						'reference_title' => $val['status_reference_title'],
-						'expert_name' => $val['status_expert_name'],
-						'organisation_name' => $val['status_organisation_name']
-					);
-
-				$val['description']=@$description;
-				$val['names']=@$names;
-				$val['classification']=@explode(' ',$val['classification']);
-				$val['images']=@$images;
-
-				if ( $this->includeClassification )
-				{
-					$class=array();
-					$m=0;	
-					foreach($val['classification'] as $pId)
-					{
-						if (in_array($pId,$this->idsToSuppressInClassification)) continue;
-						
-						if (isset($lookuplist[$pId]))
-						{
-							$t=$lookuplist[$pId];
-						}
-						else
-						{
-							$t=$this->getClassification( $pId );
-							$lookuplist[$t['id']]=array('name'=>$t['name'],'rank'=>$t['rank']);
-							//$this->addError($pId." not in classification lookup list!?");
-	
-						}
-						$class['taxon__'.($m++)]=@array('name'=>$t['name'],'rank'=>$t['rank']);
-					}
-					
-					$val['classification']=$class;
-					
-				}
-				else
-				{
-					unset($val['classification']);
-				}
-
-                unset($val['id'], $val['status_status'], $val['status_reference_title'], $val['status_expert_name'], $val['status_organisation_name']);
-
-                unset($this->taxa[$key]);
+				$val = $this->_addSecondaryData($val);
 
 				$xml= '<taxon></taxon>';
 		
@@ -812,7 +747,7 @@
 					$this->xmlWriter->writeRaw ( '</taxa>' . "\n" . '</'.$this->xmlRootelement.'>' );	
 					file_put_contents( $this->exportFolder . $this->filename , $this->xmlWriter->flush(true), FILE_APPEND);
 					$this->startXmlDocument();
-					$this->generateOutFile();
+					$this->generateOutFile('xml');
 					$batch=0;
 				}
 			}
@@ -822,6 +757,109 @@
 				$this->xmlWriter->writeRaw ( '</taxa>' . "\n" . '</'.$this->xmlRootelement.'>' );	
 				file_put_contents( $this->exportFolder . $this->filename , $this->xmlWriter->flush(true), FILE_APPEND);
 			}
+
+		}
+
+		private function _writeJSON()
+		{
+
+			$this->generateOutFile('jsonl');
+
+			$batch=0;
+			
+			foreach((array)$this->taxa as $key=>$val)
+			{
+				$val = $this->_addSecondaryData($val);
+			
+				file_put_contents( $this->exportFolder . $this->filename , json_encode($val) . "\n", FILE_APPEND);
+			
+				if (++$batch==$this->maxBatchSize)
+				{
+					$this->generateOutFile('jsonl');
+					$batch=0;
+				}
+			}
+		}
+
+		private function _addSecondaryData( $val )
+		{
+
+			if ( $this->includeDescriptions )
+			{
+				$pages=$this->getDescriptions( $val['id'] );
+				$j=0;
+				$description=array();
+				foreach((array)$pages as $page) $description['page__'.($j++)]=$page;
+			}
+
+			if ( $this->includeNames )
+			{
+				$n=$this->getNames( $val['id'] );
+				$k=0;
+				$names=array();
+				foreach((array)$n as $vdsdvsdfs) $names['name__'.($k++)]=$vdsdvsdfs;
+			}
+
+			if ( $this->includeImages )
+			{
+				$c=$this->getImages( $val['id'] );
+				$l=0;
+				$images=array();
+				foreach((array)$c as $buytjyuy) 
+				{
+					$buytjyuy['licence']=$this->cleanImageLicence($buytjyuy['licence']);
+					$images['image__'.($l++)]=$buytjyuy;
+				}
+			}
+
+			$val['status']=
+				array(
+					'status' => $val['status_status'],
+					'reference_title' => $val['status_reference_title'],
+					'expert_name' => $val['status_expert_name'],
+					'organisation_name' => $val['status_organisation_name']
+				);
+
+			$val['description']=@$description;
+			$val['names']=@$names;
+			$val['classification']=@explode(' ',$val['classification']);
+			$val['images']=@$images;
+
+			if ( $this->includeClassification )
+			{
+				$class=array();
+				$m=0;	
+				foreach($val['classification'] as $pId)
+				{
+					if (in_array($pId,$this->idsToSuppressInClassification)) continue;
+					
+					if (isset($lookuplist[$pId]))
+					{
+						$t=$lookuplist[$pId];
+					}
+					else
+					{
+						$t=$this->getClassification( $pId );
+						$lookuplist[$t['id']]=array('name'=>$t['name'],'rank'=>$t['rank']);
+						//$this->addError($pId." not in classification lookup list!?");
+
+					}
+					$class['taxon__'.($m++)]=@array('name'=>$t['name'],'rank'=>$t['rank']);
+				}
+				
+				$val['classification']=$class;
+				
+			}
+			else
+			{
+				unset($val['classification']);
+			}
+
+            unset($val['id'], $val['status_status'], $val['status_reference_title'], $val['status_expert_name'], $val['status_organisation_name']);
+
+            unset($this->taxa[$key]);
+
+            return $val;
 
 		}
 
