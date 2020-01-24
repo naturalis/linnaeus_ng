@@ -415,7 +415,7 @@ parameters:
 	            return $a["language_id"]==$lang;
 	        });
 
-	        $lang = count($matches)==1 ? array_alues($matches)[0]["language_id"] : $this->getDefaultLanguageId();
+	        $lang = count($matches)==1 ? array_values($matches)[0]["language_id"] : $this->getDefaultLanguageId();
 		}
 		else
 		{
