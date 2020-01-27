@@ -32,6 +32,8 @@
 
 	include_once("class.nsr-nba-export.php");
 
+	ini_set('memory_limit','2048M');
+
 	$b = new taxonXmlExporter;
 	$b->setConnectData( $conn );
 	$b->setLanguageId( 24 );  // 24 dutch, 26 english (affects image metadata)

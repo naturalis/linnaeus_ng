@@ -38,6 +38,8 @@
 
 	include_once("class.nsr-nba-export.php");
 
+	ini_set('memory_limit','2048M');
+
 	$b = new taxonXmlExporter;
 	$b->setConnectData( $conn );
 	$b->setLanguageId( 24 );  // 24 dutch, 26 english (affects image metadata)
@@ -57,7 +59,8 @@
 
 	echo "compressing\n";
 	$filename = 'nsr-' . date('Y-m-d') . '.tar.gz';
-	echo shell_exec( 'cd ' . $outdir . '; tar zcf ' . $filename . ' *.xml');
+	// echo shell_exec( 'cd ' . $outdir . '; tar zcf ' . $filename . ' *.xml');
+	echo shell_exec( 'cd ' . $outdir . '; tar zcf ' . $filename . ' *.jsonl');
 //  echo shell_exec('/usr/local/bin/mc cp ' . $outdir . $filename . ' s3-nba-brondata/brondata-nsr/');
 
 //	echo "adding\n";
