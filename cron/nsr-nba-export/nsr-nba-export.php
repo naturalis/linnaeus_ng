@@ -24,7 +24,7 @@
 	}
 
 	echo "truncating " . $outdir . $filelist ."\n";
-	$fp = fopen( $outdir . $filelist, 'bw' );
+	$fp = fopen( $outdir . $filelist, 'w' );
 	fclose($fp);
 
 

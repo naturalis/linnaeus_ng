@@ -718,34 +718,6 @@
 
 		}
 
-		private function arrayToXml($data, &$simpleXmlObject)
-		{
-			foreach($data as $key => $value)
-			{
-				if(is_array($value))
-				{
-					if(!is_numeric($key))
-					{
-						if (strpos($key,'__')!==false)
-						{
-							$key=substr($key,0,strpos($key,'__'));
-						}
-						$subnode = $simpleXmlObject->addChild("$key");
-						$this->arrayToXml($value, $subnode);
-					}
-					else
-					{
-						$subnode = $simpleXmlObject->addChild("item$key");
-						$this->arrayToXml($value, $subnode);
-					}
-				}
-				else
-				{
-					$simpleXmlObject->addChild("$key",htmlspecialchars("$value"));
-				}
-			}
-		}		
-
 		private function cleanImageLicence($a)
 		{
 			if (strpos($a,'CC')==0)
@@ -769,82 +741,6 @@
 				throw new Exception( 'Found no taxa.' );
 			}
 
-			// $this->_writeXML();
-			$this->_writeJSON();
-		}
-
-
-		private function _writeXML()
-		{
-
-			$this->generateOutFile('xml');
-
-			$this->startXmlDocument();
-			
-			$batch=0;
-			
-			foreach((array)$this->taxa as $key=>$val)
-			{
-			
-				$val = $this->_addSecondaryData($val);
-
-				unset($this->taxa[$key]);
-
-				$xml= '<taxon></taxon>';
-		
-				$simpleXmlObject = new SimpleXMLElement($xml);
-		
-				$this->arrayToXml($val,$simpleXmlObject);
-				
-				if ($this->prettify)
-				{
-					$dom = new DOMDocument('1.0');
-					$dom->preserveWhiteSpace = false;
-					$dom->formatOutput = true;
-					$dom->loadXML($simpleXmlObject->asXML());
-					$out=$dom->saveXML();
-				}
-				else
-				{
-					$out=$simpleXmlObject->asXML();
-				}
-	
-				if ($batch==0)
-				{
-					$this->xmlWriter->writeRaw ( '<'.$this->xmlRootelement.' exportdate="'.date('c').'">' . "\n" . '<taxa>' );	
-				}
-			
-				$this->xmlWriter->writeRaw ( str_replace('<?xml version="1.0"?>' , '' , $out ) );
-				$this->number_written++;
-			
-				unset($val);
-				
-				if ($key%1000==0)
-				{
-					file_put_contents( $this->exportFolder . $this->filename , $this->xmlWriter->flush(true), FILE_APPEND);
-				}
-			
-				if (++$batch==$this->maxBatchSize)
-				{
-					$this->xmlWriter->writeRaw ( '</taxa>' . "\n" . '</'.$this->xmlRootelement.'>' );	
-					file_put_contents( $this->exportFolder . $this->filename , $this->xmlWriter->flush(true), FILE_APPEND);
-					$this->startXmlDocument();
-					$this->generateOutFile('xml');
-					$batch=0;
-				}
-			}
-			
-			if ( $batch>0 )
-			{
-				$this->xmlWriter->writeRaw ( '</taxa>' . "\n" . '</'.$this->xmlRootelement.'>' );	
-				file_put_contents( $this->exportFolder . $this->filename , $this->xmlWriter->flush(true), FILE_APPEND);
-			}
-
-		}
-
-		private function _writeJSON()
-		{
-
 			$this->generateOutFile('jsonl');
 
 			$batch=0;
@@ -854,9 +750,8 @@
 				foreach((array)$this->taxa as $key=>$val)
 				{
 					$pages=$this->getDescriptions( $val['id'] );
-					$j=0;
 					$description=array();
-					foreach((array)$pages as $page) $description['page__'.($j++)]=$page;
+					foreach((array)$pages as $page) $description[]=$page;
 					$this->taxa[$key]['description']=@$description;
 
 				}
@@ -869,9 +764,8 @@
 				foreach((array)$this->taxa as $key=>$val)
 				{
 					$n=$this->getNames( $val['id'] );
-					$k=0;
 					$names=array();
-					foreach((array)$n as $vdsdvsdfs) $names['name__'.($k++)]=$vdsdvsdfs;
+					foreach((array)$n as $vdsdvsdfs) $names[]=$vdsdvsdfs;
 					$this->taxa[$key]['names']=@$names;
 				}
 
@@ -883,12 +777,11 @@
 				foreach((array)$this->taxa as $key=>$val)
 				{
 					$c=$this->getImages( $val['id'] );
-					$l=0;
 					$images=array();
 					foreach((array)$c as $buytjyuy) 
 					{
 						$buytjyuy['licence']=$this->cleanImageLicence($buytjyuy['licence']);
-						$images['image__'.($l++)]=$buytjyuy;
+						$images[]=$buytjyuy;
 					}
 					$this->taxa[$key]['images']=@$images;
 				}
@@ -907,7 +800,7 @@
 					{
 						if (in_array($id,$this->idsToSuppressInClassification)) continue;
 						$t=$this->getClassification( $id );
-						$class['taxon__'.($m++)]=@array('name'=>$t['name'],'rank'=>$t['rank']);
+						$class[]=@array('name'=>$t['name'],'rank'=>$t['rank']);
 					}
 					
 					$this->taxa[$key]['classification']=$class;
