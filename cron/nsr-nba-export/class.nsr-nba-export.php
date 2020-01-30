@@ -194,7 +194,7 @@
 			$this->feedback(  date(DATE_RFC2822) );
 		}
 
-		private function generateOutFile( $extension='xml')
+		private function generateOutFile( $extension='jsonl')
 		{
 			if ( $this->filecounter==0 )
 			{
@@ -273,13 +273,6 @@
 				$this->mysqli->query('SET NAMES ' . $this->connector->character_set );
 				$this->mysqli->query('SET CHARACTER SET ' . $this->connector->character_set );
 			}
-		}
-		
-		private function startXmlDocument()
-		{
-			$this->xmlWriter = new XMLWriter();
-			$this->xmlWriter->openMemory();
-			$this->xmlWriter->startDocument('1.0', 'UTF-8');
 		}
 		
 		private function setTaxa()
@@ -631,46 +624,6 @@
 			return isset($this->imageCache[$id]) ? $this->imageCache[$id] : null;
 		}
 
-		private function getClassification_ORG( $pId )
-		{
-			$query="		
-				select
-					_t.id,
-					ifnull(_names.uninomial,_t.taxon) as name,
-					_r.rank
-	
-				from
-					".$this->connector->prefix."taxa _t
-	
-				left join ".$this->connector->prefix."projects_ranks _f
-					on _t.rank_id=_f.id
-					and _t.project_id=_f.project_id
-	
-				left join ".$this->connector->prefix."names _names
-					on _t.project_id=_f.project_id
-					and _t.id=_names.taxon_id
-					and _names.type_id=".$this->validNameId."
-	
-				left join ".$this->connector->prefix."ranks _r
-					on _f.rank_id=_r.id
-	
-				where
-					_t.project_id = ".$this->connector->project_id." and _t.id=".$pId
-			;
-
-			
-			$result=$this->mysqli->query( $query );
-			
-			if ( $result )
-			{
-				$row=$result->fetch_assoc();
-				if ( $row )
-				{
-					return $row;
-				}
-			}
-		}
-
 		private function getClassification( $id )
 		{
 
@@ -741,7 +694,7 @@
 				throw new Exception( 'Found no taxa.' );
 			}
 
-			$this->generateOutFile('jsonl');
+			$this->generateOutFile();
 
 			$batch=0;
 
@@ -800,7 +753,7 @@
 					{
 						if (in_array($id,$this->idsToSuppressInClassification)) continue;
 						$t=$this->getClassification( $id );
-						$class[]=@array('name'=>$t['name'],'rank'=>$t['rank']);
+						$class[	]=@array('name'=>$t['name'],'rank'=>$t['rank']);
 					}
 					
 					$this->taxa[$key]['classification']=$class;
@@ -834,90 +787,10 @@
 			
 				if (++$batch==$this->maxBatchSize)
 				{
-					$this->generateOutFile('jsonl');
+					$this->generateOutFile();
 					$batch=0;
 				}
 			}
-		}
-
-		private function _addSecondaryData( $val )
-		{
-
-			if ( $this->includeDescriptions )
-			{
-				$pages=$this->getDescriptions( $val['id'] );
-				$j=0;
-				$description=array();
-				foreach((array)$pages as $page) $description['page__'.($j++)]=$page;
-			}
-
-			if ( $this->includeNames )
-			{
-				$n=$this->getNames( $val['id'] );
-				$k=0;
-				$names=array();
-				foreach((array)$n as $vdsdvsdfs) $names['name__'.($k++)]=$vdsdvsdfs;
-			}
-
-			if ( $this->includeImages )
-			{
-				$c=$this->getImages( $val['id'] );
-				$l=0;
-				$images=array();
-				foreach((array)$c as $buytjyuy) 
-				{
-					$buytjyuy['licence']=$this->cleanImageLicence($buytjyuy['licence']);
-					$images['image__'.($l++)]=$buytjyuy;
-				}
-			}
-
-			$val['status']=
-				array(
-					'status' => $val['status_status'],
-					'reference_title' => $val['status_reference_title'],
-					'expert_name' => $val['status_expert_name'],
-					'organisation_name' => $val['status_organisation_name']
-				);
-
-			$val['description']=@$description;
-			$val['names']=@$names;
-			$val['classification']=@explode(' ',$val['classification']);
-			$val['images']=@$images;
-
-			if ( $this->includeClassification )
-			{
-				$class=array();
-				$m=0;	
-				foreach($val['classification'] as $pId)
-				{
-					if (in_array($pId,$this->idsToSuppressInClassification)) continue;
-					
-					if (isset($lookuplist[$pId]))
-					{
-						$t=$lookuplist[$pId];
-					}
-					else
-					{
-						$t=$this->getClassification( $pId );
-						$lookuplist[$t['id']]=array('name'=>$t['name'],'rank'=>$t['rank']);
-						//$this->addError($pId." not in classification lookup list!?");
-
-					}
-					$class['taxon__'.($m++)]=@array('name'=>$t['name'],'rank'=>$t['rank']);
-				}
-				
-				$val['classification']=$class;
-				
-			}
-			else
-			{
-				unset($val['classification']);
-			}
-
-            unset($val['id'], $val['status_status'], $val['status_reference_title'], $val['status_expert_name'], $val['status_organisation_name']);
-
-            return $val;
-
 		}
 
 		private function printStats()
