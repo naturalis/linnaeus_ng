@@ -911,7 +911,7 @@
 						$class['taxon__'.($m++)]=@array('name'=>$t['name'],'rank'=>$t['rank']);
 					}
 					
-					$this->images[$key]['classification']=$class;
+					$this->taxa[$key]['classification']=$class;
 					
 				}
 				else
