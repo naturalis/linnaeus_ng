@@ -891,7 +891,7 @@
 						$buytjyuy['licence']=$this->cleanImageLicence($buytjyuy['licence']);
 						$images['image__'.($l++)]=$buytjyuy;
 					}
-					$this->images[$key]['names']=@$images;
+					$this->taxa[$key]['images']=@$images;
 				}
 
 				unset($this->imageCache);
