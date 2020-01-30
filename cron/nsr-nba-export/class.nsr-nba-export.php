@@ -543,7 +543,6 @@
 			}
 
 			return isset($this->namesCache[$id]) ? $this->namesCache[$id] : null;
-
 		}
 
 		private function getImages( $id )
@@ -630,7 +629,6 @@
 			}
 
 			return isset($this->imageCache[$id]) ? $this->imageCache[$id] : null;
-
 		}
 
 		private function getClassification_ORG( $pId )
@@ -708,8 +706,10 @@
 				
 				if ( $result )
 				{
-					$row=$result->fetch_assoc();
-					$this->classificationCache[$row["id"]]=$row;
+					while( $row=$result->fetch_assoc() )
+					{
+						$this->classificationCache[$row["id"]]=$row;
+					}
 					$result->free();
 				}
 			}
@@ -877,7 +877,6 @@
 
 				unset($this->namesCache);
 			}
-
 
 			if ( $this->includeImages )
 			{
