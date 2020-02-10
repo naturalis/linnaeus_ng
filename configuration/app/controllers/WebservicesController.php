@@ -1334,8 +1334,6 @@ parameters:
 		$this->printOutput();
 	}
 
-	
-
     private function initialise()
     {
         $this->Rdf = new RdfController(array('checkForProjectId'=>false));
@@ -1350,6 +1348,7 @@ parameters:
 		} 
 		else 
 		{
+			$this->setProjectLanguages();
  		    $this->models->Taxa->freeQuery("SET lc_time_names = '".$this->moduleSettings->getGeneralSetting( array( 'setting'=>'db_lc_time_names','subst'=>'nl_NL'))."'");
 			$this->checkJSONPCallback();
 		}
