@@ -39,7 +39,7 @@
 
 	ini_set('memory_limit','2048M');
 
-	$b = new taxonXmlExporter;
+	$b = new taxonExporter;
 	$b->setConnectData( $conn );
 	$b->setLanguageId( 24 );  // 24 dutch, 26 english (affects image metadata)
 	$b->setIdsToSuppressInClassification( [116297] ); // excluding "life"
@@ -47,9 +47,8 @@
 	$b->setValidNameTypeId( 1 );
 //	$b->setRanksToExport( ['ranks'=>74,'style'=>'and_lower'] );
 //	$b->setLimit( 1000 );  // limit on number of taxa
-	$b->setXmlRootelementName( 'nederlands_soortenregister' );
 	$b->setFileNameBase( $outfilebasename );
-	$b->setMaxBatchSize( 10000 ); // records per output file (files are numbered -00, -01 etc)
+	$b->setBatchSize( 10000 ); // records per output file (files are numbered -00, -01 etc)
 	$b->setExportFolder( $outdir );
 	$b->run();
 	

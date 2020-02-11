@@ -1,6 +1,6 @@
 <?php
 
-	class taxonXmlExporter
+	class taxonExporter
 	{
 		private $connector;
 		private $mysqli;
@@ -12,32 +12,25 @@
 		private $fileNameDate;
 		private $exportFolder;
 		private $taxa;
-		private $limit;
-		private $maxBatchSize=5000;
 
 		private $ranksToExport;
 		private $ranksToExportStyle='equals';
 
 		private $validNameId=1;
 		private $idsToSuppressInClassification=[];
-		private $xmlRootelement='root';
 
 		private $includeDescriptions=true;
 		private $includeNames=true;
 		private $includeImages=true;
 		private $includeClassification=true;
-		private $prettify=true;
 
-		private $filecounter=0;
+		private $authorCache=[];
+
+		private $batch=0;
+		private $batchSize=10000;
 		private $number_written=0;
 		
 		private $filelist;
-
-		private $descriptionCache=[];
-		private $authorCache=[];
-		private $namesCache=[];
-		private $imageCache=[];
-		private $classificationCache=[];
 
 
 		public function setConnectData( $data )
@@ -64,14 +57,9 @@
 			$this->languageId = $id;
 		}
 
-		public function setLimit( $limit )
+		public function setbatchSize( $size )
 		{
-			$this->limit = $limit;
-		}
-
-		public function setMaxBatchSize( $size )
-		{
-			$this->maxBatchSize = (int)$size;
+			$this->batchSize = (int)$size;
 		}
 
 		public function setFileNameBase( $fileNameBase )
@@ -130,7 +118,6 @@
 						break;
 				}
 			}
-
 		}
 	
 		public function setValidNameTypeId( $id )
@@ -143,11 +130,6 @@
 			$this->idsToSuppressInClassification=(array)$ids;
 		}
 	
-		public function setXmlRootelementName( $name )
-		{
-			$this->xmlRootelement=(string)$name;
-		}
-
 		public function setImageBaseUrl( $url )
 		{
 			$this->imageBaseUrl=(string)$url;
@@ -165,8 +147,18 @@
 				$this->printHeader();
 				$this->checkEssentials();
 				$this->connectDatabase();
-				$this->setTaxa();
-				$this->writeData();
+
+				$this->processing = true;
+
+				while($this->processing)
+				{
+					$this->setTaxa();
+					$this->writeData();					
+					$this->batch++;
+					$this->number_written += count($this->taxa);
+					$this->processing=count($this->taxa)>0;
+				}
+
 				$this->printStats();
 				$this->cleanUp();
 			} 
@@ -176,108 +168,11 @@
 			}
 		}
 		
-		private function feedback( $m )
-		{
-			echo $m,"\n";
-		}
-
-		private function handleException( $e )
-		{
-			$this->feedback( "\nERROR" );
-			$this->feedback( $e->getMessage() );
-			$this->feedback( "abnormal termination" );
-		}
-
-		private function printHeader()
-		{
-			$this->feedback( "running exporter for NBA import" );
-			$this->feedback(  date(DATE_RFC2822) );
-		}
-
-		private function generateOutFile( $extension='jsonl')
-		{
-			if ( $this->filecounter==0 )
-			{
-				$this->fileNameDate = date('Y-m-d_Hi');
-			}
-			
-			$this->filename = 
-				$this->fileNameBase . "--" . 
-				$this->fileNameDate . "--" . 
-				sprintf( '%02s', $this->filecounter++ ) . 
-				'.' . ltrim($extension,'.');
-
-			$this->feedback( sprintf("writing to %s", $this->filename ) );
-			
-			$this->filelist[]=$this->filename;
-		}
-
-		private function checkEssentials()
-		{
-			if ( empty($this->connector->user) )
-			{
-                $b[] = "missing database user";
-            }
-			if ( empty($this->connector->host) )
-			{
-                $b[] = 'missing database host';
-            }
-			if ( empty($this->connector->database) )
-			{
-                $b[] = "missing database name";
-            }
-			if ( empty($this->connector->project_id) )
-			{
-                $b[] = "missing project id";
-            }
-			if ( is_null($this->languageId) )
-			{
-                $b[] = "missing language id";
-            }
-			if ( is_null($this->exportFolder) )
-			{
-                $b[] = "missing export folder";
-            }
-			if ( !is_writable($this->exportFolder) )
-			{
-                $b[] = "export folder not writable";
-            }
-			if ( is_null($this->fileNameBase) )
-			{
-                $b[] = "missing export filename";
-            }
-
-			if ( !empty( $b ) )
-			{
-                throw new \Exception(implode("\n", $b));
-            }
-		}
-
-		private function connectDatabase()
-		{
-			$this->mysqli = @new mysqli(
-				$this->connector->host,
-				$this->connector->user,
-				$this->connector->password,
-				$this->connector->database
-			);
-			
-			if ($this->mysqli->connect_error)
-			{
-				throw new Exception( $this->mysqli->connect_error );
-			}
-			else
-			{
-				$this->feedback( "connected " . $this->connector->database . "@" . $this->connector->host );
-
-				$this->mysqli->query('SET NAMES ' . $this->connector->character_set );
-				$this->mysqli->query('SET CHARACTER SET ' . $this->connector->character_set );
-			}
-		}
-		
 		private function setTaxa()
 		{
-			$this->feedback( "fetching taxa");
+			$this->feedback( sprintf("fetching batch %s",$this->batch) );
+
+			$this->taxa=[];
 			
 			$ranks=null;
 			
@@ -362,8 +257,8 @@
 					_t.project_id = " . $this->connector->project_id . "
 					and ifnull(_trash.is_deleted,0)=0
 					" . ( $ranks ? $ranks : "" ) ."
-				" . ( !empty( $this->limit ) ? "limit " . $this->limit : "" ) . "
-			";
+				    limit " . $this->batchSize ." offset " . ($this->batchSize * $this->batch)
+			;
 			
 			$result=$this->mysqli->query( $query );
 
@@ -373,60 +268,50 @@
 				{
 					$this->taxa[]=$row;
 				}
-			}
+			}	
 		}
 
 		private function getDescriptions( $id )
 		{
 
-			if (empty($this->descriptionCache))
-			{
-				$query="
-					select
-						_x1.taxon_id,
-						_x1.id,
-						_x2.title,_x1.content as text,
-						if (_x2.title='Summary','English',_x3.language) as language,
-						_x1.last_change
+			$query="
+				select
+					_x1.id,
+					_x2.title,_x1.content as text,
+					if (_x2.title='Summary','English',_x3.language) as language,
+					_x1.last_change
 
-					from
-						".$this->connector->prefix."content_taxa _x1
-		
-					left join ".$this->connector->prefix."pages_taxa_titles _x2
-						on _x1.project_id=_x2.project_id
-						and  _x1.page_id=_x2.page_id
-		
-					left join ".$this->connector->prefix."languages _x3
-						on _x1.language_id=_x3.id
-		
-					where
-						_x1.project_id =".$this->connector->project_id
+				from
+					".$this->connector->prefix."content_taxa _x1
+	
+				left join ".$this->connector->prefix."pages_taxa_titles _x2
+					on _x1.project_id=_x2.project_id
+					and  _x1.page_id=_x2.page_id
+	
+				left join ".$this->connector->prefix."languages _x3
+					on _x1.language_id=_x3.id
+	
+				where
+					_x1.project_id = ".$this->connector->project_id . "
+					and _x1.taxon_id = " . $id
 				;
 			
-				$d=array();
+			$d=array();
 
-				$result=$this->mysqli->query( $query );
-				
-				if ( $result )
-				{
-					while( $row=$result->fetch_assoc() )
-					{
-						$this->descriptionCache[$row["taxon_id"]][]=$row;
-					}
-
-					$result->free();
-
-				}
-			}
-
-			if (!isset($this->descriptionCache[$id]))
+			$result=$this->mysqli->query( $query );
+			
+			if ( $result )
 			{
-				return null;
+				while( $row=$result->fetch_assoc() )
+				{
+					$d[]=$row;
+				}
+
+				$result->free();
 			}
 
 			if (empty($this->authorCache))
 			{
-
 				$query="
 					select
 						rdf.subject_id,
@@ -439,8 +324,6 @@
 						rdf.subject_type = 'passport' 
 						and rdf.predicate = 'hasAuthor'
 					";
-
-				$d=array();
 
 				$result=$this->mysqli->query( $query );
 				
@@ -457,7 +340,7 @@
 
 			$e=array();
 
-			foreach ($this->descriptionCache[$id] as $key => $val)
+			foreach ($d as $key => $val)
 			{
 				$val["authors"]=isset($this->authorCache[$val["id"]]) ? $this->authorCache[$val["id"]] : [];
 				unset($val["id"]);
@@ -469,206 +352,194 @@
 
 		private function getNames( $id )
 		{
+			$query="
+				select
+					distinct
+						_a.taxon_id,
+						_a.name as fullname,
+						_a.uninomial,
+						_a.specific_epithet,
+						_a.infra_specific_epithet,
+						_a.authorship,
+						_a.name_author,
+						_a.authorship_year,
+						_a.reference,
+						_a.expert,
+						_a.organisation,
+						_b.nametype,
+						_e.name as expert_name,
+						_f.name as organisation_name,
+						_g.label as reference_title,
+						_g.author as reference_author,
+						_g.date as reference_date,
+						_lan.language
+	
+				from ".
+					$this->connector->prefix."names _a
+	
+				left join ".$this->connector->prefix."name_types _b 
+					on _a.type_id=_b.id 
+					and _a.project_id = _b.project_id
+	
+				left join ".$this->connector->prefix."actors _e
+					on _a.expert_id = _e.id 
+					and _a.project_id=_e.project_id
+	
+				left join ".$this->connector->prefix."actors _f
+					on _a.organisation_id = _f.id 
+					and _a.project_id=_f.project_id
+	
+				left join ".$this->connector->prefix."literature2 _g
+					on _a.reference_id = _g.id 
+					and _a.project_id=_g.project_id
+	
+				left join ".$this->connector->prefix."languages _lan
+					on _a.language_id=_lan.id
+	
+				where
+					_a.project_id = ".$this->connector->project_id . "
+					and _a.taxon_id = " . $id
+			;
+					
+			$d=[];
 
-			if (empty($this->namesCache))
+			$result=$this->mysqli->query( $query );
+
+			if ( $result )
 			{
-
-				$query="
-					select
-						distinct
-							_a.taxon_id,
-							_a.name as fullname,
-							_a.uninomial,
-							_a.specific_epithet,
-							_a.infra_specific_epithet,
-							_a.authorship,
-							_a.name_author,
-							_a.authorship_year,
-							_a.reference,
-							_a.expert,
-							_a.organisation,
-							_b.nametype,
-							_e.name as expert_name,
-							_f.name as organisation_name,
-							_g.label as reference_title,
-							_g.author as reference_author,
-							_g.date as reference_date,
-							_lan.language
-		
-					from ".
-						$this->connector->prefix."names _a
-		
-					left join ".$this->connector->prefix."name_types _b 
-						on _a.type_id=_b.id 
-						and _a.project_id = _b.project_id
-		
-					left join ".$this->connector->prefix."actors _e
-						on _a.expert_id = _e.id 
-						and _a.project_id=_e.project_id
-		
-					left join ".$this->connector->prefix."actors _f
-						on _a.organisation_id = _f.id 
-						and _a.project_id=_f.project_id
-		
-					left join ".$this->connector->prefix."literature2 _g
-						on _a.reference_id = _g.id 
-						and _a.project_id=_g.project_id
-		
-					left join ".$this->connector->prefix."languages _lan
-						on _a.language_id=_lan.id
-		
-					where
-						_a.project_id = ".$this->connector->project_id
-						
-				;
-
-				$result=$this->mysqli->query( $query );
-
-				if ( $result )
+				while( $row=$result->fetch_assoc() )
 				{
-					while( $row=$result->fetch_assoc() )
-					{
-						$this->namesCache[$row["taxon_id"]][]=$row;
-					}
-
-					$result->free();
+					$d[]=$row;
 				}
+
+				$result->free();
 			}
 
-			return isset($this->namesCache[$id]) ? $this->namesCache[$id] : null;
+			return $d;
 		}
 
 		private function getImages( $id )
 		{
+			$query="		
+				select
+					_m.file_name as file_name,
+					_m.mime_type as mime_type,
+					_c.meta_data as photographer_name,
+					date_format(_meta1.meta_date,'%e %M %Y') as date_taken,
+					_meta2.meta_data as short_description,
+					_meta3.meta_data as geography,
+					_meta5.meta_data as copyright,
+					_meta7.meta_data as maker_adress,
+					if (upper(substring(_meta10.meta_data,1,2))='CC',_meta10.meta_data,if(_c.meta_data is null,'','All rights reserved')) as licence,
+					if (upper(substring(_meta10.meta_data,1,2))='CC','Copyright',if(_c.meta_data is null,'','Copyright')) as licence_type
+				
+				from  ".
+					$this->connector->prefix."media_taxon _m
+				
+				left join ".$this->connector->prefix."media_meta _c
+					on _m.project_id=_c.project_id
+					and _m.id = _c.media_id
+					and _c.sys_label = 'beeldbankFotograaf'
+					and _c.language_id=".$this->languageId."
+			
+				left join ".$this->connector->prefix."media_meta _meta1
+					on _m.id=_meta1.media_id
+					and _m.project_id=_meta1.project_id
+					and _meta1.sys_label='beeldbankDatumVervaardiging'
+					and _meta1.language_id=".$this->languageId."
+	
+				left join ".$this->connector->prefix."media_meta _meta2
+					on _m.id=_meta2.media_id
+					and _m.project_id=_meta2.project_id
+					and _meta2.sys_label='beeldbankOmschrijving'
+					and _meta2.language_id=".$this->languageId."
+				
+				left join ".$this->connector->prefix."media_meta _meta3
+					on _m.id=_meta3.media_id
+					and _m.project_id=_meta3.project_id
+					and _meta3.sys_label='beeldbankLokatie'
+					and _meta3.language_id=".$this->languageId."
+				
+				left join ".$this->connector->prefix."media_meta _meta5
+					on _m.id=_meta5.media_id
+					and _m.project_id=_meta5.project_id
+					and _meta5.sys_label='beeldbankCopyright'
+					and _meta5.language_id=".$this->languageId."
+	
+				left join ".$this->connector->prefix."media_meta _meta7
+					on _m.id=_meta7.media_id
+					and _m.project_id=_meta7.project_id
+					and _meta7.sys_label='beeldbankAdresMaker'
+					and _meta7.language_id=".$this->languageId."
 
-			if (empty($this->imageCache))
+				left join ".$this->connector->prefix."media_meta _meta10
+					on _m.id=_meta10.media_id
+					and _m.project_id=_meta10.project_id
+					and _meta10.sys_label='beeldbankLicentie'
+
+				where
+					_m.project_id = ".$this->connector->project_id . "
+  					and _m.taxon_id = " . $id
+			;
+
+			
+			$d=[];
+
+			$result=$this->mysqli->query( $query );
+			
+			if ( $result )
 			{
-				$query="		
-					select
-						_m.taxon_id,
-						_m.file_name as file_name,
-						_m.mime_type as mime_type,
-						_c.meta_data as photographer_name,
-						date_format(_meta1.meta_date,'%e %M %Y') as date_taken,
-						_meta2.meta_data as short_description,
-						_meta3.meta_data as geography,
-						_meta5.meta_data as copyright,
-						_meta7.meta_data as maker_adress,
-						if (upper(substring(_meta10.meta_data,1,2))='CC',_meta10.meta_data,if(_c.meta_data is null,'','All rights reserved')) as licence,
-						if (upper(substring(_meta10.meta_data,1,2))='CC','Copyright',if(_c.meta_data is null,'','Copyright')) as licence_type
-					
-					from  ".
-						$this->connector->prefix."media_taxon _m
-					
-					left join ".$this->connector->prefix."media_meta _c
-						on _m.project_id=_c.project_id
-						and _m.id = _c.media_id
-						and _c.sys_label = 'beeldbankFotograaf'
-						and _c.language_id=".$this->languageId."
-				
-					left join ".$this->connector->prefix."media_meta _meta1
-						on _m.id=_meta1.media_id
-						and _m.project_id=_meta1.project_id
-						and _meta1.sys_label='beeldbankDatumVervaardiging'
-						and _meta1.language_id=".$this->languageId."
-		
-					left join ".$this->connector->prefix."media_meta _meta2
-						on _m.id=_meta2.media_id
-						and _m.project_id=_meta2.project_id
-						and _meta2.sys_label='beeldbankOmschrijving'
-						and _meta2.language_id=".$this->languageId."
-					
-					left join ".$this->connector->prefix."media_meta _meta3
-						on _m.id=_meta3.media_id
-						and _m.project_id=_meta3.project_id
-						and _meta3.sys_label='beeldbankLokatie'
-						and _meta3.language_id=".$this->languageId."
-					
-					left join ".$this->connector->prefix."media_meta _meta5
-						on _m.id=_meta5.media_id
-						and _m.project_id=_meta5.project_id
-						and _meta5.sys_label='beeldbankCopyright'
-						and _meta5.language_id=".$this->languageId."
-		
-					left join ".$this->connector->prefix."media_meta _meta7
-						on _m.id=_meta7.media_id
-						and _m.project_id=_meta7.project_id
-						and _meta7.sys_label='beeldbankAdresMaker'
-						and _meta7.language_id=".$this->languageId."
-
-					left join ".$this->connector->prefix."media_meta _meta10
-						on _m.id=_meta10.media_id
-						and _m.project_id=_meta10.project_id
-						and _meta10.sys_label='beeldbankLicentie'
-
-					where
-						_m.project_id = ".$this->connector->project_id
-				;
-
-				
-				$d=array();
-
-				$result=$this->mysqli->query( $query );
-				
-				if ( $result )
+				while( $row=$result->fetch_assoc() )
 				{
-					while( $row=$result->fetch_assoc() )
-					{
-						$row['url'] = $this->imageBaseUrl . rawurlencode($row['file_name']);
-						$this->imageCache[$row["taxon_id"]][]=$row;
-					}
-					$result->free();
+					$row['url'] = $this->imageBaseUrl . rawurlencode($row['file_name']);
+					$d[]=$row;
 				}
+
+				$result->free();
 			}
 
-			return isset($this->imageCache[$id]) ? $this->imageCache[$id] : null;
+			return $d;
 		}
 
 		private function getClassification( $id )
 		{
+			$query="		
+				select
+					_t.id,
+					ifnull(_names.uninomial,_t.taxon) as name,
+					_r.rank
 
-			if (empty($this->classificationCache))
+				from
+					".$this->connector->prefix."taxa _t
+
+				left join ".$this->connector->prefix."projects_ranks _f
+					on _t.rank_id = _f.id
+					and _t.project_id = _f.project_id
+
+				left join ".$this->connector->prefix."names _names
+					on _t.project_id = _names.project_id
+					and _t.id = _names.taxon_id
+					and _names.type_id = ".$this->validNameId."
+
+				left join ".$this->connector->prefix."ranks _r
+					on _f.rank_id = _r.id
+
+				where
+					_t.project_id = ".$this->connector->project_id . "
+					and _t.id = " . $id
+			;
+
+			$d=[];
+
+			$result=$this->mysqli->query( $query );
+			
+			if ( $result )
 			{
-
-				$query="		
-					select
-						_t.id,
-						ifnull(_names.uninomial,_t.taxon) as name,
-						_r.rank
-		
-					from
-						".$this->connector->prefix."taxa _t
-		
-					left join ".$this->connector->prefix."projects_ranks _f
-						on _t.rank_id = _f.id
-						and _t.project_id = _f.project_id
-		
-					left join ".$this->connector->prefix."names _names
-						on _t.project_id = _names.project_id
-						and _t.id = _names.taxon_id
-						and _names.type_id = ".$this->validNameId."
-		
-					left join ".$this->connector->prefix."ranks _r
-						on _f.rank_id = _r.id
-		
-					where
-						_t.project_id = ".$this->connector->project_id
-				;
-
-				$result=$this->mysqli->query( $query );
-				
-				if ( $result )
-				{
-					while( $row=$result->fetch_assoc() )
-					{
-						$this->classificationCache[$row["id"]]=$row;
-					}
-					$result->free();
-				}
+				$d=$result->fetch_assoc();
+				$result->free();
 			}
 
-			return isset($this->classificationCache[$id]) ? $this->classificationCache[$id] : null;
-
+			return $d;
 		}
 
 		private function cleanImageLicence($a)
@@ -680,20 +551,15 @@
 			return $a;
 		}
 
-        /**
-         * @throws Exception
-         */
         private function writeData()
 		{
-			$this->feedback( "writing data" );
-			
-			set_time_limit( $this->executionTimeOut );
-			
 			if ( empty($this->taxa) )
 			{
-				throw new Exception( 'Found no taxa.' );
+				return;
 			}
 
+			set_time_limit( $this->executionTimeOut );
+			
 			$this->generateOutFile();
 
 			$batch=0;
@@ -708,8 +574,6 @@
 					$this->taxa[$key]['description']=@$description;
 
 				}
-
-				unset($this->descriptionCache);
 			}
 
 			if ( $this->includeNames )
@@ -721,8 +585,6 @@
 					foreach((array)$n as $vdsdvsdfs) $names[]=$vdsdvsdfs;
 					$this->taxa[$key]['names']=@$names;
 				}
-
-				unset($this->namesCache);
 			}
 
 			if ( $this->includeImages )
@@ -738,8 +600,6 @@
 					}
 					$this->taxa[$key]['images']=@$images;
 				}
-
-				unset($this->imageCache);
 			}
 
 			foreach((array)$this->taxa as $key=>$val)
@@ -765,6 +625,8 @@
 				}
 			}
 
+			$this->feedback( sprintf("writing %s", $this->filename) );
+
 			foreach((array)$this->taxa as $key=>$val)
 			{
 				$val['status']=
@@ -784,18 +646,12 @@
 				);
 
 				file_put_contents( $this->exportFolder . $this->filename , json_encode($val) . "\n", FILE_APPEND);
-			
-				if (++$batch==$this->maxBatchSize)
-				{
-					$this->generateOutFile();
-					$batch=0;
-				}
 			}
 		}
 
 		private function printStats()
 		{
-			$this->feedback( sprintf("wrote %s taxa (%s files in %s)",$this->number_written, $this->filecounter, $this->exportFolder ) );
+			$this->feedback( sprintf("wrote %s taxa (%s files in %s)",$this->number_written, $this->batch, $this->exportFolder ) );
 		}
 		
 		private function cleanUp()
@@ -804,5 +660,101 @@
 			$this->mysqli->close();
 			$this->feedback( "finished" . "\n" );
 		}
-		
+
+		private function feedback( $m )
+		{
+			echo $m,"\n";
+		}
+
+		private function handleException( $e )
+		{
+			$this->feedback( "\nERROR" );
+			$this->feedback( $e->getMessage() );
+			$this->feedback( "abnormal termination" );
+		}
+
+		private function printHeader()
+		{
+			$this->feedback( "running exporter for NBA import" );
+			$this->feedback(  date(DATE_RFC2822) );
+		}
+
+		private function generateOutFile( $extension='jsonl')
+		{
+			if ( $this->batch==0 )
+			{
+				$this->fileNameDate = date('Y-m-d_Hi');
+			}
+			
+			$this->filename = 
+				$this->fileNameBase . "--" . 
+				$this->fileNameDate . "--" . 
+				sprintf( '%02s', $this->batch ) . 
+				'.' . ltrim($extension,'.');
+			
+			$this->filelist[]=$this->filename;
+		}
+
+		private function checkEssentials()
+		{
+			if ( empty($this->connector->user) )
+			{
+                $b[] = "missing database user";
+            }
+			if ( empty($this->connector->host) )
+			{
+                $b[] = 'missing database host';
+            }
+			if ( empty($this->connector->database) )
+			{
+                $b[] = "missing database name";
+            }
+			if ( empty($this->connector->project_id) )
+			{
+                $b[] = "missing project id";
+            }
+			if ( is_null($this->languageId) )
+			{
+                $b[] = "missing language id";
+            }
+			if ( is_null($this->exportFolder) )
+			{
+                $b[] = "missing export folder";
+            }
+			if ( !is_writable($this->exportFolder) )
+			{
+                $b[] = "export folder not writable";
+            }
+			if ( is_null($this->fileNameBase) )
+			{
+                $b[] = "missing export filename";
+            }
+
+			if ( !empty( $b ) )
+			{
+                throw new \Exception(implode("\n", $b));
+            }
+		}
+
+		private function connectDatabase()
+		{
+			$this->mysqli = @new mysqli(
+				$this->connector->host,
+				$this->connector->user,
+				$this->connector->password,
+				$this->connector->database
+			);
+			
+			if ($this->mysqli->connect_error)
+			{
+				throw new Exception( $this->mysqli->connect_error );
+			}
+			else
+			{
+				$this->feedback( "connected " . $this->connector->database . "@" . $this->connector->host );
+
+				$this->mysqli->query('SET NAMES ' . $this->connector->character_set );
+				$this->mysqli->query('SET CHARACTER SET ' . $this->connector->character_set );
+			}
+		}		
 	}
