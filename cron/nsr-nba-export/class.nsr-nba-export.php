@@ -257,6 +257,7 @@
 					_t.project_id = " . $this->connector->project_id . "
 					and ifnull(_trash.is_deleted,0)=0
 					" . ( $ranks ? $ranks : "" ) ."
+					order by _t.id
 				    limit " . $this->batchSize ." offset " . ($this->batchSize * $this->batch)
 			;
 			
