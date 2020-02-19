@@ -190,17 +190,18 @@
 		
 			$query="
 				select
-					_t.taxon as name,
-					replace(_r.rank,' ','_') as rank,
-					_t.id,
-					trim(LEADING '0' FROM replace(_rr.nsr_id,'tn.nlsr.concept/','')) as nsr_id,
-					trim(LEADING '0' FROM replace(_pp.nsr_id,'tn.nlsr.concept/','')) as nsr_id_parent,
-					concat('http://nederlandsesoorten.nl/nsr/concept/',replace(_rr.nsr_id,'tn.nlsr.concept/','')) as url,
-					concat(_h.index_label,' ',_h.label) as status_status,
-					_l2.label as status_reference_title,
-					_e1.name as status_expert_name,
-					_e2.name as status_organisation_name,
-					_q.parentage as classification
+					distinct
+						_t.taxon as name,
+						replace(_r.rank,' ','_') as rank,
+						_t.id,
+						trim(LEADING '0' FROM replace(_rr.nsr_id,'tn.nlsr.concept/','')) as nsr_id,
+						trim(LEADING '0' FROM replace(_pp.nsr_id,'tn.nlsr.concept/','')) as nsr_id_parent,
+						concat('http://nederlandsesoorten.nl/nsr/concept/',replace(_rr.nsr_id,'tn.nlsr.concept/','')) as url,
+						concat(_h.index_label,' ',_h.label) as status_status,
+						_l2.label as status_reference_title,
+						_e1.name as status_expert_name,
+						_e2.name as status_organisation_name,
+						_q.parentage as classification
 
 				from
 					".$this->connector->prefix."taxa _t
