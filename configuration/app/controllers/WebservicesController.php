@@ -375,11 +375,12 @@ parameters:
 	public function taxonPageAction()	
 	{
 		$this->_usage=
-"url: http://$_SERVER[HTTP_HOST]$_SERVER[PHP_SELF]?pid=<id>&taxon=<scientific name>&cat=<page ID>
+"url: http://$_SERVER[HTTP_HOST]$_SERVER[PHP_SELF]?pid=<id>&taxon=<scientific name>&cat=<page ID>&lang=<lang>
 parameters:
   pid".chr(9)." : project id (mandatory)
   taxon".chr(9)." : scientific name or id of the taxon to retrieve (mandatory)
   cat".chr(9)." : page ID of the content page (mandatory)
+  lang".chr(9)." : language ID (optional; defaults to project default)
 ";
 
 		// pid is mandatory, now checked in initialise()
@@ -406,6 +407,22 @@ parameters:
 			return;
 		}
 
+		if (!is_null($this->rGetVal('lang')))
+		{
+			$lang = $this->rGetVal('lang');
+	        $matches = array_filter($this->getProjectLanguages(),function($a) use ($lang)
+	        {
+	            return $a["language_id"]==$lang;
+	        });
+
+	        $lang = count($matches)==1 ? array_values($matches)[0]["language_id"] : $this->getDefaultLanguageId();
+		}
+		else
+		{
+			$lang = $this->getDefaultLanguageId();
+		}
+
+
 		$query="
 			select
 				_b.id,
@@ -418,13 +435,13 @@ parameters:
 			left join %PRE%content_taxa _b
 				on _a.id=_b.page_id
 				and _a.project_id=_b.project_id
-				and _b.language_id =".LANGUAGE_ID_DUTCH."
+				and _b.language_id =".$lang."
 				and _b.taxon_id =".$this->getTaxonId()."
 				
 			left join %PRE%pages_taxa_titles _c
 				on _a.id=_c.page_id
 				and _a.project_id=_c.project_id
-				and _c.language_id =".LANGUAGE_ID_DUTCH."
+				and _c.language_id =".$lang."
 
 			where
 				_a.project_id=".$this->getCurrentProjectId()."
@@ -1317,8 +1334,6 @@ parameters:
 		$this->printOutput();
 	}
 
-	
-
     private function initialise()
     {
         $this->Rdf = new RdfController(array('checkForProjectId'=>false));
@@ -1333,6 +1348,7 @@ parameters:
 		} 
 		else 
 		{
+			$this->setProjectLanguages();
  		    $this->models->Taxa->freeQuery("SET lc_time_names = '".$this->moduleSettings->getGeneralSetting( array( 'setting'=>'db_lc_time_names','subst'=>'nl_NL'))."'");
 			$this->checkJSONPCallback();
 		}

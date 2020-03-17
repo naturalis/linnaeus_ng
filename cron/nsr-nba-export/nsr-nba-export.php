@@ -1,7 +1,6 @@
 <?php
 
-	//$outdir = "/var/opt/nba-brondata-nsr/"; // root@various-linnaeusng-027:/var/opt# git clone git@git-brondata-nsr:naturalis/nba-brondata-nsr.git
-    $outdir = "/var/www/html/tmp/"; // root@various-linnaeusng-027:/var/opt# git clone git@git-brondata-nsr:naturalis/nba-brondata-nsr.git
+        $outdir = "/var/www/html/tmp/";
 	$outfilebasename = "nsr-export";
 	$filelist = "filelist";
 	$tag = date('Y.m.d--H.i.s');
@@ -24,7 +23,7 @@
 	}
 
 	echo "truncating " . $outdir . $filelist ."\n";
-	$fp = fopen( $outdir . $filelist, 'bw' );
+	$fp = fopen( $outdir . $filelist, 'w' );
 	fclose($fp);
 
 
@@ -37,6 +36,8 @@
 	$conn['project_id']=1;
 
 	include_once("class.nsr-nba-export.php");
+
+	ini_set('memory_limit','2048M');
 
 	$b = new taxonXmlExporter;
 	$b->setConnectData( $conn );
@@ -55,9 +56,10 @@
 	echo "writing to " . $outdir . $filelist ."\n";
 	file_put_contents( $outdir . $filelist, implode( PHP_EOL, $b->getFilelist() ) );
 
-	echo "compressing\n";
-	$filename = 'nsr-' . date('Y-m-d') . '.tar.gz';
-	echo shell_exec( 'cd ' . $outdir . '; tar zcf ' . $filename . ' *.xml');
+//		echo "compressing\n";
+//		$filename = 'nsr-' . date('Y-m-d') . '.tar.gz';
+	// echo shell_exec( 'cd ' . $outdir . '; tar zcf ' . $filename . ' *.xml');
+//		echo shell_exec( 'cd ' . $outdir . '; tar zcf ' . $filename . ' *.jsonl');
 //  echo shell_exec('/usr/local/bin/mc cp ' . $outdir . $filename . ' s3-nba-brondata/brondata-nsr/');
 
 //	echo "adding\n";
