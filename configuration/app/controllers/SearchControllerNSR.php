@@ -190,7 +190,7 @@ class SearchControllerNSR extends SearchController
 		$this->smarty->assign('url_taxon_detail',"http://". $this->httpHost.'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
 		
 		if ($this->rHasVal('action','export')) {
-			$search['limit']=1000;
+			//$search['limit']=1000;
 			$template='export_search_extended';
 			$this->smarty->assign('csvExportSettings',$this->csvExportSettings);
 
