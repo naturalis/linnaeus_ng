@@ -43,7 +43,10 @@
 	$b->setConnectData( $conn );
 	$b->setLanguageId( 24 );  // 24 dutch, 26 english (affects image metadata)
 	$b->setIdsToSuppressInClassification( [116297] ); // excluding "life"
+
+	$b->setConceptBaseUrl( 'http://nederlandsesoorten.nl/nsr/concept/' );
 	$b->setImageBaseUrl( 'https://images.naturalis.nl/original/' );
+
 	$b->setValidNameTypeId( 1 );
 //	$b->setRanksToExport( ['ranks'=>74,'style'=>'and_lower'] );
 //	$b->setLimit( 1000 );  // limit on number of taxa
