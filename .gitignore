@@ -119,3 +119,4 @@ vendor
 composer.lock
 yarn.lock
 www/sitemap*
+cron/nsr-nba-export$ nsr-nba-export.php
