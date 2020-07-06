@@ -457,6 +457,7 @@ parameters:
 		{
 			$page=$p[0]['content'];
 			$title=$p[0]['title'];
+			$publish=$p[0]['publish'];
 
 			if (isset($p[0]['id']))
 			{
@@ -488,6 +489,7 @@ parameters:
 			array(
 				'title'=>$title,
 				'body'=>$page,
+				'publish'=>$publish,
 				'rdf'=>$rdf
 			);
 
