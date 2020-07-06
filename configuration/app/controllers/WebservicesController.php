@@ -427,7 +427,8 @@ parameters:
 			select
 				_b.id,
 				ifnull(_c.title,_a.page) as title,
-				_b.content
+				_b.content,
+				_b.publish
 
 			from
 				%PRE%pages_taxa _a
