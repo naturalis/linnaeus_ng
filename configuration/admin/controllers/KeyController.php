@@ -32,11 +32,6 @@ class KeyController extends Controller
             'int-link.js',
 			'nsr_taxon_beheer.js',
         )
-        /*
-        'IE' => array(
-            'jit/Extras/excanvas.js'
-        )
-        */
     );
 
     public $cssToLoad = array(
