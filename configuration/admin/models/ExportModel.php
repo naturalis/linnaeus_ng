@@ -44,7 +44,7 @@ final class ExportModel extends AbstractModel
 				_t.id,
 				trim(LEADING '0' FROM replace(_rr.nsr_id,'tn.nlsr.concept/','')) as nsr_id,
 				trim(LEADING '0' FROM replace(_pp.nsr_id,'tn.nlsr.concept/','')) as nsr_id_parent,
-				concat('http://nederlandsesoorten.nl/nsr/concept/',replace(_rr.nsr_id,'tn.nlsr.concept/','')) as url,
+				concat('https://nederlandsesoorten.nl/nsr/concept/',replace(_rr.nsr_id,'tn.nlsr.concept/','')) as url,
 				concat(_h.index_label,' ',_h.label) as status_status,
 				_l2.label as status_reference_title,
 				_e1.name as status_expert_name,

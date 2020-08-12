@@ -3089,7 +3089,16 @@ class Controller extends BaseClass
 		$this->server_name=trim(@shell_exec( "hostname" ));
 	}
 
-	protected function setGoogleAnalyticsCode()
+    protected function getProtocol()
+    {
+        if (isset($_SERVER['HTTPS']) && in_array($_SERVER['HTTPS'], ['on', 1]) ||
+            isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') {
+            return 'https://';
+        }
+        return 'http://';
+    }
+
+    protected function setGoogleAnalyticsCode()
 	{
 		$d=$this->models->ControllerModel->getSetting(array(
 			'project_id' => $this->getCurrentProjectId(),

@@ -187,7 +187,7 @@ class SearchControllerNSR extends SearchController
     public function searchExtendedAction()
     {
 		$search=$this->rGetAll();
-		$this->smarty->assign('url_taxon_detail',"http://". $this->httpHost.'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
+		$this->smarty->assign('url_taxon_detail', $this->getProtocol() . $this->httpHost.'/linnaeus_ng/'.$this->getAppname().'/views/species/taxon.php?id=');
 		
 		if ($this->rHasVal('action','export')) {
 			$search['limit']=5000;
