@@ -134,7 +134,7 @@ class SearchControllerNSR extends SearchController
 		$this->models->SearchNSRModel->setNameTypeIds($this->_nameTypeIds);
 		$this->setRobotsDirective( ["index","nofollow"] );
 		
-		$this->httpHost = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ?  $_SERVER['HTTP_X_FORWARDED_HOST'] : $_SERVER["HTTP_HOST"];
+		$this->httpHost = $this->getHttpHost();
 
     }
 

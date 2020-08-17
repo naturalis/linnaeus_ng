@@ -3342,6 +3342,12 @@ class Controller extends BaseClass
         return preg_replace('/\s+/', ' ', $str);
     }
 
+    public function getHttpHost ()
+    {
+        $host = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : $_SERVER["HTTP_HOST"];
+        $parts = explode(',', $host);
+        return $parts[0];
+    }
 
 }
  
