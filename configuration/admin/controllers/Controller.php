@@ -583,7 +583,7 @@ class Controller extends BaseClass
      */
     public function getProjectsMediaStorageDir ()
     {
-		return $this->baseSession->getModuleSetting( 'project_media_path' );
+        return $this->baseSession->getModuleSetting( 'project_media_path' );
     }
 
 

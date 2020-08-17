@@ -815,8 +815,7 @@ class VersatileExportController extends Controller
     
     private function openFileHandlers ()
     {
-        $basePath = $this->getProjectsMediaStorageDir();
-        //$basePath = sys_get_temp_dir() . '/';
+        $basePath = sys_get_temp_dir() . '/';
         
         $this->names_file_path = $basePath . $this->names_file_name;
         $this->fhNames = fopen($this->names_file_path, 'w');
