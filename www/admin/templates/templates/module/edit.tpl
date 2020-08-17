@@ -1,3 +1,4 @@
+{include file="../shared/admin-header.tpl"}
 <style>
 .image-preview {
 	max-width: 300px;
@@ -6,7 +7,6 @@
 }
 </style>
 
-{include file="../shared/admin-header.tpl"}
 <div id="page-main">
 <form name="theForm" id="theForm" method="post" action="" >
 <input type="button" value="{t}save{/t}" onclick="freemodSaveContentAll()" style="margin-right:5px" />
