@@ -46,7 +46,7 @@
     "sprintf-js": "git+https://github.com/alexei/sprintf.js.git",
     "tablesorter": "^2.31.3",
     "terser": "^4.8.0",
-    "tinymce": "^5.4.1",
+    "tinymce": "^4.5.12",
     "vinyl-buffer": "^1.0.1",
     "vinyl-source-stream": "^2.0.0"
   },
