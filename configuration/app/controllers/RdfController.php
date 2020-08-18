@@ -5,10 +5,11 @@ class RdfController extends Controller
 {
 
     public $usedModels = array(
-		'rdf','actors','literature2'
+		'rdf','actors','literature2',
     );
 
     public $controllerPublicName = 'RDF';
+    public $modelNameOverride = 'Literature2Model';
 
     public $usedHelpers = array(
     );
@@ -60,13 +61,14 @@ class RdfController extends Controller
 					));
 					break;
 				case 'reference' :
+				    /*
 					$data=$this->models->Literature2->_get(array(
 						'id' => array(
 							'project_id'=>$this->getCurrentProjectId(),
 							'id'=>$val['object_id']
 						)
 					));
-					
+
 					if (isset($data[0]['actor_id']))
 					{
 						$actor=$this->models->Actors->_get(array(
@@ -79,6 +81,13 @@ class RdfController extends Controller
 						unset($actor[0]['last_change']);
 						$data[0]['actor']=$actor[0];
 					}
+				    */
+
+                    $data[0] = $this->models->Literature2Model->getReference([
+                        'project_id' => $this->getCurrentProjectId(),
+                        'language_id' => $this->getCurrentLanguageId(),
+                        'literature2_id' => $val['object_id']
+                    ]);
 
                     $data[0]['formatted'] = $this->formatReference($data[0]);
 

@@ -13,7 +13,7 @@
 				<div class="container">
 					<ul class="footer-menu__list">
 						<li>
-							<a href="http://linnaeus.naturalis.nl/" target="_blank">
+							<a href="https://linnaeus.naturalis.nl/" target="_blank">
 								Linnaeus
 							</a>
 						</li>
@@ -24,7 +24,7 @@
 							<span class="decode">{$contact}</span>
 						</li>
 						<li>
-							<a target="_blank" href="http://www.naturalis.nl">
+							<a target="_blank" href="https://www.naturalis.nl">
 								Naturalis Biodiversity Center
 							</a>	
 						</li>

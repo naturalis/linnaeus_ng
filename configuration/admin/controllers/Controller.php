@@ -3206,13 +3206,14 @@ class Controller extends BaseClass
         }
 
         if (!empty($r['volume']) && !empty($r['pages'])) {
-            $str .= $r['volume'] . ': ';
+            $str .= ' ' . $r['volume'] . ': ';
         } else if (!empty($r['volume'])) {
             $str .= ' ' . $r['volume'] . '. ';
         }
         if (!empty($r['pages'])) {
             $str .= $r['pages'] . '. ';
         }
+
         if (!empty($r['publisher'])) {
             $str .= $r['publisher'] . '.';
         }

@@ -3089,7 +3089,16 @@ class Controller extends BaseClass
 		$this->server_name=trim(@shell_exec( "hostname" ));
 	}
 
-	protected function setGoogleAnalyticsCode()
+    protected function getProtocol()
+    {
+        if (isset($_SERVER['HTTPS']) && in_array($_SERVER['HTTPS'], ['on', 1]) ||
+            isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') {
+            return 'https://';
+        }
+        return 'http://';
+    }
+
+    protected function setGoogleAnalyticsCode()
 	{
 		$d=$this->models->ControllerModel->getSetting(array(
 			'project_id' => $this->getCurrentProjectId(),
@@ -3309,7 +3318,7 @@ class Controller extends BaseClass
         }
 
         if (!empty($r['volume']) && !empty($r['pages'])) {
-            $str .= $r['volume'] . ': ';
+            $str .= ' ' . $r['volume'] . ': ';
         } else if (!empty($r['volume'])) {
             $str .= ' ' . $r['volume'] . '. ';
         }
@@ -3333,6 +3342,12 @@ class Controller extends BaseClass
         return preg_replace('/\s+/', ' ', $str);
     }
 
+    public function getHttpHost ()
+    {
+        $host = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : $_SERVER["HTTP_HOST"];
+        $parts = explode(',', $host);
+        return $parts[0];
+    }
 
 }
  
