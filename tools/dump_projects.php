@@ -38,9 +38,9 @@
 	echo 'This script dumps all projects in the '.$s['database'].' database to individual .sql files.' .
 	     'These files can be used to restore individual projects from a backup.';
 
- 	$d = mysql_connect($s['host'],$s['user'],$s['password']) or die ('Cannot connect to '.$s['host']);
-	mysql_select_db($s['database'],$d) or die ('Cannot select database '.$s['database']);
-	mysql_set_charset('utf8', $d);
+ 	$d = mysqli_connect($s['host'],$s['user'],$s['password']) or die ('Cannot connect to '.$s['host']);
+	mysqli_select_db($d, $s['database']) or die ('Cannot select database '.$s['database']);
+	mysqli_set_charset($d, 'utf8');
 	
 	$projects = getProjects($s);
 	$tables = getTables($s);
@@ -52,15 +52,15 @@
 		foreach ($tables as $table) {
 			$columns = getColumns($s, $table);
 			if (array_key_exists('project_id', $columns) || array_key_exists($table, $exceptions)) {
-				$result = mysql_query(constructQuery($table, $columns, $exceptions, $projectId)) or die(mysql_error());
-				$nrRows = mysql_num_rows($result);
+				$result = mysqli_query($d, constructQuery($table, $columns, $exceptions, $projectId)) or die(mysqli_error($result));
+				$nrRows = mysqli_num_rows($d);
 				if ($nrRows > 0) {
 					$i = 0;
 					$line = "--\n-- Dumping data for table `$table`\n--\n\n" . startDump($table, $columns);
 					fwrite($fp, $line);
 					$length = strlen($line);
 
-					while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
+					while ($row = mysqli_fetch_array($d, MYSQLI_ASSOC)) {
 						$i++; 
 						$line = '(';
 						foreach ($row as $column => $value) {
@@ -100,13 +100,15 @@
 		}
 		fclose($fp);
 	}
-	mysql_close();
+	mysqli_close();
 
 		
 	function getProjects ($s)
 	{
-		$result = mysql_query('SELECT `id`, `title` FROM `' . $s['tablePrefix'] . 'projects`');
-		while ($row = mysql_fetch_array($result, MYSQL_NUM)) {
+        global $d;
+
+		$result = mysqli_query($d, 'SELECT `id`, `title` FROM `' . $s['tablePrefix'] . 'projects`');
+		while ($row = mysqli_fetch_array($d, MYSQLI_NUM)) {
 			$projects[$row[0]] = $row[1];
 		}
 		return $projects;
@@ -114,8 +116,10 @@
 	
 	function getTables ($s)
 	{
-		$result = mysql_query('SHOW TABLES');
-		while ($row = mysql_fetch_array($result, MYSQL_NUM)) {
+        global $d;
+
+		$result = mysqli_query($d, 'SHOW TABLES');
+		while ($row = mysqli_fetch_array($d, MYSQLI_NUM)) {
 			$tables[] = $row[0];
 		}
 		return $tables;
@@ -123,8 +127,10 @@
 
 	function getColumns ($s, $table)
 	{
-		$result = mysql_query("SHOW COLUMNS FROM `$table`");
-		while ($row = mysql_fetch_array($result, MYSQL_NUM)) {
+        global $d;
+
+		$result = mysqli_query($d, "SHOW COLUMNS FROM `$table`");
+		while ($row = mysqli_fetch_array($d, MYSQLI_NUM)) {
 			$columns[$row[0]] = setMysqlType($row[1]);
 		}
 		return $columns;

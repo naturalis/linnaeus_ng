@@ -41,9 +41,9 @@
 	     Authors that cannot be successfully extracted are listed in red. Please review the list and click 
 	     the "Update database" click to copy the authors to the database.</p><p>';
 
- 	$d = mysql_connect($s['host'],$s['user'],$s['password']) or die ('Cannot connect to '.$s['host']);
-	mysql_select_db($s['database'],$d) or die ('Cannot select database '.$s['database']);
-	mysql_set_charset('utf8', $d);
+ 	$d = mysqli_connect($s['host'],$s['user'],$s['password']) or die ('Cannot connect to '.$s['host']);
+	mysqli_select_db($d, $s['database']) or die ('Cannot select database '.$s['database']);
+	mysqli_set_charset($d, 'utf8');
 	
 	// Nullify authors before commencing
 	if (isset($_GET['update'])) nullifyAuthors();
@@ -56,9 +56,9 @@
 	if (!$settings['includeHigherTaxa'])  {
 	    $query .= ' AND t3.`lower_taxon` = 1';
 	}
-	$result = mysql_query($query) or die(mysql_error());
+	$result = mysqli_query($result, $query) or die(mysqli_error($result));
 	$n = $k = 0;
-	while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
 	    // get an array with results, size dependent of number of lines to scan for author
 	    $authorResults = getAuthor($row);
 		$author = false;
@@ -153,15 +153,15 @@
     {
 		global $settings, $s;
 		$query = 'UPDATE `' . $s['tablePrefix'] . 'taxa` SET `author` = NULL WHERE `project_id` = ' . $settings['projectId'];
-		$result = mysql_query($query) or die(mysql_error());
+		$result = mysqli_query($result, $query) or die(mysqli_error($result));
     }
     
     function updateAuthor ($row, $author)
     {
 		global $settings, $s, $n;
-		$query = 'UPDATE `' . $s['tablePrefix'] . 'taxa` SET `author` = "' . mysql_real_escape_string($author) .
+		$query = 'UPDATE `' . $s['tablePrefix'] . 'taxa` SET `author` = "' . mysqli_real_escape_string($author) .
 			'" WHERE `id` = ' . $row['taxon_id'];
-		$result = mysql_query($query) or die(mysql_error());
+		$result = mysqli_query($result, $query) or die(mysqli_error($result));
 		$n++;
     }
 	
