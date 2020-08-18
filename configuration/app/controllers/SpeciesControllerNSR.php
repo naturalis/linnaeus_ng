@@ -259,7 +259,7 @@ class SpeciesControllerNSR extends SpeciesController
                 $overview = $this->getTaxonOverviewImage();
             }
 
-            $classification=(isset($content['classification']) ? $content['classification'] : isset($classification) ? $classification : null);
+            $classification=((isset($content['classification']) ? $content['classification'] : isset($classification)) ? $classification : null);
             $content= isset($content['content']) ? $content['content'] : null;
             
             if ($categories['start']['tabname'] != 'CTAB_MEDIA') {

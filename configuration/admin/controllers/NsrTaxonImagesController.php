@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection ALL */
 
 include_once ('NsrController.php');
 include_once ('ModuleSettingsReaderController.php');

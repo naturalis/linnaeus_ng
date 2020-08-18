@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpHierarchyChecksInspection */
 
 /*
 	deleting of language should delete glossary terms
@@ -1063,6 +1063,7 @@ class ProjectsController extends Controller
      * Set the current project Id
      *
      * @param int $id
+     * @noinspection PhpHierarchyChecksInspection
      */
     private function setCurrentProjectId($id)
     {
