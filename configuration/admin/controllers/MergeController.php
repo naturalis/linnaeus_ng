@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * Merges the data of projects after an import
  */

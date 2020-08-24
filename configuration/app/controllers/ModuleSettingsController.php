@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  *
  *  	$this->moduleSettings=new ModuleSettingsController;

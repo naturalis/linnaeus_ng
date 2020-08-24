@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /*
 	deleting of language should delete glossary terms

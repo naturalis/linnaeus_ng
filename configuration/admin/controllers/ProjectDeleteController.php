@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * Controller used for deleting before a new import.
  */

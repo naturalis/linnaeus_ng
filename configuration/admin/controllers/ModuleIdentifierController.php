@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * Controller which supplies information about projects and modules to other controllers. Used by MediaController and ProjectsController
  */

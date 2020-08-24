@@ -1,4 +1,4 @@
-<?php 
+<?php
 include_once ('Controller.php');
 
 class InterfaceController extends Controller

@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  *  The webservices controller handles the Webservices api
  */

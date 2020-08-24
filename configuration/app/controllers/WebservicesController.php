@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /*
  * *** START OF RANT ***

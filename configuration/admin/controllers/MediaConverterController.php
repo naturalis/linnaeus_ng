@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * Batch converts all local media to the ResourceSpace infrastructure
  */

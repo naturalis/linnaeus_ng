@@ -1,4 +1,4 @@
-<?php 
+<?php
 include_once (__DIR__ . "/AbstractModel.php");
 
 final class IndexModel extends AbstractModel
