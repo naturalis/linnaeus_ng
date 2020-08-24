@@ -846,9 +846,7 @@ class beeldbankDownloader
 
         foreach ((array)$this->newImages as $key => $val) {
             if (isset($val->_tmp_file) && file_exists($val->_tmp_file)) {
-                if (unlink($val->_tmp_file)) {
-                    //$this->feedback( sprintf("deleted %s",$val->_tmp_file) );
-                } else {
+                if (!unlink($val->_tmp_file)) {
                     $this->feedback(sprintf("could not delete %s", $val->_tmp_file));
                 }
             }

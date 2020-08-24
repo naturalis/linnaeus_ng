@@ -2036,11 +2036,11 @@ class SpeciesController extends Controller
                         )
                     ));
 
-                    foreach ((array) $pr as $key => $val) {
+                    foreach ((array) $pr as $prank) {
 
                         $this->models->LabelsProjectsRanks->delete(array(
                             'project_id' => $this->getCurrentProjectId(),
-                            'project_rank_id' => $val['id']
+                            'project_rank_id' => $prank['id']
                         ));
                     }
 

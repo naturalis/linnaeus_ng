@@ -1,16 +1,16 @@
 <?php
 
-	/*
+/*
 
-	the content for 'About ETI' is the same for all projects. it is stored in the same table
-	as the project specific content, using project ID=-10 (defined in the configuration file).
-	it needs to be available in the same language(s) that the project uses in order for
-	it to be displayed.
-	there is no editing interface for the 'About ETI' content. it should be edited directly
-	in the database (SELECT * FROM dev_content WHERE project_id = -10)
-	(dutch = 24, english = 26)
+the content for 'About ETI' is the same for all projects. it is stored in the same table
+as the project specific content, using project ID=-10 (defined in the configuration file).
+it needs to be available in the same language(s) that the project uses in order for
+it to be displayed.
+there is no editing interface for the 'About ETI' content. it should be edited directly
+in the database (SELECT * FROM dev_content WHERE project_id = -10)
+(dutch = 24, english = 26)
 
-	*/
+*/
 
 include_once ('Controller.php');
 include_once ('ModuleSettingsReaderController.php');

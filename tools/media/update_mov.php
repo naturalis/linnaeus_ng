@@ -32,7 +32,7 @@
 
     foreach ($regular as $q) {
         foreach ($replacement as $replace => $find) {
-            mysqli_query($my, sprintf($q, $find, $replace)) or die(mysqli_error($q));
+            mysqli_query($my, sprintf($q, $find, $replace)) or die(mysqli_error($my));
         }
     }
 

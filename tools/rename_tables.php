@@ -36,12 +36,12 @@
   aborted
 	');
 	
-	$d = @mysql_connect($s['host'],$s['user'],$s['password']) or die ('cannot connect');
-	@mysql_select_db($s['database'],$d) or die ('cannot select db');
+	$d = @mysqli_connect($s['host'],$s['user'],$s['password']) or die ('cannot connect');
+	@mysqli_select_db($d, $s['database']) or die ('cannot select db');
 
-	$q = mysql_query('show tables');
+	$q = mysqli_query($d, 'show tables');
 
-	while ($r = mysql_fetch_array($q)) {
+	while ($r = mysqli_fetch_array($d)) {
 
 		$pF = substr($r[0],0,strlen($s['tablePrefix']));
 	
@@ -49,7 +49,7 @@
 
 			$new = $prefix.substr($r[0],strlen($s['tablePrefix']));
 			echo '  renaming '.$r[0].' to '.$new.' ... ';
-			if (mysql_query('rename table '.$r[0].' to '.$new)==1)
+			if (mysqli_query($d, 'rename table '.$r[0].' to '.$new)==1)
 				echo 'done';
 			else
 				echo 'failed';
@@ -63,7 +63,7 @@
 	
 	}
 	
-	mysql_close();
+	mysqli_close($d);
 	
 	echo '
   done
