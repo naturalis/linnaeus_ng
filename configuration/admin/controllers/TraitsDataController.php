@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpMissingParentCallMagicInspection */
+<?php 
 /*
 
 	export from excel NOT as csv, but as tab-delimited text

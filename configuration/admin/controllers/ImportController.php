@@ -1,5 +1,5 @@
 <?php
-/** @noinspection PhpMissingParentCallMagicInspection */
+
 include_once ('Controller.php');
 
 class ImportController extends Controller

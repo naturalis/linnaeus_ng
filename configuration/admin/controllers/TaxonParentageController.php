@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpMissingParentCallMagicInspection */
+<?php 
 
 class TaxonParentageController extends Controller
 {

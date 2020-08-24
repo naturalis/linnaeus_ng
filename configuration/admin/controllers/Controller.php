@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpMissingParentCallMagicInspection */
+<?php 
 
 include_once (__DIR__ . "/../BaseClass.php");
 include_once (__DIR__ . "/../../../vendor/autoload.php");

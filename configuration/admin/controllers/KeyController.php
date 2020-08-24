@@ -1,5 +1,5 @@
 <?php
-/** @noinspection PhpMissingParentCallMagicInspection */
+
 include_once ('Controller.php');
 include_once ('MediaController.php');
 include_once ('ModuleSettingsReaderController.php');

@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpMissingParentCallMagicInspection */
+<?php 
 /**
  *
  *  	$this->moduleSettings=new ModuleSettingsController;

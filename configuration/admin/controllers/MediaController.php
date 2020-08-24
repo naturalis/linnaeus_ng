@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpMissingParentCallMagicInspection */
+<?php 
 /**
  * Controller for uploading (media) files to resourcespace
  *

@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpMissingParentCallMagicInspection */
+<?php 
 /*
 
 	on skins:
@@ -3137,7 +3137,6 @@ class Controller extends BaseClass
 			'setting' => 'site_header_subtitle'
 		));
 
-        /** @noinspection ElvisOperatorCanBeUsedInspection */
         $this->_generalHeaderSubtitle = $d ? $d : null;
 	}
 

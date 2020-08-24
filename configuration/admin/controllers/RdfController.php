@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpMissingParentCallMagicInspection */
+<?php 
 
 /*
 	mysql> select distinct subject_type from rdf;
