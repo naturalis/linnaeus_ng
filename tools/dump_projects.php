@@ -52,7 +52,7 @@
 		foreach ($tables as $table) {
 			$columns = getColumns($s, $table);
 			if (array_key_exists('project_id', $columns) || array_key_exists($table, $exceptions)) {
-				$result = mysqli_query($d, constructQuery($table, $columns, $exceptions, $projectId)) or die(mysqli_error($result));
+				$result = mysqli_query($d, constructQuery($table, $columns, $exceptions, $projectId)) or die(mysqli_error($d));
 				$nrRows = mysqli_num_rows($d);
 				if ($nrRows > 0) {
 					$i = 0;
@@ -100,7 +100,7 @@
 		}
 		fclose($fp);
 	}
-	mysqli_close();
+	mysqli_close($d);
 
 		
 	function getProjects ($s)

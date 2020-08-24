@@ -82,7 +82,7 @@ die('nsr data file cruncher dies at line 3');
 
 					if (mysqli_query($d, $q)) {
 						$i++;
-						$results[$Description_about] = mysqli_insert_id();
+						$results[$Description_about] = mysqli_insert_id($d);
 
 					} else {
 						echo 'Failed insert ('.mysqli_error($d).'<!--'.$q.'-->)<br />'.chr(10);
@@ -138,8 +138,8 @@ die('nsr data file cruncher dies at line 3');
 
 			if (isset($prefLabel_nl)) {
 				$q = sprintf($qLanguages, 
-					mysqli_real_escape_string($Description_about),
-					mysqli_real_escape_string($prefLabel_nl),
+					mysqli_real_escape_string($d, $Description_about),
+					mysqli_real_escape_string($d, $prefLabel_nl),
 					(isset($ISO_639_6[$prefLabel_nl]) ? $ISO_639_6[$prefLabel_nl] : null)
 				);
 
@@ -200,12 +200,12 @@ die('nsr data file cruncher dies at line 3');
 		if ($line=='</rdf:Description>') {
 			if (isset($Preflabel_sci)) {
 				$q = sprintf($qRanks, 
-					mysqli_real_escape_string($Description_about),
-					isset($Parent_about) ? mysqli_real_escape_string($Parent_about) :'',
-					mysqli_real_escape_string(fixLabel($Preflabel_sci)),
-					mysqli_real_escape_string(fixLabel($Preflabel_en)),
-					mysqli_real_escape_string(fixLabel($Preflabel_nl)),
-					mysqli_real_escape_string($mutationDate)
+					mysqli_real_escape_string($d, $Description_about),
+					isset($Parent_about) ? mysqli_real_escape_string($d, $Parent_about) :'',
+					mysqli_real_escape_string($d, fixLabel($Preflabel_sci)),
+					mysqli_real_escape_string($d, fixLabel($Preflabel_en)),
+					mysqli_real_escape_string($d, fixLabel($Preflabel_nl)),
+					mysqli_real_escape_string($d, $mutationDate)
 				);
 
 
@@ -281,7 +281,7 @@ die('nsr data file cruncher dies at line 3');
 					else
 						$c[$hasTaxonRank_resource]++;
 
-					$concepts[$Description_about] = mysqli_insert_id();
+					$concepts[$Description_about] = mysqli_insert_id($d);
 
 					$i++;
 
@@ -351,16 +351,16 @@ die('nsr data file cruncher dies at line 3');
 				$q = sprintf($qNames, 
 					isset($concept_id) ? $concept_id : 'null',
 					isset($language_id) ? $language_id : 'null',
-					mysqli_real_escape_string(fixLabel($Label)),
-					mysqli_real_escape_string($Label_type),
-					isset($hasLanguage_resource) ? mysqli_real_escape_string($hasLanguage_resource) : 'null',
-					isset($isNameOf_resource) ? mysqli_real_escape_string($isNameOf_resource) : 'null',
-					isset($typeOfName) ? mysqli_real_escape_string($typeOfName) : 'null',
-					isset($hasNameAuthor) ? mysqli_real_escape_string($hasNameAuthor) : 'null',
-					isset($hasAuthorship) ? mysqli_real_escape_string($hasAuthorship) : 'null',
-					isset($hasAuthorshipYear) ? mysqli_real_escape_string($hasAuthorshipYear) : 'null',
-					isset($hasUninomial) ? mysqli_real_escape_string($hasUninomial) : 'null',
-					isset($hasSpecificEpithet) ? mysqli_real_escape_string($hasSpecificEpithet) : 'null'
+					mysqli_real_escape_string($d, fixLabel($Label)),
+					mysqli_real_escape_string($d, $Label_type),
+					isset($hasLanguage_resource) ? mysqli_real_escape_string($d, $hasLanguage_resource) : 'null',
+					isset($isNameOf_resource) ? mysqli_real_escape_string($d, $isNameOf_resource) : 'null',
+					isset($typeOfName) ? mysqli_real_escape_string($d, $typeOfName) : 'null',
+					isset($hasNameAuthor) ? mysqli_real_escape_string($d, $hasNameAuthor) : 'null',
+					isset($hasAuthorship) ? mysqli_real_escape_string($d, $hasAuthorship) : 'null',
+					isset($hasAuthorshipYear) ? mysqli_real_escape_string($d, $hasAuthorshipYear) : 'null',
+					isset($hasUninomial) ? mysqli_real_escape_string($d, $hasUninomial) : 'null',
+					isset($hasSpecificEpithet) ? mysqli_real_escape_string($d, $hasSpecificEpithet) : 'null'
 				);
 
 				if (mysqli_query($d, $q)) {
@@ -431,20 +431,20 @@ die('nsr data file cruncher dies at line 3');
 
 	echo '<h2>parsing habitats</h2>'.chr(10);
 
-	$d = crunchSimpleStructure($fHabitats,$qHabitats,'habitats');
+	$structure = crunchSimpleStructure($fHabitats,$qHabitats,'habitats');
 
-	$habitats = $d[1];
+	$habitats = $structure[1];
 
-	echo '<p>wrote '.$d[0].' habitats</p>'.chr(10);
+	echo '<p>wrote '.$structure[0].' habitats</p>'.chr(10);
 
 
 	echo '<h2>parsing presences</h2>'.chr(10);
 
-	$d = crunchSimpleStructure($fPresence,$qPresence,'presence_statussen');
+	$structure = crunchSimpleStructure($fPresence,$qPresence,'presence_statussen');
 
-	$precenses = $d[1];
+	$precenses = $structure[1];
 
-	echo '<p>wrote '.$d[0].' presences</p>'.chr(10);
+	echo '<p>wrote '.$structure[0].' presences</p>'.chr(10);
 
 
 	echo '<h2>parsing taxon statuses</h2>'.chr(10);
@@ -476,9 +476,9 @@ die('nsr data file cruncher dies at line 3');
 					isset($status82_id) ? $status82_id : 'null',
 					isset($habitat_id) ? $habitat_id : 'null',
 					isset($is_indigeneous) ? $is_indigeneous : 'null',
-					isset($habitat_verbatim) ? mysqli_real_escape_string($habitat_verbatim) : 'null',
-					isset($concept_verbatim) ? mysqli_real_escape_string($concept_verbatim) : 'null',
-					isset($prefLabel) ? mysqli_real_escape_string($prefLabel) : 'null'
+					isset($habitat_verbatim) ? mysqli_real_escape_string($d, $habitat_verbatim) : 'null',
+					isset($concept_verbatim) ? mysqli_real_escape_string($d, $concept_verbatim) : 'null',
+					isset($prefLabel) ? mysqli_real_escape_string($d, $prefLabel) : 'null'
 				);
 
 				if (mysqli_query($d, $q)) {

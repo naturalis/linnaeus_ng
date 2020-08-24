@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpMissingParentCallMagicInspection */
 /**
  * Batch converts all local media to the ResourceSpace infrastructure
  */

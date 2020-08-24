@@ -56,9 +56,9 @@
 	if (!$settings['includeHigherTaxa'])  {
 	    $query .= ' AND t3.`lower_taxon` = 1';
 	}
-	$result = mysqli_query($result, $query) or die(mysqli_error($result));
+	$result = mysqli_query($d, $query) or die(mysqli_error($d));
 	$n = $k = 0;
-	while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
+	while ($row = mysqli_fetch_array($d, MYSQLI_ASSOC)) {
 	    // get an array with results, size dependent of number of lines to scan for author
 	    $authorResults = getAuthor($row);
 		$author = false;
@@ -151,17 +151,17 @@
     
     function nullifyAuthors ()
     {
-		global $settings, $s;
+		global $settings, $s, $d;
 		$query = 'UPDATE `' . $s['tablePrefix'] . 'taxa` SET `author` = NULL WHERE `project_id` = ' . $settings['projectId'];
-		$result = mysqli_query($result, $query) or die(mysqli_error($result));
+		$result = mysqli_query($d, $query) or die(mysqli_error($d));
     }
     
     function updateAuthor ($row, $author)
     {
-		global $settings, $s, $n;
-		$query = 'UPDATE `' . $s['tablePrefix'] . 'taxa` SET `author` = "' . mysqli_real_escape_string($author) .
+		global $settings, $s, $n, $d;
+		$query = 'UPDATE `' . $s['tablePrefix'] . 'taxa` SET `author` = "' . mysqli_real_escape_string($d, $author) .
 			'" WHERE `id` = ' . $row['taxon_id'];
-		$result = mysqli_query($result, $query) or die(mysqli_error($result));
+		$result = mysqli_query($d, $query) or die(mysqli_error($d));
 		$n++;
     }
 	

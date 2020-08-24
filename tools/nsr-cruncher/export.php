@@ -85,7 +85,7 @@ die('nsr exporter dies');
 	ini_set('max_execution_time',900);
 
 	$d = mysqli_connect('localhost','nsr','nsr') or die('cannot connect');
-	@mysqli_select_db('nsr_import') or die(mysqli_error($d));
+	@mysqli_select_db($d, 'nsr_import') or die(mysqli_error($d));
 	mysqli_query($d, 'SET NAMES utf8');
 	mysqli_query($d, 'SET CHARACTER SET utf8');
 
@@ -257,11 +257,11 @@ die('nsr exporter dies');
 				);
 
 
-				if (mysqli_query($row, $q)) {
+				if (mysqli_query($d, $q)) {
 					$i++;
 					$r[$Description_about]=$Preflabel_sci;
 				} else {
-					echo 'Failed insert ('.mysqli_error($row).'<!--'.$q.'-->)<br />'.chr(10);
+					echo 'Failed insert ('.mysqli_error($d).'<!--'.$q.'-->)<br />'.chr(10);
 				}
 			} else {
 				echo 'No scientific name for "'.$Preflabel_en.'" ('.$Description_about.') - record not saved<br />'.chr(10);
@@ -457,20 +457,20 @@ die('nsr exporter dies');
 
 	echo '<h2>parsing habitats</h2>'.chr(10);
 
-	$d = crunchSimpleStructure($fHabitats,$qHabitats,'habitats');
+	$structure = crunchSimpleStructure($fHabitats,$qHabitats,'habitats');
 
-	$habitats = $d[1];
+	$habitats = $structure[1];
 
-	echo '<p>wrote '.$d[0].' habitats</p>'.chr(10);
+	echo '<p>wrote '.$structure[0].' habitats</p>'.chr(10);
 
 
 	echo '<h2>parsing presences</h2>'.chr(10);
 
-	$d = crunchSimpleStructure($fPresence,$qPresence,'presence_statussen');
+	$structure = crunchSimpleStructure($fPresence,$qPresence,'presence_statussen');
 
-	$precenses = $d[1];
+	$precenses = $structure[1];
 
-	echo '<p>wrote '.$d[0].' presences</p>'.chr(10);
+	echo '<p>wrote '.$structure[0].' presences</p>'.chr(10);
 
 
 	echo '<h2>parsing taxon statuses</h2>'.chr(10);

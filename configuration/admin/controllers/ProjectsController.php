@@ -1,4 +1,5 @@
-<?php /** @noinspection PhpHierarchyChecksInspection */
+<?php /** @noinspection PhpMissingParentCallMagicInspection */
+/** @noinspection PhpHierarchyChecksInspection */
 
 /*
 	deleting of language should delete glossary terms

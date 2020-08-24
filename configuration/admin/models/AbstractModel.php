@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpMissingParentCallMagicInspection */
 
 include_once (__DIR__ . "/../BaseClass.php");
 include_once (__DIR__ . "/../Db.php");
@@ -31,7 +31,7 @@ class AbstractModel extends BaseClass
         parent::__construct();
     }
 
-    public function __destruct ()
+    public function __destruct()
     {
         parent::__destruct();
     }

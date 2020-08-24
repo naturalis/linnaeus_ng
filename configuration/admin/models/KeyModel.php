@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpMissingParentCallMagicInspection */
 include_once (__DIR__ . "/AbstractModel.php");
 
 class KeyModel extends AbstractModel

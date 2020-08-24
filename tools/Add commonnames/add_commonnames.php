@@ -59,9 +59,7 @@
     function getTaxonId ($name)
     {
 		global $settings, $s, $d;
-		$query = 'SELECT `id`
-			' WHERE `taxon` = "' . mysqli_real_escape_string($d, $name) . 
-			'" AND `project_id` = ' . $settings['projectId'];
+		$query = 'SELECT `id` WHERE `taxon` = "' . mysqli_real_escape_string($d, $name) . '" AND `project_id` = ' . $settings['projectId'];
 		$result = mysqli_query($d, $query) or die(mysqli_error($d, $result));
 		$row = mysqli_fetch_row($d, $result);
 		return $row[0];
