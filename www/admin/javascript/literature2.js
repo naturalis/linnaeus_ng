@@ -46,8 +46,6 @@ function lit2Lookup(caller,action,letter)
 		data.search_author=text;
 	}
 
-
-
 	$.ajax({
 		url : "ajax_interface.php",
 		type: "POST",

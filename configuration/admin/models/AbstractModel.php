@@ -31,7 +31,7 @@ class AbstractModel extends BaseClass
         parent::__construct();
     }
 
-    public function __destruct ()
+    public function __destruct()
     {
         parent::__destruct();
     }

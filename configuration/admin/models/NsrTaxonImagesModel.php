@@ -1,4 +1,5 @@
 <?php
+
 include_once (__DIR__ . "/AbstractModel.php");
 
 final class NsrTaxonImagesModel extends AbstractModel

@@ -1,3 +1,4 @@
+{include file="../shared/admin-header.tpl"}
 <style>
 .image-preview {
 	max-width: 300px;
@@ -6,8 +7,6 @@
 }
 </style>
 
-
-{include file="../shared/admin-header.tpl"}
 <div id="page-main">
 <form name="theForm" id="theForm" method="post" action="edit.php" >
 {if $CRUDstates.can_update}

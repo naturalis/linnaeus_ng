@@ -171,7 +171,8 @@ class ImportHelper
 
         } else {
 
-            $ext = strtolower(array_pop(explode('.', $filename)));
+            $fileParts = explode('.', $filename);
+            $ext = strtolower(array_pop($fileParts));
 
             if (array_key_exists($ext, $this->_mime_types)) {
 

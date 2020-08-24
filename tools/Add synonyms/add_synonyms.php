@@ -27,13 +27,13 @@
         had to be upgraded to Linnaeus II 2.6 before import. The synonyms should be stored in a tab-delimited text file,
         in the format valid name - tab - synonym. Make sure the file is saved with Unix line breaks (can be done in BBEdit).</p><p>';
 
- 	$d = mysql_connect($s['host'],$s['user'],$s['password']) or die ('Cannot connect to '.$s['host']);
-	mysql_select_db($s['database'],$d) or die ('Cannot select database '.$s['database']);
-	mysql_set_charset('utf8', $d);
+ 	$d = mysqli_connect($s['host'],$s['user'],$s['password']) or die ('Cannot connect to '.$s['host']);
+	mysqli_select_db($d, $s['database']) or die ('Cannot select database '.$s['database']);
+	mysqli_set_charset($d, 'utf8');
 	
 	// Delete old records if present
 	$delete = 'DELETE FROM `' . $s['tablePrefix'] . 'synonyms` WHERE `project_id` = ' . $settings['projectId'];
-	mysql_query($delete) or die(mysql_error());
+	mysqli_query($d, $delete) or die(mysqli_error($d));
 	
 	$file = dirname(__FILE__) . '/' . $settings['text_file'];
 	if (!file_exists($file)) die('Unable to read ' .$settings['text_file']);
@@ -48,24 +48,24 @@
     
     function getTaxonId ($name)
     {
-		global $settings, $s;
+		global $settings, $s, $d;
 		$query = 'SELECT `id` FROM `' . $s['tablePrefix'] . 'taxa` ' .
-			' WHERE `taxon` = "' . mysql_real_escape_string($name) . 
+			' WHERE `taxon` = "' . mysqli_real_escape_string($d, $name) . 
 			'" AND `project_id` = ' . $settings['projectId'];
-		$result = mysql_query($query) or die(mysql_error());
-		$row = mysql_fetch_row($result);
+		$result = mysqli_query($d, $query) or die(mysqli_error($d));
+		$row = mysqli_fetch_row($d, $result);
 		return $row[0];
     }
     
     function insertSynonym ($taxonId, $synonym)
     {
-		global $settings, $s;
+		global $settings, $s, $d;
 		$query = 'INSERT INTO `' . $s['tablePrefix'] . 'synonyms` ' .
 		    '(`project_id`, `taxon_id`, `synonym`, `created`) VALUES (' .
-			mysql_real_escape_string($settings['projectId']) . ', ' .
-			mysql_real_escape_string($taxonId) . ', "' .
-			mysql_real_escape_string($synonym) . '", NOW())';
-		$result = mysql_query($query) or die(mysql_error());
+			mysqli_real_escape_string($d, settings['projectId']) . ', ' .
+			mysqli_real_escape_string($d, taxonId) . ', "' .
+			mysqli_real_escape_string($d, synonym) . '", NOW())';
+		$result = mysqli_query($d, $query) or die(mysqli_error($d));
     }
     
 

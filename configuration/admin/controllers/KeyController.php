@@ -1,4 +1,5 @@
 <?php
+
 include_once ('Controller.php');
 include_once ('MediaController.php');
 include_once ('ModuleSettingsReaderController.php');
@@ -32,11 +33,6 @@ class KeyController extends Controller
             'int-link.js',
 			'nsr_taxon_beheer.js',
         )
-        /*
-        'IE' => array(
-            'jit/Extras/excanvas.js'
-        )
-        */
     );
 
     public $cssToLoad = array(
