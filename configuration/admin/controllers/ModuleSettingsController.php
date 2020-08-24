@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpMissingParentCallMagicInspection */
 /**
  * Module Settings Controller, has access to module specific settings
  *

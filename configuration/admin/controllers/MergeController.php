@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpMissingParentCallMagicInspection */
 /**
  * Merges the data of projects after an import
  */

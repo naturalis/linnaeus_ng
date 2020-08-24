@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpMissingParentCallMagicInspection */
 include_once (__DIR__ . "/AbstractModel.php");
 
 final class GlossaryModel extends AbstractModel

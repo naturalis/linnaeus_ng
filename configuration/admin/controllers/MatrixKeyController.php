@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpMissingParentCallMagicInspection */
 
 include_once ('Controller.php');
 include_once ('MediaController.php');
@@ -1086,12 +1086,7 @@ class MatrixKeyController extends Controller
 				]);
 
 		$matrix['label']=
-			isset($mn[$this->getDefaultProjectLanguage()]['name']) ?
-				$mn[$this->getDefaultProjectLanguage()]['name'] :
-					isset($m[0]['sys_name']) ?
-						$m[0]['sys_name'] :
-						'(matrix)'
-				;
+            (isset($mn[$this->getDefaultProjectLanguage()]['name']) ? $mn[$this->getDefaultProjectLanguage()]['name'] : isset($m[0]['sys_name'])) ? $m[0]['sys_name'] : '(matrix)';
 
         return $matrix;
     }

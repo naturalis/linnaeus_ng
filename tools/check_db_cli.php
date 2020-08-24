@@ -201,8 +201,8 @@
 		{
 			echo "connecting to database\n";
 
-			$this->conn0=@mysqli_connect( $this->dbHost, $this->dbUser, $this->dbPassword) or die( sprintf( "abnormal program termination: could not connect to mysql (%s@%s)\n",$this->dbUser, $this->dbHost, $this->dbPassword) );
-			$this->conn1=@mysqli_connect( $this->dbHost, $this->dbUser, $this->dbPassword) or die( sprintf( "abnormal program termination: could not connect to mysql (%s@%s)\n",$this->dbUser, $this->dbHost, $this->dbPassword) );
+			$this->conn0=@mysqli_connect( $this->dbHost, $this->dbUser, $this->dbPassword) or die( sprintf( "abnormal program termination: could not connect to mysql (%s@%s)\n",$this->dbUser, $this->dbHost) );
+			$this->conn1=@mysqli_connect( $this->dbHost, $this->dbUser, $this->dbPassword) or die( sprintf( "abnormal program termination: could not connect to mysql (%s@%s)\n",$this->dbUser, $this->dbHost) );
 
 			mysqli_select_db( $this->conn0, $this->dbDb0 ) or die( sprintf( "abnormal program termination: could not select database '%s'\n", $this->dbDb0 ) );
 

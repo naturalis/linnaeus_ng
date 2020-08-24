@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpMissingParentCallMagicInspection */
 
 include_once ('TraitsController.php');
 

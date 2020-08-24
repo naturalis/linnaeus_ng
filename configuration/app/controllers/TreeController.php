@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpMissingParentCallMagicInspection */
 
 include_once ('SpeciesController.php');
 include_once ('ModuleSettingsReaderController.php');

@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpMissingParentCallMagicInspection */
 /*
 
 	on skins:
@@ -693,7 +693,7 @@ class Controller extends BaseClass
     /**
      * Adds a message to the class's stack of messages stored in class variable 'messages'
      *
-     * @param      type    $message    the message
+     * @param      string    $message    the message
      * @access     public
      */
     public function addMessage ($message)

@@ -1,12 +1,10 @@
 <?php
-
-
 	ini_set('max_execution_time',900);
 
-	mysql_connect('localhost','nsr','nsr') or die(mysql_error());
-	mysql_select_db('nsr_import') or die(mysql_error());
-	mysql_query('SET NAMES utf8');
-	mysql_query('SET CHARACTER SET utf8');
+	$d = @mysqli_connect('localhost','nsr','nsr') or die('cannot connect'));
+	@mysqli_select_db($d, 'nsr_import') or die(mysqli_error($d));
+	mysqli_query($d, 'SET NAMES utf8');
+	mysqli_query($d, 'SET CHARACTER SET utf8');
 /*
 
 "4c5640cf-750c-4f15-9a95-1be7edef02ee","regnum"
@@ -40,13 +38,13 @@
 	);
 
 	$qConcepts = 'select * from nsr_taxon_concepten where hasTaxonRank_resource in ("'.implode('","',$ranks).'") limit 100';
-	
-	$sql = mysql_query($qConcepts);
-	
-	while ($row = mysql_fetch_assoc($sql)) {
-		
+
+	$sql = mysqli_query($d, $qConcepts);
+
+	while ($row = mysqli_fetch_assoc($d)) {
+
 		echo $row[''];
-		
+
 	}
 
 
@@ -70,7 +68,7 @@ die('nsr exporter dies');
 	$qHabitats		= "insert into habitats (Description_about,prefLabel_nl) values ('%s','%s')";
 	$qPresence		= "insert into presence_statussen (Description_about,prefLabel_nl) values ('%s','%s')";
 	$qTaxonPresence	= "insert into nsr_taxon_statussen (concept_id,status_id,status82_id,habitat_id,is_indigeneous,habitat_verbatim,concept_verbatim,Preflabel_sci) values (%s,%s,%s,%s,%s,'%s','%s','%s')";
-	
+
 	$regExpDescription = '/\<rdf:Description rdf:about="(https?\:\/\/)([a-z0-9-]+){0,1}((\.)([a-z0-9-]+))+\/([a-z0-9-]+\/)*([a-z0-9-]{36})"\>/i';
 	$regExpTaxonPresence = '/\<rna:%s rdf:resource="(https?\:\/\/)([a-z0-9-]+){0,1}((\.)([a-z0-9-]+))+\/([a-z0-9-]+\/)*([a-z0-9-]{36})"(.*)\>/i';
 
@@ -86,10 +84,10 @@ die('nsr exporter dies');
 
 	ini_set('max_execution_time',900);
 
-	mysql_connect('localhost','nsr','nsr') or die(mysql_error());
-	mysql_select_db('nsr_import') or die(mysql_error());
-	mysql_query('SET NAMES utf8');
-	mysql_query('SET CHARACTER SET utf8');
+	$d = mysqli_connect('localhost','nsr','nsr') or die('cannot connect');
+	@mysqli_select_db($d, 'nsr_import') or die(mysqli_error($d));
+	mysqli_query($d, 'SET NAMES utf8');
+	mysqli_query($d, 'SET CHARACTER SET utf8');
 
 
 	function fixLabel($label)
@@ -100,72 +98,72 @@ die('nsr exporter dies');
 	function crunchSimpleStructure($filename,$query,$table)
 	{
 
-		global $regExpDescription;
-	
-		mysql_query("truncate ".$table);
-	
+		global $regExpDescription, $d;
+
+		mysqli_query($d, "truncate ".$table);
+
 		$file = fopen($filename, "r");
-	
+
 		$i = 0;
 		$rec = false;
 		$results = array();
-		
+
 		while (!feof($file)) {
-			
+
 			$line = trim(fgets($file));
 
 			preg_match($regExpDescription,$line,$m);
-			
+
 			if (isset($m[7]) && !empty($m[7])) {
 				$Start_line = $line;
 				$Description_about = $m[7];
 				$rec = true;
 			}
-			
+
 			if ($line=='</rdf:Description>') {
-	
+
 				if (isset($prefLabel_nl)) {
 					$q = sprintf($query, 
-						mysql_real_escape_string($Description_about),
-						mysql_real_escape_string($prefLabel_nl)
+						mysqli_real_escape_string($d, $Description_about),
+						mysqli_real_escape_string($d, $prefLabel_nl)
 					);
-	
-					if (mysql_query($q)) {
+
+					if (mysqli_query($d, $q)) {
 						$i++;
-						$results[$Description_about] = mysql_insert_id();
-	
+						$results[$Description_about] = mysqli_insert_id($d);
+
 					} else {
-						echo 'Failed insert ('.mysql_error().'<!--'.$q.'-->)<br />'.chr(10);
+						echo 'Failed insert ('.mysqli_error($d).'<!--'.$q.'-->)<br />'.chr(10);
 					}
-	
+
 				} else {
-	
+
 					echo 'No Dutch name for "'.(isset($prefLabel_en) ? $prefLabel_en : htmlentities($Description_about)).'" ('.$Description_about.') - record not saved<br />'.chr(10);
-	
+
 				}
 				$rec = false;
 				$Description_about = $prefLabel_nl = $prefLabel_en = null;
 			}
-				
+
 			if ($rec) {
 				if (stripos($line,'<skos:prefLabel xml:lang="nl">')!==false)
 					$prefLabel_nl = strip_tags($line);
 				if (stripos($line,'<skos:prefLabel xml:lang="en">')!==false)
 					$prefLabel_en = strip_tags($line);
 			}
-			
-	
+
+
 		}
 		fclose($file);
 
 		return array($i,$results);
-		
+
 	}
-	
+
 
 	echo '<h2>parsing languages</h2>'.chr(10);
 
-	mysql_query("truncate languages");
+	mysqli_query($d, "truncate languages");
 
 	$file = fopen($fLanguages, "r");
 
@@ -173,11 +171,11 @@ die('nsr exporter dies');
 	$rec = false;
 	$languages = array();
 	while (!feof($file)) {
-		
+
 		$line = trim(fgets($file));
 
 		preg_match($regExpDescription,$line,$m);
-		
+
 		if (isset($m[7]) && !empty($m[7])) {
 			$Start_line = $line;
 			$Description_about = $m[7];
@@ -188,20 +186,20 @@ die('nsr exporter dies');
 
 			if (isset($prefLabel_nl)) {
 				$q = sprintf($qLanguages, 
-					mysql_real_escape_string($Description_about),
-					mysql_real_escape_string($prefLabel_nl),
+					mysqli_real_escape_string($d, $Description_about),
+					mysqli_real_escape_string($d, $prefLabel_nl),
 					(isset($ISO_639_6[$prefLabel_nl]) ? $ISO_639_6[$prefLabel_nl] : null)
 				);
 
-				if (mysql_query($q)) {
+				if (mysqli_query($d, $q)) {
 					$i++;
-					$languages[$Description_about] = mysql_insert_id();
+					$languages[$Description_about] = mysqli_insert_id($d);
 
 					if (!isset($ISO_639_6[$prefLabel_nl]))
 						echo 'No ISO639-6 code avaialble for "'.$prefLabel_nl.'" (saved record anyway)';
 
 				} else {
-					echo 'Failed insert ('.mysql_error().'<!--'.$q.'-->)<br />'.chr(10);
+					echo 'Failed insert ('.mysqli_error($d).'<!--'.$q.'-->)<br />'.chr(10);
 				}
 
 			} else {
@@ -212,58 +210,58 @@ die('nsr exporter dies');
 			$rec = false;
 			$Description_about = $prefLabel_nl = $prefLabel_en = null;
 		}
-				
+
 		if ($rec) {
 			if (stripos($line,'<skos:prefLabel xml:lang="nl">')!==false)
 				$prefLabel_nl = strip_tags($line);
 			if (stripos($line,'<skos:prefLabel xml:lang="en">')!==false)
 				$prefLabel_en = strip_tags($line);
 		}
-		
+
 
 	}
 	fclose($file);
 
 	echo '<p>wrote '.$i.' languages</p>'.chr(10);
 
-		
+
 	echo '<h2>parsing ranks</h2>'.chr(10);
 
-	mysql_query("truncate taxon_ranks");
+	mysqli_query($d, "truncate taxon_ranks");
 
 	$file = fopen($fRanks, "r");
 	$r = array();
 	$i = 0;
 	$rec = false;
 	while (!feof($file)) {
-		
+
 		$line = trim(fgets($file));
 
 		preg_match($regExpDescription,$line,$m);
-		
+
 		if (isset($m[7]) && !empty($m[7])) {
 			$Start_line = $line;
 			$Description_about = $m[7];
 			$rec = true;
 		}
-		
+
 		if ($line=='</rdf:Description>') {
 			if (isset($Preflabel_sci)) {
 				$q = sprintf($qRanks, 
-					mysql_real_escape_string($Description_about),
-					isset($Parent_about) ? mysql_real_escape_string($Parent_about) :'',
-					mysql_real_escape_string(fixLabel($Preflabel_sci)),
-					mysql_real_escape_string(fixLabel($Preflabel_en)),
-					mysql_real_escape_string(fixLabel($Preflabel_nl)),
-					mysql_real_escape_string($mutationDate)
+					mysqli_real_escape_string($d, $Description_about),
+					isset($Parent_about) ? mysqli_real_escape_string($d, $Parent_about) :'',
+					mysqli_real_escape_string($d, fixLabel($Preflabel_sci)),
+					mysqli_real_escape_string($d, fixLabel($Preflabel_en)),
+					mysqli_real_escape_string($d, fixLabel($Preflabel_nl)),
+					mysqli_real_escape_string($d, $mutationDate)
 				);
-				
 
-				if (mysql_query($q)) {
+
+				if (mysqli_query($d, $q)) {
 					$i++;
 					$r[$Description_about]=$Preflabel_sci;
 				} else {
-					echo 'Failed insert ('.mysql_error().'<!--'.$q.'-->)<br />'.chr(10);
+					echo 'Failed insert ('.mysqli_error($d).'<!--'.$q.'-->)<br />'.chr(10);
 				}
 			} else {
 				echo 'No scientific name for "'.$Preflabel_en.'" ('.$Description_about.') - record not saved<br />'.chr(10);
@@ -271,7 +269,7 @@ die('nsr exporter dies');
 			$rec = false;
 			$Description_about = $Preflabel_sci = $hasTaxonRank_resource = $hasNsrId = $mutationDate = $Preflabel_nl = null;
 		}
-				
+
 		if ($rec) {
 			if (stripos($line,'<skos:prefLabel xml:lang="sci">')!==false)
 				$Preflabel_sci = strip_tags($line);
@@ -284,7 +282,7 @@ die('nsr exporter dies');
 			if (stripos($line,'<rnax:mutationDate>')!==false)
 				$mutationDate = strip_tags($line);
 		}
-		
+
 
 	}
 	fclose($file);
@@ -294,7 +292,7 @@ die('nsr exporter dies');
 
 	echo '<h2>parsing taxon concepts</h2>'.chr(10);
 
-	mysql_query("truncate nsr_taxon_concepten");
+	mysqli_query($d, "truncate nsr_taxon_concepten");
 
 	$file = fopen($fConcepts, "r");
 	$i = 0;
@@ -305,7 +303,7 @@ die('nsr exporter dies');
 
 		$line = trim(fgets($file));
 		preg_match($regExpDescription,$line,$m);
-		
+
 		if (isset($m[7]) && !empty($m[7])) {
 			$Start_line = $line;
 			$Description_about = $m[7];
@@ -316,27 +314,27 @@ die('nsr exporter dies');
 			if (isset($Preflabel_sci)) {
 
 				$q = sprintf($qConcepts, 
-					mysql_real_escape_string($Description_about),
-					mysql_real_escape_string(fixLabel($Preflabel_sci)),
-					mysql_real_escape_string($hasTaxonRank_resource),
-					mysql_real_escape_string($broader),
-					mysql_real_escape_string($hasNsrId),
-					mysql_real_escape_string($mutationDate)
+					mysqli_real_escape_string($d, $Description_about),
+					mysqli_real_escape_string($d, fixLabel($Preflabel_sci)),
+					mysqli_real_escape_string($d, $hasTaxonRank_resource),
+					mysqli_real_escape_string($d, $broader),
+					mysqli_real_escape_string($d, $hasNsrId),
+					mysqli_real_escape_string($d, $mutationDate)
 				);
 
-				if (mysql_query($q)) {
-				
+				if (mysqli_query($d, $q)) {
+
 					if (!isset($c[$hasTaxonRank_resource]))
 						$c[$hasTaxonRank_resource]=1;
 					else
 						$c[$hasTaxonRank_resource]++;
-					
-					$concepts[$Description_about] = mysql_insert_id();
+
+					$concepts[$Description_about] = mysqli_insert_id($d);
 
 					$i++;
-					
+
 				} else {
-					
+
 					echo 'Failed inserting ('.htmlentities($Start_line).')<br />'.chr(10);
 
 				}
@@ -347,7 +345,7 @@ die('nsr exporter dies');
 			$rec = false;
 			$Description_about = $Preflabel_sci = $hasTaxonRank_resource = $hasNsrId = $mutationDate = $Preflabel_nl = $hasSource = $broader = null;
 		}
-				
+
 		if ($rec) {
 			// base data
 			if (stripos($line,'<skos:prefLabel xml:lang="sci">')!==false)
@@ -367,19 +365,19 @@ die('nsr exporter dies');
 			if (preg_match('/\<skos:broader rdf:resource="(https?\:\/\/)([a-z0-9-]+){0,1}((\.)([a-z0-9-]+))+\/([a-z0-9-]+\/)*([a-z0-9-]{36})"(.*)\>/i',$line,$m)) {
 				$broader = $m[7];
 			}
-			
+
 		}
 
 
 	}
 	fclose($file);
-	
+
 	echo '<p>wrote '.$i.' concepts</p>'.chr(10);
 
 
 	echo '<h2>parsing taxon names & synonyms</h2>'.chr(10);
 
-	mysql_query("truncate nsr_taxon_namen");
+	mysqli_query($d, "truncate nsr_taxon_namen");
 
 	$file = fopen($fNames, "r");
 	$i = $skippedProbablyUseless = 0;
@@ -388,7 +386,7 @@ die('nsr exporter dies');
 
 		$line = trim(fgets($file));
 		preg_match($regExpDescription,$line,$m);
-		
+
 		if (isset($m[7]) && !empty($m[7])) {
 			$Start_line = $line;
 			$Description_about = $m[7];
@@ -401,37 +399,37 @@ die('nsr exporter dies');
 				$q = sprintf($qNames, 
 					isset($concept_id) ? $concept_id : 'null',
 					isset($language_id) ? $language_id : 'null',
-					mysql_real_escape_string(fixLabel($Label)),
-					mysql_real_escape_string($Label_type),
-					isset($hasLanguage_resource) ? mysql_real_escape_string($hasLanguage_resource) : 'null',
-					isset($isNameOf_resource) ? $isNameOf_resource : mysql_real_escape_string($isNameOf_resource),
-					isset($typeOfName) ? $typeOfName : mysql_real_escape_string($typeOfName)
+					mysqli_real_escape_string($d, fixLabel($Label)),
+					mysqli_real_escape_string($d, $Label_type),
+					isset($hasLanguage_resource) ? mysqli_real_escape_string($d, $hasLanguage_resource) : 'null',
+					isset($isNameOf_resource) ? $isNameOf_resource : mysqli_real_escape_string($d, $isNameOf_resource),
+					isset($typeOfName) ? $typeOfName : mysqli_real_escape_string($d, $typeOfName)
 				);
 
-				if (mysql_query($q)) {
+				if (mysqli_query($d, $q)) {
 
 					$i++;
-					
+
 				} else {
-					
-					echo 'Failed inserting '.$Label.' ('.mysql_error().'<!--'.$q.'-->)<br />'.chr(10);
-					
+
+					echo 'Failed inserting '.$Label.' ('.mysqli_error($d).'<!--'.$q.'-->)<br />'.chr(10);
+
 					var_dump($q);
 
 				}
 
 			} else {
-				
+
 				if (!isset($Label))
 					echo 'No name for "'.$Description_about.'" - record not saved<br />'.chr(10);
 				else
 					$skippedProbablyUseless++;
-					
+
 			}
 			$rec = false;
 			$concept_id = $language_id = $Label = $Label_type = $hasLanguage_resource = $typeOfName = $isNameOf_resource = null;
 		}
-				
+
 		if ($rec) {
 
 			if (preg_match('/\<rna:is(AlternativeName|Anamorf|Basionym|Homonym|InvalidName|MisspelledName|NomenDubium|PreferredName|Synonym|SynonymSL|ValidName)Of rdf:resource="(https?\:\/\/)([a-z0-9-]+){0,1}((\.)([a-z0-9-]+))+\/([a-z0-9-]+\/)*([a-z0-9-]{36})"(\s|\/)*\>/i',$line,$m)===1) {
@@ -455,29 +453,29 @@ die('nsr exporter dies');
 	fclose($file);
 
 	echo '<p>wrote '.$i.' names (skipped '.$skippedProbablyUseless.' without a name; probably entries for alphabet letters)</p>'.chr(10);	
-	
+
 
 	echo '<h2>parsing habitats</h2>'.chr(10);
-	
-	$d = crunchSimpleStructure($fHabitats,$qHabitats,'habitats');
 
-	$habitats = $d[1];
+	$structure = crunchSimpleStructure($fHabitats,$qHabitats,'habitats');
 
-	echo '<p>wrote '.$d[0].' habitats</p>'.chr(10);
+	$habitats = $structure[1];
+
+	echo '<p>wrote '.$structure[0].' habitats</p>'.chr(10);
 
 
 	echo '<h2>parsing presences</h2>'.chr(10);
-	
-	$d = crunchSimpleStructure($fPresence,$qPresence,'presence_statussen');
 
-	$precenses = $d[1];
+	$structure = crunchSimpleStructure($fPresence,$qPresence,'presence_statussen');
 
-	echo '<p>wrote '.$d[0].' presences</p>'.chr(10);
+	$precenses = $structure[1];
+
+	echo '<p>wrote '.$structure[0].' presences</p>'.chr(10);
 
 
 	echo '<h2>parsing taxon statuses</h2>'.chr(10);
 
-	mysql_query("truncate nsr_taxon_statussen");
+	mysqli_query($d, "truncate nsr_taxon_statussen");
 
 	$file = fopen($fTaxonPresence, "r");
 	$i = $f = $noStatus = $noHabitat = $verbHabitat = $verbConcept = $justLabel = $skippedProbablyUseless = 0;
@@ -487,7 +485,7 @@ die('nsr exporter dies');
 
 		$line = trim(fgets($file));
 		preg_match($regExpDescription,$line,$m);
-		
+
 		if (isset($m[7]) && !empty($m[7])) {
 			$Start_line = $line;
 			$Description_about = $m[7];
@@ -504,13 +502,13 @@ die('nsr exporter dies');
 					isset($status82_id) ? $status82_id : 'null',
 					isset($habitat_id) ? $habitat_id : 'null',
 					isset($is_indigeneous) ? $is_indigeneous : 'null',
-					isset($habitat_verbatim) ? mysql_real_escape_string($habitat_verbatim) : 'null',
-					isset($concept_verbatim) ? mysql_real_escape_string($concept_verbatim) : 'null',
-					isset($prefLabel) ? mysql_real_escape_string($prefLabel) : 'null'
+					isset($habitat_verbatim) ? mysqli_real_escape_string($d, $habitat_verbatim) : 'null',
+					isset($concept_verbatim) ? mysqli_real_escape_string($d, $concept_verbatim) : 'null',
+					isset($prefLabel) ? mysqli_real_escape_string($d, $prefLabel) : 'null'
 				);
 
-				if (mysql_query($q)) {
-					
+				if (mysqli_query($d, $q)) {
+
 					if (!isset($status_id))
 						$noStatus++;
 					if (!isset($habitat_id))
@@ -521,13 +519,13 @@ die('nsr exporter dies');
 						$verbConcept++;
 					if (!isset($concept_id) && !isset($concept_verbatim) && isset($prefLabel))
 						$justLabel++;
-					
-				
+
+
 					$i++;
-					
+
 				} else {
-					
-					echo 'Failed inserting '.$Description_about.' ('.mysql_error().'<!--'.$q.'-->)<br />'.chr(10);
+
+					echo 'Failed inserting '.$Description_about.' ('.mysqli_error($d).'<!--'.$q.'-->)<br />'.chr(10);
 
 				}
 
@@ -539,7 +537,7 @@ die('nsr exporter dies');
 			$concept_id = $status_id = $status82_id = $habitat_id = $is_indigeneous = $prefLabel = $habitat_verbatim = $concept_verbatim = $prefLabel = $Label_en = $Label_nl = null;
 		}
 
-		
+
 		if ($rec) {
 
 			if (stripos($line,'<skos:prefLabel xml:lang="en">')!==false) {
@@ -572,18 +570,18 @@ die('nsr exporter dies');
 			if (stripos($line,'<rna:isIndigeneous>')!==false) {
 				$is_indigeneous = strtolower(trim(strip_tags($line)))=='ja' ? '1' : '0';
 			}
-			
+
 		}
 
 
 	}
 	fclose($file);
-	
+
 	echo '<p>wrote '.$i.' taxon statuses<br />'.
 	'skipped '.$skippedProbablyUseless.' without a name; probably entries for alphabet letters<br />'.
 	$verbConcept.' with a verbatim concept (unresolved), '.$justLabel.' with just a status label (<i>definitely</i> unresolved);<br/>'.
 	$noStatus.' without status, '.$noHabitat.' without habitat, '.$verbHabitat.' with a unresolved verbatim habitat</p>'.chr(10);
-		
+
 
 	echo '<p><i>breakdown concepts per rank:</i><br />'.chr(10);
 
@@ -592,8 +590,8 @@ die('nsr exporter dies');
 		echo $r[$key].': '.$val.'<br />'.chr(10);
 
 	echo '</p>'.chr(10);
-	
-	
+
+
 	echo 'to do:
 		<ol>
 			<li>add hasNsrId for all tables</li>
@@ -746,7 +744,7 @@ CREATE TABLE IF NOT EXISTS taxon_ranks (			// corresponds to "Taxon ranks.rdf.xm
     isSynonymOf
     isSynonymSLOf
     isValidNameOf
- 
+
 
 */
 /*
