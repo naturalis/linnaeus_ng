@@ -1,3 +1,10 @@
+**THIS REPO HAS MOVED AND IS NO LONGER MAINTAINED**
+
+We are in the process of moving to gitlab for our day-to-day development.
+This repository has now been moved and is currently not publicly accessable.
+Please contact us at [support@naturalis.nl](support@naturalis.nl) if you 
+need any assistance or information.
+
 Linnaeus Next Generation
 ========================
 
